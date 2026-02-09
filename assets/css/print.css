@@ -1,0 +1,54 @@
+/* ═══════════════════════════════════════════════
+   PRINT — Print media styles
+   ═══════════════════════════════════════════════ */
+
+@media print {
+  /* Hide all chrome */
+  .side, .topbar, .prop-stats, .prop-actions,
+  .toasts, .ctx, .modal-wrap, .overlay, .preview,
+  .loading-overlay, .hamburger-btn, .onboard,
+  .save-indicator, .side-overlay,
+  dialog.command-dialog {
+    display: none !important;
+  }
+
+  /* Reset layout */
+  body {
+    background: white !important;
+    color: #09090b !important;
+    font-size: 12px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .app {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .main {
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .body-scroll {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  /* Cards lose borders/shadows */
+  .card, .stat-card, .client-card, .sec-b {
+    border: none !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  /* Buttons hidden */
+  .btn, .btn-sm, .btn-outline, .btn-sm-outline,
+  .btn-ghost, .btn-sm-ghost, .btn-sm-icon-ghost,
+  .btn-icon-ghost, .btn-icon-outline,
+  .btn-sm-destructive {
+    display: none !important;
+  }
+}

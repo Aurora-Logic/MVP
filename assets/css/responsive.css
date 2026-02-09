@@ -1,0 +1,318 @@
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — Mobile & Tablet Breakpoints
+   ═══════════════════════════════════════════════ */
+
+/* ─── Below 1100px (small desktop / large tablet) ─── */
+@media (max-width: 1100px) {
+  .prop-cols {
+    display: none;
+  }
+
+  .dash-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pkg-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fr-features {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .preview {
+    width: 100%;
+  }
+
+  /* Editor tabs scroll on smaller desktops */
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ─── Below 768px (tablet / mobile) ─── */
+@media (max-width: 768px) {
+
+  /* Sidebar becomes offcanvas */
+  .side {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 99;
+    transform: translateX(-100%);
+    transition: transform var(--t2);
+    width: 18rem;
+  }
+
+  .side.mobile-open {
+    transform: translateX(0);
+  }
+
+  .side-overlay {
+    display: block;
+    pointer-events: none;
+  }
+
+  .side-overlay.show {
+    pointer-events: auto;
+  }
+
+  .side-collapse-btn {
+    display: none !important;
+  }
+
+  /* Show hamburger */
+  .hamburger-btn {
+    display: flex;
+  }
+
+  /* Layout */
+  .body-scroll {
+    padding: 14px;
+  }
+
+  .topbar {
+    padding: 10px 14px;
+  }
+
+  .topbar-title {
+    max-width: 140px;
+  }
+
+  .topbar-search {
+    display: none;
+  }
+
+  /* Dashboard */
+  .dash-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dash-toolbar-right {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  /* Filter tabs horizontal scroll */
+  .filter-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    max-width: 100%;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Analytics widget responsive */
+  .an-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .an-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Prop rows */
+  .prop-actions {
+    opacity: 1;
+  }
+
+  .prop-row {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  /* Forms stack */
+  .fr {
+    grid-template-columns: 1fr;
+  }
+
+  /* Clients */
+  .client-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Client insights responsive */
+  .ci-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Template grid */
+  .tpl-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* First run */
+  .fr-features {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Topbar right — base already has overflow-x handling */
+
+  /* Tabs overflow — scrollbar already hidden from 1100px rule */
+  .tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  /* Stats bar — tighter padding on smaller screens */
+  .prop-stats {
+    padding: 8px 12px;
+  }
+
+  /* Sections */
+  .sec-acts {
+    opacity: 1;
+  }
+
+  /* Pricing table */
+  .li-tbl {
+    font-size: 12px;
+  }
+
+  .li-tbl th {
+    padding: 8px 6px;
+  }
+
+  .li-tbl td {
+    padding: 6px;
+  }
+
+  .lq,
+  .lr {
+    width: 100%;
+    min-width: 60px;
+  }
+
+  /* Add-ons */
+  .ao-row {
+    flex-wrap: wrap;
+  }
+
+  .ao-price {
+    width: 80px !important;
+  }
+
+  /* Payment schedule */
+  .ps-row-top {
+    flex-wrap: wrap;
+  }
+
+  .ps-row-values {
+    margin-left: 0;
+    margin-top: 6px;
+  }
+
+  /* Notes */
+  .note-del {
+    opacity: 1;
+  }
+}
+
+/* ─── Below 480px (small mobile) ─── */
+@media (max-width: 480px) {
+
+  /* Toasts full width */
+  .toasts {
+    right: 10px;
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .toast {
+    width: 100%;
+  }
+
+  /* Dashboard stat cards */
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Analytics widget small mobile */
+  .an-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .an-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .an-filters {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .an-chart {
+    height: 80px;
+  }
+
+  /* Client insights small mobile */
+  .ci-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Onboarding */
+  .ob-card {
+    padding: 24px 20px;
+  }
+
+  .ob-title {
+    font-size: 18px;
+  }
+
+  .ob-desc {
+    font-size: 12px;
+  }
+
+  /* Modal full width */
+  .modal {
+    max-width: 100%;
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  /* Sidebar */
+  .side {
+    width: 85vw;
+  }
+
+  /* Topbar */
+  .topbar-title {
+    max-width: 100px;
+    font-size: 14px;
+  }
+
+  /* Preview */
+  .prev-doc {
+    padding: 20px;
+  }
+
+  .prev-top {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Command palette */
+  .command {
+    width: 95vw;
+  }
+}

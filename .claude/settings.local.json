@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:basecoatui.com)",
+      "Bash(for func in renderNDAs openNDAModal closeNDAModal saveNDA editNDA deleteNDA showNDACtx hideNDACtx ndaCtxAction previewNDADirect dupNDA previewNDA saveClients renderClients openAddClient saveClient editClient delClient showClientPicker pickClient bumpVersion toggleCover buildCoverHtml)",
+      "Bash(do echo \"=== $func ===\")",
+      "Bash(grep:*)",
+      "Bash(done)",
+      "Bash(for varname in COLORS COLOR_NAMES datePickers currentSort sectionEditors paymentTermsEditor EditorHeader EditorList EditorQuote EditorMarker EditorDelimiter TC_DEFAULTS DEFAULT_TEMPLATES TPLS NDA_TEMPLATES ndaCtxTarget docTemplate lastSaveTime saveIndicatorTimer CLIENTS ndaPurposeEditor)",
+      "Bash(do echo \"=== $varname ===\")",
+      "Bash(for var in undoStack redoStack MAX_UNDO VARIABLE_LIST)",
+      "Bash(do echo \"=== $var ===\")",
+      "Bash(node -c:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:basecoat.dev)",
+      "Bash(curl:*)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "WebFetch(domain:colors.id)",
+      "Bash(comm -23:*)",
+      "Bash(for class in \"btn-sm-ghost\" \"pkg-toggle-card\" \"dp-month-select\" \"dp-year-select\" \"dp-today-btn\" \"form-label\" \"share-stats\" \"scrollbar\")",
+      "Bash(do echo \"=== Searching for: $class ===\" grep -n \"$class\" /Users/virag/Downloads/MVP/assets/js/*.js)",
+      "Bash(cat:*)",
+      "Bash(open:*)"
+    ]
+  }
+}

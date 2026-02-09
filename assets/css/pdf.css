@@ -1,0 +1,105 @@
+/* ═══════════════════════════════════════════════
+   PDF — Preview document styles
+   Styles for rendered proposal inside .prev-doc
+   ═══════════════════════════════════════════════ */
+
+.prev-doc {
+  font-family: var(--font);
+}
+
+.prev-doc h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #09090b;
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+.prev-doc h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #09090b;
+  margin: 20px 0 8px;
+}
+.prev-doc h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #3f3f46;
+  margin: 16px 0 6px;
+}
+.prev-doc h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3f3f46;
+  margin: 12px 0 4px;
+}
+.prev-doc p {
+  margin-bottom: 8px;
+}
+
+.prev-doc table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+}
+.prev-doc th, .prev-doc td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e4e4e7;
+  font-size: 13px;
+}
+.prev-doc th {
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #71717a;
+  background: #f9f9fa;
+}
+
+.prev-doc ul, .prev-doc ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+.prev-doc li {
+  margin-bottom: 4px;
+}
+
+.prev-doc img {
+  max-width: 100%;
+  height: auto;
+}
+
+.prev-doc blockquote {
+  border-left: 3px solid #e4e4e7;
+  padding-left: 12px;
+  color: #71717a;
+  margin: 12px 0;
+}
+
+.prev-doc hr {
+  border: none;
+  height: 1px;
+  background: #e4e4e7;
+  margin: 16px 0;
+}
+
+/* PDF logo */
+.pd-logo {
+  max-height: 36px;
+  margin-bottom: 16px;
+}
+
+/* Draft watermark */
+.draft-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 80px;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.04);
+  text-transform: uppercase;
+  letter-spacing: 10px;
+  pointer-events: none;
+  white-space: nowrap;
+}

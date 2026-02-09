@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=none">
+    <title>ProposalKit — Professional Proposals in Minutes</title>
+    <!-- Inter Font (replacing DM Sans) + JetBrains Mono -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Tailwind CSS v4 Browser CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Inline theme detection (prevent FOUC) -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('pk_theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+        })();
+    </script>
+    <!-- App CSS (modular) -->
+    <link rel="stylesheet" href="assets/css/variables.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/pages.css">
+    <link rel="stylesheet" href="assets/css/features.css">
+    <link rel="stylesheet" href="assets/css/pdf.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/print.css">
+
+</head>
+
+<body>
+
+    <!-- ═══ ONBOARDING ═══ -->
+    <div class="onboard" id="onboard">
+        <div class="ob-card">
+            <div class="ob-icon">P</div>
+            <div id="obStep1">
+                <div class="ob-title">Welcome to ProposalKit</div>
+                <div class="ob-desc">Create professional proposals that win clients. Set up your organization details
+                    once,
+                    and we'll auto-fill every proposal you create.</div>
+                <div class="ob-form">
+                    <div class="ob-step">Step 1 of 2 — Your Organization</div>
+                    <div class="fg"><label class="fl">Company Name</label><input type="text" id="obCompany"
+                            placeholder="e.g. Delta System"></div>
+                    <div class="fr">
+                        <div class="fg"><label class="fl">Your Name</label><input type="text" id="obName"
+                                placeholder="Your name"></div>
+                        <div class="fg"><label class="fl">Email</label><input type="email" id="obEmail"
+                                placeholder="hello@company.com"></div>
+                    </div>
+                    <div class="fr">
+                        <div class="fg"><label class="fl">Phone</label><input type="tel" id="obPhone"
+                                placeholder="+91 98765 43210"></div>
+                        <div class="fg"><label class="fl">Country</label>
+                            <select id="obCountry">
+                                <option value="">Select country</option>
+                                <option value="IN">India</option>
+                                <option value="US">United States</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="CA">Canada</option>
+                                <option value="AU">Australia</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="SG">Singapore</option>
+                                <option value="AE">UAE</option>
+                                <option value="JP">Japan</option>
+                                <option value="NL">Netherlands</option>
+                                <option value="SE">Sweden</option>
+                                <option value="CH">Switzerland</option>
+                                <option value="NZ">New Zealand</option>
+                                <option value="IE">Ireland</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="fg"><label class="fl">Address</label><input type="text" id="obAddr"
+                            placeholder="Street, City, State, PIN"></div>
+                    <div class="fr">
+                        <div class="fg"><label class="fl">GST / Tax ID</label><input type="text" id="obTaxId"
+                                placeholder="e.g. 27AAAAA0000A1Z5">
+                            <div class="fh">GSTIN, VAT, EIN, ABN, etc.</div>
+                        </div>
+                        <div class="fg"><label class="fl">Website</label><input type="url" id="obWebsite"
+                                placeholder="https://yourcompany.com"></div>
+                    </div>
+                    <button class="btn w-full" onclick="obNext()" style="margin-top:4px">Continue <i
+                            data-lucide="arrow-right"></i></button>
+                </div>
+            </div>
+            <div id="obStep2" style="display:none">
+                <div class="ob-title">Brand Your Proposals</div>
+                <div class="ob-desc">Upload your logo and pick a brand color. These will appear on every proposal you
+                    create.</div>
+                <div class="ob-form">
+                    <div class="ob-step">Step 2 of 2 — Branding (optional)</div>
+                    <div class="fg">
+                        <label class="fl">Logo</label>
+                        <div class="brand-logo-box" onclick="document.getElementById('logoInput').click()"
+                            id="obLogoBox">
+                            <i data-lucide="image-plus"></i>
+                        </div>
+                        <input type="file" id="logoInput" accept="image/*" style="display:none"
+                            onchange="handleLogo(this)">
+                        <div class="fh">Click to upload (PNG, JPG, SVG)</div>
+                    </div>
+                    <div class="fg">
+                        <label class="fl">Brand Color</label>
+                        <div class="color-row" id="obColors"></div>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:8px">
+                        <button class="btn-ghost" onclick="skipOb()">Skip</button>
+                        <button class="btn" style="flex:1" onclick="finishOb()">Start Creating <i
+                                data-lucide="arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ APP ═══ -->
+    <div class="app" id="appShell" style="display:none">
+        <!-- Mobile sidebar overlay -->
+        <div class="side-overlay" id="sideOverlay" onclick="closeMobileSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside class="side" id="sidebar">
+            <button class="side-collapse-btn" onclick="toggleSidebar()" title="Collapse sidebar">
+                <i data-lucide="chevron-left"></i>
+            </button>
+            <div class="side-top">
+                <div class="side-logo" id="sideLogo">P</div>
+                <div class="side-top-info">
+                    <span class="side-brand">ProposalKit</span>
+                    <!-- <span class="side-tag">Beta</span> -->
+                </div>
+                <button class="side-new-btn" onclick="openNewModal()" data-tooltip="New Proposal" data-side="bottom">
+                    <i data-lucide="plus"></i>
+                </button>
+            </div>
+            <div class="side-body">
+                <button class="side-btn on" data-nav="dashboard" onclick="goNav('dashboard')"><i
+                        data-lucide="layout-dashboard"></i><span>Dashboard</span></button>
+                <button class="side-btn" data-nav="editor" onclick="goNav('editor')"><i
+                        data-lucide="file-text"></i><span>Proposals</span><span class="cnt"
+                        id="propCnt">0</span></button>
+                <button class="side-btn" data-nav="clients" onclick="goNav('clients')"><i
+                        data-lucide="users"></i><span>Clients</span><span class="cnt" id="clientCnt">0</span></button>
+
+                <div class="side-divider"></div>
+
+                <div class="side-label">Recent</div>
+                <div id="recentList"></div>
+            </div>
+            <div class="side-foot">
+                <button class="side-foot-btn" data-nav="settings" onclick="goNav('settings')"><i
+                        data-lucide="settings"></i><span>Settings</span></button>
+                <button class="side-foot-btn" onclick="toggleTheme()" id="sideThemeBtn"><i data-lucide="sun"
+                        class="theme-icon-light"></i><i data-lucide="moon"
+                        class="theme-icon-dark"></i><span>Theme</span></button>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main">
+            <div class="topbar">
+                <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileSidebar()"
+                    aria-label="Toggle menu">
+                    <i data-lucide="menu"></i>
+                </button>
+                <span class="topbar-title" id="topTitle">Dashboard</span>
+                <span class="save-indicator" id="saveIndicator" style="display:none">
+                    <i data-lucide="loader-2" class="save-icon saving"></i>
+                    <i data-lucide="check" class="save-icon saved"></i>
+                    <span class="save-text">Saved</span>
+                </span>
+                <div class="topbar-search" id="topSearch">
+                    <i data-lucide="search"></i>
+                    <input type="text" placeholder="Search proposals..." id="searchInput" oninput="filterList()"
+                        aria-label="Search proposals">
+                    <kbd class="kbd" style="cursor:pointer" onclick="openCommandPalette()"
+                        title="Open command palette">⌘K</kbd>
+                </div>
+                <div class="topbar-right" id="topRight"></div>
+            </div>
+            <div class="body-scroll" id="bodyScroll"></div>
+        </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="overlay" id="ov" onclick="closePreview()"></div>
+    <div class="preview" id="prevPanel">
+        <div class="prev-top">
+            <i data-lucide="eye" style="width:16px;height:16px;color:var(--text3)"></i>
+            <span class="prev-top-t">Preview</span>
+            <div class="tpl-picker" id="tplPicker">
+                <button class="tpl-pick on" onclick="setDocTpl('modern',this)">Modern</button>
+                <button class="tpl-pick" onclick="setDocTpl('classic',this)">Classic</button>
+                <button class="tpl-pick" onclick="setDocTpl('minimal',this)">Minimal</button>
+                <button class="tpl-pick" onclick="setDocTpl('tabular',this)">Tabular</button>
+            </div>
+            <div style="display:flex;gap:6px">
+                <button class="btn-sm-outline" onclick="doExport('invoice')"><i data-lucide="receipt"></i> As
+                    Invoice</button>
+                <button class="btn-sm" onclick="doExport('proposal')"><i data-lucide="download"></i> Export
+                    PDF</button>
+                <button class="btn-icon-outline" onclick="closePreview()" data-tooltip="Close" data-side="bottom"
+                    data-align="center"><i data-lucide="x"></i></button>
+            </div>
+        </div>
+        <div class="prev-body">
+            <div class="prev-doc" id="prevDoc"></div>
+        </div>
+    </div>
+
+    <!-- New Proposal Modal -->
+    <div class="modal-wrap" id="newModal" onclick="closeNewModal(event)">
+        <div class="modal modal-md" onclick="event.stopPropagation()">
+            <div class="modal-t">Create New Proposal</div>
+            <div class="modal-d">Choose a starting point</div>
+            <div class="tpl-grid">
+                <div class="tpl-c" onclick="fromTpl('blank')">
+                    <div class="tpl-ic"><i data-lucide="file"></i></div>
+                    <div>
+                        <div class="tpl-t">Blank</div>
+                        <div class="tpl-d">Start from scratch</div>
+                    </div>
+                </div>
+                <div class="tpl-c" onclick="fromTpl('web')">
+                    <div class="tpl-ic"><i data-lucide="globe"></i></div>
+                    <div>
+                        <div class="tpl-t">Web Development</div>
+                        <div class="tpl-d">Website & app projects</div>
+                    </div>
+                </div>
+                <div class="tpl-c" onclick="fromTpl('design')">
+                    <div class="tpl-ic"><i data-lucide="palette"></i></div>
+                    <div>
+                        <div class="tpl-t">Design Services</div>
+                        <div class="tpl-d">Branding & UI/UX</div>
+                    </div>
+                </div>
+                <div class="tpl-c" onclick="fromTpl('consulting')">
+                    <div class="tpl-ic"><i data-lucide="briefcase"></i></div>
+                    <div>
+                        <div class="tpl-t">Consulting</div>
+                        <div class="tpl-d">Advisory & strategy</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot"><button class="btn-sm-outline" onclick="closeNewModal()">Cancel</button></div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="ctx" id="ctxMenu">
+        <div class="ctx-item" onclick="ctxAction('open')"><i data-lucide="external-link"></i> Open</div>
+        <div class="ctx-item" onclick="ctxAction('dup')"><i data-lucide="copy"></i> Duplicate</div>
+        <div class="ctx-item" onclick="ctxAction('dupClient')"><i data-lucide="users"></i> Duplicate for Client</div>
+        <div class="ctx-item" onclick="ctxAction('export')"><i data-lucide="download"></i> Export PDF</div>
+        <div class="ctx-item" onclick="ctxAction('invoice')"><i data-lucide="receipt"></i> Export as Invoice</div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-item" id="ctxArchive" onclick="ctxAction('archive')"><i data-lucide="archive"></i> Archive</div>
+        <div class="ctx-item" id="ctxUnarchive" onclick="ctxAction('unarchive')" style="display:none"><i
+                data-lucide="archive-restore"></i> Unarchive</div>
+        <div class="ctx-item danger" onclick="ctxAction('del')"><i data-lucide="trash-2"></i> Delete</div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toasts" id="toastBox"></div>
+
+    <!-- Global Loading Indicator -->
+    <div class="loading-overlay" id="loadingOverlay" style="display:none">
+        <div class="loading-spinner">
+            <i data-lucide="loader-2"></i>
+            <span id="loadingText">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Modular JavaScript (load order matters) -->
+    <script src="assets/js/store.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/theme.js"></script>
+    <script src="assets/js/variables.js"></script>
+    <script src="assets/js/modals.js"></script>
+    <script src="assets/js/autosave.js"></script>
+    <script src="assets/js/command.js"></script>
+    <script src="assets/js/shortcuts.js"></script>
+    <script src="assets/js/completeness.js"></script>
+    <script src="assets/js/onboarding.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/analytics.js"></script>
+    <script src="assets/js/editor.js"></script>
+    <script src="assets/js/details.js"></script>
+    <script src="assets/js/sections.js"></script>
+    <script src="assets/js/structured-sections.js"></script>
+    <script src="assets/js/pricing.js"></script>
+    <script src="assets/js/csv-import.js"></script>
+    <script src="assets/js/packages.js"></script>
+    <script src="assets/js/addons.js"></script>
+    <script src="assets/js/payment-schedule.js"></script>
+    <script src="assets/js/notes.js"></script>
+    <script src="assets/js/preview.js"></script>
+    <script src="assets/js/templates.js"></script>
+    <script src="assets/js/export.js"></script>
+    <script src="assets/js/email.js"></script>
+    <script src="assets/js/clients.js"></script>
+    <script src="assets/js/settings.js"></script>
+    <script src="assets/js/create.js"></script>
+    <script src="assets/js/boot.js"></script>
+
+</body>
+
+</html>
