@@ -71,7 +71,8 @@ function dirty() {
             email: get('fCEm') !== undefined ? get('fCEm') : p.client.email,
             phone: get('fCPh') !== undefined ? get('fCPh') : p.client.phone
         };
-        p.currency = get('fCur') !== undefined ? get('fCur') : p.currency;
+        const curEl = document.getElementById('fCur');
+        p.currency = curEl ? (cselGetValue(curEl) || p.currency) : p.currency;
 
         // Payment Terms - save from EditorJS
         if (typeof paymentTermsEditor !== 'undefined' && paymentTermsEditor && typeof paymentTermsEditor.save === 'function') {
@@ -156,6 +157,7 @@ function dirty() {
         if (typeof collectAddOnsData === 'function') collectAddOnsData(p);
         if (typeof collectPaymentScheduleData === 'function') collectPaymentScheduleData(p);
 
+        p.updatedAt = Date.now();
         persist();
         showSaveIndicator('saved');
         document.getElementById('topTitle').textContent = p.title || 'Untitled';

@@ -46,7 +46,7 @@ function renderDetails(p) {
       <div class="cover-wrap" id="coverWrap">
         ${p.coverPhoto ?
             `<div class="cover-preview">
-            <img src="${p.coverPhoto}" alt="Cover photo">
+            <img src="${esc(p.coverPhoto)}" alt="Cover photo">
             <div class="cover-actions">
               <button class="btn-sm-ghost" onclick="changeCoverPhoto()"><i data-lucide="edit-3"></i> Change</button>
               <button class="btn-sm-destructive" onclick="removeCoverPhoto()"><i data-lucide="trash-2"></i> Remove</button>
@@ -144,7 +144,9 @@ function handleCoverPhoto(input) {
     reader.onload = (e) => {
         const p = cur();
         if (!p) return;
-        p.coverPhoto = e.target.result;
+        const url = sanitizeDataUrl(e.target.result);
+        if (!url) { input.value = ''; return; }
+        p.coverPhoto = url;
         if (persist()) {
             renderDetails(p);
             toast('Cover photo uploaded');

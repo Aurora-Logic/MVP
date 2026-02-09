@@ -4,6 +4,12 @@
 
 /* ─── Below 1100px (small desktop / large tablet) ─── */
 @media (max-width: 1100px) {
+  .toc-panel {
+    display: none !important;
+  }
+  .body-scroll.has-toc {
+    padding-right: 20px;
+  }
   .prop-cols {
     display: none;
   }
@@ -22,6 +28,15 @@
 
   .fr-features {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .tpl-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nm-customize {
+    flex-direction: column;
+    gap: 12px;
   }
 
   .preview {
@@ -43,6 +58,8 @@
 
 /* ─── Below 768px (tablet / mobile) ─── */
 @media (max-width: 768px) {
+
+  .kanban-board { grid-template-columns: 1fr; }
 
   /* Sidebar becomes offcanvas */
   .side {

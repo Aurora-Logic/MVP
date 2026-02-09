@@ -91,12 +91,12 @@ function buildAddOnsPdfHtml(p, c, bc) {
         const icon = ao.selected ? '☑' : '☐';
         h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f4f4f5">
             <span style="font-size:13px;color:${ao.selected ? '#09090b' : '#a1a1aa'}">${icon} ${esc(ao.desc)}</span>
-            <span style="font-size:13px;font-family:var(--mono);font-weight:500;color:${ao.selected ? '#09090b' : '#a1a1aa'}">${cur}${(ao.price || 0).toLocaleString('en-IN')}</span>
+            <span style="font-size:13px;font-family:var(--mono);font-weight:500;color:${ao.selected ? '#09090b' : '#a1a1aa'}">${cur}${(ao.price || 0).toLocaleString(cur === '₹' ? 'en-IN' : 'en-US')}</span>
         </div>`;
     });
     const selectedTotal = addOns.filter(a => a.selected).reduce((s, a) => s + (a.price || 0), 0);
     if (selectedTotal > 0) {
-        h += `<div style="display:flex;justify-content:flex-end;padding:8px 0;font-size:13px;font-weight:600"><span>Add-Ons Total: ${cur}${selectedTotal.toLocaleString('en-IN')}</span></div>`;
+        h += `<div style="display:flex;justify-content:flex-end;padding:8px 0;font-size:13px;font-weight:600"><span>Add-Ons Total: ${cur}${selectedTotal.toLocaleString(cur === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
     }
     h += '</div>';
     return h;

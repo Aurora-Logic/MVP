@@ -16,6 +16,8 @@ let saveIndicatorTimer = null;
 let docTemplate = 'modern';
 let sectionEditors = {};
 let paymentTermsEditor = null;
+let focusMode = false;
+let viewMode = localStorage.getItem('pk_viewMode') || 'list';
 
 // Undo/Redo state stack
 let undoStack = [];
@@ -57,6 +59,57 @@ function cur() { return DB.find(p => p.id === CUR); }
 function uid() { return 'p' + Date.now() + Math.random().toString(36).slice(2, 7); }
 function activeDB() { return DB.filter(p => !p.archived); }
 
+function safeGetStorage(key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch (e) { console.warn('Corrupted ' + key + ', resetting'); return fallback; }
+}
+
+// Merge client responses from client.html (stored in pk_client_responses)
+(function mergeClientResponses() {
+    try {
+        const responses = JSON.parse(localStorage.getItem('pk_client_responses') || '[]');
+        if (!responses.length) return;
+        let merged = 0;
+        responses.forEach(r => {
+            const p = DB.find(x => x.id === r.proposalId && x.shareToken === r.token);
+            if (p && !p.clientResponse) {
+                p.clientResponse = { status: r.status, respondedAt: r.respondedAt, comment: r.comment };
+                p.status = r.status;
+                merged++;
+            }
+        });
+        localStorage.removeItem('pk_client_responses');
+        if (merged) persist();
+    } catch (e) { /* ignore */ }
+})();
+
+// Multi-tab sync: reload data when another tab writes to localStorage
+window.addEventListener('storage', (e) => {
+    if (e.key === 'pk_db' && e.newValue) {
+        try {
+            const remote = JSON.parse(e.newValue);
+            if (CUR) {
+                const local = cur();
+                const remoteCur = remote.find(p => p.id === CUR);
+                if (local && remoteCur && (remoteCur.updatedAt || 0) > (local.updatedAt || 0)) {
+                    DB = remote;
+                    loadEditor(CUR);
+                    toast('Updated from another tab', 'info');
+                    return;
+                }
+            }
+            DB = remote;
+            if (typeof refreshSide === 'function') refreshSide();
+        } catch (err) { console.warn('Storage sync error', err); }
+    }
+    if (e.key === 'pk_config' && e.newValue) {
+        try { CONFIG = JSON.parse(e.newValue); } catch (err) { /* ignore */ }
+    }
+    if (e.key === 'pk_clients' && e.newValue) {
+        try { CLIENTS = JSON.parse(e.newValue); } catch (err) { /* ignore */ }
+    }
+});
+
 function esc(s) {
     return (s || '')
         .replace(/&/g, '&amp;')
@@ -64,6 +117,44 @@ function esc(s) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+}
+
+// Escape for safe use inside onclick="fn('${escAttr(val)}')" attributes
+function escAttr(s) { return esc(s).replace(/\\/g, '\\\\'); }
+
+// Safe localStorage.setItem with try-catch
+function safeLsSet(key, val) {
+    try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); return true; }
+    catch (e) { console.error('localStorage write error:', key, e); toast('Storage error', 'error'); return false; }
+}
+
+// Sanitize data URLs — reject SVGs with embedded scripts/handlers
+function sanitizeDataUrl(dataUrl) {
+    if (!dataUrl || typeof dataUrl !== 'string') return dataUrl;
+    if (!dataUrl.startsWith('data:image/svg')) return dataUrl;
+    const decoded = atob(dataUrl.split(',')[1] || '');
+    if (/<script/i.test(decoded) || /on\w+\s*=/i.test(decoded) || /<iframe/i.test(decoded) || /<object/i.test(decoded) || /javascript:/i.test(decoded)) {
+        toast('SVG rejected — contains unsafe content', 'error');
+        return null;
+    }
+    return dataUrl;
+}
+
+// Validate ID format — alphanumeric + underscore only (matches uid() output)
+function isValidId(id) { return typeof id === 'string' && /^[\w-]+$/.test(id); }
+
+// Tax ID format validators — return true if empty (optional) or valid format
+const TAX_VALIDATORS = {
+    gstin: { re: /^\d{2}[A-Z]{5}\d{4}[A-Z]\d[Z][A-Z\d]$/i, label: 'GSTIN', hint: 'Format: 22AAAAA0000A1Z5' },
+    pan: { re: /^[A-Z]{5}\d{4}[A-Z]$/i, label: 'PAN', hint: 'Format: AAAAA0000A' },
+    udyam: { re: /^UDYAM-[A-Z]{2}-\d{2}-\d{7}$/i, label: 'UDYAM', hint: 'Format: UDYAM-MH-00-0000000' },
+    ein: { re: /^\d{2}-?\d{7}$/, label: 'EIN', hint: 'Format: 12-3456789' },
+    abn: { re: /^\d{2}\s?\d{3}\s?\d{3}\s?\d{3}$/, label: 'ABN', hint: '11 digits' }
+};
+function validateTaxId(type, value) {
+    if (!value || !value.trim()) return true; // optional fields
+    const v = TAX_VALIDATORS[type];
+    return v ? v.re.test(value.trim()) : true;
 }
 
 function fmtCur(n, c) {
@@ -74,10 +165,17 @@ function fmtCur(n, c) {
     return displayCurrency + val.toLocaleString(locale);
 }
 
+function fmtNum(n, c) {
+    const val = (typeof n === 'number' && isFinite(n)) ? n : 0;
+    const locale = (c === '₹') ? 'en-IN' : 'en-US';
+    return val.toLocaleString(locale);
+}
+
 function fmtDate(d) {
     if (!d) return '—';
     const dt = new Date(d);
-    return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    const isIN = CONFIG?.country === 'IN';
+    return dt.toLocaleDateString(isIN ? 'en-IN' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function timeAgo(ts) {
@@ -86,6 +184,13 @@ function timeAgo(ts) {
     if (s < 3600) return Math.floor(s / 60) + 'm ago';
     if (s < 86400) return Math.floor(s / 3600) + 'h ago';
     return Math.floor(s / 86400) + 'd ago';
+}
+
+function rgbToHex(rgb) {
+    if (!rgb || rgb.startsWith('#')) return rgb;
+    const m = rgb.match(/\d+/g);
+    if (!m || m.length < 3) return rgb;
+    return '#' + m.slice(0, 3).map(n => parseInt(n).toString(16).padStart(2, '0')).join('');
 }
 
 const COLORS = ['#18181b', '#2563eb', '#7c3aed', '#dc2626', '#d97706', '#16a34a', '#0891b2', '#be185d'];

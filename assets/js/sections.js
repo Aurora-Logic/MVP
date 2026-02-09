@@ -57,6 +57,9 @@ function initSectionEditors(sections) {
             data = s.content || { blocks: [] };
         }
 
+        const holderEl = document.getElementById(`sec-editor-${i}`);
+        if (holderEl) holderEl.classList.add('editor-loading');
+
         try {
             sectionEditors[i] = new EditorJS({
                 holder: `sec-editor-${i}`,
@@ -70,6 +73,7 @@ function initSectionEditors(sections) {
                 },
                 placeholder: 'Write section content... (use / for blocks)',
                 minHeight: 60,
+                onReady: () => { if (holderEl) { holderEl.classList.remove('editor-loading'); holderEl.classList.add('editor-loaded'); } },
                 onChange: () => dirty()
             });
         } catch (e) { console.error('EditorJS init error', e); }
@@ -84,6 +88,7 @@ function secBlockHtml(s, i) {
       <span class="sec-nm">${esc(s.title) || 'New Section'}</span>
       <span class="sec-chv"><i data-lucide="chevron-down"></i></span>
       <div class="sec-acts" onclick="event.stopPropagation()">
+        <button class="btn-sm-icon-ghost" onclick="showInsertVariableDropdown(sectionEditors[${i}],this)" data-tooltip="Insert Variable" data-side="bottom" data-align="center"><i data-lucide="braces"></i></button>
         <button class="btn-sm-icon-ghost" onclick="saveSectionToLib(this)" data-tooltip="Save to Library" data-side="bottom" data-align="center"><i data-lucide="bookmark"></i></button>
         <button class="btn-sm-icon-ghost" onclick="delSec(this)" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="trash-2"></i></button>
       </div>
@@ -192,50 +197,56 @@ async function saveSectionToLib(btn) {
     if (sectionEditors[idx] && typeof sectionEditors[idx].save === 'function') {
         try { content = await sectionEditors[idx].save(); } catch (e) { console.warn('Save to lib: editor save failed', e); }
     }
-    let lib = JSON.parse(localStorage.getItem('pk_seclib') || '[]');
+    let lib = safeGetStorage('pk_seclib', []);
     lib.push({ title, content, savedAt: Date.now() });
-    localStorage.setItem('pk_seclib', JSON.stringify(lib));
+    safeLsSet('pk_seclib', lib);
     toast('Saved to library');
 }
 
+const DEFAULT_SECTIONS = [
+    { title: 'Executive Summary', category: 'intro', content: 'We are pleased to present this proposal outlining our approach, timeline, and investment for the project described herein.' },
+    { title: 'Project Overview', category: 'intro', content: 'This section provides a high-level overview of the project objectives, scope, and expected outcomes.' },
+    { title: 'Scope of Work', category: 'scope', content: 'The following deliverables are included in this proposal:\n\n• Project planning and requirements gathering\n• Design and development\n• Testing and quality assurance\n• Deployment and training' },
+    { title: 'Timeline & Milestones', category: 'scope', content: 'Phase 1: Discovery (Week 1-2)\nPhase 2: Development (Week 3-6)\nPhase 3: Review & Refinement (Week 7-8)\nPhase 4: Launch (Week 9)' },
+    { title: 'Terms & Conditions', category: 'terms', content: 'All intellectual property transfers to the client upon final payment.\n\nEither party may terminate with 15 days written notice.\n\nConfidential information will not be disclosed to third parties.' },
+    { title: 'Payment Terms', category: 'pricing', content: '50% deposit upon acceptance\n25% at project midpoint\n25% upon completion\n\nPayment due within 15 days of invoice.' },
+    { title: 'About Us', category: 'intro', content: 'We are a team of experienced professionals dedicated to delivering high-quality solutions that drive business results.' },
+    { title: 'Next Steps', category: 'general', content: '1. Review and accept this proposal\n2. Sign the attached agreement\n3. Submit initial deposit\n4. Schedule kickoff meeting' }
+];
+
 function openLibrary() {
-    const lib = JSON.parse(localStorage.getItem('pk_seclib') || '[]');
-    const defaultLib = [
-        { title: 'Executive Summary', category: 'intro', content: 'We are pleased to present this proposal outlining our approach, timeline, and investment for the project described herein.' },
-        { title: 'Project Overview', category: 'intro', content: 'This section provides a high-level overview of the project objectives, scope, and expected outcomes.' },
-        { title: 'Scope of Work', category: 'scope', content: 'The following deliverables are included in this proposal:\n\n\u2022 Project planning and requirements gathering\n\u2022 Design and development\n\u2022 Testing and quality assurance\n\u2022 Deployment and training' },
-        { title: 'Timeline & Milestones', category: 'scope', content: 'Phase 1: Discovery (Week 1-2)\nPhase 2: Development (Week 3-6)\nPhase 3: Review & Refinement (Week 7-8)\nPhase 4: Launch (Week 9)' },
-        { title: 'Terms & Conditions', category: 'terms', content: 'All intellectual property created during this engagement transfers to the client upon final payment.\n\nEither party may terminate with 15 days written notice.\n\nConfidential information shared during this project will not be disclosed to third parties.' },
-        { title: 'Payment Terms', category: 'pricing', content: '50% deposit upon acceptance\n25% at project midpoint\n25% upon completion\n\nPayment due within 15 days of invoice.' },
-        { title: 'About Us', category: 'intro', content: 'We are a team of experienced professionals dedicated to delivering high-quality solutions that drive business results.' },
-        { title: 'Next Steps', category: 'general', content: '1. Review and accept this proposal\n2. Sign the attached agreement\n3. Submit initial deposit\n4. Schedule kickoff meeting' },
-        ...(typeof STRUCTURED_SECTION_DEFAULTS !== 'undefined' ? STRUCTURED_SECTION_DEFAULTS : [])
-    ];
-    const savedWithCat = lib.map(s => ({ ...s, category: s.category || 'general', source: 'saved' }));
-    const all = [...defaultLib.map(s => ({ ...s, source: 'default' })), ...savedWithCat];
+    const lib = safeGetStorage('pk_seclib', []);
+    const defaultLib = [...DEFAULT_SECTIONS, ...(typeof STRUCTURED_SECTION_DEFAULTS !== 'undefined' ? STRUCTURED_SECTION_DEFAULTS : [])];
+    const all = [...defaultLib.map(s => ({ ...s, source: 'default' })), ...lib.map(s => ({ ...s, category: s.category || 'general', source: 'saved' }))];
     window._libData = all;
     window._libFilter = { search: '', category: 'all' };
-
     const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show';
-    wrap.id = 'libModal';
+    wrap.className = 'modal-wrap'; wrap.id = 'libModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `<div class="modal" style="width:450px" onclick="event.stopPropagation()">
         <div class="modal-t">Section Library</div>
         <div class="modal-d">Click to insert into your proposal</div>
-        <div class="lib-search"><input type="text" id="libSearch" placeholder="Search sections..." oninput="filterLibrary()"></div>
-        <div class="lib-cats">
-            <span class="lib-cat active" data-cat="all" onclick="setLibCat(this)">All</span>
-            <span class="lib-cat" data-cat="intro" onclick="setLibCat(this)">Intro</span>
-            <span class="lib-cat" data-cat="scope" onclick="setLibCat(this)">Scope</span>
-            <span class="lib-cat" data-cat="terms" onclick="setLibCat(this)">Terms</span>
-            <span class="lib-cat" data-cat="pricing" onclick="setLibCat(this)">Pricing</span>
-            <span class="lib-cat" data-cat="general" onclick="setLibCat(this)">General</span>
+        <div class="lib-tabs" style="display:flex;gap:2px;background:var(--muted);padding:2px;border-radius:9999px;margin-bottom:12px">
+            <button class="filter-tab on" id="libTabSections" onclick="setLibTab('sections',this)">Sections</button>
+            ${typeof renderPacksTab === 'function' ? '<button class="filter-tab" id="libTabPacks" onclick="setLibTab(\'packs\',this)">Packs</button>' : ''}
         </div>
-        <div id="libList" style="max-height:280px;overflow-y:auto"></div>
+        <div id="libSectionsView">
+            <div class="lib-search"><input type="text" id="libSearch" placeholder="Search sections..." oninput="filterLibrary()"></div>
+            <div class="lib-cats">
+                <span class="lib-cat active" data-cat="all" onclick="setLibCat(this)">All</span>
+                <span class="lib-cat" data-cat="intro" onclick="setLibCat(this)">Intro</span>
+                <span class="lib-cat" data-cat="scope" onclick="setLibCat(this)">Scope</span>
+                <span class="lib-cat" data-cat="terms" onclick="setLibCat(this)">Terms</span>
+                <span class="lib-cat" data-cat="pricing" onclick="setLibCat(this)">Pricing</span>
+                <span class="lib-cat" data-cat="general" onclick="setLibCat(this)">General</span>
+            </div>
+            <div id="libList" style="max-height:280px;overflow-y:auto"></div>
+        </div>
+        <div id="libPacksView" style="display:none;max-height:340px;overflow-y:auto"></div>
         <div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('libModal').remove()">Close</button></div>
     </div>`;
     document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
     filterLibrary();
     lucide.createIcons();
 }
@@ -247,42 +258,39 @@ function setLibCat(el) {
     filterLibrary();
 }
 
+function setLibTab(tab, el) {
+    document.querySelectorAll('.lib-tabs .filter-tab').forEach(t => t.classList.remove('on'));
+    if (el) el.classList.add('on');
+    const secView = document.getElementById('libSectionsView');
+    const packView = document.getElementById('libPacksView');
+    if (secView) secView.style.display = tab === 'sections' ? '' : 'none';
+    if (packView) {
+        packView.style.display = tab === 'packs' ? '' : 'none';
+        if (tab === 'packs' && typeof renderPacksTab === 'function') renderPacksTab();
+    }
+}
+
 function filterLibrary() {
     const search = (document.getElementById('libSearch')?.value || '').toLowerCase();
     const cat = window._libFilter.category;
     const list = document.getElementById('libList');
     if (!list) return;
-    const filtered = window._libData.filter(s => {
-        const matchSearch = s.title.toLowerCase().includes(search);
-        const matchCat = cat === 'all' || s.category === cat;
-        return matchSearch && matchCat;
-    });
+    const filtered = window._libData.filter(s => s.title.toLowerCase().includes(search) && (cat === 'all' || s.category === cat));
     if (!filtered.length) { list.innerHTML = '<div class="lib-empty">No matching sections found</div>'; return; }
-    const catClass = { intro: 'cat-intro', scope: 'cat-scope', terms: 'cat-terms', pricing: 'cat-pricing', general: 'cat-general' };
-    list.innerHTML = filtered.map((s) => {
-        const realIdx = window._libData.indexOf(s);
-        return `<div class="lib-item" onclick="insertFromLib(${realIdx})">
-            <i data-lucide="file-text"></i>
-            <span class="lib-item-t">${esc(s.title)}</span>
-            <span class="lib-item-cat ${catClass[s.category] || 'cat-general'}">${s.category}</span>
-            <span class="lib-item-d">${s.source === 'default' ? 'Default' : 'Saved'}</span>
-        </div>`;
+    const cc = { intro: 'cat-intro', scope: 'cat-scope', terms: 'cat-terms', pricing: 'cat-pricing', general: 'cat-general' };
+    list.innerHTML = filtered.map(s => {
+        const idx = window._libData.indexOf(s);
+        return `<div class="lib-item" onclick="insertFromLib(${idx})"><i data-lucide="file-text"></i><span class="lib-item-t">${esc(s.title)}</span><span class="lib-item-cat ${cc[s.category] || 'cat-general'}">${s.category}</span><span class="lib-item-d">${s.source === 'default' ? 'Default' : 'Saved'}</span></div>`;
     }).join('');
     lucide.createIcons();
 }
 
 function insertFromLib(i) {
-    const s = window._libData[i];
-    const p = cur(); if (!p) return;
+    const s = window._libData[i]; const p = cur(); if (!p) return;
     const sec = { title: s.title, content: s.content };
     if (s.type) sec.type = s.type;
     if (s.testimonial) sec.testimonial = JSON.parse(JSON.stringify(s.testimonial));
     if (s.caseStudy) sec.caseStudy = JSON.parse(JSON.stringify(s.caseStudy));
-    p.sections.push(sec);
-    persist();
-    document.getElementById('libModal')?.remove();
-    renderSections(p);
-    refreshStatsBar();
-    lucide.createIcons();
-    toast('Section added');
+    p.sections.push(sec); persist(); document.getElementById('libModal')?.remove();
+    renderSections(p); refreshStatsBar(); lucide.createIcons(); toast('Section added');
 }

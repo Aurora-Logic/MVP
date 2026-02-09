@@ -149,8 +149,8 @@ function collectPaymentScheduleData(p) {
         p.paymentSchedule.push({
             name: row.querySelector('.ps-name')?.value || '',
             desc: row.querySelector('.ps-desc')?.value || '',
-            percentage: mode === 'percentage' ? (parseFloat(row.querySelector('.ps-pct')?.value) || 0) : 0,
-            amount: mode === 'amount' ? (parseFloat(row.querySelector('.ps-amt')?.value) || 0) : 0,
+            percentage: mode === 'percentage' ? Math.min(100, Math.max(0, parseFloat(row.querySelector('.ps-pct')?.value) || 0)) : 0,
+            amount: mode === 'amount' ? Math.max(0, parseFloat(row.querySelector('.ps-amt')?.value) || 0) : 0,
             dueDate: row.querySelector('.ps-date')?.dataset?.value || row.querySelector('.ps-date')?.value || ''
         });
     });
@@ -182,7 +182,7 @@ function buildSchedulePdfHtml(p, c, bc) {
         const amt = mode === 'percentage' ? Math.round(t.grand * (m.percentage || 0) / 100) : (m.amount || 0);
         const pctLabel = mode === 'percentage' ? ` (${m.percentage}%)` : '';
         h += `<tr><td style="padding:8px 0;border-bottom:1px solid #f4f4f5"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${colors[i % colors.length]};margin-right:8px"></span>${esc(m.name)}${m.desc ? '<div style="font-size:11px;color:#a1a1aa;margin-left:16px">' + esc(m.desc) + '</div>' : ''}</td>`;
-        h += `<td style="padding:8px 0;border-bottom:1px solid #f4f4f5;text-align:right;font-family:var(--mono);font-weight:500">${cur}${amt.toLocaleString('en-IN')}${pctLabel}</td>`;
+        h += `<td style="padding:8px 0;border-bottom:1px solid #f4f4f5;text-align:right;font-family:var(--mono);font-weight:500">${cur}${amt.toLocaleString(cur === '₹' ? 'en-IN' : 'en-US')}${pctLabel}</td>`;
         h += `<td style="padding:8px 0;border-bottom:1px solid #f4f4f5;text-align:right;font-size:12px;color:#71717a">${m.dueDate ? fmtDate(m.dueDate) : '—'}</td></tr>`;
     });
     h += '</tbody></table></div>';

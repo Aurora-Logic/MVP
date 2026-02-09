@@ -9,12 +9,12 @@ function emailProposal(id) {
     const templates = getEmailTemplates();
 
     const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show';
+    wrap.className = 'modal-wrap';
     wrap.id = 'emailTplModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
 
     const tplOptions = templates.map(t =>
-        `<div class="tpl-item" style="cursor:pointer" onclick="sendWithTemplate('${t.id}', '${id}')">
+        `<div class="tpl-item" style="cursor:pointer" onclick="sendWithTemplate('${escAttr(t.id)}', '${escAttr(id)}')">
             <div>
                 <div class="tpl-name">${esc(t.name)}</div>
                 <div class="tpl-subject">${esc(t.subject)}</div>
@@ -33,6 +33,7 @@ function emailProposal(id) {
             </div>
         </div>`;
     document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
     lucide.createIcons();
 }
 

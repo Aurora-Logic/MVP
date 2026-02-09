@@ -23,7 +23,9 @@
       "Bash(for class in \"btn-sm-ghost\" \"pkg-toggle-card\" \"dp-month-select\" \"dp-year-select\" \"dp-today-btn\" \"form-label\" \"share-stats\" \"scrollbar\")",
       "Bash(do echo \"=== Searching for: $class ===\" grep -n \"$class\" /Users/virag/Downloads/MVP/assets/js/*.js)",
       "Bash(cat:*)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(test:*)",
+      "Bash(ls:*)"
     ]
   }
 }

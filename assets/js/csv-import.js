@@ -25,7 +25,7 @@ function buildPricingInsights(p) {
 // CSV Import
 function openCsvImport() {
     const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show';
+    wrap.className = 'modal-wrap';
     wrap.id = 'csvModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `<div class="modal" style="width:520px" onclick="event.stopPropagation()">
@@ -47,6 +47,7 @@ function openCsvImport() {
         </div>
     </div>`;
     document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
     lucide.createIcons();
 }
 

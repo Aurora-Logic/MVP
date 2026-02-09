@@ -52,6 +52,18 @@
   --amber-bg: #fffbeb;
   --purple: #AF52DE;
 
+  /* Semantic Status Tokens */
+  --status-draft: var(--text3);
+  --status-draft-bg: var(--muted);
+  --status-sent: var(--blue);
+  --status-sent-bg: var(--blue-bg);
+  --status-accepted: var(--green);
+  --status-accepted-bg: var(--green-bg);
+  --status-declined: var(--red);
+  --status-declined-bg: var(--red-bg);
+  --status-expired: var(--amber);
+  --status-expired-bg: var(--amber-bg);
+
   /* Shadows */
   --sh: 0 1px 2px rgba(0, 0, 0, 0.05);
   --sh2: 0 4px 16px rgba(0, 0, 0, 0.07);
@@ -157,7 +169,7 @@ body {
 /* ─── Global Focus Ring ─── */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.06);
+  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.15);
 }
 .dark :focus-visible {
   box-shadow: 0 0 0 2px rgba(212, 212, 216, 0.15);
@@ -171,7 +183,7 @@ body {
   display: inline-block !important;
   vertical-align: middle;
   flex-shrink: 0;
-  stroke-width: 2;
+  stroke-width: 1.5;
   stroke: currentColor;
   fill: none;
 }

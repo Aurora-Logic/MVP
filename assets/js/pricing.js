@@ -14,7 +14,7 @@ function renderPricing(p) {
       <td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>
     </tr>`;
     });
-    if (!items.length) rows = `<tr class="li-row"><td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="editorjs-container li-desc-editor" id="li-editor-0"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, p.currency)}</td><td><button class="btn-sm-icon-ghost" onclick="this.closest('tr').remove();reTotal();dirty()"><i data-lucide="x"></i></button></td></tr>`;
+    const hasItems = items.length > 0;
 
     const subtotal = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
     const disc = p.discount || 0;
@@ -23,15 +23,14 @@ function renderPricing(p) {
     const taxAmt = Math.round(afterDisc * taxRate / 100);
     const grand = afterDisc + taxAmt;
 
-    const curOpts = [['₹', 'INR'], ['$', 'USD'], ['€', 'EUR'], ['£', 'GBP'], ['A$', 'AUD'], ['C$', 'CAD'], ['S$', 'SGD'], ['د.إ', 'AED'], ['¥', 'JPY'], ['¥CN', 'CNY']].map(([v, l]) => `<option value="${v}" ${p.currency === v ? 'selected' : ''}>${v} ${l}</option>`).join('');
     const taxLbl = CONFIG?.country === 'IN' ? 'GST' : (['GB', 'DE', 'FR', 'NL', 'IE', 'SE', 'CH'].includes(CONFIG?.country) ? 'VAT' : 'Tax');
 
     const sectionHtml = {
         packages: '<div id="pkgSection"></div>',
-        lineItems: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Line Items</div><div class="card-d">Deliverables and costs</div></div><div style="display:flex;align-items:center;gap:8px"><label class="fl" style="margin:0;font-size:10px">Currency</label><select id="fCur" style="width:84px;padding:4px 12px!important ;font-size:12px;border-radius:999px!important" onchange="dirty();reTotal()">${curOpts}</select></div></div><table class="li-tbl"><thead><tr><th style="width:40%">Item</th><th style="width:12%">Qty</th><th style="width:18%">Rate</th><th style="width:18%;text-align:right">Amount</th><th style="width:12%"></th></tr></thead><tbody id="liBody">${rows}</tbody></table><div style="padding-top:14px;margin-top:14px;border-top:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:flex-start"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()" style="margin-left:4px"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}<div style="width:260px"><div class="summary-row sub"><span class="sr-label">Subtotal</span><span class="sr-val" id="subtotalVal">${fmtCur(subtotal, p.currency)}</span></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">Discount</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><span style="font-size:12px;color:var(--text4)">−</span><input type="number" id="fDiscount" value="${disc}" min="0" step="500" style="width:90px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"></div></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">${taxLbl}</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><input type="number" id="fTaxRate" value="${taxRate}" min="0" max="100" step="0.5" style="width:55px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"><span style="font-size:12px;color:var(--text4)">%</span><span class="sr-val" style="min-width:70px;text-align:right" id="taxAmtVal">${fmtCur(taxAmt, p.currency)}</span></div></div><div class="summary-row sub" id="addOnsSummaryRow" style="display:none"></div><div class="summary-row grand"><span class="sr-label">Total</span><span class="sr-val" id="totalVal">${fmtCur(grand, p.currency)}</span></div></div></div></div></div>`,
+        lineItems: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Line Items</div><div class="card-d">Deliverables and costs</div></div><div style="display:flex;align-items:center;gap:8px"><label class="fl" style="margin:0;font-size:10px">Currency</label><div id="fCur" style="width:100px"></div></div></div>${hasItems ? `<table class="li-tbl"><thead><tr><th style="width:40%">Item</th><th style="width:12%">Qty</th><th style="width:18%">Rate</th><th style="width:18%;text-align:right">Amount</th><th style="width:12%"></th></tr></thead><tbody id="liBody">${rows}</tbody></table><div style="padding-top:14px;margin-top:14px;border-top:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:flex-start"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()" style="margin-left:4px"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}<div style="width:260px"><div class="summary-row sub"><span class="sr-label">Subtotal</span><span class="sr-val" id="subtotalVal">${fmtCur(subtotal, p.currency)}</span></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">Discount</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><span style="font-size:12px;color:var(--text4)">−</span><input type="number" id="fDiscount" value="${disc}" min="0" step="500" style="width:90px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"></div></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">${taxLbl}</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><input type="number" id="fTaxRate" value="${taxRate}" min="0" max="100" step="0.5" style="width:55px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"><span style="font-size:12px;color:var(--text4)">%</span><span class="sr-val" style="min-width:70px;text-align:right" id="taxAmtVal">${fmtCur(taxAmt, p.currency)}</span></div></div><div class="summary-row sub" id="addOnsSummaryRow" style="display:none"></div><div class="summary-row grand"><span class="sr-label">Total</span><span class="sr-val" id="totalVal">${fmtCur(grand, p.currency)}</span></div></div></div></div>` : `<div class="empty" style="padding:40px"><div class="empty-icon" style="width:40px;height:40px;border-radius:10px"><i data-lucide="receipt" style="width:18px;height:18px"></i></div><div class="empty-t" style="font-size:14px">No line items yet</div><div class="empty-d" style="font-size:12px">Add deliverables, services, or products with quantities and rates.</div><div style="display:flex;gap:6px"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add First Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}</div></div>`}</div>`,
         addOns: '<div id="addOnsSection"></div>',
         paySchedule: '<div id="payScheduleSection"></div>',
-        payTerms: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Payment Terms</div><div class="card-d">Conditions and legal terms</div></div><div style="display:flex;gap:6px"><button class="btn-sm-outline" onclick="openTCLib()"><i data-lucide="bookmark"></i> T&C Library</button></div></div><div class="fg" style="margin:0"><div id="paymentTermsEditor" class="editorjs-container"></div></div></div>`
+        payTerms: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Payment Terms</div><div class="card-d">Conditions and legal terms</div></div><div style="display:flex;gap:6px"><button class="btn-sm-icon-ghost" onclick="showInsertVariableDropdown(paymentTermsEditor,this)" data-tooltip="Insert Variable" data-side="bottom" data-align="center"><i data-lucide="braces"></i></button><button class="btn-sm-outline" onclick="openTCLib()"><i data-lucide="bookmark"></i> T&C Library</button></div></div><div class="fg" style="margin:0"><div id="paymentTermsEditor" class="editorjs-container"></div></div></div>`
     };
 
     const defaultOrder = ['packages', 'lineItems', 'addOns', 'paySchedule', 'payTerms'];
@@ -49,6 +48,21 @@ function renderPricing(p) {
     if (typeof renderAddOns === 'function') renderAddOns(p);
     if (typeof renderPaymentSchedule === 'function') renderPaymentSchedule(p);
     if (typeof buildPricingInsights === 'function') buildPricingInsights(p);
+
+    // Currency custom select
+    const curEl = document.getElementById('fCur');
+    if (curEl) {
+        csel(curEl, {
+            value: p.currency || '₹', small: true,
+            items: [
+                { value: '₹', label: '₹ INR' }, { value: '$', label: '$ USD' }, { value: '€', label: '€ EUR' },
+                { value: '£', label: '£ GBP' }, { value: 'A$', label: 'A$ AUD' }, { value: 'C$', label: 'C$ CAD' },
+                { value: 'S$', label: 'S$ SGD' }, { value: 'د.إ', label: 'د.إ AED' }, { value: '¥', label: '¥ JPY' },
+                { value: '¥CN', label: '¥ CNY' }
+            ],
+            onChange: () => { reTotal(); dirty(); }
+        });
+    }
     lucide.createIcons();
     setTimeout(() => {
         initPaymentTermsEditor(p);
@@ -105,8 +119,9 @@ function initPaymentTermsEditor(p) {
     }
     paymentTermsEditor = null;
 
-    // Check if element exists
-    if (!document.getElementById('paymentTermsEditor')) return;
+    const ptHolder = document.getElementById('paymentTermsEditor');
+    if (!ptHolder) return;
+    ptHolder.classList.add('editor-loading');
 
     let data;
     if (p.paymentTerms) {
@@ -140,6 +155,7 @@ function initPaymentTermsEditor(p) {
             },
             placeholder: 'Add payment terms... (use / for blocks)',
             minHeight: 60,
+            onReady: () => { ptHolder.classList.remove('editor-loading'); ptHolder.classList.add('editor-loaded'); },
             onChange: () => dirty()
         });
     } catch (e) { console.error('Payment terms editor init error', e); }
@@ -150,6 +166,7 @@ function initSingleLiEditor(el, initialData) {
         try { el._editor.destroy(); } catch (e) { }
     }
     el._editor = null;
+    el.classList.add('editor-loading');
 
     let data;
     if (typeof initialData === 'string') {
@@ -174,6 +191,7 @@ function initSingleLiEditor(el, initialData) {
             },
             placeholder: 'Description...',
             minHeight: 0,
+            onReady: () => { el.classList.remove('editor-loading'); el.classList.add('editor-loaded'); },
             onChange: () => dirty()
         });
     } catch (e) { console.error('LI editor init error', e); }
@@ -207,9 +225,17 @@ function deleteLineItem(btn) {
 
 function addLine() {
     const body = document.getElementById('liBody');
+    if (!body) {
+        // First item from empty state — add a blank item and re-render
+        const p = cur(); if (!p) return;
+        p.lineItems = [{ desc: '', qty: 1, rate: 0, detail: null }];
+        persist();
+        renderPricing(p);
+        return;
+    }
     const tr = document.createElement('tr');
     tr.className = 'li-row';
-    const c = document.getElementById('fCur')?.value || '\u20B9';
+    const c = cselGetValue(document.getElementById('fCur')) || '\u20B9';
     const uniqueId = 'li-' + Date.now() + Math.random().toString(36).slice(2, 5);
     tr.innerHTML = `<td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="editorjs-container li-desc-editor" id="${uniqueId}"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, c)}</td><td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>`;
     body.appendChild(tr);
@@ -221,21 +247,23 @@ function addLine() {
 
 function reRow(inp) {
     const row = inp.closest('tr');
-    const q = parseFloat(row.querySelector('.lq').value) || 0;
-    const r = parseFloat(row.querySelector('.lr').value) || 0;
-    const c = document.getElementById('fCur')?.value || '\u20B9';
+    const q = Math.max(0, parseFloat(row.querySelector('.lq').value) || 0);
+    const r = Math.max(0, parseFloat(row.querySelector('.lr').value) || 0);
+    const c = cselGetValue(document.getElementById('fCur')) || '\u20B9';
     row.querySelector('.li-amt').textContent = fmtCur(q * r, c);
     reTotal();
 }
 
 function reTotal() {
     let subtotal = 0;
-    const c = document.getElementById('fCur')?.value || '\u20B9';
+    const c = cselGetValue(document.getElementById('fCur')) || '\u20B9';
     document.querySelectorAll('.li-row').forEach(row => {
-        subtotal += (parseFloat(row.querySelector('.lq')?.value) || 0) * (parseFloat(row.querySelector('.lr')?.value) || 0);
+        const q = Math.max(0, parseFloat(row.querySelector('.lq')?.value) || 0);
+        const r = Math.max(0, parseFloat(row.querySelector('.lr')?.value) || 0);
+        subtotal += q * r;
     });
-    const disc = parseFloat(document.getElementById('fDiscount')?.value) || 0;
-    const taxRate = parseFloat(document.getElementById('fTaxRate')?.value) || 0;
+    const disc = Math.max(0, parseFloat(document.getElementById('fDiscount')?.value) || 0);
+    const taxRate = Math.min(100, Math.max(0, parseFloat(document.getElementById('fTaxRate')?.value) || 0));
     const afterDisc = Math.max(0, subtotal - disc);
     const taxAmt = Math.round(afterDisc * taxRate / 100);
     const addOnsTotal = (typeof calcAddOnsTotal === 'function') ? calcAddOnsTotal() : 0;
@@ -261,95 +289,3 @@ function reTotal() {
     }
 }
 
-// T&C Library
-const TC_DEFAULTS = [
-    { title: 'Standard Payment (50/50)', text: '50% advance before project kickoff.\nRemaining 50% upon completion and before final delivery.\nPayment due within 7 business days of invoice.', category: 'payment' },
-    { title: 'Milestone-based (30/30/40)', text: '30% advance to begin work.\n30% upon design approval.\n40% upon final delivery.\nAll payments due within 15 days of invoice.', category: 'payment' },
-    { title: 'Net 30 Terms', text: 'Payment is due within 30 days of invoice date.', category: 'payment' },
-    { title: 'Net 15 Terms', text: 'Payment is due within 15 days of invoice date.', category: 'payment' },
-    { title: 'IP Transfer on Payment', text: 'All intellectual property rights transfer to the client upon receipt of final payment.', category: 'legal' },
-    { title: 'Revisions Policy (2 Rounds)', text: 'This proposal includes 2 rounds of revisions per deliverable. Additional revision rounds will be billed at the applicable hourly rate.', category: 'project' },
-    { title: 'Cancellation (15 Days Notice)', text: 'Either party may terminate this agreement with 15 days written notice. Client will be billed for all work completed.', category: 'termination' },
-    { title: 'Warranty (30 Days)', text: '30-day post-launch support included for bug fixes only. Feature additions will be quoted separately.', category: 'support' },
-    { title: 'Late Payment Penalty', text: 'Invoices not paid within the due date will incur a late fee of 1.5% per month.', category: 'legal' },
-    { title: 'Mutual Confidentiality', text: 'Both parties agree to keep all project-related information confidential.', category: 'legal' },
-    { title: 'Force Majeure', text: 'Neither party shall be liable for delays due to circumstances beyond reasonable control.', category: 'legal' }
-];
-
-function openTCLib() {
-    const userTC = JSON.parse(localStorage.getItem('pk_tclib') || '[]').map(t => ({ ...t, category: 'custom' }));
-    const all = [...TC_DEFAULTS, ...userTC];
-    window._tcData = all;
-
-    const categories = {
-        all: { label: 'All', icon: 'layers' },
-        payment: { label: 'Payment', icon: 'credit-card' },
-        legal: { label: 'Legal & IP', icon: 'shield' },
-        project: { label: 'Project', icon: 'folder' },
-        termination: { label: 'Termination', icon: 'x-circle' },
-        support: { label: 'Support', icon: 'headphones' },
-        custom: { label: 'Custom', icon: 'bookmark' }
-    };
-
-    const renderItems = (filter) => {
-        const filtered = filter === 'all' ? all : all.filter(t => t.category === filter);
-        if (!filtered.length) return '<div style="padding:20px;text-align:center;color:var(--text4)">No items in this category</div>';
-        return filtered.map((t) => {
-            const idx = all.indexOf(t);
-            return `<div class="tc-chip" onclick="insertTC(${idx})"><div class="tc-chip-t">${esc(t.title)}</div><div class="tc-chip-d">${esc(t.text.substring(0, 70))}...</div></div>`;
-        }).join('');
-    };
-
-    const tabs = Object.entries(categories).map(([k, v]) => {
-        const count = k === 'all' ? all.length : all.filter(t => t.category === k).length;
-        if (count === 0 && k !== 'custom') return '';
-        return `<button class="tc-tab ${k === 'all' ? 'active' : ''}" data-cat="${k}" onclick="filterTCLib('${k}')"><i data-lucide="${v.icon}"></i>${v.label}<span class="tc-count">${count}</span></button>`;
-    }).join('');
-
-    const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show';
-    wrap.id = 'tcModal';
-    wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-    wrap.innerHTML = `
-        <div class="modal modal-lg" onclick="event.stopPropagation()">
-            <div class="modal-t">Terms & Conditions Library</div>
-            <div class="modal-d">Click any term to append it to your payment terms</div>
-            <div class="tc-tabs">${tabs}</div>
-            <div class="tc-grid" id="tcGrid" style="max-height:340px;overflow-y:auto">${renderItems('all')}</div>
-            <div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('tcModal').remove()">Close</button></div>
-        </div>`;
-    document.body.appendChild(wrap);
-    lucide.createIcons();
-}
-
-function filterTCLib(cat) {
-    const all = window._tcData;
-    const filtered = cat === 'all' ? all : all.filter(t => t.category === cat);
-    const grid = document.getElementById('tcGrid');
-    if (!filtered.length) {
-        grid.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text4)">No items in this category</div>';
-    } else {
-        grid.innerHTML = filtered.map((t) => {
-            const idx = all.indexOf(t);
-            return `<div class="tc-chip" onclick="insertTC(${idx})"><div class="tc-chip-t">${esc(t.title)}</div><div class="tc-chip-d">${esc(t.text.substring(0, 70))}...</div></div>`;
-        }).join('');
-    }
-    document.querySelectorAll('.tc-tab').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.tc-tab[data-cat="${cat}"]`)?.classList.add('active');
-}
-
-function insertTC(i) {
-    const tc = window._tcData[i];
-    if (paymentTermsEditor && paymentTermsEditor.blocks) {
-        const blockCount = paymentTermsEditor.blocks.getBlocksCount();
-        if (blockCount > 0) paymentTermsEditor.blocks.insert('paragraph', { text: '' });
-        tc.text.split('\n').filter(line => line.trim()).forEach(line => {
-            paymentTermsEditor.blocks.insert('paragraph', { text: line });
-        });
-        dirty();
-    }
-    document.getElementById('tcModal')?.remove();
-    toast(tc.title + ' added');
-}
-
-// buildPricingInsights moved to csv-import.js

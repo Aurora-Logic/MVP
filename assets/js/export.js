@@ -3,7 +3,7 @@
 // ════════════════════════════════════════
 
 function doExport(mode) {
-    showLoading('Generating PDF...');
+    showLoading('Saving changes...');
     dirty();
     const win = window.open('', '_blank');
     if (!win) {
@@ -12,6 +12,7 @@ function doExport(mode) {
         return;
     }
     setTimeout(() => {
+        showLoading('Rendering PDF...');
         const p = cur();
         if (!p) {
             hideLoading();
@@ -19,7 +20,8 @@ function doExport(mode) {
             return;
         }
         buildPreview(mode || 'proposal');
-        const html = document.getElementById('prevDoc').innerHTML;
+        const html = document.getElementById('prevDoc')?.innerHTML;
+        if (!html) { hideLoading(); win.close(); return; }
         win.document.write(`<!DOCTYPE html><html><head><title>${esc(mode === 'invoice' ? 'Invoice' : p.title)}</title>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
       <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}}</style></head><body>${html}</body></html>`);
@@ -74,19 +76,21 @@ function clearBulkSelection() {
 
 function bulkExport() {
     if (!bulkSelected.size) return;
-    showLoading('Generating PDFs...');
+    const ids = [...bulkSelected];
+    showLoading('Exporting 1 of ' + ids.length + '...');
     const win = window.open('', '_blank');
     if (!win) { hideLoading(); toast('Please allow popups', 'error'); return; }
-    const ids = [...bulkSelected];
     let combinedHtml = '';
     const origCUR = CUR;
-    ids.forEach((id, idx) => {
-        CUR = id;
-        buildPreview('proposal');
-        combinedHtml += document.getElementById('prevDoc').innerHTML;
-        if (idx < ids.length - 1) combinedHtml += '<div style="page-break-after:always"></div>';
-    });
-    CUR = origCUR;
+    try {
+        ids.forEach((id, idx) => {
+            showLoading('Exporting ' + (idx + 1) + ' of ' + ids.length + '...');
+            CUR = id;
+            buildPreview('proposal');
+            combinedHtml += (document.getElementById('prevDoc')?.innerHTML || '');
+            if (idx < ids.length - 1) combinedHtml += '<div style="page-break-after:always"></div>';
+        });
+    } finally { CUR = origCUR; }
     win.document.write(`<!DOCTYPE html><html><head><title>Bulk Export - ${ids.length} Proposals</title>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
       <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}}</style></head><body>${combinedHtml}</body></html>`);

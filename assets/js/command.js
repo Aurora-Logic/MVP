@@ -69,6 +69,15 @@ function buildCommandItems() {
             <span>Force Save</span>
             <kbd class="kbd ml-auto">⌘</kbd><kbd class="kbd">S</kbd>
         </div>
+        <div role="menuitem" data-filter="Focus mode distraction free zen" data-keywords="focus distraction" onclick="cmdRun(()=>{if(typeof toggleFocusMode==='function')toggleFocusMode()})">
+            <i data-lucide="maximize-2"></i>
+            <span>${focusMode ? 'Exit Focus Mode' : 'Focus Mode'}</span>
+            <kbd class="kbd ml-auto">⌘</kbd><kbd class="kbd">.</kbd>
+        </div>
+        <div role="menuitem" data-filter="Save as template reuse" data-keywords="template bookmark" onclick="cmdRun(()=>{if(CUR)saveAsTemplate();else toast('Open a proposal first')})">
+            <i data-lucide="bookmark-plus"></i>
+            <span>Save as Template</span>
+        </div>
     </div>`;
 
     // Navigation group
@@ -103,7 +112,7 @@ function buildCommandItems() {
         recent.forEach(p => {
             const statusIcon = p.status === 'accepted' ? 'check-circle' : p.status === 'sent' ? 'send' : p.status === 'declined' ? 'x-circle' : 'file-text';
             const val = (p.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0);
-            html += `<div role="menuitem" data-filter="${esc(p.title)} ${esc(p.client?.name || '')} ${esc(p.number || '')}" data-keywords="${p.status}" onclick="cmdRun(()=>loadEditor('${p.id}'))">
+            html += `<div role="menuitem" data-filter="${esc(p.title)} ${esc(p.client?.name || '')} ${esc(p.number || '')}" data-keywords="${p.status}" onclick="cmdRun(()=>loadEditor('${escAttr(p.id)}'))">
                 <i data-lucide="${statusIcon}"></i>
                 <span>${esc(p.title || 'Untitled')}</span>
                 <span style="margin-left:auto;font-size:11px;color:var(--text4);font-family:var(--mono)">${fmtCur(val, p.currency)}</span>

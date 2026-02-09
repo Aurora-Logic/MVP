@@ -33,6 +33,7 @@ function loadEditor(id) {
     </div>
     <button class="btn-sm-outline" onclick="openPreview()"><i data-lucide="eye"></i> Preview</button>
     <button class="btn-sm-outline" onclick="shareProposal()"><i data-lucide="share-2"></i> Share</button>
+    <button class="btn-sm-outline" onclick="saveAsTemplate()"><i data-lucide="bookmark-plus"></i> Template</button>
     <button class="btn-sm" onclick="doExport('proposal')"><i data-lucide="download"></i> Export</button>
   `;
 
@@ -68,12 +69,13 @@ function loadEditor(id) {
     renderPricing(p);
     renderNotes(p);
     refreshSide();
+    if (typeof renderTOC === 'function') renderTOC();
     lucide.createIcons();
 }
 
 function refreshStatsBar() {
     const p = cur(); if (!p) return;
-    const c = document.getElementById('fCur')?.value || p.currency || '₹';
+    const c = cselGetValue(document.getElementById('fCur')) || p.currency || '₹';
     // Read live line item values from DOM (before debounced save)
     let subtotal = 0;
     const liRows = document.querySelectorAll('.li-row');

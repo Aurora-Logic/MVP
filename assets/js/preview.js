@@ -100,10 +100,10 @@ function buildPreview(mode) {
         const a = (i.qty || 0) * (i.rate || 0);
         const detailHtml = editorJsToHtml(i.detail, p);
         const detail = detailHtml ? `<div style="font-size:11px;color:#71717a;margin-top:2px;line-height:1.5">${detailHtml}</div>` : '';
-        return { desc: `<div style="font-weight:600">${esc(i.desc)}</div>${detail}`, qty: i.qty, rate: c + (i.rate || 0).toLocaleString('en-IN'), amt: c + a.toLocaleString('en-IN') };
+        return { desc: `<div style="font-weight:600">${esc(i.desc)}</div>${detail}`, qty: i.qty, rate: c + (i.rate || 0).toLocaleString(c === '₹' ? 'en-IN' : 'en-US'), amt: c + a.toLocaleString(c === '₹' ? 'en-IN' : 'en-US') };
     });
     const secs = (p.sections || []).filter(s => s.title || s.content);
-    const logoHtml = CONFIG?.logo ? `<img class="pd-logo" src="${CONFIG.logo}" style="max-height:36px;margin-bottom:16px">` : '';
+    const logoHtml = CONFIG?.logo ? `<img class="pd-logo" src="${esc(CONFIG.logo)}" style="max-height:36px;margin-bottom:16px">` : '';
 
     let html = '';
     // Draft watermark (Phase 1.5)
@@ -113,15 +113,20 @@ function buildPreview(mode) {
     // Cover page
     if (p.coverPage && !isInvoice) { html += buildCoverHtml(p, bc); }
 
-    if (docTemplate === 'modern') {
-        html += buildModernTpl(p, c, bc, t, rows, secs, logoHtml, docTitle, docNum, isInvoice);
-    } else if (docTemplate === 'classic') {
-        html += buildClassicTpl(p, c, bc, t, rows, secs, logoHtml, docTitle, docNum, isInvoice);
-    } else if (docTemplate === 'tabular') {
-        html += buildTabularTpl(p, c, bc, t, rows, secs, logoHtml, docTitle, docNum, isInvoice);
-    } else {
-        html += buildMinimalTpl(p, c, bc, t, rows, secs, logoHtml, docTitle, docNum, isInvoice);
-    }
+    const tplFns = {
+        modern: buildModernTpl, classic: buildClassicTpl, minimal: buildMinimalTpl, tabular: buildTabularTpl,
+        executive: typeof buildExecutiveTpl === 'function' ? buildExecutiveTpl : null,
+        compact: typeof buildCompactTpl === 'function' ? buildCompactTpl : null,
+        bold: typeof buildBoldTpl === 'function' ? buildBoldTpl : null,
+        sidebar: typeof buildSidebarTpl === 'function' ? buildSidebarTpl : null,
+        stripe: typeof buildStripeTpl === 'function' ? buildStripeTpl : null,
+        formal: typeof buildFormalTpl === 'function' ? buildFormalTpl : null,
+        clean: typeof buildCleanTpl === 'function' ? buildCleanTpl : null,
+        nord: typeof buildNordTpl === 'function' ? buildNordTpl : null,
+        american: typeof buildAmericanTpl === 'function' ? buildAmericanTpl : null
+    };
+    const fn = tplFns[docTemplate] || buildModernTpl;
+    html += fn(p, c, bc, t, rows, secs, logoHtml, docTitle, docNum, isInvoice);
     // Phase 2 PDF sections
     if (!isInvoice && p.packagesEnabled && typeof buildPackagesPdfHtml === 'function') html += buildPackagesPdfHtml(p, c, bc);
     if ((p.addOns || []).some(a => a.desc) && typeof buildAddOnsPdfHtml === 'function') html += buildAddOnsPdfHtml(p, c, bc);

@@ -55,7 +55,7 @@
 .sec-acts {
   display: flex;
   gap: 2px;
-  opacity: 0;
+  opacity: 0.4;
   transition: opacity var(--t);
 }
 .sec-hd:hover .sec-acts { opacity: 1; }
@@ -386,9 +386,9 @@
   transition: color var(--t);
 }
 .star-btn svg { width: 18px; height: 18px; }
-.star-btn.on { color: #f59e0b; }
-.star-btn.on svg { fill: #f59e0b; stroke: #f59e0b; }
-.star-btn:hover { color: #f59e0b; }
+.star-btn.on { color: #FF9500; }
+.star-btn.on svg { fill: #FF9500; stroke: #FF9500; }
+.star-btn:hover { color: #FF9500; }
 
 .sec-type-menu {
   position: absolute;
@@ -419,9 +419,28 @@
 
 /* ════════ DRAG STATES ════════ */
 
-.dragging { opacity: 0.5; }
-.drag-over { border-top: 2px solid var(--blue) !important; }
-.drag-over-bottom { border-bottom: 2px solid var(--blue) !important; }
+.dragging {
+  opacity: 0.6;
+  transform: scale(0.98);
+  box-shadow: var(--sh2);
+  transition: opacity var(--t), transform var(--t);
+}
+.drag-over {
+  border-top: 2px solid var(--blue) !important;
+  padding-top: 6px;
+  transition: padding var(--t);
+  animation: drag-pulse 1s ease-in-out infinite;
+}
+.drag-over-bottom {
+  border-bottom: 2px solid var(--blue) !important;
+  padding-bottom: 6px;
+  transition: padding var(--t);
+  animation: drag-pulse 1s ease-in-out infinite;
+}
+@keyframes drag-pulse {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(37, 99, 235, 0.04); }
+}
 
 /* ════════ LOADING OVERLAY ════════ */
 
@@ -451,6 +470,44 @@
   height: 28px;
   color: var(--primary);
   animation: spin 1s linear infinite;
+}
+
+/* ════════ SKELETON SCREENS ════════ */
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.skeleton {
+  background: var(--muted);
+  border-radius: var(--r);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+.skeleton-text {
+  height: 12px;
+  border-radius: 6px;
+}
+.skeleton-text.w-full { width: 100%; }
+.skeleton-text.w-3-4 { width: 75%; }
+.skeleton-text.w-1-2 { width: 50%; }
+.skeleton-badge {
+  height: 22px;
+  width: 60px;
+  border-radius: var(--r-pill);
+}
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Editor fade-in */
+.editor-loading { opacity: 0; }
+.editor-loaded {
+  opacity: 1;
+  transition: opacity 300ms ease-out;
 }
 
 /* ════════ SHORTCUTS PANEL ════════ */
@@ -516,4 +573,109 @@
   color: var(--text);
   max-height: 300px;
   overflow-y: auto;
+}
+
+/* ════════ SECTION PACKS ════════ */
+
+.pack-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.pack-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r3);
+  padding: 16px;
+  text-align: center;
+  transition: all var(--t);
+}
+
+.pack-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--sh2);
+}
+
+.pack-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.pack-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pack-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pack-desc {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.pack-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text4);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 6px;
+}
+
+.pack-preview-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pack-preview-item:last-child {
+  border-bottom: none;
+}
+
+.pack-preview-num {
+  width: 22px;
+  height: 22px;
+  background: var(--muted);
+  color: var(--text3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pack-preview-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pack-preview-excerpt {
+  font-size: 11px;
+  color: var(--text4);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+  .pack-grid {
+    grid-template-columns: 1fr;
+  }
 }

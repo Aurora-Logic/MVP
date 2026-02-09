@@ -1,5 +1,5 @@
 // ════════════════════════════════════════
-// WIN RATE ANALYTICS (Phase 3.1)
+// WIN RATE ANALYTICS (Phase 3.1 + 5.5)
 // ════════════════════════════════════════
 
 let analyticsFilter = 'all';
@@ -29,7 +29,9 @@ function computeAnalytics(proposals) {
         .map(p => Math.round((p.clientResponse.respondedAt - p.createdAt) / 86400000));
     const avgDays = closedTimes.length ? Math.round(closedTimes.reduce((a, b) => a + b, 0) / closedTimes.length) : 0;
 
-    return { winRate, pipeline, avgValue, avgDays, total: proposals.length, accepted: accepted.length, decided: decided.length };
+    const forecast = Math.round(pipeline * (winRate / 100));
+
+    return { winRate, pipeline, avgValue, avgDays, forecast, total: proposals.length, accepted: accepted.length, decided: decided.length };
 }
 
 function buildBarChart(proposals) {
@@ -39,21 +41,13 @@ function buildBarChart(proposals) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         months.push({ year: d.getFullYear(), month: d.getMonth(), label: d.toLocaleString('en', { month: 'short' }) });
     }
-
     const buckets = months.map(m => {
         const inMonth = proposals.filter(p => {
             const d = new Date(p.createdAt || 0);
             return d.getFullYear() === m.year && d.getMonth() === m.month;
         });
-        return {
-            label: m.label,
-            accepted: inMonth.filter(p => p.status === 'accepted').length,
-            declined: inMonth.filter(p => p.status === 'declined').length,
-            pending: inMonth.filter(p => p.status === 'draft' || p.status === 'sent').length,
-            expired: inMonth.filter(p => p.status === 'expired').length
-        };
+        return { label: m.label, accepted: inMonth.filter(p => p.status === 'accepted').length, declined: inMonth.filter(p => p.status === 'declined').length, pending: inMonth.filter(p => p.status === 'draft' || p.status === 'sent').length, expired: inMonth.filter(p => p.status === 'expired').length };
     });
-
     const maxVal = Math.max(...buckets.map(b => b.accepted + b.declined + b.pending + b.expired), 1);
 
     return `<div class="an-chart">
@@ -79,7 +73,6 @@ function buildBarChart(proposals) {
     </div>`;
 }
 
-// Build status donut chart
 function buildDonutChart(proposals) {
     const draft = proposals.filter(p => p.status === 'draft').length;
     const sent = proposals.filter(p => p.status === 'sent').length;
@@ -87,19 +80,10 @@ function buildDonutChart(proposals) {
     const declined = proposals.filter(p => p.status === 'declined').length;
     const expired = proposals.filter(p => p.status === 'expired').length;
     const total = draft + sent + accepted + declined + expired || 1;
-
-    // Calculate percentages for conic gradient
     let cumulative = 0;
     const segments = [];
-    const colors = {
-        draft: 'var(--text4)',
-        sent: 'var(--blue)',
-        accepted: 'var(--green)',
-        declined: 'var(--red)',
-        expired: 'var(--amber)'
-    };
+    const colors = { draft: 'var(--text4)', sent: 'var(--blue)', accepted: 'var(--green)', declined: 'var(--red)', expired: 'var(--amber)' };
     const counts = { draft, sent, accepted, declined, expired };
-
     for (const [status, count] of Object.entries(counts)) {
         if (count > 0) {
             const pct = (count / total) * 100;
@@ -107,15 +91,10 @@ function buildDonutChart(proposals) {
             cumulative += pct;
         }
     }
-
     const gradient = segments.length ? segments.join(', ') : 'var(--muted) 0% 100%';
-
     return `<div class="an-donut-wrap">
         <div class="an-donut" style="background: conic-gradient(${gradient})">
-            <div class="an-donut-center">
-                <div class="an-donut-val">${total}</div>
-                <div class="an-donut-label">Total</div>
-            </div>
+            <div class="an-donut-center"><div class="an-donut-val">${total}</div><div class="an-donut-label">Total</div></div>
         </div>
         <div class="an-donut-legend">
             ${draft ? `<div class="an-donut-item"><span class="an-dot" style="background:var(--text4)"></span>Draft <strong>${draft}</strong></div>` : ''}
@@ -133,17 +112,21 @@ function buildAnalyticsWidget() {
     const c = proposals[0]?.currency || '₹';
     const filters = ['month', '3mo', 'year', 'all'];
     const labels = { month: '30d', '3mo': '3mo', year: '1yr', all: 'All' };
+    const hasBreakdowns = typeof openAnalyticsBreakdowns === 'function';
 
     return `<div class="an-widget">
         <div class="an-header">
             <div><div class="an-title">Analytics</div><div class="an-subtitle">${stats.total} proposal${stats.total !== 1 ? 's' : ''} in period</div></div>
-            <div class="an-filters">
-                ${filters.map(f => `<button class="an-filter${analyticsFilter === f ? ' on' : ''}" onclick="setAnalyticsFilter('${f}')">${labels[f]}</button>`).join('')}
+            <div style="display:flex;align-items:center;gap:6px">
+                <div class="an-filters">
+                    ${filters.map(f => `<button class="an-filter${analyticsFilter === f ? ' on' : ''}" onclick="setAnalyticsFilter('${f}')">${labels[f]}</button>`).join('')}
+                </div>
+                ${hasBreakdowns ? '<button class="btn-sm-outline" onclick="openAnalyticsBreakdowns()"><i data-lucide="bar-chart-3"></i> Breakdowns</button>' : ''}
             </div>
         </div>
         <div class="an-body">
             <div class="an-main">
-                <div class="an-metrics">
+                <div class="an-metrics an-metrics-5">
                     <div class="an-metric">
                         <div class="an-metric-val ${stats.winRate >= 50 ? 'good' : stats.winRate > 0 ? 'mid' : ''}">${stats.winRate}%</div>
                         <div class="an-metric-label">Win Rate</div>
@@ -153,6 +136,11 @@ function buildAnalyticsWidget() {
                         <div class="an-metric-val">${fmtCur(stats.pipeline, c)}</div>
                         <div class="an-metric-label">Pipeline</div>
                         <div class="an-metric-sub">Open proposals</div>
+                    </div>
+                    <div class="an-metric">
+                        <div class="an-metric-val">${fmtCur(stats.forecast, c)}</div>
+                        <div class="an-metric-label">Forecast</div>
+                        <div class="an-metric-sub">Expected revenue</div>
                     </div>
                     <div class="an-metric">
                         <div class="an-metric-val">${fmtCur(stats.avgValue, c)}</div>

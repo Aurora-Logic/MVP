@@ -531,3 +531,39 @@
 }
 .completeness-bar:hover { background: var(--hover); }
 .completeness-ring { display: flex; }
+
+/* ════════ FOCUS MODE ════════ */
+
+.app.focus-mode .side { display: none; }
+.app.focus-mode .topbar { display: none; }
+.app.focus-mode .toc-panel { display: none; }
+.app.focus-mode .body-scroll {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.focus-exit-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 200;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--sh2);
+  transition: all var(--t);
+  color: var(--text3);
+}
+.focus-exit-btn:hover {
+  background: var(--muted);
+  color: var(--text);
+  transform: scale(1.05);
+}
+.focus-exit-btn svg { width: 14px; height: 14px; }

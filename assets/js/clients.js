@@ -43,7 +43,7 @@ function openAddClient(idx) {
     const isEdit = idx !== undefined;
     const c = isEdit ? CLIENTS[idx] : { name: '', contact: '', email: '', phone: '' };
     const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show'; wrap.id = 'clientModal';
+    wrap.className = 'modal-wrap'; wrap.id = 'clientModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()">
     <div class="modal-t">${isEdit ? 'Edit' : 'Add'} Client</div>
@@ -60,6 +60,7 @@ function openAddClient(idx) {
     </div>
   </div>`;
     document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
 }
 
 function saveClient(idx) {
@@ -90,11 +91,12 @@ function delClient(i) {
 function showClientPicker() {
     if (!CLIENTS.length) { toast('No saved clients. Add one in the Clients tab.'); return; }
     const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show'; wrap.id = 'cpModal';
+    wrap.className = 'modal-wrap'; wrap.id = 'cpModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     let items = CLIENTS.map((c, i) => `<div class="cp-item" onclick="pickClient(${i})"><span class="cp-item-name">${esc(c.name)}</span><span class="cp-item-email">${esc(c.email)}</span></div>`).join('');
     wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-t">Select Client</div><div class="modal-d">Pick a saved client to auto-fill</div><div style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">${items}</div><div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('cpModal').remove()">Cancel</button></div></div>`;
     document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
 }
 
 function pickClient(i) {
@@ -149,7 +151,7 @@ function buildClientHistory(props) {
     const sorted = [...props].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     return '<div class="ci-history">' + sorted.map(p => {
         const val = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
-        return `<div class="ci-prop" onclick="loadEditor('${p.id}')">
+        return `<div class="ci-prop" onclick="loadEditor('${escAttr(p.id)}')">
             <div style="flex:1">
                 <div class="ci-prop-title">${esc(p.title || 'Untitled')}</div>
                 <div class="ci-prop-meta">${esc(p.number)} · ${fmtDate(p.createdAt)}</div>

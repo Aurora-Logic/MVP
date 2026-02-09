@@ -27,7 +27,7 @@ function toggleTheme() {
   html.classList.toggle('dark', !isDark);
 
   // Persist preference
-  localStorage.setItem('pk_theme', newTheme);
+  safeLsSet('pk_theme', newTheme);
 
   // Update meta theme-color
   updateMetaTheme(newTheme);
@@ -53,6 +53,40 @@ function updateMetaTheme(theme) {
 function getCurrentTheme() {
   return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
 }
+
+// ─── Apply font family (Google Fonts) ───
+const FONT_URLS = {
+    'Inter': '', // already loaded
+    'Roboto': 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap',
+    'Lato': 'https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap',
+    'Playfair Display': 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap',
+    'Merriweather': 'https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap',
+    'Courier Prime': 'https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap'
+};
+
+function applyFont(fontName) {
+    if (!fontName || fontName === 'Inter') {
+        document.documentElement.style.setProperty('--font', "'Inter', system-ui, sans-serif");
+        return;
+    }
+    const url = FONT_URLS[fontName];
+    if (url && !document.querySelector(`link[href="${url}"]`)) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = url;
+        document.head.appendChild(link);
+    }
+    const fallback = fontName === 'Courier Prime' ? 'monospace' : 'system-ui, sans-serif';
+    document.documentElement.style.setProperty('--font', `'${fontName}', ${fallback}`);
+}
+
+// Apply saved font on load
+(function initFont() {
+    try {
+        const cfg = JSON.parse(localStorage.getItem('pk_config') || 'null');
+        if (cfg?.font) applyFont(cfg.font);
+    } catch (e) { /* ignore */ }
+})();
 
 // ─── Listen for system theme changes ───
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {

@@ -7,7 +7,7 @@ function openShortcutsPanel() {
     document.getElementById('shortcutsModal')?.remove();
 
     const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show';
+    wrap.className = 'modal-wrap';
     wrap.id = 'shortcutsModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
 
@@ -33,6 +33,7 @@ function openShortcutsPanel() {
                         ${shortcutRow('⌘ Z', 'Undo')}
                         ${shortcutRow('⌘ ⇧ Z', 'Redo')}
                         ${shortcutRow('⌘ S', 'Force save')}
+                        ${shortcutRow('⌘ .', 'Focus mode')}
                     </div>
                 </div>
                 <div>
@@ -57,6 +58,7 @@ function openShortcutsPanel() {
         </div>`;
 
     document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
     lucide.createIcons();
 }
 

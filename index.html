@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=none">
     <title>ProposalKit — Professional Proposals in Minutes</title>
+    <meta name="description" content="Build professional proposals in minutes. Export polished PDFs.">
+    <meta name="theme-color" content="#18181b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
     <!-- Inter Font (replacing DM Sans) + JetBrains Mono -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -37,89 +43,9 @@
 
     <!-- ═══ ONBOARDING ═══ -->
     <div class="onboard" id="onboard">
-        <div class="ob-card">
+        <div class="ob-card ob-card-wide">
             <div class="ob-icon">P</div>
-            <div id="obStep1">
-                <div class="ob-title">Welcome to ProposalKit</div>
-                <div class="ob-desc">Create professional proposals that win clients. Set up your organization details
-                    once,
-                    and we'll auto-fill every proposal you create.</div>
-                <div class="ob-form">
-                    <div class="ob-step">Step 1 of 2 — Your Organization</div>
-                    <div class="fg"><label class="fl">Company Name</label><input type="text" id="obCompany"
-                            placeholder="e.g. Delta System"></div>
-                    <div class="fr">
-                        <div class="fg"><label class="fl">Your Name</label><input type="text" id="obName"
-                                placeholder="Your name"></div>
-                        <div class="fg"><label class="fl">Email</label><input type="email" id="obEmail"
-                                placeholder="hello@company.com"></div>
-                    </div>
-                    <div class="fr">
-                        <div class="fg"><label class="fl">Phone</label><input type="tel" id="obPhone"
-                                placeholder="+91 98765 43210"></div>
-                        <div class="fg"><label class="fl">Country</label>
-                            <select id="obCountry">
-                                <option value="">Select country</option>
-                                <option value="IN">India</option>
-                                <option value="US">United States</option>
-                                <option value="GB">United Kingdom</option>
-                                <option value="CA">Canada</option>
-                                <option value="AU">Australia</option>
-                                <option value="DE">Germany</option>
-                                <option value="FR">France</option>
-                                <option value="SG">Singapore</option>
-                                <option value="AE">UAE</option>
-                                <option value="JP">Japan</option>
-                                <option value="NL">Netherlands</option>
-                                <option value="SE">Sweden</option>
-                                <option value="CH">Switzerland</option>
-                                <option value="NZ">New Zealand</option>
-                                <option value="IE">Ireland</option>
-                                <option value="OTHER">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="fg"><label class="fl">Address</label><input type="text" id="obAddr"
-                            placeholder="Street, City, State, PIN"></div>
-                    <div class="fr">
-                        <div class="fg"><label class="fl">GST / Tax ID</label><input type="text" id="obTaxId"
-                                placeholder="e.g. 27AAAAA0000A1Z5">
-                            <div class="fh">GSTIN, VAT, EIN, ABN, etc.</div>
-                        </div>
-                        <div class="fg"><label class="fl">Website</label><input type="url" id="obWebsite"
-                                placeholder="https://yourcompany.com"></div>
-                    </div>
-                    <button class="btn w-full" onclick="obNext()" style="margin-top:4px">Continue <i
-                            data-lucide="arrow-right"></i></button>
-                </div>
-            </div>
-            <div id="obStep2" style="display:none">
-                <div class="ob-title">Brand Your Proposals</div>
-                <div class="ob-desc">Upload your logo and pick a brand color. These will appear on every proposal you
-                    create.</div>
-                <div class="ob-form">
-                    <div class="ob-step">Step 2 of 2 — Branding (optional)</div>
-                    <div class="fg">
-                        <label class="fl">Logo</label>
-                        <div class="brand-logo-box" onclick="document.getElementById('logoInput').click()"
-                            id="obLogoBox">
-                            <i data-lucide="image-plus"></i>
-                        </div>
-                        <input type="file" id="logoInput" accept="image/*" style="display:none"
-                            onchange="handleLogo(this)">
-                        <div class="fh">Click to upload (PNG, JPG, SVG)</div>
-                    </div>
-                    <div class="fg">
-                        <label class="fl">Brand Color</label>
-                        <div class="color-row" id="obColors"></div>
-                    </div>
-                    <div style="display:flex;gap:8px;margin-top:8px">
-                        <button class="btn-ghost" onclick="skipOb()">Skip</button>
-                        <button class="btn" style="flex:1" onclick="finishOb()">Start Creating <i
-                                data-lucide="arrow-right"></i></button>
-                    </div>
-                </div>
-            </div>
+            <div id="obContent"></div>
         </div>
     </div>
 
@@ -129,7 +55,7 @@
         <div class="side-overlay" id="sideOverlay" onclick="closeMobileSidebar()"></div>
 
         <!-- Sidebar -->
-        <aside class="side" id="sidebar">
+        <aside class="side" id="sidebar" role="navigation" aria-label="Main navigation">
             <button class="side-collapse-btn" onclick="toggleSidebar()" title="Collapse sidebar">
                 <i data-lucide="chevron-left"></i>
             </button>
@@ -174,7 +100,7 @@
                     <i data-lucide="menu"></i>
                 </button>
                 <span class="topbar-title" id="topTitle">Dashboard</span>
-                <span class="save-indicator" id="saveIndicator" style="display:none">
+                <span class="save-indicator" id="saveIndicator" style="display:none" aria-live="polite" role="status">
                     <i data-lucide="loader-2" class="save-icon saving"></i>
                     <i data-lucide="check" class="save-icon saved"></i>
                     <span class="save-text">Saved</span>
@@ -200,8 +126,17 @@
             <span class="prev-top-t">Preview</span>
             <div class="tpl-picker" id="tplPicker">
                 <button class="tpl-pick on" onclick="setDocTpl('modern',this)">Modern</button>
-                <button class="tpl-pick" onclick="setDocTpl('classic',this)">Classic</button>
+                <button class="tpl-pick" onclick="setDocTpl('clean',this)">Clean</button>
                 <button class="tpl-pick" onclick="setDocTpl('minimal',this)">Minimal</button>
+                <button class="tpl-pick" onclick="setDocTpl('executive',this)">Executive</button>
+                <button class="tpl-pick" onclick="setDocTpl('stripe',this)">Stripe</button>
+                <button class="tpl-pick" onclick="setDocTpl('nord',this)">Nord</button>
+                <button class="tpl-pick" onclick="setDocTpl('bold',this)">Bold</button>
+                <button class="tpl-pick" onclick="setDocTpl('compact',this)">Compact</button>
+                <button class="tpl-pick" onclick="setDocTpl('sidebar',this)">Sidebar</button>
+                <button class="tpl-pick" onclick="setDocTpl('formal',this)">Formal</button>
+                <button class="tpl-pick" onclick="setDocTpl('american',this)">American</button>
+                <button class="tpl-pick" onclick="setDocTpl('classic',this)">Classic</button>
                 <button class="tpl-pick" onclick="setDocTpl('tabular',this)">Tabular</button>
             </div>
             <div style="display:flex;gap:6px">
@@ -218,43 +153,9 @@
         </div>
     </div>
 
-    <!-- New Proposal Modal -->
-    <div class="modal-wrap" id="newModal" onclick="closeNewModal(event)">
-        <div class="modal modal-md" onclick="event.stopPropagation()">
-            <div class="modal-t">Create New Proposal</div>
-            <div class="modal-d">Choose a starting point</div>
-            <div class="tpl-grid">
-                <div class="tpl-c" onclick="fromTpl('blank')">
-                    <div class="tpl-ic"><i data-lucide="file"></i></div>
-                    <div>
-                        <div class="tpl-t">Blank</div>
-                        <div class="tpl-d">Start from scratch</div>
-                    </div>
-                </div>
-                <div class="tpl-c" onclick="fromTpl('web')">
-                    <div class="tpl-ic"><i data-lucide="globe"></i></div>
-                    <div>
-                        <div class="tpl-t">Web Development</div>
-                        <div class="tpl-d">Website & app projects</div>
-                    </div>
-                </div>
-                <div class="tpl-c" onclick="fromTpl('design')">
-                    <div class="tpl-ic"><i data-lucide="palette"></i></div>
-                    <div>
-                        <div class="tpl-t">Design Services</div>
-                        <div class="tpl-d">Branding & UI/UX</div>
-                    </div>
-                </div>
-                <div class="tpl-c" onclick="fromTpl('consulting')">
-                    <div class="tpl-ic"><i data-lucide="briefcase"></i></div>
-                    <div>
-                        <div class="tpl-t">Consulting</div>
-                        <div class="tpl-d">Advisory & strategy</div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-foot"><button class="btn-sm-outline" onclick="closeNewModal()">Cancel</button></div>
-        </div>
+    <!-- New Proposal Modal (content built dynamically by openNewModal) -->
+    <div class="modal-wrap" id="newModal" onclick="closeNewModal(event)" role="dialog" aria-modal="true" aria-label="New Proposal">
+        <div class="modal modal-lg" id="newModalInner" onclick="event.stopPropagation()"></div>
     </div>
 
     <!-- Context Menu -->
@@ -272,7 +173,7 @@
     </div>
 
     <!-- Toast -->
-    <div class="toasts" id="toastBox"></div>
+    <div class="toasts" id="toastBox" aria-live="assertive" role="alert"></div>
 
     <!-- Global Loading Indicator -->
     <div class="loading-overlay" id="loadingOverlay" style="display:none">
@@ -285,6 +186,7 @@
     <!-- Modular JavaScript (load order matters) -->
     <script src="assets/js/store.js"></script>
     <script src="assets/js/utils.js"></script>
+    <script src="assets/js/custom-select.js"></script>
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/variables.js"></script>
     <script src="assets/js/modals.js"></script>
@@ -307,14 +209,21 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/underline@1.1.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@2.5.3"></script>
 
+    <script src="assets/js/focus-mode.js"></script>
     <script src="assets/js/nav.js"></script>
     <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/proposals.js"></script>
+    <script src="assets/js/kanban.js"></script>
     <script src="assets/js/analytics.js"></script>
+    <script src="assets/js/analytics-breakdowns.js"></script>
+    <script src="assets/js/toc.js"></script>
     <script src="assets/js/editor.js"></script>
     <script src="assets/js/details.js"></script>
     <script src="assets/js/sections.js"></script>
     <script src="assets/js/structured-sections.js"></script>
+    <script src="assets/js/section-packs.js"></script>
     <script src="assets/js/pricing.js"></script>
+    <script src="assets/js/tc-library.js"></script>
     <script src="assets/js/csv-import.js"></script>
     <script src="assets/js/packages.js"></script>
     <script src="assets/js/addons.js"></script>
@@ -322,12 +231,21 @@
     <script src="assets/js/notes.js"></script>
     <script src="assets/js/preview.js"></script>
     <script src="assets/js/templates.js"></script>
+    <script src="assets/js/pdf-templates2.js"></script>
     <script src="assets/js/export.js"></script>
     <script src="assets/js/email.js"></script>
     <script src="assets/js/clients.js"></script>
+    <script src="assets/js/signature.js"></script>
     <script src="assets/js/settings.js"></script>
+    <script src="assets/js/tpl-data.js"></script>
+    <script src="assets/js/sharing.js"></script>
     <script src="assets/js/create.js"></script>
     <script src="assets/js/boot.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+    </script>
 
 </body>
 

@@ -2,13 +2,6 @@
 // CREATE / DUPLICATE / DELETE + SIDEBAR + CONTEXT MENU + SHARING
 // ════════════════════════════════════════
 
-const TPLS = {
-    blank: { title: 'Untitled Proposal', sections: [], lineItems: [], paymentTerms: '' },
-    web: { title: 'Web Development Proposal', sections: [{ title: 'Executive Summary', content: 'We are pleased to present this proposal for the design and development of your new website. Our team brings extensive experience in building modern, responsive, and conversion-focused web solutions.' }, { title: 'Scope of Work', content: '\u2022 Custom UI/UX Design (Desktop + Mobile)\n\u2022 Frontend Development (HTML, CSS, JS)\n\u2022 CMS Integration & Setup\n\u2022 SEO Foundation Setup\n\u2022 Performance Optimization\n\u2022 Cross-browser & Device Testing\n\u2022 30-day Post-launch Support' }, { title: 'Timeline', content: 'Phase 1 \u2014 Discovery & Wireframes: Week 1\u20132\nPhase 2 \u2014 UI Design: Week 3\u20134\nPhase 3 \u2014 Development: Week 5\u20138\nPhase 4 \u2014 Testing & Launch: Week 9\u201310' }, { title: 'Terms & Conditions', content: 'All IP transfers to client upon final payment. Source files delivered within 5 business days of project completion. Either party may terminate with 15 days written notice.' }], lineItems: [{ desc: 'UI/UX Design', detail: 'Wireframes, mockups, and interactive prototypes for all pages', qty: 1, rate: 25000 }, { desc: 'Frontend Development', detail: 'Responsive HTML/CSS/JS implementation with cross-browser support', qty: 1, rate: 40000 }, { desc: 'CMS Integration', detail: 'WordPress/headless CMS setup with content migration', qty: 1, rate: 15000 }, { desc: 'SEO Setup', detail: 'Technical SEO, meta tags, sitemap, and analytics integration', qty: 1, rate: 10000 }], paymentTerms: '50% advance before kickoff.\n50% upon completion before deployment.\nPayment due within 7 days of invoice.' },
-    design: { title: 'Design Services Proposal', sections: [{ title: 'Overview', content: 'This proposal outlines our approach to creating a cohesive brand identity that elevates your presence across all touchpoints.' }, { title: 'Deliverables', content: '\u2022 Brand Strategy & Positioning\n\u2022 Logo Design (3 concepts, 2 revision rounds)\n\u2022 Brand Guidelines Document\n\u2022 Business Card & Letterhead\n\u2022 Social Media Templates' }, { title: 'Process', content: 'Step 1: Discovery Workshop\nStep 2: Moodboard & Direction\nStep 3: Concept Presentation\nStep 4: Refinement\nStep 5: Final Delivery' }], lineItems: [{ desc: 'Brand Strategy', detail: 'Market research, competitor analysis, and positioning framework', qty: 1, rate: 15000 }, { desc: 'Logo Design', detail: '3 initial concepts with 2 rounds of revisions', qty: 1, rate: 20000 }, { desc: 'Brand Guidelines', detail: 'Typography, color palette, logo usage, and tone of voice', qty: 1, rate: 10000 }, { desc: 'Collateral Design', detail: 'Business cards, letterhead, and social media templates', qty: 1, rate: 12000 }], paymentTerms: '40% advance, 30% midpoint, 30% on completion.' },
-    consulting: { title: 'Consulting Engagement Proposal', sections: [{ title: 'Background', content: 'Based on our discussions, we understand the challenges your organization faces and are confident in delivering actionable recommendations.' }, { title: 'Approach', content: '\u2022 Stakeholder Interviews\n\u2022 Current State Assessment\n\u2022 Gap Analysis\n\u2022 Recommendations Report\n\u2022 Implementation Roadmap\n\u2022 Monthly Check-ins (3 months)' }, { title: 'Expected Outcomes', content: 'Clear understanding of bottlenecks, prioritized action plan with quick wins and long-term strategies, and measurable KPIs.' }], lineItems: [{ desc: 'Discovery & Assessment', detail: 'Stakeholder interviews, current state analysis, and gap identification', qty: 1, rate: 30000 }, { desc: 'Strategy Report', detail: 'Comprehensive recommendations with prioritized action plan', qty: 1, rate: 25000 }, { desc: 'Monthly Retainer', detail: 'Ongoing advisory, check-ins, and implementation support', qty: 3, rate: 15000 }], paymentTerms: '100% Discovery upfront. Retainer billed monthly.' }
-};
-
 function createProp(tpl) {
     const id = uid();
     const existingNumbers = DB.map(p => {
@@ -56,12 +49,13 @@ function dupPropWithClient(id) {
     const src = DB.find(p => p.id === id); if (!src) return;
     if (!CLIENTS.length) { dupProp(id); return; }
     const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show'; wrap.id = 'dupClientModal';
+    wrap.className = 'modal-wrap'; wrap.id = 'dupClientModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-    let items = CLIENTS.map((c, i) => `<div class="cp-item" onclick="doDupWithClient('${id}', ${i})"><span class="cp-item-name">${esc(c.name)}</span><span class="cp-item-email">${esc(c.email)}</span></div>`).join('');
-    items += `<div class="cp-item" onclick="doDupWithClient('${id}', -1)" style="color:var(--text4);font-style:italic"><span class="cp-item-name">Keep original client</span></div>`;
+    let items = CLIENTS.map((c, i) => `<div class="cp-item" onclick="doDupWithClient('${escAttr(id)}', ${i})"><span class="cp-item-name">${esc(c.name)}</span><span class="cp-item-email">${esc(c.email)}</span></div>`).join('');
+    items += `<div class="cp-item" onclick="doDupWithClient('${escAttr(id)}', -1)" style="color:var(--text4);font-style:italic"><span class="cp-item-name">Keep original client</span></div>`;
     wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-t">Duplicate for Client</div><div class="modal-d">Select a client for the duplicated proposal</div><div style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">${items}</div><div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('dupClientModal').remove()">Cancel</button></div></div>`;
     document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
 }
 
 function doDupWithClient(id, clientIdx) {
@@ -97,6 +91,59 @@ function delProp(id) {
 }
 
 function fromTpl(key) { closeNewModal(); createProp(TPLS[key] || TPLS.blank); }
+
+function fromSavedTpl(idx) {
+    const saved = safeGetStorage('pk_templates', []);
+    if (saved[idx]) { closeNewModal(); createProp(saved[idx]); }
+}
+
+function saveAsTemplate() {
+    const p = cur(); if (!p) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-wrap'; wrap.id = 'saveTplModal';
+    wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
+    wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()">
+        <div class="modal-t">Save as Template</div>
+        <div class="modal-d">Save this proposal's structure as a reusable template</div>
+        <div class="fg" style="margin-top:12px"><label class="fl">Template Name</label><input type="text" id="saveTplName" value="${esc(p.title)}" placeholder="e.g. Web Dev Starter"></div>
+        <div class="modal-foot">
+            <button class="btn-sm-outline" onclick="document.getElementById('saveTplModal').remove()">Cancel</button>
+            <button class="btn-sm" onclick="doSaveAsTemplate()">Save Template</button>
+        </div>
+    </div>`;
+    document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
+    document.getElementById('saveTplName').focus();
+}
+
+function doSaveAsTemplate() {
+    const name = document.getElementById('saveTplName')?.value.trim();
+    if (!name) { toast('Enter a template name', 'warning'); return; }
+    const p = cur(); if (!p) return;
+    const tpl = {
+        title: name, category: 'saved', icon: 'bookmark',
+        sections: JSON.parse(JSON.stringify(p.sections || [])),
+        lineItems: JSON.parse(JSON.stringify(p.lineItems || [])),
+        paymentTerms: p.paymentTerms || '',
+        savedAt: Date.now()
+    };
+    let saved = safeGetStorage('pk_templates', []);
+    saved.push(tpl);
+    safeLsSet('pk_templates', saved);
+    document.getElementById('saveTplModal')?.remove();
+    toast('Template saved');
+}
+
+function deleteSavedTpl(idx, e) {
+    e.stopPropagation();
+    confirmDialog('Delete this template?', () => {
+        let saved = safeGetStorage('pk_templates', []);
+        saved.splice(idx, 1);
+        safeLsSet('pk_templates', saved);
+        openNewModal();
+        toast('Template deleted');
+    }, { title: 'Delete Template', confirmText: 'Delete' });
+}
 
 // ════════════════════════════════════════
 // VERSIONING
@@ -195,104 +242,3 @@ function ctxAction(action) {
     else if (action === 'del') delProp(ctxTarget);
 }
 
-// ════════════════════════════════════════
-// CLIENT PORTAL / SHARING
-// ════════════════════════════════════════
-function generateShareToken() {
-    return 'sh_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
-}
-
-function shareProposal() {
-    const p = cur();
-    if (!p) return;
-
-    if (!p.shareToken) {
-        p.shareToken = generateShareToken();
-        p.sharedAt = Date.now();
-        p.viewCount = 0;
-        persist();
-    }
-
-    const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
-    const shareUrl = baseUrl + 'client.html?p=' + p.shareToken;
-
-    const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show';
-    wrap.id = 'shareModal';
-    wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-
-    wrap.innerHTML = `
-        <div class="modal modal-sm" onclick="event.stopPropagation()">
-            <div class="modal-t"><i data-lucide="share-2" style="width:20px;height:20px;margin-right:8px;vertical-align:-4px"></i> Share Proposal</div>
-            <div class="modal-d">Send this link to your client. They can view the proposal and accept or decline it directly.</div>
-
-            <div style="margin:16px 0">
-                <label class="form-label">Client Portal Link</label>
-                <div style="display:flex;gap:8px">
-                    <input type="text" class="input" id="shareLink" value="${shareUrl}" readonly style="flex:1;font-size:12px">
-                    <button class="btn-sm" onclick="copyShareLink()">
-                        <i data-lucide="copy"></i> Copy
-                    </button>
-                </div>
-            </div>
-
-            ${p.viewCount > 0 ? `
-            <div class="share-stats" style="background:var(--muted);padding:12px;border-radius:8px;margin-bottom:16px">
-                <div style="display:flex;gap:20px;font-size:13px">
-                    <div><strong>${p.viewCount}</strong> views</div>
-                    <div>Last viewed: ${p.lastViewedAt ? timeAgo(p.lastViewedAt) : 'Never'}</div>
-                </div>
-            </div>
-            ` : ''}
-
-            <div class="modal-foot">
-                <button class="btn-sm-outline" onclick="document.getElementById('shareModal').remove()">Close</button>
-                <button class="btn-sm-outline" onclick="window.open('${shareUrl}', '_blank')">
-                    <i data-lucide="external-link"></i> Open Preview
-                </button>
-            </div>
-        </div>`;
-    document.body.appendChild(wrap);
-    lucide.createIcons();
-}
-
-function copyShareLink() {
-    const input = document.getElementById('shareLink');
-    input.select();
-    navigator.clipboard.writeText(input.value).then(() => {
-        toast('Link copied to clipboard!');
-    }).catch(() => {
-        document.execCommand('copy');
-        toast('Link copied!');
-    });
-}
-
-function getProposalByToken(token) {
-    return DB.find(p => p.shareToken === token);
-}
-
-function recordProposalView(token) {
-    const p = getProposalByToken(token);
-    if (!p) return null;
-    p.viewCount = (p.viewCount || 0) + 1;
-    p.lastViewedAt = Date.now();
-    persist();
-    return p;
-}
-
-function respondToProposal(token, status, comment) {
-    const p = getProposalByToken(token);
-    if (!p) return false;
-
-    p.clientResponse = {
-        status: status,
-        respondedAt: Date.now(),
-        comment: comment || ''
-    };
-
-    if (status === 'accepted') p.status = 'accepted';
-    else if (status === 'declined') p.status = 'declined';
-
-    persist();
-    return true;
-}

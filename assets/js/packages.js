@@ -164,7 +164,7 @@ function buildPackagesPdfHtml(p, c, bc) {
         h += `<div style="flex:1;border:${pkg.recommended ? '2px solid ' + bc : '1px solid #e4e4e7'};border-radius:8px;padding:16px;text-align:center;position:relative">`;
         if (pkg.recommended) h += `<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:${bc};color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px">Recommended</div>`;
         h += `<div style="font-size:14px;font-weight:700;margin-bottom:4px">${esc(pkg.name)}</div>`;
-        h += `<div style="font-size:20px;font-weight:800;color:${bc}">${cur}${(pkg.price || 0).toLocaleString('en-IN')}</div>`;
+        h += `<div style="font-size:20px;font-weight:800;color:${bc}">${cur}${(pkg.price || 0).toLocaleString(cur === '₹' ? 'en-IN' : 'en-US')}</div>`;
         h += '</div>';
     });
     h += '</div>';

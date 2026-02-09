@@ -3,8 +3,101 @@
 // ════════════════════════════════════════
 
 function openNewModal() {
+    const modal = document.getElementById('newModalInner');
+    const curCat = window._newModalCat || 'general';
+    const font = CONFIG?.font || 'Inter';
+    const color = CONFIG?.color || COLORS[0];
+
+    // Template descriptions for cards
+    const tplDesc = {
+        blank: 'Start from scratch', web: 'Website & app projects', design: 'Branding & UI/UX',
+        consulting: 'Advisory & strategy', saas: 'Cloud software products', marketing: 'Campaigns & SEO',
+        photography: 'Shoots & editing', ecommerce: 'Online store builds', mobile: 'iOS & Android apps',
+        india: 'GST/TDS compliant', us: 'W-9 & Net 30 terms', uk: 'VAT & IR35 ready'
+    };
+
+    // Category tabs
+    const tabs = TPL_CATEGORIES.map(c =>
+        `<button class="filter-tab ${c.key === curCat ? 'on' : ''}" onclick="window._newModalCat='${c.key}';openNewModal()"><i data-lucide="${c.icon}"></i> ${c.label}</button>`
+    ).join('');
+
+    // Template cards for current category
+    let cards = '';
+    if (curCat === 'saved') {
+        const saved = safeGetStorage('pk_templates', []);
+        if (!saved.length) {
+            cards = '<div class="empty" style="padding:30px"><div class="empty-t" style="font-size:13px">No saved templates</div><div class="empty-d" style="font-size:12px">Open a proposal and use Save as Template to create one.</div></div>';
+        } else {
+            cards = saved.map((t, idx) => {
+                const secs = (t.sections || []).length;
+                const items = (t.lineItems || []).length;
+                return `<div class="tpl-c" onclick="fromSavedTpl(${idx})">
+                    <div class="tpl-preview"><div class="tm-bar" style="width:${50 + secs * 10}%;height:4px"></div><div class="tm-bar" style="width:100%;height:3px;opacity:0.5"></div>${items > 1 ? '<div class="tm-bar tm-accent" style="width:40%;height:4px"></div>' : ''}<div class="tm-bar" style="width:${60 + items * 5}%;height:3px;opacity:0.3"></div></div>
+                    <div class="tpl-row"><div class="tpl-ic"><i data-lucide="bookmark"></i></div><div style="flex:1"><div class="tpl-t">${esc(t.title)}</div><div class="tpl-d">${secs} sections, ${items} items</div></div><button class="btn-sm-icon-ghost" onclick="deleteSavedTpl(${idx},event)" data-tooltip="Delete" data-side="bottom"><i data-lucide="trash-2"></i></button></div>
+                </div>`;
+            }).join('');
+        }
+    } else {
+        const tpls = Object.entries(TPLS).filter(([, v]) => v.category === curCat);
+        cards = tpls.map(([key, t]) => {
+            const secs = (t.sections || []).length;
+            const items = (t.lineItems || []).length;
+            const countryBadge = t.countryLabel ? `<span class="tpl-badge">${esc(t.countryLabel)}</span>` : '';
+            return `<div class="tpl-c" onclick="fromTpl('${key}')">
+                <div class="tpl-preview"><div class="tm-bar" style="width:${50 + secs * 10}%;height:4px"></div><div class="tm-bar" style="width:100%;height:3px;opacity:0.5"></div>${items > 1 ? '<div class="tm-bar tm-accent" style="width:40%;height:4px"></div>' : ''}<div class="tm-bar" style="width:${60 + items * 5}%;height:3px;opacity:0.3"></div></div>
+                <div class="tpl-row"><div class="tpl-ic"><i data-lucide="${t.icon || 'file'}"></i></div><div><div class="tpl-t">${esc(t.title.replace(' Proposal', ''))}${countryBadge}</div><div class="tpl-d">${tplDesc[key] || ''}</div></div></div>
+            </div>`;
+        }).join('');
+    }
+
+    // Font items
+    const fonts = [
+        { value: 'Inter', label: 'Inter', desc: 'Modern' },
+        { value: 'Roboto', label: 'Roboto', desc: 'Standard' },
+        { value: 'Lato', label: 'Lato', desc: 'Friendly' },
+        { value: 'Playfair Display', label: 'Playfair Display', desc: 'Elegant' },
+        { value: 'Merriweather', label: 'Merriweather', desc: 'Classic' },
+        { value: 'Courier Prime', label: 'Courier Prime', desc: 'Typewriter' }
+    ];
+
+    // Color swatches
+    const swatches = COLORS.map(c =>
+        `<div class="nm-swatch ${c === color ? 'on' : ''}" style="background:${c}" onclick="pickNewModalColor('${c}')"></div>`
+    ).join('');
+
+    modal.innerHTML = `
+        <div class="modal-t">New Proposal</div>
+        <div class="modal-d">Pick a template and customize appearance</div>
+        <div class="nm-tabs">${tabs}</div>
+        <div class="tpl-grid">${cards}</div>
+        <div class="nm-customize">
+            <div class="nm-opt">
+                <label class="fl" style="margin-bottom:6px">Font</label>
+                <div id="nmFont"></div>
+            </div>
+            <div class="nm-opt">
+                <label class="fl" style="margin-bottom:6px">Brand Color</label>
+                <div class="nm-swatches">${swatches}</div>
+            </div>
+        </div>
+        <div class="modal-foot"><button class="btn-sm-outline" onclick="closeNewModal()">Cancel</button></div>
+    `;
+
+    // Init font custom select
+    csel(document.getElementById('nmFont'), {
+        value: font,
+        items: fonts,
+        onChange: (val) => { CONFIG.font = val; saveConfig(); applyFont(val); }
+    });
+
     document.getElementById('newModal').classList.add('show');
     lucide.createIcons();
+}
+
+function pickNewModalColor(c) {
+    CONFIG.color = c;
+    saveConfig();
+    document.querySelectorAll('.nm-swatch').forEach(s => s.classList.toggle('on', s.style.background === c));
 }
 
 function closeNewModal(e) {
@@ -54,8 +147,11 @@ function confirmDialog(message, onConfirm, opts = {}) {
     const confirmText = opts.confirmText || 'Delete';
     const destructive = opts.destructive !== false;
     const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap show';
+    wrap.className = 'modal-wrap';
     wrap.id = 'confirmModal';
+    wrap.setAttribute('role', 'alertdialog');
+    wrap.setAttribute('aria-modal', 'true');
+    wrap.setAttribute('aria-label', title);
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `
         <div class="modal modal-sm" onclick="event.stopPropagation()">
@@ -67,8 +163,8 @@ function confirmDialog(message, onConfirm, opts = {}) {
             </div>
         </div>`;
     document.body.appendChild(wrap);
-    document.getElementById('confirmBtn').onclick = () => {
-        wrap.remove();
-        onConfirm();
-    };
+    requestAnimationFrame(() => wrap.classList.add('show'));
+    const confirmBtn = document.getElementById('confirmBtn');
+    confirmBtn.onclick = () => { wrap.remove(); onConfirm(); };
+    confirmBtn.focus();
 }

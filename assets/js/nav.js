@@ -9,6 +9,8 @@ function goNav(view) {
     document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
     const btn = document.querySelector(`[data-nav="${view}"]`);
     if (btn) btn.classList.add('on');
+    // Hide TOC on non-editor views
+    if (view !== 'editor' && typeof hideTOC === 'function') hideTOC();
     if (view === 'dashboard') renderDashboard();
     else if (view === 'editor') { if (CUR) loadEditor(CUR); else renderProposals(); }
     else if (view === 'clients') renderClients();
@@ -33,7 +35,7 @@ function closeMobileSidebar() {
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('collapsed');
-    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+    safeLsSet('sidebarCollapsed', sidebar.classList.contains('collapsed') ? 'true' : 'false');
 }
 
 function initSidebarState() {
@@ -57,8 +59,9 @@ function initKeyboardShortcuts() {
             return;
         }
 
-        // ESC key — close topmost modal or preview
+        // ESC key — exit focus mode first, then close topmost modal or preview
         if (e.key === 'Escape') {
+            if (focusMode && typeof exitFocusMode === 'function') { exitFocusMode(); return; }
             const prevPanel = document.getElementById('prevPanel');
             if (prevPanel && prevPanel.classList.contains('show')) {
                 closePreview();
@@ -117,6 +120,11 @@ function initKeyboardShortcuts() {
             if (e.key === 'y' && !e.shiftKey && CUR) {
                 e.preventDefault();
                 redo();
+            }
+            // Focus mode: Cmd+.
+            if (e.key === '.' && typeof toggleFocusMode === 'function') {
+                e.preventDefault();
+                toggleFocusMode();
             }
         }
     });
