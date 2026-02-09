@@ -386,9 +386,9 @@
   transition: color var(--t);
 }
 .star-btn svg { width: 18px; height: 18px; }
-.star-btn.on { color: #FF9500; }
-.star-btn.on svg { fill: #FF9500; stroke: #FF9500; }
-.star-btn:hover { color: #FF9500; }
+.star-btn.on { color: var(--amber); }
+.star-btn.on svg { fill: var(--amber); stroke: var(--amber); }
+.star-btn:hover { color: var(--amber); }
 
 .sec-type-menu {
   position: absolute;

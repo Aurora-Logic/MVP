@@ -12,8 +12,8 @@ function buildPricingHtml(rows, c, t, bc, style) {
     h += '<div style="display:flex;justify-content:flex-end;margin-top:8px"><div style="width:220px">';
     h += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#71717a"><span>Subtotal</span><span style="font-family:var(--mono)">${c}${t.subtotal.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
     if (t.disc) h += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#71717a"><span>Discount</span><span style="font-family:var(--mono)">\u2212${c}${t.disc.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
-    const taxLabel = CONFIG?.country === 'IN' ? 'GST' : (CONFIG?.country === 'GB' || CONFIG?.country === 'DE' || CONFIG?.country === 'FR' || CONFIG?.country === 'NL' || CONFIG?.country === 'IE' ? 'VAT' : 'Tax');
-    if (t.taxRate) h += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#71717a"><span>${taxLabel} (${t.taxRate}%)</span><span style="font-family:var(--mono)">${c}${t.taxAmt.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
+    const txLabel = typeof taxLabel === 'function' ? taxLabel() : 'Tax';
+    if (t.taxRate) h += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#71717a"><span>${txLabel} (${t.taxRate}%)</span><span style="font-family:var(--mono)">${c}${t.taxAmt.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
     if (t.addOnsTotal) h += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#71717a"><span>Add-Ons</span><span style="font-family:var(--mono)">${c}${t.addOnsTotal.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
     h += `<div style="display:flex;justify-content:space-between;padding:8px 0 0;font-size:16px;font-weight:700;border-top:2px solid ${bc};margin-top:4px"><span>Total</span><span style="font-family:var(--mono)">${c}${t.grand.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
     h += '</div></div>';
@@ -27,9 +27,17 @@ function buildSenderDetails() {
 }
 
 function buildSenderTaxLine() {
-    if (!CONFIG?.taxId) return '';
     const country = CONFIG?.country || '';
-    const labels = { IN: 'GSTIN', US: 'EIN', GB: 'VAT', AU: 'ABN', CA: 'BN', DE: 'USt-IdNr', FR: 'SIREN', SG: 'UEN', AE: 'TRN', NL: 'BTW', JP: 'Corp. No', SE: 'Org.nr', CH: 'UID', NZ: 'NZBN', IE: 'VAT' };
+    // India stores tax IDs in separate fields (gstin, pan, udyam), not taxId
+    if (country === 'IN') {
+        const parts = [];
+        if (CONFIG?.gstin) parts.push('GSTIN: ' + esc(CONFIG.gstin));
+        if (CONFIG?.pan) parts.push('PAN: ' + esc(CONFIG.pan));
+        if (parts.length) return `<div style="font-size:10px;color:#a1a1aa;margin-top:4px">${parts.join(' | ')}</div>`;
+        return '';
+    }
+    if (!CONFIG?.taxId) return '';
+    const labels = { US: 'EIN', GB: 'VAT', AU: 'ABN', CA: 'BN', DE: 'USt-IdNr', FR: 'SIREN', SG: 'UEN', AE: 'TRN', NL: 'BTW', JP: 'Corp. No', SE: 'Org.nr', CH: 'UID', NZ: 'NZBN', IE: 'VAT' };
     const label = labels[country] || 'Tax ID';
     return `<div style="font-size:10px;color:#a1a1aa;margin-top:4px">${label}: ${esc(CONFIG.taxId)}</div>`;
 }
@@ -114,7 +122,7 @@ function buildTabularTpl(p, c, bc, t, rows, secs, logo, title, num, isInv) {
         h += '<div style="display:flex;justify-content:flex-end;margin-top:8px"><div style="width:220px">';
         h += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#71717a"><span>Subtotal</span><span style="font-family:var(--mono)">${c}${t.subtotal.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
         if (t.disc) h += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#71717a"><span>Discount</span><span style="font-family:var(--mono)">\u2212${c}${t.disc.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
-        const txLbl = CONFIG?.country === 'IN' ? 'GST' : (['GB','DE','FR','NL','IE'].includes(CONFIG?.country) ? 'VAT' : 'Tax');
+        const txLbl = typeof taxLabel === 'function' ? taxLabel() : 'Tax';
         if (t.taxRate) h += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#71717a"><span>${txLbl} (${t.taxRate}%)</span><span style="font-family:var(--mono)">${c}${t.taxAmt.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
         if (t.addOnsTotal) h += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#71717a"><span>Add-Ons</span><span style="font-family:var(--mono)">${c}${t.addOnsTotal.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
         h += `<div style="display:flex;justify-content:space-between;padding:8px 0 0;font-size:16px;font-weight:700;border-top:2px solid ${bc};margin-top:4px"><span>Total</span><span style="font-family:var(--mono)">${c}${t.grand.toLocaleString(c === '₹' ? 'en-IN' : 'en-US')}</span></div>`;

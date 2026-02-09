@@ -126,8 +126,8 @@ function setFeatureTier(fIdx, tIdx) {
     const f = p.packageFeatures[fIdx];
     if (!f || !f.tiers) return;
     const cycle = ['check', 'dash', 'cross'];
-    const cur_val = f.tiers[tIdx] || 'check';
-    f.tiers[tIdx] = cycle[(cycle.indexOf(cur_val) + 1) % 3];
+    const tierVal = f.tiers[tIdx] || 'check';
+    f.tiers[tIdx] = cycle[(cycle.indexOf(tierVal) + 1) % 3];
     persist();
     renderPackages(p);
     dirty();
@@ -156,7 +156,7 @@ function buildPackagesPdfHtml(p, c, bc) {
     const pkgs = p.packages || [];
     const features = p.packageFeatures || [];
     if (!pkgs.length) return '';
-    const cur = c || defaultCurrency();
+    const currSymbol = c || defaultCurrency();
 
     let h = `<div style="margin-top:20px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Pricing Packages</div>`;
     h += '<div style="display:flex;gap:12px;margin-bottom:12px">';
@@ -164,7 +164,7 @@ function buildPackagesPdfHtml(p, c, bc) {
         h += `<div style="flex:1;border:${pkg.recommended ? '2px solid ' + bc : '1px solid #e4e4e7'};border-radius:8px;padding:16px;text-align:center;position:relative">`;
         if (pkg.recommended) h += `<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:${bc};color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px">Recommended</div>`;
         h += `<div style="font-size:14px;font-weight:700;margin-bottom:4px">${esc(pkg.name)}</div>`;
-        h += `<div style="font-size:20px;font-weight:800;color:${bc}">${cur}${(pkg.price || 0).toLocaleString(cur === '₹' ? 'en-IN' : 'en-US')}</div>`;
+        h += `<div style="font-size:20px;font-weight:800;color:${bc}">${currSymbol}${(pkg.price || 0).toLocaleString(currSymbol === '₹' ? 'en-IN' : 'en-US')}</div>`;
         h += '</div>';
     });
     h += '</div>';

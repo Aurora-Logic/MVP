@@ -70,7 +70,7 @@ function saveClient(idx) {
         email: document.getElementById('acEmail').value,
         phone: document.getElementById('acPhone').value
     };
-    if (!c.name) { toast('Name is required'); return; }
+    if (!c.name) { toast('Name is required', 'error'); return; }
     if (idx >= 0) CLIENTS[idx] = c;
     else CLIENTS.push(c);
     saveClients();

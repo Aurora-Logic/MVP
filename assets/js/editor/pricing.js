@@ -150,9 +150,9 @@ function initPaymentTermsEditor(p) {
             tools: {
                 header: { class: EditorHeader, inlineToolbar: true, config: { placeholder: 'Heading', levels: [2, 3, 4], defaultLevel: 3 } },
                 list: { class: EditorList, inlineToolbar: true },
-                quote: { class: Quote, inlineToolbar: true },
-                marker: Marker,
-                delimiter: Delimiter
+                quote: { class: window.Quote || window.EditorQuote || class {}, inlineToolbar: true },
+                marker: window.Marker || window.EditorMarker || class {},
+                delimiter: window.Delimiter || window.EditorDelimiter || class {}
             },
             placeholder: 'Add payment terms... (use / for blocks)',
             minHeight: 60,
@@ -186,9 +186,9 @@ function initSingleLiEditor(el, initialData) {
             tools: {
                 header: { class: EditorHeader, inlineToolbar: true, config: { placeholder: 'Heading', levels: [3, 4], defaultLevel: 3 } },
                 list: { class: EditorList, inlineToolbar: true },
-                quote: { class: Quote, inlineToolbar: true },
-                marker: Marker,
-                delimiter: Delimiter
+                quote: { class: window.Quote || window.EditorQuote || class {}, inlineToolbar: true },
+                marker: window.Marker || window.EditorMarker || class {},
+                delimiter: window.Delimiter || window.EditorDelimiter || class {}
             },
             placeholder: 'Description...',
             minHeight: 0,

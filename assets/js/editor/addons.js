@@ -85,18 +85,18 @@ function collectAddOnsData(p) {
 function buildAddOnsPdfHtml(p, c, bc) {
     const addOns = (p.addOns || []).filter(a => a.desc);
     if (!addOns.length) return '';
-    const cur = c || defaultCurrency();
+    const currSymbol = c || defaultCurrency();
     let h = `<div style="margin-top:20px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Optional Add-Ons</div>`;
     addOns.forEach(ao => {
         const icon = ao.selected ? '☑' : '☐';
         h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f4f4f5">
             <span style="font-size:13px;color:${ao.selected ? '#09090b' : '#a1a1aa'}">${icon} ${esc(ao.desc)}</span>
-            <span style="font-size:13px;font-family:var(--mono);font-weight:500;color:${ao.selected ? '#09090b' : '#a1a1aa'}">${cur}${(ao.price || 0).toLocaleString(cur === '₹' ? 'en-IN' : 'en-US')}</span>
+            <span style="font-size:13px;font-family:var(--mono);font-weight:500;color:${ao.selected ? '#09090b' : '#a1a1aa'}">${currSymbol}${(ao.price || 0).toLocaleString(currSymbol === '₹' ? 'en-IN' : 'en-US')}</span>
         </div>`;
     });
     const selectedTotal = addOns.filter(a => a.selected).reduce((s, a) => s + (a.price || 0), 0);
     if (selectedTotal > 0) {
-        h += `<div style="display:flex;justify-content:flex-end;padding:8px 0;font-size:13px;font-weight:600"><span>Add-Ons Total: ${cur}${selectedTotal.toLocaleString(cur === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
+        h += `<div style="display:flex;justify-content:flex-end;padding:8px 0;font-size:13px;font-weight:600"><span>Add-Ons Total: ${currSymbol}${selectedTotal.toLocaleString(currSymbol === '₹' ? 'en-IN' : 'en-US')}</span></div>`;
     }
     h += '</div>';
     return h;

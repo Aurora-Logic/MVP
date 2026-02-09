@@ -159,7 +159,7 @@ function collectPaymentScheduleData(p) {
 function buildSchedulePdfHtml(p, c, bc) {
     const milestones = (p.paymentSchedule || []).filter(m => m.name);
     if (!milestones.length) return '';
-    const cur = c || defaultCurrency();
+    const currSymbol = c || defaultCurrency();
     const mode = p.paymentScheduleMode || 'percentage';
     const t = calcTotals(p);
     const colors = ['#007AFF', '#AF52DE', '#34C759', '#FF9500', '#FF3B30', '#5AC8FA'];
@@ -182,7 +182,7 @@ function buildSchedulePdfHtml(p, c, bc) {
         const amt = mode === 'percentage' ? Math.round(t.grand * (m.percentage || 0) / 100) : (m.amount || 0);
         const pctLabel = mode === 'percentage' ? ` (${m.percentage}%)` : '';
         h += `<tr><td style="padding:8px 0;border-bottom:1px solid #f4f4f5"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${colors[i % colors.length]};margin-right:8px"></span>${esc(m.name)}${m.desc ? '<div style="font-size:11px;color:#a1a1aa;margin-left:16px">' + esc(m.desc) + '</div>' : ''}</td>`;
-        h += `<td style="padding:8px 0;border-bottom:1px solid #f4f4f5;text-align:right;font-family:var(--mono);font-weight:500">${cur}${amt.toLocaleString(cur === '₹' ? 'en-IN' : 'en-US')}${pctLabel}</td>`;
+        h += `<td style="padding:8px 0;border-bottom:1px solid #f4f4f5;text-align:right;font-family:var(--mono);font-weight:500">${currSymbol}${amt.toLocaleString(currSymbol === '₹' ? 'en-IN' : 'en-US')}${pctLabel}</td>`;
         h += `<td style="padding:8px 0;border-bottom:1px solid #f4f4f5;text-align:right;font-size:12px;color:#71717a">${m.dueDate ? fmtDate(m.dueDate) : '—'}</td></tr>`;
     });
     h += '</tbody></table></div>';

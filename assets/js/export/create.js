@@ -219,6 +219,7 @@ function showCtx(e, id) {
     ctxTarget = id;
     const p = DB.find(x => x.id === id);
     const ctx = document.getElementById('ctxMenu');
+    if (!ctx) return;
     const archiveEl = document.getElementById('ctxArchive');
     const unarchiveEl = document.getElementById('ctxUnarchive');
     if (archiveEl) archiveEl.style.display = p?.archived ? 'none' : '';
@@ -228,7 +229,7 @@ function showCtx(e, id) {
     ctx.classList.add('show');
 }
 
-function hideCtx() { document.getElementById('ctxMenu').classList.remove('show'); }
+function hideCtx() { const m = document.getElementById('ctxMenu'); if (m) m.classList.remove('show'); }
 
 function ctxAction(action) {
     hideCtx();

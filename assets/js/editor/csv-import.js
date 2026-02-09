@@ -60,6 +60,7 @@ function handleCsvFile(input) {
         if (textarea) textarea.value = e.target.result;
         parseCsvInput();
     };
+    reader.onerror = () => toast('Failed to read CSV file', 'error');
     reader.readAsText(file);
 }
 

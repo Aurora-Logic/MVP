@@ -51,7 +51,7 @@ function shareProposal() {
 
             <div class="modal-foot">
                 <button class="btn-sm-outline" onclick="document.getElementById('shareModal').remove()">Close</button>
-                <button class="btn-sm-outline" onclick="window.open('${esc(shareUrl)}', '_blank')">
+                <button class="btn-sm-outline" onclick="window.open('${escAttr(shareUrl)}', '_blank')">
                     <i data-lucide="external-link"></i> Open Preview
                 </button>
             </div>

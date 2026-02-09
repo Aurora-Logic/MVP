@@ -2574,7 +2574,11 @@
 }
 
 .dark .ce-inline-tool--active {
-  color: #007AFF;
+  color: var(--blue);
+}
+
+.dark .editorjs-container .cdx-marker {
+  background: rgba(245, 235, 111, 0.3);
 }
 
 /* Line item description editor — compact variant */
