@@ -157,7 +157,7 @@ function buildClientHistory(props) {
                 <div class="ci-prop-meta">${esc(p.number)} · ${fmtDate(p.createdAt)}</div>
             </div>
             <div class="ci-prop-val">${fmtCur(val, p.currency)}</div>
-            <span class="badge badge-${p.status}" style="font-size:10px;padding:2px 7px"><span class="badge-dot" style="width:5px;height:5px"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span>
+            <span class="badge badge-${p.status}"><span class="badge-dot"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span>
         </div>`;
     }).join('') + '</div>';
 }
