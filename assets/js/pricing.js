@@ -7,14 +7,14 @@ function renderPricing(p) {
     let rows = '';
     items.forEach((item, i) => {
         rows += `<tr class="li-row">
-      <td><div class="li-title-wrap"><input type="text" class="ld" value="${esc(item.desc)}" placeholder="Item title" oninput="dirty()"><textarea class="ld-sub" placeholder="Description (optional)" oninput="autoResizeTextarea(this);dirty()" rows="1">${esc(item.detail || '')}</textarea></div></td>
+      <td><div class="li-title-wrap"><input type="text" class="ld" value="${esc(item.desc)}" placeholder="Item title" oninput="dirty()"><div class="editorjs-container li-desc-editor" id="li-editor-${i}"></div></div></td>
       <td><input type="number" class="lq" value="${item.qty}" min="0" step="1" oninput="reRow(this);dirty()"></td>
       <td><input type="number" class="lr" value="${item.rate}" min="0" step="100" oninput="reRow(this);dirty()"></td>
       <td class="li-amt">${fmtCur((item.qty || 0) * (item.rate || 0), p.currency)}</td>
       <td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>
     </tr>`;
     });
-    if (!items.length) rows = `<tr class="li-row"><td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><textarea class="ld-sub" placeholder="Description (optional)" oninput="autoResizeTextarea(this);dirty()" rows="1"></textarea></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, p.currency)}</td><td><button class="btn-sm-icon-ghost" onclick="this.closest('tr').remove();reTotal();dirty()"><i data-lucide="x"></i></button></td></tr>`;
+    if (!items.length) rows = `<tr class="li-row"><td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="editorjs-container li-desc-editor" id="li-editor-0"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, p.currency)}</td><td><button class="btn-sm-icon-ghost" onclick="this.closest('tr').remove();reTotal();dirty()"><i data-lucide="x"></i></button></td></tr>`;
 
     const subtotal = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
     const disc = p.discount || 0;
@@ -31,11 +31,10 @@ function renderPricing(p) {
         lineItems: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Line Items</div><div class="card-d">Deliverables and costs</div></div><div style="display:flex;align-items:center;gap:8px"><label class="fl" style="margin:0;font-size:10px">Currency</label><select id="fCur" style="width:84px;padding:4px 12px!important ;font-size:12px;border-radius:999px!important" onchange="dirty();reTotal()">${curOpts}</select></div></div><table class="li-tbl"><thead><tr><th style="width:40%">Item</th><th style="width:12%">Qty</th><th style="width:18%">Rate</th><th style="width:18%;text-align:right">Amount</th><th style="width:12%"></th></tr></thead><tbody id="liBody">${rows}</tbody></table><div style="padding-top:14px;margin-top:14px;border-top:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:flex-start"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()" style="margin-left:4px"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}<div style="width:260px"><div class="summary-row sub"><span class="sr-label">Subtotal</span><span class="sr-val" id="subtotalVal">${fmtCur(subtotal, p.currency)}</span></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">Discount</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><span style="font-size:12px;color:var(--text4)">−</span><input type="number" id="fDiscount" value="${disc}" min="0" step="500" style="width:90px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"></div></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">${taxLbl}</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><input type="number" id="fTaxRate" value="${taxRate}" min="0" max="100" step="0.5" style="width:55px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"><span style="font-size:12px;color:var(--text4)">%</span><span class="sr-val" style="min-width:70px;text-align:right" id="taxAmtVal">${fmtCur(taxAmt, p.currency)}</span></div></div><div class="summary-row sub" id="addOnsSummaryRow" style="display:none"></div><div class="summary-row grand"><span class="sr-label">Total</span><span class="sr-val" id="totalVal">${fmtCur(grand, p.currency)}</span></div></div></div></div></div>`,
         addOns: '<div id="addOnsSection"></div>',
         paySchedule: '<div id="payScheduleSection"></div>',
-        pricingDesc: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Pricing Description</div><div class="card-d">Scope overview or details</div></div></div><div class="fg" style="margin:0"><div id="pricingDescEditor" class="editorjs-container"></div></div></div>`,
         payTerms: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Payment Terms</div><div class="card-d">Conditions and legal terms</div></div><div style="display:flex;gap:6px"><button class="btn-sm-outline" onclick="openTCLib()"><i data-lucide="bookmark"></i> T&C Library</button></div></div><div class="fg" style="margin:0"><div id="paymentTermsEditor" class="editorjs-container"></div></div></div>`
     };
 
-    const defaultOrder = ['pricingDesc', 'packages', 'lineItems', 'addOns', 'paySchedule', 'payTerms'];
+    const defaultOrder = ['packages', 'lineItems', 'addOns', 'paySchedule', 'payTerms'];
     const order = p.pricingSectionOrder || defaultOrder;
     const validOrder = order.filter(k => sectionHtml[k]);
     defaultOrder.forEach(k => { if (!validOrder.includes(k)) validOrder.push(k); });
@@ -53,7 +52,9 @@ function renderPricing(p) {
     lucide.createIcons();
     setTimeout(() => {
         initPaymentTermsEditor(p);
-        initPricingDescEditor(p);
+        document.querySelectorAll('.li-desc-editor').forEach((el, i) => {
+            if (items[i]) initSingleLiEditor(el, items[i].detail);
+        });
     }, 100);
 }
 
@@ -140,46 +141,44 @@ function initPaymentTermsEditor(p) {
     } catch (e) { console.error('Payment terms editor init error', e); }
 }
 
-function initPricingDescEditor(p) {
-    if (pricingDescEditor && typeof pricingDescEditor.destroy === 'function') {
-        try { pricingDescEditor.destroy(); } catch (e) { }
+function initSingleLiEditor(el, initialData) {
+    if (el._editor && typeof el._editor.destroy === 'function') {
+        try { el._editor.destroy(); } catch (e) { }
     }
-    pricingDescEditor = null;
-
-    // Check if element exists
-    if (!document.getElementById('pricingDescEditor')) return;
+    el._editor = null;
 
     let data;
-    if (p.pricingDesc) {
-        if (typeof p.pricingDesc === 'string') {
-            if (p.pricingDesc.trim()) {
-                data = { blocks: p.pricingDesc.split('\n\n').map(t => ({ type: 'paragraph', data: { text: t } })) };
-            } else {
-                data = { blocks: [] };
-            }
-        } else {
-            data = p.pricingDesc;
-        }
-    } else {
-        data = { blocks: [] };
-    }
+    if (typeof initialData === 'string') {
+        if (initialData.trim()) {
+            data = { blocks: initialData.split('\n').map(t => ({ type: 'paragraph', data: { text: t } })) };
+        } else { data = { blocks: [] }; }
+    } else { data = initialData || { blocks: [] }; }
 
     try {
-        pricingDescEditor = new EditorJS({
-            holder: 'pricingDescEditor',
+        // Tools must be loaded in index.html
+        const tools = {
+            header: { class: Header, inlineToolbar: true, config: { placeholder: 'Header', levels: [2, 3, 4], defaultLevel: 3 } },
+            list: { class: List, inlineToolbar: true },
+            checklist: { class: Checklist, inlineToolbar: true },
+            table: { class: Table, inlineToolbar: true },
+            quote: { class: Quote, inlineToolbar: true },
+            marker: Marker,
+            delimiter: Delimiter,
+            underline: Underline,
+            inlineCode: InlineCode,
+            code: Code,
+            embed: Embed
+        };
+
+        el._editor = new EditorJS({
+            holder: el,
             data: data,
-            tools: {
-                header: Header,
-                list: List,
-                quote: Quote,
-                marker: Marker,
-                delimiter: Delimiter
-            },
-            placeholder: 'Add pricing description...',
-            minHeight: 50,
+            tools: tools,
+            placeholder: 'Description...',
+            minHeight: 0,
             onChange: () => dirty()
         });
-    } catch (e) { console.error('Pricing desc editor init error', e); }
+    } catch (e) { console.error('LI editor init error', e); }
 }
 
 function deleteLineItem(btn) {
@@ -203,9 +202,12 @@ function addLine() {
     const tr = document.createElement('tr');
     tr.className = 'li-row';
     const c = document.getElementById('fCur')?.value || '\u20B9';
-    tr.innerHTML = `<td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><textarea class="ld-sub" placeholder="Description (optional)" oninput="autoResizeTextarea(this);dirty()" rows="1"></textarea></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, c)}</td><td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>`;
+    const uniqueId = 'li-' + Date.now() + Math.random().toString(36).slice(2, 5);
+    tr.innerHTML = `<td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="editorjs-container li-desc-editor" id="${uniqueId}"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, c)}</td><td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>`;
     body.appendChild(tr);
     lucide.createIcons();
+    const el = document.getElementById(uniqueId);
+    if (el) initSingleLiEditor(el, null);
     dirty();
 }
 

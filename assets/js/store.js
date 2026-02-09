@@ -16,7 +16,6 @@ let saveIndicatorTimer = null;
 let docTemplate = 'modern';
 let sectionEditors = {};
 let paymentTermsEditor = null;
-let pricingDescEditor = null;
 
 // Undo/Redo state stack
 let undoStack = [];

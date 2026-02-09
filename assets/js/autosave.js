@@ -81,13 +81,7 @@ function dirty() {
             } catch (err) { console.warn('Error saving payment terms', err); }
         }
 
-        // Pricing Description - save from EditorJS
-        if (typeof pricingDescEditor !== 'undefined' && pricingDescEditor && typeof pricingDescEditor.save === 'function') {
-            try {
-                const data = await pricingDescEditor.save();
-                p.pricingDesc = data;
-            } catch (err) { console.warn('Error saving pricing description', err); }
-        }
+
 
         p.discount = parseFloat(get('fDiscount')) || 0;
         p.taxRate = parseFloat(get('fTaxRate')) || 0;
@@ -134,18 +128,27 @@ function dirty() {
             p.sections = newSections;
         }
 
-        // Lines
+        // Line Items - save from inputs and EditorJS
         const liEls = document.querySelectorAll('.li-row');
         if (liEls.length || document.getElementById('liBody')) {
-            p.lineItems = [];
-            liEls.forEach(row => {
-                p.lineItems.push({
-                    desc: row.querySelector('.ld')?.value || '',
-                    detail: row.querySelector('.ld-sub')?.value || '',
-                    qty: parseFloat(row.querySelector('.lq')?.value) || 0,
-                    rate: parseFloat(row.querySelector('.lr')?.value) || 0
-                });
-            });
+            const newLineItems = [];
+            for (const row of liEls) {
+                const desc = row.querySelector('.ld')?.value || '';
+                const qty = parseFloat(row.querySelector('.lq')?.value) || 0;
+                const rate = parseFloat(row.querySelector('.lr')?.value) || 0;
+
+                let detail = null;
+                const editorEl = row.querySelector('.li-desc-editor');
+                if (editorEl && editorEl._editor && typeof editorEl._editor.save === 'function') {
+                    try {
+                        detail = await editorEl._editor.save();
+                    } catch (e) { console.warn('LI editor save failed', e); }
+                }
+                if (!detail) detail = { blocks: [] };
+
+                newLineItems.push({ desc, detail, qty, rate });
+            }
+            p.lineItems = newLineItems;
         }
 
         // Phase 2 data collectors

@@ -2124,3 +2124,102 @@ h3.ce-header {
 .ce-toolbar__settings-btn:hover {
   color: var(--text);
 }
+
+/* Sleek EditorJS Toolbar */
+.ce-toolbar__actions {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-right: -12px;
+}
+
+.dark .ce-toolbar__actions {
+  background: rgba(30, 30, 32, 0.9);
+  border-color: var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.ce-toolbar__plus,
+.ce-toolbar__settings-btn {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.ce-toolbar__plus:hover,
+.ce-toolbar__settings-btn:hover {
+  background: var(--bg2);
+  color: var(--primary);
+}
+
+/* Inline Toolbar */
+.ce-inline-toolbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.dark .ce-inline-toolbar {
+  background: rgba(30, 30, 32, 0.95);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.ce-inline-tool {
+  color: var(--text2);
+  transition: color 0.15s ease;
+}
+
+.ce-inline-tool:hover {
+  color: var(--text1);
+  background: var(--bg2);
+}
+
+.ce-inline-tool--active {
+  color: var(--primary);
+}
+
+/* Popover (Toolbox) */
+.ce-popover {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  background: var(--bg1);
+  padding: 6px;
+}
+
+.ce-popover__item {
+  border-radius: 6px;
+  transition: background 0.15s ease;
+  color: var(--text1);
+}
+
+.ce-popover__item:hover {
+  background: var(--bg2);
+}
+
+.ce-popover__item-icon {
+  background: var(--bg2);
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+
+/* Line Item Editor Specifics */
+.li-desc-editor .codex-editor__redactor {
+  padding-bottom: 0 !important;
+  min-height: 24px;
+}
+
+.li-desc-editor .ce-block__content {
+  max-width: 100%;
+  margin: 0;
+}
+
+.li-desc-editor .ce-paragraph {
+  line-height: 1.4em;
+  font-size: 13px;
+  color: var(--text2);
+}
