@@ -5,9 +5,9 @@
 function renderSections(p) {
     const el = document.getElementById('edSections');
     const secs = p.sections || [];
-    let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <div><div style="font-size:14px;font-weight:700">Content Sections</div><div style="font-size:12px;color:var(--text4)">Drag to reorder</div></div>
-    <div style="display:flex;gap:6px">
+    let html = `<div class="sec-header">
+    <div><div class="sec-header-t">Content Sections</div><div class="sec-header-d">Drag to reorder</div></div>
+    <div class="sec-header-actions">
       <button class="btn-sm-outline" onclick="openLibrary()"><i data-lucide="bookmark"></i> Library</button>
       <button class="btn-sm-outline" onclick="showAddSectionMenu(this)"><i data-lucide="plus"></i> Add Section</button>
     </div>
@@ -18,7 +18,7 @@ function renderSections(p) {
         else html += secBlockHtml(s, i);
     });
     html += '</div>';
-    if (!secs.length) html += `<div id="secEmpty" class="empty" style="padding:40px"><div class="empty-icon" style="width:40px;height:40px;border-radius:10px"><i data-lucide="text" style="width:18px;height:18px"></i></div><div class="empty-t" style="font-size:14px">No sections yet</div><div class="empty-d" style="font-size:12px">Add content sections like Scope, Timeline, and Terms to tell your story.</div><button class="btn-sm-outline" onclick="addSec()"><i data-lucide="plus"></i> Add Section</button></div>`;
+    if (!secs.length) html += `<div id="secEmpty" class="empty empty-sm"><div class="empty-icon"><i data-lucide="text"></i></div><div class="empty-t">No sections yet</div><div class="empty-d">Add content sections like Scope, Timeline, and Terms to tell your story.</div><button class="btn-sm-outline" onclick="addSec()"><i data-lucide="plus"></i> Add Section</button></div>`;
     el.innerHTML = html;
 
     // Initialize EditorJS

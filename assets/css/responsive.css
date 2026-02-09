@@ -166,6 +166,10 @@
     grid-template-columns: 1fr;
   }
 
+  .cc-actions {
+    opacity: 1;
+  }
+
   /* Client insights responsive */
   .ci-metrics {
     grid-template-columns: repeat(3, 1fr);

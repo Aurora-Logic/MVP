@@ -247,6 +247,26 @@
   margin-bottom: 14px;
 }
 
+/* Compact empty state (editor tabs) */
+.empty-sm {
+  padding: 40px 20px;
+}
+.empty-sm .empty-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+.empty-sm .empty-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.empty-sm .empty-t {
+  font-size: 14px;
+}
+.empty-sm .empty-d {
+  font-size: 12px;
+}
+
 /* First run (dashboard) */
 .first-run {
   display: flex;

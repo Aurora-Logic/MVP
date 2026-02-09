@@ -53,9 +53,9 @@ function renderDetails(p) {
             </div>
           </div>` :
             `<div class="cover-upload" onclick="document.getElementById('coverInput').click()">
-            <i data-lucide="image-plus" style="width:32px;height:32px;color:var(--text4)"></i>
-            <div style="margin-top:8px;color:var(--text3);font-size:13px">Click to upload a cover photo</div>
-            <div style="color:var(--text4);font-size:11px">Recommended: 1200x400px</div>
+            <i data-lucide="image-plus"></i>
+            <div class="cover-upload-text">Click to upload a cover photo</div>
+            <div class="cover-upload-hint">Recommended: 1200x400px</div>
           </div>`}
         <input type="file" id="coverInput" accept="image/*" style="display:none" onchange="handleCoverPhoto(this)">
       </div>

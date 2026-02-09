@@ -83,7 +83,7 @@ function renderSettings() {
         </div>
         <div class="card card-p">
           <div class="card-head"><div><div class="card-t">Data Management</div><div class="card-d">Export or clear your local data</div></div></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div class="sec-header-actions">
             <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export All Data</button>
             <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear All Data</button>
           </div>
@@ -134,7 +134,7 @@ function renderEmailTemplates() {
     list.innerHTML = templates.map(t => `
         <div class="tpl-item">
             <div>
-                <div class="tpl-name">${esc(t.name)} ${t.isDefault ? '<span style="font-size:10px;color:var(--text4)">(Default)</span>' : ''}</div>
+                <div class="tpl-name">${esc(t.name)} ${t.isDefault ? '<span class="tpl-badge">(Default)</span>' : ''}</div>
                 <div class="tpl-subject">Subject: ${esc(t.subject)}</div>
             </div>
             <div class="tpl-actions">

@@ -193,7 +193,7 @@ function renderProposals() {
           <button class="filter-tab${currentFilter === 'accepted' ? ' on' : ''}${!counts.accepted ? ' dimmed' : ''}" onclick="setFilter('accepted')">Won <span class="fc">${counts.accepted}</span></button>
           <button class="filter-tab${currentFilter === 'declined' ? ' on' : ''}${!counts.declined ? ' dimmed' : ''}" onclick="setFilter('declined')">Lost <span class="fc">${counts.declined}</span></button>
           <button class="filter-tab${currentFilter === 'expired' ? ' on' : ''}${!counts.expired ? ' dimmed' : ''}" onclick="setFilter('expired')">Expired <span class="fc">${counts.expired}</span></button>
-          <button class="filter-tab${currentFilter === 'archived' ? ' on' : ''}${!counts.archived ? ' dimmed' : ''}" onclick="setFilter('archived')"><i data-lucide="archive" style="width:12px;height:12px"></i> Archived <span class="fc">${counts.archived}</span></button>
+          <button class="filter-tab${currentFilter === 'archived' ? ' on' : ''}${!counts.archived ? ' dimmed' : ''}" onclick="setFilter('archived')"><i data-lucide="archive"></i> Archived <span class="fc">${counts.archived}</span></button>
         </div>
         <button class="sort-btn" onclick="toggleSortProposals()" id="sortBtnP"><i data-lucide="arrow-up-down"></i> ${currentSort === 'date' ? 'Newest' : currentSort === 'value' ? 'Highest' : currentSort === 'name' ? 'A-Z' : 'Newest'}</button>
         <div class="view-toggle">
