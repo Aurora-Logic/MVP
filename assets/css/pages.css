@@ -2051,10 +2051,10 @@
 .editorjs-container {
   min-height: 120px;
   padding: 12px 16px;
-  border: 1px solid var(--border);
-  /* Added: Main border */
+  border: none;
+  /* Removed border */
   border-radius: var(--r2);
-  background: var(--card);
+  background: transparent;
   color: var(--text);
   font-size: 15px;
   line-height: 1.6;
