@@ -25,7 +25,11 @@
       "Bash(cat:*)",
       "Bash(open:*)",
       "Bash(test:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(for f in assets/js/core/*.js assets/js/views/*.js assets/js/editor/*.js assets/js/export/*.js assets/js/boot.js)",
+      "Bash(do node -c \"$f\")",
+      "Bash(echo:*)",
+      "Bash(git add:*)"
     ]
   }
 }

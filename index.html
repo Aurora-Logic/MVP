@@ -183,19 +183,19 @@
         </div>
     </div>
 
-    <!-- Modular JavaScript (load order matters) -->
-    <script src="assets/js/store.js"></script>
-    <script src="assets/js/utils.js"></script>
-    <script src="assets/js/custom-select.js"></script>
-    <script src="assets/js/theme.js"></script>
-    <script src="assets/js/variables.js"></script>
-    <script src="assets/js/modals.js"></script>
-    <script src="assets/js/autosave.js"></script>
-    <script src="assets/js/command.js"></script>
-    <script src="assets/js/shortcuts.js"></script>
-    <script src="assets/js/completeness.js"></script>
-    <script src="assets/js/onboarding.js"></script>
-    <!-- Tools -->
+    <!-- Core: Foundation (loaded first, no deps) -->
+    <script src="assets/js/core/store.js"></script>
+    <script src="assets/js/core/utils.js"></script>
+    <script src="assets/js/core/custom-select.js"></script>
+    <script src="assets/js/core/theme.js"></script>
+    <script src="assets/js/core/variables.js"></script>
+    <script src="assets/js/core/modals.js"></script>
+    <script src="assets/js/core/autosave.js"></script>
+    <script src="assets/js/core/command.js"></script>
+    <script src="assets/js/core/shortcuts.js"></script>
+    <script src="assets/js/core/completeness.js"></script>
+    <script src="assets/js/core/onboarding.js"></script>
+    <!-- CDN: Editor.js + plugins -->
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.29.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.7"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0"></script>
@@ -208,38 +208,42 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@1.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/underline@1.1.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@2.5.3"></script>
-
-    <script src="assets/js/focus-mode.js"></script>
-    <script src="assets/js/nav.js"></script>
-    <script src="assets/js/dashboard.js"></script>
-    <script src="assets/js/proposals.js"></script>
-    <script src="assets/js/kanban.js"></script>
-    <script src="assets/js/analytics.js"></script>
-    <script src="assets/js/analytics-breakdowns.js"></script>
-    <script src="assets/js/toc.js"></script>
-    <script src="assets/js/editor.js"></script>
-    <script src="assets/js/details.js"></script>
-    <script src="assets/js/sections.js"></script>
-    <script src="assets/js/structured-sections.js"></script>
-    <script src="assets/js/section-packs.js"></script>
-    <script src="assets/js/pricing.js"></script>
-    <script src="assets/js/tc-library.js"></script>
-    <script src="assets/js/csv-import.js"></script>
-    <script src="assets/js/packages.js"></script>
-    <script src="assets/js/addons.js"></script>
-    <script src="assets/js/payment-schedule.js"></script>
-    <script src="assets/js/notes.js"></script>
-    <script src="assets/js/preview.js"></script>
-    <script src="assets/js/templates.js"></script>
-    <script src="assets/js/pdf-templates2.js"></script>
-    <script src="assets/js/export.js"></script>
-    <script src="assets/js/email.js"></script>
-    <script src="assets/js/clients.js"></script>
-    <script src="assets/js/signature.js"></script>
-    <script src="assets/js/settings.js"></script>
-    <script src="assets/js/tpl-data.js"></script>
-    <script src="assets/js/sharing.js"></script>
-    <script src="assets/js/create.js"></script>
+    <!-- Editor: Editor tabs & components -->
+    <script src="assets/js/editor/focus-mode.js"></script>
+    <!-- Views: Main page views -->
+    <script src="assets/js/views/nav.js"></script>
+    <script src="assets/js/views/dashboard.js"></script>
+    <script src="assets/js/views/proposals.js"></script>
+    <script src="assets/js/views/kanban.js"></script>
+    <script src="assets/js/views/analytics.js"></script>
+    <script src="assets/js/views/analytics-breakdowns.js"></script>
+    <!-- Editor: Main editor + all tabs -->
+    <script src="assets/js/editor/toc.js"></script>
+    <script src="assets/js/editor/editor.js"></script>
+    <script src="assets/js/editor/details.js"></script>
+    <script src="assets/js/editor/sections.js"></script>
+    <script src="assets/js/editor/structured-sections.js"></script>
+    <script src="assets/js/editor/section-packs.js"></script>
+    <script src="assets/js/editor/pricing.js"></script>
+    <script src="assets/js/editor/tc-library.js"></script>
+    <script src="assets/js/editor/csv-import.js"></script>
+    <script src="assets/js/editor/packages.js"></script>
+    <script src="assets/js/editor/addons.js"></script>
+    <script src="assets/js/editor/payment-schedule.js"></script>
+    <script src="assets/js/editor/notes.js"></script>
+    <!-- Export: PDF, preview, sharing -->
+    <script src="assets/js/export/preview.js"></script>
+    <script src="assets/js/export/templates.js"></script>
+    <script src="assets/js/export/pdf-templates2.js"></script>
+    <script src="assets/js/export/export.js"></script>
+    <script src="assets/js/export/email.js"></script>
+    <script src="assets/js/views/clients.js"></script>
+    <script src="assets/js/export/signature.js"></script>
+    <script src="assets/js/views/settings.js"></script>
+    <script src="assets/js/export/tpl-data.js"></script>
+    <script src="assets/js/export/sharing.js"></script>
+    <script src="assets/js/export/create.js"></script>
+    <!-- Boot: App initialization (always last) -->
     <script src="assets/js/boot.js"></script>
     <script>
         if ('serviceWorker' in navigator) {

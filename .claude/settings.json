@@ -1,7 +1,20 @@
 {
+  "experimental": {
+    "agentTeams": true
+  },
   "permissions": {
     "allow": [
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(node -c:*)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)"
     ]
+  },
+  "agents": {
+    "enabled": true,
+    "allowSubagents": true,
+    "teamDisplay": "split-panes"
   }
 }
