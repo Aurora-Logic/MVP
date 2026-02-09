@@ -8,12 +8,19 @@ function initSignaturePad() {
 
     const savedSig = CONFIG?.signature;
     if (savedSig) {
-        display.innerHTML = `
-            <img src="${savedSig}" class="sig-saved" alt="Your signature">
+        const safeSig = savedSig.startsWith('data:image/') ? savedSig : '';
+        if (!safeSig) return showSignatureCanvas();
+        const img = document.createElement('img');
+        img.src = safeSig;
+        img.className = 'sig-saved';
+        img.alt = 'Your signature';
+        display.innerHTML = '';
+        display.appendChild(img);
+        display.insertAdjacentHTML('beforeend', `
             <div class="sig-controls">
                 <button class="btn-sm-ghost" onclick="editSignature()"><i data-lucide="edit-3"></i> Edit</button>
                 <button class="btn-sm-destructive" onclick="clearSignature()"><i data-lucide="trash-2"></i> Clear</button>
-            </div>`;
+            </div>`);
     } else {
         showSignatureCanvas();
     }

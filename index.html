@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=none">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProposalKit — Professional Proposals in Minutes</title>
     <meta name="description" content="Build professional proposals in minutes. Export polished PDFs.">
     <meta name="theme-color" content="#18181b">
@@ -159,17 +159,17 @@
     </div>
 
     <!-- Context Menu -->
-    <div class="ctx" id="ctxMenu">
-        <div class="ctx-item" onclick="ctxAction('open')"><i data-lucide="external-link"></i> Open</div>
-        <div class="ctx-item" onclick="ctxAction('dup')"><i data-lucide="copy"></i> Duplicate</div>
-        <div class="ctx-item" onclick="ctxAction('dupClient')"><i data-lucide="users"></i> Duplicate for Client</div>
-        <div class="ctx-item" onclick="ctxAction('export')"><i data-lucide="download"></i> Export PDF</div>
-        <div class="ctx-item" onclick="ctxAction('invoice')"><i data-lucide="receipt"></i> Export as Invoice</div>
-        <div class="ctx-sep"></div>
-        <div class="ctx-item" id="ctxArchive" onclick="ctxAction('archive')"><i data-lucide="archive"></i> Archive</div>
-        <div class="ctx-item" id="ctxUnarchive" onclick="ctxAction('unarchive')" style="display:none"><i
+    <div class="ctx" id="ctxMenu" role="menu" aria-label="Proposal actions">
+        <div class="ctx-item" role="menuitem" onclick="ctxAction('open')"><i data-lucide="external-link"></i> Open</div>
+        <div class="ctx-item" role="menuitem" onclick="ctxAction('dup')"><i data-lucide="copy"></i> Duplicate</div>
+        <div class="ctx-item" role="menuitem" onclick="ctxAction('dupClient')"><i data-lucide="users"></i> Duplicate for Client</div>
+        <div class="ctx-item" role="menuitem" onclick="ctxAction('export')"><i data-lucide="download"></i> Export PDF</div>
+        <div class="ctx-item" role="menuitem" onclick="ctxAction('invoice')"><i data-lucide="receipt"></i> Export as Invoice</div>
+        <div class="ctx-sep" role="separator"></div>
+        <div class="ctx-item" role="menuitem" id="ctxArchive" onclick="ctxAction('archive')"><i data-lucide="archive"></i> Archive</div>
+        <div class="ctx-item" role="menuitem" id="ctxUnarchive" onclick="ctxAction('unarchive')" style="display:none"><i
                 data-lucide="archive-restore"></i> Unarchive</div>
-        <div class="ctx-item danger" onclick="ctxAction('del')"><i data-lucide="trash-2"></i> Delete</div>
+        <div class="ctx-item danger" role="menuitem" onclick="ctxAction('del')"><i data-lucide="trash-2"></i> Delete</div>
     </div>
 
     <!-- Toast -->

@@ -10,7 +10,9 @@ Use this command to coordinate multiple specialized agents for complex developme
 
 | Agent | Specialty | Use For |
 |-------|-----------|---------|
-| `@ui-specialist` | UI/UX design, CSS | Styling, responsive design, themes |
+| `@ux-designer` | UX-first design (shadcn/Notion/Apple) | User flows, interactions, UX patterns |
+| `@frontend-design` | Production-grade UI (anti-AI-slop) | Distinctive interfaces, bold design, polish |
+| `@ui-specialist` | UI/CSS implementation | Styling, responsive design, themes |
 | `@js-engineer` | JavaScript development | Features, bugs, logic |
 | `@qa-tester` | Testing, verification | Quality assurance, validation |
 | `@code-reviewer` | Code review | Best practices, documentation |
@@ -37,8 +39,8 @@ For tasks requiring verification:
 ### Pattern 3: Complex Feature
 For large features:
 ```
-1. Team Lead → Plan and coordinate
-2. @ui-specialist + @js-engineer → Parallel development
+1. @ux-designer → Define user flow and interaction design
+2. @ui-specialist + @js-engineer → Parallel implementation
 3. @code-reviewer → Review both
 4. @qa-tester → Integration testing
 ```

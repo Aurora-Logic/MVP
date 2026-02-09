@@ -90,13 +90,14 @@ function renderDashboard() {
 
   // Auto-expire proposals past their validUntil date (skip archived)
   const today = new Date(); today.setHours(0, 0, 0, 0);
+  let changed = false;
   DB.forEach(p => {
     if (!p.archived && (p.status === 'draft' || p.status === 'sent') && p.validUntil) {
       const exp = new Date(p.validUntil); exp.setHours(0, 0, 0, 0);
-      if (exp < today) p.status = 'expired';
+      if (exp < today) { p.status = 'expired'; changed = true; }
     }
   });
-  persist();
+  if (changed) persist();
 
   const body = document.getElementById('bodyScroll');
   const active = activeDB();

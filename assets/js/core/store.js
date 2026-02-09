@@ -80,7 +80,7 @@ function safeGetStorage(key, fallback) {
         });
         localStorage.removeItem('pk_client_responses');
         if (merged) persist();
-    } catch (e) { /* ignore */ }
+    } catch (e) { console.warn('Client response merge error:', e); }
 })();
 
 // Multi-tab sync: reload data when another tab writes to localStorage
@@ -220,6 +220,34 @@ function rgbToHex(rgb) {
 
 const COUNTRY_CURRENCY = { IN: '₹', US: '$', GB: '£', CA: 'C$', AU: 'A$', DE: '€', FR: '€', SG: 'S$', AE: 'د.إ', JP: '¥', NL: '€', SE: 'kr', CH: 'CHF', NZ: 'NZ$', IE: '€' };
 function defaultCurrency() { return COUNTRY_CURRENCY[CONFIG?.country] || '₹'; }
+
+// Shared utility: calculate proposal line-item value
+function proposalValue(p) {
+    return (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
+}
+
+// Shared utility: capitalize first letter
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+// Shared utility: generate next proposal number
+function nextPropNumber() {
+    const nums = DB.map(p => { const m = (p.number || '').match(/PROP-(\d+)/); return m ? parseInt(m[1]) : 0; });
+    return 'PROP-' + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(3, '0');
+}
+
+// Shared utility: get tax label for current country
+function taxLabel() {
+    const c = CONFIG?.country;
+    if (c === 'IN') return 'GST';
+    if (c === 'AU') return 'GST';
+    if (c === 'US' || c === 'CA') return 'Tax';
+    if (c === 'GB' || c === 'DE' || c === 'FR' || c === 'NL' || c === 'IE' || c === 'SE') return 'VAT';
+    if (c === 'JP') return 'CT';
+    if (c === 'SG') return 'GST';
+    if (c === 'AE') return 'VAT';
+    if (c === 'CH') return 'VAT';
+    return 'Tax';
+}
 
 const COLORS = ['#18181b', '#2563eb', '#7c3aed', '#dc2626', '#d97706', '#16a34a', '#0891b2', '#be185d'];
 const COLOR_NAMES = { '#18181b': '#09090b', '#2563eb': '#1e40af', '#7c3aed': '#5b21b6', '#dc2626': '#991b1b', '#d97706': '#92400e', '#16a34a': '#166534', '#0891b2': '#155e75', '#be185d': '#9d174d' };

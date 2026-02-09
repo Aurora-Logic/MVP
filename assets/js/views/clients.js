@@ -15,8 +15,8 @@ function renderClients() {
 
     let cards = CLIENTS.map((c, i) => {
         const ini = (c.name || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-        const propCount = DB.filter(p => p.client.name === c.name || p.client.email === c.email).length;
-        const totalVal = DB.filter(p => p.client.name === c.name || p.client.email === c.email).reduce((s, p) => s + (p.lineItems || []).reduce((a, it) => a + (it.qty || 0) * (it.rate || 0), 0), 0);
+        const propCount = DB.filter(p => p.client?.name === c.name || p.client?.email === c.email).length;
+        const totalVal = DB.filter(p => p.client?.name === c.name || p.client?.email === c.email).reduce((s, p) => s + (p.lineItems || []).reduce((a, it) => a + (it.qty || 0) * (it.rate || 0), 0), 0);
         return `<div class="client-card" onclick="showClientInsight(${i})">
       <div class="cc-head">
         <div class="cc-avi" style="background:var(--blue-bg);color:var(--blue)">${ini}</div>
@@ -28,7 +28,7 @@ function renderClients() {
       </div>
       <div class="cc-stats">
         <div class="cc-stat"><strong>${propCount}</strong> proposals</div>
-        <div class="cc-stat"><strong>${fmtCur(totalVal, DB.find(p => p.client.name === c.name || p.client.email === c.email)?.currency || defaultCurrency())}</strong> total value</div>
+        <div class="cc-stat"><strong>${fmtCur(totalVal, DB.find(p => p.client?.name === c.name || p.client?.email === c.email)?.currency || defaultCurrency())}</strong> total value</div>
       </div>
     </div>`;
     }).join('');
@@ -113,7 +113,7 @@ function pickClient(i) {
 // Client Insights (Phase 3.2)
 function showClientInsight(idx) {
     const c = CLIENTS[idx]; if (!c) return;
-    const props = activeDB().filter(p => p.client.name === c.name || p.client.email === c.email);
+    const props = activeDB().filter(p => p.client?.name === c.name || p.client?.email === c.email);
     const accepted = props.filter(p => p.status === 'accepted');
     const declined = props.filter(p => p.status === 'declined');
     const totalVal = props.reduce((s, p) => s + (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0), 0);

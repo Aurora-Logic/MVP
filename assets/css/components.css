@@ -113,10 +113,6 @@
   color: var(--text);
 }
 
-.btn-sm-ghost {
-  margin-bottom: 10px !important;
-}
-
 /* Icon-only ghost */
 .btn-sm-icon-ghost,
 .btn-icon-ghost {

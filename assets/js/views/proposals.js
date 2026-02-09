@@ -16,7 +16,7 @@ function renderPropList(list) {
 
   let rows = list.map(p => {
     const val = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
-    const initials = (p.client.name || p.title || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const initials = (p.client?.name || p.title || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     const isNew = (Date.now() - (p.createdAt || 0)) < 86400000;
     const pid = escAttr(p.id);
     return `<div class="prop-row" onclick="loadEditor('${pid}')" oncontextmenu="showCtx(event,'${pid}')">
@@ -26,7 +26,7 @@ function renderPropList(list) {
         <div class="prop-title">${esc(p.title || 'Untitled')}${isNew ? ' <span class="badge-new">NEW</span>' : ''}</div>
         <div class="prop-meta">
           <span>${esc(p.number)}</span>
-          ${p.client.name ? '<span class="prop-meta-sep"></span><span>' + esc(p.client.name) + '</span>' : ''}
+          ${p.client?.name ? '<span class="prop-meta-sep"></span><span>' + esc(p.client.name) + '</span>' : ''}
           <span class="prop-meta-sep"></span>
           <span>${timeAgo(p.createdAt || Date.now())}</span>
         </div>

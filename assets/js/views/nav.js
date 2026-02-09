@@ -35,12 +35,12 @@ function closeMobileSidebar() {
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('collapsed');
-    safeLsSet('sidebarCollapsed', sidebar.classList.contains('collapsed') ? 'true' : 'false');
+    safeLsSet('pk_sidebarCollapsed', sidebar.classList.contains('collapsed') ? 'true' : 'false');
 }
 
 function initSidebarState() {
     const sidebar = document.getElementById('sidebar');
-    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+    if (localStorage.getItem('pk_sidebarCollapsed') === 'true') {
         sidebar.classList.add('collapsed');
     }
 }

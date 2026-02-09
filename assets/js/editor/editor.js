@@ -3,7 +3,10 @@
 // ════════════════════════════════════════
 
 function loadEditor(id) {
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     CUR = id;
+    undoStack = [];
+    redoStack = [];
     const p = cur();
     if (!p) return renderDashboard();
     const topSearch = document.getElementById('topSearch');

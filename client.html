@@ -618,8 +618,19 @@
             });
             return div.innerHTML;
         }
-        function fmtCur(n, c) { return (c || '₹') + n.toLocaleString('en-IN'); }
-        function fmtDate(d) { if (!d) return '—'; const dt = new Date(d); return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
+        function fmtCur(n, c) {
+            const currency = c || '₹';
+            const displayCurrency = currency === '¥CN' ? '¥' : currency;
+            const val = (typeof n === 'number' && isFinite(n)) ? n : 0;
+            const locale = (currency === '₹') ? 'en-IN' : 'en-US';
+            return displayCurrency + val.toLocaleString(locale);
+        }
+        function fmtDate(d) {
+            if (!d) return '—';
+            const dt = new Date(d);
+            const isIN = CONFIG?.country === 'IN';
+            return dt.toLocaleDateString(isIN ? 'en-IN' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
 
         // persist() removed — client page is read-only to prevent data tampering
 
