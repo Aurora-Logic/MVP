@@ -138,11 +138,6 @@ function renderDashboard() {
     </div>
 
     ${typeof buildAnalyticsWidget === 'function' && active.length >= 3 ? buildAnalyticsWidget() : ''}
-
-    <div class="dash-actions" style="margin-top:20px">
-      <button class="btn" onclick="goNav('editor')"><i data-lucide="list"></i> View All Proposals</button>
-      <button class="btn-outline" onclick="openNewModal()"><i data-lucide="plus"></i> New Proposal</button>
-    </div>
   `;
 
   lucide.createIcons();
