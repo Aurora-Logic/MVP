@@ -31,10 +31,11 @@ function renderPricing(p) {
         lineItems: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Line Items</div><div class="card-d">Deliverables and costs</div></div><div style="display:flex;align-items:center;gap:8px"><label class="fl" style="margin:0;font-size:10px">Currency</label><select id="fCur" style="width:84px;padding:4px 12px!important ;font-size:12px;border-radius:999px!important" onchange="dirty();reTotal()">${curOpts}</select></div></div><table class="li-tbl"><thead><tr><th style="width:40%">Item</th><th style="width:12%">Qty</th><th style="width:18%">Rate</th><th style="width:18%;text-align:right">Amount</th><th style="width:12%"></th></tr></thead><tbody id="liBody">${rows}</tbody></table><div style="padding-top:14px;margin-top:14px;border-top:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:flex-start"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()" style="margin-left:4px"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}<div style="width:260px"><div class="summary-row sub"><span class="sr-label">Subtotal</span><span class="sr-val" id="subtotalVal">${fmtCur(subtotal, p.currency)}</span></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">Discount</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><span style="font-size:12px;color:var(--text4)">−</span><input type="number" id="fDiscount" value="${disc}" min="0" step="500" style="width:90px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"></div></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">${taxLbl}</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><input type="number" id="fTaxRate" value="${taxRate}" min="0" max="100" step="0.5" style="width:55px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"><span style="font-size:12px;color:var(--text4)">%</span><span class="sr-val" style="min-width:70px;text-align:right" id="taxAmtVal">${fmtCur(taxAmt, p.currency)}</span></div></div><div class="summary-row sub" id="addOnsSummaryRow" style="display:none"></div><div class="summary-row grand"><span class="sr-label">Total</span><span class="sr-val" id="totalVal">${fmtCur(grand, p.currency)}</span></div></div></div></div></div>`,
         addOns: '<div id="addOnsSection"></div>',
         paySchedule: '<div id="payScheduleSection"></div>',
-        payTerms: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Payment Terms</div><div class="card-d">Conditions and legal terms</div></div><div style="display:flex;gap:6px"><button class="btn-sm-outline" onclick="openTCLib()"><i data-lucide="bookmark"></i> T&C Library</button></div></div><div class="fg" style="margin:0"><div id="paymentTermsEditor" class="editorjs-container sec-content"></div></div></div>`
+        pricingDesc: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Pricing Description</div><div class="card-d">Scope overview or details</div></div></div><div class="fg" style="margin:0"><div id="pricingDescEditor" class="editorjs-container"></div></div></div>`,
+        payTerms: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Payment Terms</div><div class="card-d">Conditions and legal terms</div></div><div style="display:flex;gap:6px"><button class="btn-sm-outline" onclick="openTCLib()"><i data-lucide="bookmark"></i> T&C Library</button></div></div><div class="fg" style="margin:0"><div id="paymentTermsEditor" class="editorjs-container"></div></div></div>`
     };
 
-    const defaultOrder = ['packages', 'lineItems', 'addOns', 'paySchedule', 'payTerms'];
+    const defaultOrder = ['pricingDesc', 'packages', 'lineItems', 'addOns', 'paySchedule', 'payTerms'];
     const order = p.pricingSectionOrder || defaultOrder;
     const validOrder = order.filter(k => sectionHtml[k]);
     defaultOrder.forEach(k => { if (!validOrder.includes(k)) validOrder.push(k); });
@@ -50,7 +51,10 @@ function renderPricing(p) {
     if (typeof renderPaymentSchedule === 'function') renderPaymentSchedule(p);
     if (typeof buildPricingInsights === 'function') buildPricingInsights(p);
     lucide.createIcons();
-    setTimeout(() => initPaymentTermsEditor(p), 100);
+    setTimeout(() => {
+        initPaymentTermsEditor(p);
+        initPricingDescEditor(p);
+    }, 100);
 }
 
 function initPricingDrag() {
@@ -134,6 +138,48 @@ function initPaymentTermsEditor(p) {
             onChange: () => dirty()
         });
     } catch (e) { console.error('Payment terms editor init error', e); }
+}
+
+function initPricingDescEditor(p) {
+    if (pricingDescEditor && typeof pricingDescEditor.destroy === 'function') {
+        try { pricingDescEditor.destroy(); } catch (e) { }
+    }
+    pricingDescEditor = null;
+
+    // Check if element exists
+    if (!document.getElementById('pricingDescEditor')) return;
+
+    let data;
+    if (p.pricingDesc) {
+        if (typeof p.pricingDesc === 'string') {
+            if (p.pricingDesc.trim()) {
+                data = { blocks: p.pricingDesc.split('\n\n').map(t => ({ type: 'paragraph', data: { text: t } })) };
+            } else {
+                data = { blocks: [] };
+            }
+        } else {
+            data = p.pricingDesc;
+        }
+    } else {
+        data = { blocks: [] };
+    }
+
+    try {
+        pricingDescEditor = new EditorJS({
+            holder: 'pricingDescEditor',
+            data: data,
+            tools: {
+                header: Header,
+                list: List,
+                quote: Quote,
+                marker: Marker,
+                delimiter: Delimiter
+            },
+            placeholder: 'Add pricing description...',
+            minHeight: 50,
+            onChange: () => dirty()
+        });
+    } catch (e) { console.error('Pricing desc editor init error', e); }
 }
 
 function deleteLineItem(btn) {

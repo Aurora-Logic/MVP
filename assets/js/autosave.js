@@ -81,6 +81,14 @@ function dirty() {
             } catch (err) { console.warn('Error saving payment terms', err); }
         }
 
+        // Pricing Description - save from EditorJS
+        if (typeof pricingDescEditor !== 'undefined' && pricingDescEditor && typeof pricingDescEditor.save === 'function') {
+            try {
+                const data = await pricingDescEditor.save();
+                p.pricingDesc = data;
+            } catch (err) { console.warn('Error saving pricing description', err); }
+        }
+
         p.discount = parseFloat(get('fDiscount')) || 0;
         p.taxRate = parseFloat(get('fTaxRate')) || 0;
 
