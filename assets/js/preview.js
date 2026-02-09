@@ -61,6 +61,20 @@ function editorJsToHtml(content, p = null) {
                 return style === 'ol'
                     ? `<ol style="margin:6px 0;padding-left:20px">${listItems}</ol>`
                     : `<ul style="margin:6px 0;padding-left:20px">${listItems}</ul>`;
+            case 'checklist':
+                const checkItems = (block.data?.items || []).map(ci => {
+                    const checked = ci.checked ? '\u2611' : '\u2610';
+                    return `<div style="margin:2px 0">${checked} ${ci.text || ''}</div>`;
+                }).join('');
+                return `<div style="margin:6px 0">${checkItems}</div>`;
+            case 'table':
+                const rows = (block.data?.content || []).map(row => {
+                    const cells = row.map(cell => `<td style="border:1px solid #e4e4e7;padding:6px 10px;font-size:12px">${cell}</td>`).join('');
+                    return `<tr>${cells}</tr>`;
+                }).join('');
+                return `<table style="border-collapse:collapse;width:100%;margin:8px 0">${rows}</table>`;
+            case 'code':
+                return `<pre style="background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:12px;font-family:monospace;overflow-x:auto;margin:8px 0">${esc(block.data?.code || '')}</pre>`;
             case 'quote':
                 return `<blockquote style="border-left:3px solid #888;padding-left:12px;margin:8px 0;font-style:italic;color:#666">${text}</blockquote>`;
             case 'delimiter':
@@ -84,7 +98,8 @@ function buildPreview(mode) {
 
     const rows = (p.lineItems || []).filter(i => i.desc).map(i => {
         const a = (i.qty || 0) * (i.rate || 0);
-        const detail = i.detail ? `<div style="font-size:11px;color:#71717a;margin-top:2px;line-height:1.5">${esc(i.detail).replace(/\n/g, '<br>')}</div>` : '';
+        const detailHtml = editorJsToHtml(i.detail, p);
+        const detail = detailHtml ? `<div style="font-size:11px;color:#71717a;margin-top:2px;line-height:1.5">${detailHtml}</div>` : '';
         return { desc: `<div style="font-weight:600">${esc(i.desc)}</div>${detail}`, qty: i.qty, rate: c + (i.rate || 0).toLocaleString('en-IN'), amt: c + a.toLocaleString('en-IN') };
     });
     const secs = (p.sections || []).filter(s => s.title || s.content);

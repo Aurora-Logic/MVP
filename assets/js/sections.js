@@ -35,6 +35,13 @@ function initSectionEditors(sections) {
     });
     sectionEditors = {};
 
+    // Resolve CDN globals with fallbacks (matches reference pattern)
+    const EditorHeader = window.Header || window.EditorjsHeader;
+    const EditorList = window.List || window.EditorjsList || window.NestedList;
+    const EditorQuote = window.Quote;
+    const EditorMarker = window.Marker;
+    const EditorDelimiter = window.Delimiter;
+
     sections.forEach((s, i) => {
         if (s.type === 'testimonial' || s.type === 'case-study') return;
 
@@ -55,14 +62,14 @@ function initSectionEditors(sections) {
                 holder: `sec-editor-${i}`,
                 data: data,
                 tools: {
-                    header: Header,
-                    list: List,
-                    quote: Quote,
-                    marker: Marker,
-                    delimiter: Delimiter
+                    header: { class: EditorHeader, inlineToolbar: true, config: { placeholder: 'Heading', levels: [2, 3, 4], defaultLevel: 2 } },
+                    list: { class: EditorList, inlineToolbar: true },
+                    quote: { class: EditorQuote, inlineToolbar: true },
+                    marker: EditorMarker,
+                    delimiter: EditorDelimiter
                 },
-                placeholder: 'Type forward slash / for menu',
-                minHeight: 30,
+                placeholder: 'Write section content... (use / for blocks)',
+                minHeight: 60,
                 onChange: () => dirty()
             });
         } catch (e) { console.error('EditorJS init error', e); }
@@ -181,8 +188,10 @@ async function saveSectionToLib(btn) {
     const idx = parseInt(block.dataset.idx);
     const title = block.querySelector('.sec-ti').value;
     if (!title) { toast('Add a title first'); return; }
-    const textarea = block.querySelector('.sec-content');
-    const content = textarea ? textarea.value : '';
+    let content = { blocks: [] };
+    if (sectionEditors[idx] && typeof sectionEditors[idx].save === 'function') {
+        try { content = await sectionEditors[idx].save(); } catch (e) { console.warn('Save to lib: editor save failed', e); }
+    }
     let lib = JSON.parse(localStorage.getItem('pk_seclib') || '[]');
     lib.push({ title, content, savedAt: Date.now() });
     localStorage.setItem('pk_seclib', JSON.stringify(lib));

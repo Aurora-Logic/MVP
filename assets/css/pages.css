@@ -1581,37 +1581,6 @@
   position: relative;
 }
 
-/* ════════ CONTENT TEXTAREAS ════════ */
-
-.sec-content {
-  width: 100%;
-  min-height: 120px;
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  padding: 12px;
-  font-family: var(--font);
-  font-size: 13px;
-  line-height: 1.6;
-  background: var(--card);
-  color: var(--text);
-  resize: vertical;
-  transition: border-color var(--t), box-shadow var(--t);
-}
-
-.sec-content:focus {
-  outline: none;
-  border-color: var(--ring);
-  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.06);
-}
-
-.dark .sec-content:focus {
-  box-shadow: 0 0 0 2px rgba(212, 212, 216, 0.15);
-}
-
-.sec-content::placeholder {
-  color: var(--text4);
-}
-
 /* ════════ BULK EXPORT ════════ */
 
 .bulk-check {
@@ -2048,57 +2017,81 @@
 
 /* ════════ EDITOR JS ════════ */
 
+/* Base container — provides border, background, focus ring */
 .editorjs-container {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
   min-height: 120px;
   padding: 12px 16px;
-  border: none;
-  /* Removed border */
-  border-radius: var(--r2);
-  background: transparent;
-  color: var(--text);
-  font-size: 15px;
-  line-height: 1.6;
+  transition: all var(--t);
+}
+.editorjs-container:focus-within {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px rgba(24, 24, 27, .06);
 }
 
-/* Fix: Ensure menu doesn't get clipped */
+/* Internal layout — full width, no bottom padding bloat */
+.editorjs-container .codex-editor__redactor { padding-bottom: 0 !important; }
+.editorjs-container .ce-block__content { max-width: 100%; margin: 0; }
+.editorjs-container .ce-toolbar__content { max-width: 100%; }
+
+/* Typography — match reference font sizes */
+.editorjs-container .ce-paragraph { font-size: 13px; line-height: 1.6; color: var(--text); }
+.editorjs-container .ce-header { font-weight: 600; color: var(--text); }
+.editorjs-container h2.ce-header { font-size: 16px; }
+.editorjs-container h3.ce-header { font-size: 14px; }
+
+/* Block types */
+.editorjs-container .cdx-list { font-size: 13px; padding-left: 20px; }
+.editorjs-container .cdx-quote { border-left: 3px solid var(--blue); padding-left: 12px; font-style: italic; color: var(--text2); }
+.editorjs-container .ce-delimiter { line-height: 1.6; }
+.editorjs-container .cdx-marker { background: rgba(245, 235, 111, 0.5); padding: 2px 0; }
+
+/* Toolbar buttons */
+.editorjs-container .ce-toolbar__plus,
+.editorjs-container .ce-toolbar__settings-btn {
+  color: var(--text3);
+  background: var(--muted);
+  border-radius: 6px;
+}
+.editorjs-container .ce-toolbar__plus:hover,
+.editorjs-container .ce-toolbar__settings-btn:hover {
+  background: var(--hover);
+}
+
+/* Toolbar actions wrapper */
+.ce-toolbar__actions { z-index: 4; }
+
+/* Inline toolbar */
+.editorjs-container .ce-inline-toolbar {
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  box-shadow: var(--sh2);
+}
+.ce-inline-toolbar { z-index: 1000; }
+.ce-inline-tool--active { color: var(--primary); }
+
+/* Popover (toolbox) */
+.editorjs-container .ce-popover {
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  box-shadow: var(--sh2);
+}
+.ce-popover { z-index: 1000; }
+.ce-settings { z-index: 1000; }
+.ce-conversion-toolbar { z-index: 1000; }
+
+/* Fix: Ensure menus don't get clipped by section accordion */
 .sec-b.open,
 .sec-b.open .sec-bd {
   overflow: visible !important;
 }
 
-.codex-editor__redactor {
-  padding-bottom: 40px !important;
-  /* Added: Extra space for bottom menu */
-}
-
-.ce-block__content,
-.ce-toolbar__content {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.ce-header {
-  font-weight: 700;
-  margin-bottom: 0.5em;
-}
-
-h2.ce-header {
-  font-size: 1.25em;
-}
-
-h3.ce-header {
-  font-size: 1.1em;
-}
-
-.cdx-block {
-  padding: 0.2em 0;
-}
-
-/* Dark mode adjustments for EditorJS */
-.dark .ce-block--selected .ce-block__content {
-  background: var(--muted);
-}
-
+/* Dark mode */
+.dark .editorjs-container { background: var(--card); }
+.dark .editorjs-container:focus-within { box-shadow: 0 0 0 2px rgba(255, 255, 255, .06); }
+.dark .ce-block--selected .ce-block__content { background: var(--muted); }
 .dark .ce-inline-toolbar,
 .dark .ce-conversion-toolbar,
 .dark .ce-settings,
@@ -2106,120 +2099,22 @@ h3.ce-header {
   background: var(--card);
   border: 1px solid var(--border);
   color: var(--text);
-  z-index: 1000;
 }
-
 .dark .ce-inline-tool:hover,
 .dark .ce-conversion-tool:hover,
-.dark .ce-popover-item:hover {
-  background: var(--muted);
-}
+.dark .ce-popover-item:hover { background: var(--muted); }
+.dark .ce-inline-tool--active { color: #007AFF; }
 
-.ce-toolbar__plus,
-.ce-toolbar__settings-btn {
-  color: var(--text3);
+/* Line item description editor — compact variant */
+.li-desc-editor {
+  min-height: 30px !important;
+  padding: 4px 8px !important;
+  border: 1px solid var(--border) !important;
+  background: var(--card) !important;
 }
-
-.ce-toolbar__plus:hover,
-.ce-toolbar__settings-btn:hover {
-  color: var(--text);
-}
-
-/* Sleek EditorJS Toolbar */
-.ce-toolbar__actions {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  margin-right: -12px;
-}
-
-.dark .ce-toolbar__actions {
-  background: rgba(30, 30, 32, 0.9);
-  border-color: var(--border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.ce-toolbar__plus,
-.ce-toolbar__settings-btn {
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.ce-toolbar__plus:hover,
-.ce-toolbar__settings-btn:hover {
-  background: var(--bg2);
-  color: var(--primary);
-}
-
-/* Inline Toolbar */
-.ce-inline-toolbar {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-.dark .ce-inline-toolbar {
-  background: rgba(30, 30, 32, 0.95);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-}
-
-.ce-inline-tool {
-  color: var(--text2);
-  transition: color 0.15s ease;
-}
-
-.ce-inline-tool:hover {
-  color: var(--text1);
-  background: var(--bg2);
-}
-
-.ce-inline-tool--active {
-  color: var(--primary);
-}
-
-/* Popover (Toolbox) */
-.ce-popover {
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  background: var(--bg1);
-  padding: 6px;
-}
-
-.ce-popover__item {
-  border-radius: 6px;
-  transition: background 0.15s ease;
-  color: var(--text1);
-}
-
-.ce-popover__item:hover {
-  background: var(--bg2);
-}
-
-.ce-popover__item-icon {
-  background: var(--bg2);
-  box-shadow: none;
-  border: 1px solid var(--border);
-}
-
-/* Line Item Editor Specifics */
 .li-desc-editor .codex-editor__redactor {
   padding-bottom: 0 !important;
   min-height: 24px;
 }
-
-.li-desc-editor .ce-block__content {
-  max-width: 100%;
-  margin: 0;
-}
-
-.li-desc-editor .ce-paragraph {
-  line-height: 1.4em;
-  font-size: 13px;
-  color: var(--text2);
-}
+.li-desc-editor .ce-block__content { max-width: 100%; margin: 0; }
+.li-desc-editor .ce-paragraph { line-height: 1.4; font-size: 12px; color: var(--text2); }

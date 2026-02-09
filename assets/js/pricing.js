@@ -123,19 +123,23 @@ function initPaymentTermsEditor(p) {
         data = { blocks: [] };
     }
 
+    // Resolve CDN globals with fallbacks
+    const EditorHeader = window.Header || window.EditorjsHeader;
+    const EditorList = window.List || window.EditorjsList || window.NestedList;
+
     try {
         paymentTermsEditor = new EditorJS({
             holder: 'paymentTermsEditor',
             data: data,
             tools: {
-                header: Header,
-                list: List,
-                quote: Quote,
+                header: { class: EditorHeader, inlineToolbar: true, config: { placeholder: 'Heading', levels: [2, 3, 4], defaultLevel: 3 } },
+                list: { class: EditorList, inlineToolbar: true },
+                quote: { class: Quote, inlineToolbar: true },
                 marker: Marker,
                 delimiter: Delimiter
             },
-            placeholder: 'Add payment terms...',
-            minHeight: 50,
+            placeholder: 'Add payment terms... (use / for blocks)',
+            minHeight: 60,
             onChange: () => dirty()
         });
     } catch (e) { console.error('Payment terms editor init error', e); }
@@ -155,21 +159,19 @@ function initSingleLiEditor(el, initialData) {
     } else { data = initialData || { blocks: [] }; }
 
     try {
-        // Tools must be loaded in index.html
-        const tools = {
-            header: { class: Header, inlineToolbar: true, config: { placeholder: 'Header', levels: [2, 3, 4], defaultLevel: 3 } },
-            list: { class: List, inlineToolbar: true },
-            checklist: { class: Checklist, inlineToolbar: true },
-            table: { class: Table, inlineToolbar: true },
-            quote: { class: Quote, inlineToolbar: true },
-            marker: Marker,
-            delimiter: Delimiter
-        };
+        const EditorHeader = window.Header || window.EditorjsHeader;
+        const EditorList = window.List || window.EditorjsList || window.NestedList;
 
         el._editor = new EditorJS({
             holder: el,
             data: data,
-            tools: tools,
+            tools: {
+                header: { class: EditorHeader, inlineToolbar: true, config: { placeholder: 'Heading', levels: [3, 4], defaultLevel: 3 } },
+                list: { class: EditorList, inlineToolbar: true },
+                quote: { class: Quote, inlineToolbar: true },
+                marker: Marker,
+                delimiter: Delimiter
+            },
             placeholder: 'Description...',
             minHeight: 0,
             onChange: () => dirty()
@@ -177,17 +179,27 @@ function initSingleLiEditor(el, initialData) {
     } catch (e) { console.error('LI editor init error', e); }
 }
 
+function destroyLiEditor(row) {
+    const editorEl = row.querySelector('.li-desc-editor');
+    if (editorEl?._editor && typeof editorEl._editor.destroy === 'function') {
+        try { editorEl._editor.destroy(); } catch (e) { }
+        editorEl._editor = null;
+    }
+}
+
 function deleteLineItem(btn) {
     const row = btn.closest('tr');
     const desc = row.querySelector('.ld')?.value || '';
     if (desc.trim().length > 0) {
         confirmDialog('Delete this line item?', () => {
+            destroyLiEditor(row);
             row.remove();
             reTotal();
             dirty();
         }, { title: 'Delete Line Item', confirmText: 'Delete' });
         return;
     }
+    destroyLiEditor(row);
     row.remove();
     reTotal();
     dirty();
