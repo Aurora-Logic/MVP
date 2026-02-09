@@ -4,7 +4,12 @@
 
 function openPreview() {
     dirty();
-    setTimeout(() => { buildPreview(); document.getElementById('prevPanel').classList.add('show'); document.getElementById('ov').classList.add('show'); }, 400);
+    const doc = document.getElementById('prevDoc');
+    if (doc) doc.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text4)"><i data-lucide="loader-2" style="width:20px;height:20px;animation:spin 1s linear infinite;margin-right:8px"></i> Generating preview\u2026</div>';
+    document.getElementById('prevPanel').classList.add('show');
+    document.getElementById('ov').classList.add('show');
+    lucide.createIcons();
+    setTimeout(() => { buildPreview(); }, 400);
 }
 
 function closePreview() {

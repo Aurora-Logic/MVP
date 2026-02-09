@@ -192,6 +192,13 @@
             gap: 8px;
         }
 
+        /* Print styles */
+        @media print {
+            .header, .action-bar { display: none !important; }
+            .container { padding: 0; max-width: 100%; }
+            .prop-card { border: none; box-shadow: none; }
+        }
+
         /* Proposal Card */
         .prop-card {
             background: var(--card);
@@ -551,6 +558,32 @@
 
 
 
+        /* Section nav for quick jumping */
+        .section-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text3);
+            cursor: pointer;
+            transition: all var(--t);
+        }
+        .section-nav-btn:hover { background: var(--muted); color: var(--text); border-color: var(--border-h); }
+        .section-nav-btn i { width: 12px; height: 12px; }
+
         /* Responsive */
         @media (max-width: 600px) {
             .container {
@@ -703,9 +736,14 @@
             const taxAmount = (total - discount) * (taxRate / 100);
             const grandTotal = total - discount + taxAmount;
 
+            // Build section navigation
+            const sectionNav = (p.sections || []).length > 1
+                ? `<div class="section-nav">${(p.sections || []).map((s, i) => `<button class="section-nav-btn" onclick="document.getElementById('sec-${i}').scrollIntoView({behavior:'smooth',block:'start'})"><i data-lucide="${getSectionIcon(s.type)}"></i> ${esc(s.title)}</button>`).join('')}${(p.lineItems || []).length ? '<button class="section-nav-btn" onclick="document.querySelector(\'.pricing-section\').scrollIntoView({behavior:\'smooth\',block:\'start\'})"><i data-lucide="banknote"></i> Pricing</button>' : ''}</div>`
+                : '';
+
             // Build sections HTML
-            let sectionsHtml = (p.sections || []).map(s => `
-                <div class="section-card">
+            let sectionsHtml = (p.sections || []).map((s, i) => `
+                <div class="section-card" id="sec-${i}">
                     <div class="section-title">
                         <i data-lucide="${getSectionIcon(s.type)}"></i>
                         ${esc(s.title)}
@@ -765,13 +803,17 @@
                             ${CONFIG?.logo ? `<img src="${esc(CONFIG.logo)}" class="logo-img">` : ''}
                             <span class="logo-text">${esc(p.sender?.company || CONFIG?.company || 'ProposalKit')}</span>
                         </div>
+                        <div class="header-actions">
+                            <button class="btn btn-out btn-sm" onclick="window.print()"><i data-lucide="printer"></i> Print</button>
+                        </div>
                     </div>
                 </header>
                 
                 <div class="container">
                     <div class="prop-card">
                         ${p.coverPhoto ? `<div class="prop-cover"><img src="${esc(p.coverPhoto)}"></div>` : ''}
-                        
+
+                        ${sectionNav}
                         <div class="prop-header">
                             <div class="prop-title">${esc(p.title)}</div>
                             <div class="prop-meta">

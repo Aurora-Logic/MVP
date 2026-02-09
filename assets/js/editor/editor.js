@@ -15,7 +15,8 @@ function loadEditor(id) {
     document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
     document.querySelector('[data-nav="editor"]')?.classList.add('on');
 
-    document.getElementById('topTitle').textContent = p.title || 'Untitled';
+    document.getElementById('topTitle').innerHTML = `<span style="color:var(--text3);cursor:pointer" onclick="renderProposals();document.querySelectorAll('[data-nav]').forEach(b=>b.classList.remove('on'));document.querySelector('[data-nav=&quot;editor&quot;]')?.classList.add('on')">Proposals</span> <span style="color:var(--text4);margin:0 4px">/</span> ${esc(p.title || 'Untitled')}`;
+    document.title = (p.title || 'Untitled') + ' — ProposalKit';
 
     // Calc stats for bar
     const t = (typeof calcTotals === 'function') ? calcTotals(p) : { grand: (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0) };
@@ -34,10 +35,10 @@ function loadEditor(id) {
       <button class="tab" onclick="edTab(this,'pricing')">Pricing</button>
       <button class="tab" onclick="edTab(this,'notes')">Notes</button>
     </div>
-    <button class="btn-sm-outline" onclick="openPreview()"><i data-lucide="eye"></i> Preview</button>
+    <button class="btn-sm-outline" onclick="openPreview()" data-tooltip="Preview (⌘P)" data-side="bottom"><i data-lucide="eye"></i> Preview</button>
     <button class="btn-sm-outline" onclick="shareProposal()"><i data-lucide="share-2"></i> Share</button>
     <button class="btn-sm-outline" onclick="saveAsTemplate()"><i data-lucide="bookmark-plus"></i> Template</button>
-    <button class="btn-sm" onclick="doExport('proposal')"><i data-lucide="download"></i> Export</button>
+    <button class="btn-sm" onclick="doExport('proposal')" data-tooltip="Export PDF (⌘E)" data-side="bottom"><i data-lucide="download"></i> Export</button>
   `;
 
     const body = document.getElementById('bodyScroll');
@@ -53,6 +54,8 @@ function loadEditor(id) {
       <div class="ps-sep"></div>
       ${buildCompletenessHtml(p)}
       <div class="ps-right">
+        <button class="btn-sm-icon-ghost" onclick="typeof undo==='function'&&undo()" data-tooltip="Undo (⌘Z)" data-side="bottom"><i data-lucide="undo-2"></i></button>
+        <button class="btn-sm-icon-ghost" onclick="typeof redo==='function'&&redo()" data-tooltip="Redo (⌘⇧Z)" data-side="bottom"><i data-lucide="redo-2"></i></button>
         <span class="ver-badge">v${p.version || 1}</span>
         <button class="btn-sm-icon-ghost" onclick="bumpVersion()" data-tooltip="Bump version" data-side="bottom"><i data-lucide="arrow-up-circle"></i></button>
         <div class="cover-toggle ${p.coverPage ? 'on' : ''}" onclick="toggleCover()" title="Add cover page to PDF">

@@ -118,7 +118,16 @@ function setProposalStatus(id, status) {
 }
 
 function setFilter(f) { currentFilter = f; currentPage = 1; renderProposals(); }
-function filterList() { if (!CUR) renderProposals(); }
+function filterList() {
+  const q = document.getElementById('searchInput')?.value?.trim() || '';
+  if (!CUR && q) {
+    document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
+    document.querySelector('[data-nav="editor"]')?.classList.add('on');
+    renderProposals();
+  } else if (!CUR) {
+    renderProposals();
+  }
+}
 
 // Pagination
 let currentPage = 1;
@@ -130,7 +139,7 @@ function renderProposals() {
   document.getElementById('topTitle').textContent = 'Proposals';
   const topSearch = document.getElementById('topSearch');
   if (topSearch) topSearch.style.display = '';
-  document.getElementById('topRight').innerHTML = '<button class="btn-sm" onclick="openNewModal()"><i data-lucide="plus"></i> New Proposal</button>';
+  document.getElementById('topRight').innerHTML = '<button class="btn-sm" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom"><i data-lucide="plus"></i> New Proposal</button>';
 
   const body = document.getElementById('bodyScroll');
   const isArchiveView = currentFilter === 'archived';

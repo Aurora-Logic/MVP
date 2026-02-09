@@ -123,8 +123,8 @@
 }
 
 .btn-sm-icon-ghost {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
 }
 
 .btn-icon-ghost {
@@ -192,6 +192,30 @@
   transform: none !important;
   box-shadow: none !important;
   pointer-events: none;
+}
+
+/* Focus indicators for buttons */
+.btn:focus-visible,
+.btn-sm:focus-visible {
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
+  transform: none;
+}
+
+.btn-outline:focus-visible,
+.btn-sm-outline:focus-visible,
+.btn-icon-outline:focus-visible {
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+}
+
+.btn-ghost:focus-visible,
+.btn-sm-ghost:focus-visible,
+.btn-icon-ghost:focus-visible,
+.btn-sm-icon-ghost:focus-visible {
+  box-shadow: 0 0 0 2px var(--muted);
+}
+
+.btn-sm-destructive:focus-visible {
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--red);
 }
 
 /* ════════ FORMS ════════ */

@@ -85,8 +85,8 @@ function renderDashboard() {
   if (typeof hideTOC === 'function') hideTOC();
   document.getElementById('topTitle').textContent = 'Dashboard';
   const topSearch = document.getElementById('topSearch');
-  if (topSearch) topSearch.style.display = 'none';
-  document.getElementById('topRight').innerHTML = '<button class="btn-sm" onclick="openNewModal()"><i data-lucide="plus"></i> New Proposal</button>';
+  if (topSearch) topSearch.style.display = '';
+  document.getElementById('topRight').innerHTML = '<button class="btn-sm" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom"><i data-lucide="plus"></i> New Proposal</button>';
 
   // Auto-expire proposals past their validUntil date (skip archived)
   const today = new Date(); today.setHours(0, 0, 0, 0);

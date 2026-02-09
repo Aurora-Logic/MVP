@@ -242,6 +242,15 @@
   .note-del {
     opacity: 1;
   }
+
+  /* Touch targets — Apple HIG 44px minimum */
+  .side-btn { min-height: 44px; }
+  .ri { min-height: 40px; }
+  .tab { min-height: 44px; padding: 8px 16px; }
+  .btn-sm, .btn-sm-outline, .btn-sm-ghost, .btn-sm-icon-ghost, .btn-sm-destructive { min-height: 44px; }
+  .ctx-item { min-height: 44px; }
+  .csel-opt { min-height: 44px; }
+  .status-opt { min-height: 44px; }
 }
 
 /* ─── Below 480px (small mobile) ─── */

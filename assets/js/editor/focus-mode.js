@@ -15,7 +15,7 @@ function toggleFocusMode() {
             exitBtn = document.createElement('button');
             exitBtn.id = 'focusExitBtn';
             exitBtn.className = 'focus-exit-btn';
-            exitBtn.setAttribute('data-tooltip', 'Exit focus mode');
+            exitBtn.setAttribute('data-tooltip', 'Exit focus mode (Esc)');
             exitBtn.setAttribute('data-side', 'bottom');
             exitBtn.innerHTML = '<i data-lucide="minimize-2"></i>';
             exitBtn.onclick = exitFocusMode;

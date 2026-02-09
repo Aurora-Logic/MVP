@@ -4,8 +4,10 @@
 
 function goNav(view) {
     closeMobileSidebar();
+    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', clients: 'Clients', analytics: 'Analytics', settings: 'Settings' };
+    document.title = (titles[view] || 'ProposalKit') + ' — ProposalKit';
     const topSearch = document.getElementById('topSearch');
-    if (topSearch) topSearch.style.display = (view === 'dashboard' || view === 'editor') ? '' : 'none';
+    if (topSearch) topSearch.style.display = (view === 'analytics' || view === 'settings') ? 'none' : '';
     document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
     const btn = document.querySelector(`[data-nav="${view}"]`);
     if (btn) btn.classList.add('on');
