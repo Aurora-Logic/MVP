@@ -300,7 +300,7 @@
 
 .kanban-card.dragging {
   opacity: 0.5;
-  transform: scale(0.95);
+  box-shadow: var(--sh2);
 }
 
 .kanban-card-title {
@@ -426,7 +426,7 @@
   /* Default sidebar width */
   z-index: 100;
   margin: 0;
-  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left var(--t2);
 }
 
 /* Adjust pagination when sidebar is collapsed */
@@ -1663,7 +1663,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  transition: opacity 0.3s ease-out;
+  transition: opacity var(--t2);
 }
 
 .onboard.hide {
@@ -1739,7 +1739,7 @@
   height: 100%;
   background: var(--primary);
   border-radius: 2px;
-  transition: width 0.3s ease-out;
+  transition: width var(--t2);
 }
 
 .ob-steps {
@@ -1812,11 +1812,15 @@
 .overlay {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 900;
   opacity: 0;
   visibility: hidden;
   transition: all var(--t2);
+  overflow: hidden;
 }
 
 .overlay.show {
@@ -2365,7 +2369,7 @@
 .an-hbar-fill {
   height: 100%;
   border-radius: 4px;
-  transition: width 0.3s ease-out;
+  transition: width var(--t2);
   min-width: 2px;
 }
 

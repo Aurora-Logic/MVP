@@ -311,12 +311,16 @@
   display: none;
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 98;
   opacity: 0;
-  transition: opacity var(--t2);
+  visibility: hidden;
+  transition: opacity var(--t2), visibility var(--t2);
 }
-.side-overlay.show { opacity: 1; }
+.side-overlay.show { opacity: 1; visibility: visible; }
 
 /* ════════ MAIN AREA ════════ */
 
@@ -549,7 +553,7 @@
   position: fixed;
   top: 16px;
   right: 16px;
-  z-index: 200;
+  z-index: 1001;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -566,6 +570,5 @@
 .focus-exit-btn:hover {
   background: var(--muted);
   color: var(--text);
-  transform: scale(1.05);
 }
 .focus-exit-btn svg { width: 14px; height: 14px; }

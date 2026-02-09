@@ -103,7 +103,10 @@
   gap: 2px;
   max-height: 400px;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.lib-list::-webkit-scrollbar { display: none; }
 .lib-item {
   display: flex;
   align-items: center;
@@ -420,26 +423,21 @@
 /* ════════ DRAG STATES ════════ */
 
 .dragging {
-  opacity: 0.6;
-  transform: scale(0.98);
+  opacity: 0.5;
   box-shadow: var(--sh2);
-  transition: opacity var(--t), transform var(--t);
+  user-select: none;
 }
 .drag-over {
-  border-top: 2px solid var(--blue) !important;
-  padding-top: 6px;
-  transition: padding var(--t);
-  animation: drag-pulse 1s ease-in-out infinite;
+  border-top: 3px solid var(--blue) !important;
+  background: rgba(37, 99, 235, 0.04);
 }
 .drag-over-bottom {
-  border-bottom: 2px solid var(--blue) !important;
-  padding-bottom: 6px;
-  transition: padding var(--t);
-  animation: drag-pulse 1s ease-in-out infinite;
+  border-bottom: 3px solid var(--blue) !important;
+  background: rgba(37, 99, 235, 0.04);
 }
-@keyframes drag-pulse {
-  0%, 100% { background-color: transparent; }
-  50% { background-color: rgba(37, 99, 235, 0.04); }
+.sec-b.dragging .sec-hd {
+  background: transparent !important;
+  transition: none;
 }
 
 /* ════════ LOADING OVERLAY ════════ */
@@ -447,15 +445,19 @@
 .loading-overlay {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
   z-index: 10000;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(4px);
+  overflow: hidden;
 }
 .dark .loading-overlay {
-  background: rgba(9, 9, 11, 0.85);
+  background: rgba(9, 9, 11, 0.7);
 }
 .loading-spinner {
   display: flex;

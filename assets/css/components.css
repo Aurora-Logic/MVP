@@ -252,7 +252,21 @@ textarea:focus {
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--text4) !important;
+  color: var(--text3) !important;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: var(--muted) !important;
+}
+
+input:hover:not(:focus):not(:disabled),
+select:hover:not(:focus):not(:disabled),
+textarea:hover:not(:focus):not(:disabled) {
+  border-color: var(--border-h) !important;
 }
 
 select {
@@ -335,7 +349,10 @@ select {
   max-height: 240px;
   overflow-y: auto;
   display: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.csel-menu::-webkit-scrollbar { display: none; }
 .csel.open .csel-menu { display: block; }
 .csel-menu.above {
   top: auto;
@@ -538,6 +555,9 @@ input[type="number"] {
 .modal-wrap {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -547,6 +567,7 @@ input[type="number"] {
   visibility: hidden;
   transition: all var(--t2);
   padding: 16px;
+  overflow: hidden;
 }
 
 .modal-wrap.show {
@@ -956,15 +977,17 @@ dialog.command-dialog {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
   background: rgba(0, 0, 0, 0.5);
   border: none;
   padding: 0;
+  padding-top: 20vh;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 20vh;
+  overflow: hidden;
 }
 
 dialog.command-dialog::backdrop {
@@ -1014,7 +1037,10 @@ dialog.command-dialog::backdrop {
   max-height: 320px;
   overflow-y: auto;
   padding: 6px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.command [role="menu"]::-webkit-scrollbar { display: none; }
 
 .command [role="group"] {
   margin-bottom: 2px;
@@ -1303,7 +1329,7 @@ dialog.command-dialog::backdrop {
   padding: 4px;
   min-width: 140px;
   box-shadow: var(--sh2);
-  z-index: 9999;
+  z-index: 950;
 }
 
 /* ════════ TEMPLATE GRID (New Modal) ════════ */
