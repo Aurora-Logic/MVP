@@ -31,7 +31,7 @@ function renderPricing(p) {
         lineItems: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Line Items</div><div class="card-d">Deliverables and costs</div></div><div style="display:flex;align-items:center;gap:8px"><label class="fl" style="margin:0;font-size:10px">Currency</label><select id="fCur" style="width:84px;padding:4px 12px!important ;font-size:12px;border-radius:999px!important" onchange="dirty();reTotal()">${curOpts}</select></div></div><table class="li-tbl"><thead><tr><th style="width:40%">Item</th><th style="width:12%">Qty</th><th style="width:18%">Rate</th><th style="width:18%;text-align:right">Amount</th><th style="width:12%"></th></tr></thead><tbody id="liBody">${rows}</tbody></table><div style="padding-top:14px;margin-top:14px;border-top:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:flex-start"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()" style="margin-left:4px"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}<div style="width:260px"><div class="summary-row sub"><span class="sr-label">Subtotal</span><span class="sr-val" id="subtotalVal">${fmtCur(subtotal, p.currency)}</span></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">Discount</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><span style="font-size:12px;color:var(--text4)">−</span><input type="number" id="fDiscount" value="${disc}" min="0" step="500" style="width:90px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"></div></div><div class="summary-row sub" style="gap:8px"><span class="sr-label">${taxLbl}</span><div style="display:flex;align-items:center;gap:4px;margin-left:auto"><input type="number" id="fTaxRate" value="${taxRate}" min="0" max="100" step="0.5" style="width:55px;padding:4px 8px;font-size:12px;text-align:right" oninput="reTotal();dirty()"><span style="font-size:12px;color:var(--text4)">%</span><span class="sr-val" style="min-width:70px;text-align:right" id="taxAmtVal">${fmtCur(taxAmt, p.currency)}</span></div></div><div class="summary-row sub" id="addOnsSummaryRow" style="display:none"></div><div class="summary-row grand"><span class="sr-label">Total</span><span class="sr-val" id="totalVal">${fmtCur(grand, p.currency)}</span></div></div></div></div></div>`,
         addOns: '<div id="addOnsSection"></div>',
         paySchedule: '<div id="payScheduleSection"></div>',
-        payTerms: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Payment Terms</div><div class="card-d">Conditions and legal terms</div></div><div style="display:flex;gap:6px"><button class="btn-sm-outline" onclick="openTCLib()"><i data-lucide="bookmark"></i> T&C Library</button></div></div><div class="fg" style="margin:0"><textarea id="paymentTermsEditor" class="sec-content" rows="6" placeholder="Add payment terms, conditions, or select from T&C Library..." oninput="dirty()"></textarea></div></div>`
+        payTerms: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Payment Terms</div><div class="card-d">Conditions and legal terms</div></div><div style="display:flex;gap:6px"><button class="btn-sm-outline" onclick="openTCLib()"><i data-lucide="bookmark"></i> T&C Library</button></div></div><div class="fg" style="margin:0"><div id="paymentTermsEditor" class="editorjs-container sec-content"></div></div></div>`
     };
 
     const defaultOrder = ['packages', 'lineItems', 'addOns', 'paySchedule', 'payTerms'];
@@ -95,24 +95,45 @@ function savePricingOrder() {
 }
 
 function initPaymentTermsEditor(p) {
-    // No longer using EditorJS, just populate textarea
-    const textarea = document.getElementById('paymentTermsEditor');
-    if (!textarea) return;
-    let text = '';
+    if (paymentTermsEditor && typeof paymentTermsEditor.destroy === 'function') {
+        try { paymentTermsEditor.destroy(); } catch (e) { }
+    }
+    paymentTermsEditor = null;
+
+    // Check if element exists
+    if (!document.getElementById('paymentTermsEditor')) return;
+
+    let data;
     if (p.paymentTerms) {
         if (typeof p.paymentTerms === 'string') {
-            text = p.paymentTerms;
-        } else if (typeof p.paymentTerms === 'object' && p.paymentTerms.blocks) {
-            text = p.paymentTerms.blocks.map(b => {
-                if (b.type === 'paragraph') return b.data?.text || '';
-                if (b.type === 'header') return b.data?.text || '';
-                if (b.type === 'list') return (b.data?.items || []).join('\n');
-                if (b.type === 'quote') return b.data?.text || '';
-                return '';
-            }).filter(t => t).join('\n\n');
+            if (p.paymentTerms.trim()) {
+                data = { blocks: p.paymentTerms.split('\n\n').map(t => ({ type: 'paragraph', data: { text: t } })) };
+            } else {
+                data = { blocks: [] };
+            }
+        } else {
+            data = p.paymentTerms;
         }
+    } else {
+        data = { blocks: [] };
     }
-    textarea.value = text;
+
+    try {
+        paymentTermsEditor = new EditorJS({
+            holder: 'paymentTermsEditor',
+            data: data,
+            tools: {
+                header: Header,
+                list: List,
+                quote: Quote,
+                marker: Marker,
+                delimiter: Delimiter
+            },
+            placeholder: 'Add payment terms...',
+            minHeight: 50,
+            onChange: () => dirty()
+        });
+    } catch (e) { console.error('Payment terms editor init error', e); }
 }
 
 function deleteLineItem(btn) {

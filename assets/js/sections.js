@@ -20,28 +20,57 @@ function renderSections(p) {
     html += '</div>';
     if (!secs.length) html += `<div id="secEmpty" class="empty" style="padding:40px"><div class="empty-icon" style="width:40px;height:40px;border-radius:10px"><i data-lucide="text" style="width:18px;height:18px"></i></div><div class="empty-t" style="font-size:14px">No sections yet</div><div class="empty-d" style="font-size:12px">Add content sections like Scope, Timeline, and Terms to tell your story.</div><button class="btn-sm-outline" onclick="addSec()"><i data-lucide="plus"></i> Add Section</button></div>`;
     el.innerHTML = html;
+
+    // Initialize EditorJS
+    setTimeout(() => initSectionEditors(secs), 10);
+
     initDrag();
     lucide.createIcons();
 }
 
-// Content is now stored as plain text, no EditorJS needed
-function getPlainTextContent(content) {
-    if (!content) return '';
-    if (typeof content === 'string') return content;
-    if (content.blocks) {
-        return content.blocks.map(b => {
-            if (b.type === 'paragraph') return b.data?.text || '';
-            if (b.type === 'header') return b.data?.text || '';
-            if (b.type === 'list') return (b.data?.items || []).join('\n');
-            if (b.type === 'quote') return b.data?.text || '';
-            return '';
-        }).filter(t => t).join('\n\n');
-    }
-    return '';
+function initSectionEditors(sections) {
+    // Destroy existing
+    Object.values(sectionEditors).forEach(e => {
+        if (e && typeof e.destroy === 'function') try { e.destroy(); } catch (err) { }
+    });
+    sectionEditors = {};
+
+    sections.forEach((s, i) => {
+        if (s.type === 'testimonial' || s.type === 'case-study') return;
+
+        let data;
+        // Convert plain text to blocks if needed
+        if (typeof s.content === 'string') {
+            if (s.content.trim()) {
+                data = { blocks: s.content.split('\n\n').map(t => ({ type: 'paragraph', data: { text: t } })) };
+            } else {
+                data = { blocks: [] };
+            }
+        } else {
+            data = s.content || { blocks: [] };
+        }
+
+        try {
+            sectionEditors[i] = new EditorJS({
+                holder: `sec-editor-${i}`,
+                data: data,
+                tools: {
+                    header: Header,
+                    list: List,
+                    quote: Quote,
+                    marker: Marker,
+                    delimiter: Delimiter
+                },
+                placeholder: 'Type forward slash / for menu',
+                minHeight: 30,
+                onChange: () => dirty()
+            });
+        } catch (e) { console.error('EditorJS init error', e); }
+    });
 }
 
+
 function secBlockHtml(s, i) {
-    const contentText = getPlainTextContent(s.content);
     return `<div class="sec-b open" draggable="true" data-idx="${i}">
     <div class="sec-hd" onclick="togSec(this)">
       <span class="sec-grip" onmousedown="event.stopPropagation()"><i data-lucide="grip-vertical"></i></span>
@@ -54,7 +83,9 @@ function secBlockHtml(s, i) {
     </div>
     <div class="sec-bd">
       <div class="fg"><label class="fl">Title</label><input type="text" class="sec-ti" value="${esc(s.title)}" placeholder="e.g. Executive Summary" oninput="updSecName(this);dirty()"></div>
-      <div class="fg" style="margin:0"><label class="fl">Content</label><textarea class="sec-content" id="sec-editor-${i}" rows="6" placeholder="Write section content..." oninput="dirty()">${esc(contentText)}</textarea></div>
+      <div class="fg" style="margin:0"><label class="fl">Content</label>
+        <div class="editorjs-container" id="sec-editor-${i}"></div>
+      </div>
     </div>
   </div>`;
 }
@@ -63,7 +94,7 @@ function addSec(type) {
     const p = cur(); if (!p) return;
     if (type === 'testimonial') p.sections.push({ type: 'testimonial', title: 'Client Testimonial', testimonial: { quote: '', author: '', company: '', rating: 5 } });
     else if (type === 'case-study') p.sections.push({ type: 'case-study', title: 'Case Study', caseStudy: { challenge: '', solution: '', result: '' } });
-    else p.sections.push({ title: '', content: '' });
+    else p.sections.push({ title: '', content: { blocks: [] } }); // Start with empty object for block editor
     persist(); renderSections(p); refreshStatsBar(); lucide.createIcons();
 }
 
@@ -90,7 +121,13 @@ function delSec(btn) {
     const idx = parseInt(block.dataset.idx);
     const p = cur();
     if (!p) return;
-    if (sectionEditors[idx] && sectionEditors[idx].destroy) sectionEditors[idx].destroy();
+
+    // Destroy editor
+    if (sectionEditors[idx] && typeof sectionEditors[idx].destroy === 'function') {
+        try { sectionEditors[idx].destroy(); } catch (e) { }
+        delete sectionEditors[idx];
+    }
+
     p.sections.splice(idx, 1);
     persist();
     renderSections(p);

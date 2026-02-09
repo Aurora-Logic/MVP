@@ -73,28 +73,54 @@ function dirty() {
         };
         p.currency = get('fCur') !== undefined ? get('fCur') : p.currency;
 
-        // Payment Terms - save from textarea
-        const paymentTermsEl = document.getElementById('paymentTermsEditor');
-        if (paymentTermsEl && paymentTermsEl.tagName === 'TEXTAREA') {
-            p.paymentTerms = paymentTermsEl.value;
+        // Payment Terms - save from EditorJS
+        if (typeof paymentTermsEditor !== 'undefined' && paymentTermsEditor && typeof paymentTermsEditor.save === 'function') {
+            try {
+                const data = await paymentTermsEditor.save();
+                p.paymentTerms = data;
+            } catch (err) { console.warn('Error saving payment terms', err); }
         }
+
         p.discount = parseFloat(get('fDiscount')) || 0;
         p.taxRate = parseFloat(get('fTaxRate')) || 0;
 
-        // Sections - save from textareas or structured forms
+        // Sections - save from EditorJS or structured forms
         const secEls = document.querySelectorAll('.sec-b');
         if (secEls.length) {
             const newSections = [];
             for (let i = 0; i < secEls.length; i++) {
                 const b = secEls[i];
                 const secType = b.dataset.type;
+
+                // Structured sections (Testimonial, Case Study)
                 if (secType && typeof collectStructuredSection === 'function') {
                     const structured = collectStructuredSection(b);
                     if (structured) { newSections.push(structured); continue; }
                 }
+
+                // Standard Content Sections
                 const title = b.querySelector('.sec-ti')?.value || '';
-                const contentEl = b.querySelector('.sec-content');
-                const content = contentEl ? contentEl.value : '';
+                let content = null;
+
+                // Try getting from EditorJS
+                if (typeof sectionEditors !== 'undefined' && sectionEditors[i] && typeof sectionEditors[i].save === 'function') {
+                    try {
+                        content = await sectionEditors[i].save();
+                    } catch (err) {
+                        console.warn('Error saving section ' + i, err);
+                        // Fallback to existing content if save fails to avoid data loss?
+                        // But existing content might be stale. 
+                        // If save fails, content remains null.
+                    }
+                }
+
+                // If content is still null (e.g. editor not ready or failed), try to keep existing?
+                if (!content && p.sections && p.sections[i]) {
+                    content = p.sections[i].content;
+                }
+                // Or if it was initialized as empty object
+                if (!content) content = { blocks: [] };
+
                 newSections.push({ title, content });
             }
             p.sections = newSections;

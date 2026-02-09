@@ -2044,3 +2044,83 @@
     width: auto;
   }
 }
+
+
+/* ════════ EDITOR JS ════════ */
+
+.editorjs-container {
+  min-height: 120px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  /* Added: Main border */
+  border-radius: var(--r2);
+  background: var(--card);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Fix: Ensure menu doesn't get clipped */
+.sec-b.open,
+.sec-b.open .sec-bd {
+  overflow: visible !important;
+}
+
+.codex-editor__redactor {
+  padding-bottom: 40px !important;
+  /* Added: Extra space for bottom menu */
+}
+
+.ce-block__content,
+.ce-toolbar__content {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.ce-header {
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
+h2.ce-header {
+  font-size: 1.25em;
+}
+
+h3.ce-header {
+  font-size: 1.1em;
+}
+
+.cdx-block {
+  padding: 0.2em 0;
+}
+
+/* Dark mode adjustments for EditorJS */
+.dark .ce-block--selected .ce-block__content {
+  background: var(--muted);
+}
+
+.dark .ce-inline-toolbar,
+.dark .ce-conversion-toolbar,
+.dark .ce-settings,
+.dark .ce-popover {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  z-index: 1000;
+}
+
+.dark .ce-inline-tool:hover,
+.dark .ce-conversion-tool:hover,
+.dark .ce-popover-item:hover {
+  background: var(--muted);
+}
+
+.ce-toolbar__plus,
+.ce-toolbar__settings-btn {
+  color: var(--text3);
+}
+
+.ce-toolbar__plus:hover,
+.ce-toolbar__settings-btn:hover {
+  color: var(--text);
+}
