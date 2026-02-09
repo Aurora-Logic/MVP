@@ -61,7 +61,7 @@
   opacity: 0;
 }
 .side:hover .side-collapse-btn { opacity: 1; }
-.side-collapse-btn:hover { background: var(--muted); color: var(--text); }
+.side-collapse-btn:hover { background: var(--muted); color: var(--text); border-color: var(--border-h); }
 .side-collapse-btn svg { width: 14px; height: 14px; }
 .side.collapsed .side-collapse-btn svg { transform: rotate(180deg); }
 
@@ -185,7 +185,10 @@
   overflow-x: hidden;
   padding: 0 8px;
   margin-top: 2px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.side-body::-webkit-scrollbar { display: none; }
 
 .side-label {
   font-size: 10px;
@@ -235,6 +238,9 @@
   padding: 1px 7px;
   border-radius: var(--r-pill);
   margin-left: auto;
+}
+.side-btn.on .cnt {
+  background: var(--border);
 }
 
 /* Recent items */
@@ -398,7 +404,10 @@
   background: var(--muted);
   padding: 3px;
   border-radius: var(--r-pill);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.tabs::-webkit-scrollbar { display: none; }
 .tab {
   padding: 5px 14px;
   font-size: 12px;
@@ -467,7 +476,7 @@
   background: var(--background);
   border-radius: var(--r2);
   flex-wrap: nowrap;
-  /* overflow-x: auto; */
+  overflow-x: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

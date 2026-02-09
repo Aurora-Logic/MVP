@@ -509,7 +509,7 @@
 .editor-loading { opacity: 0; }
 .editor-loaded {
   opacity: 1;
-  transition: opacity 300ms ease-out;
+  transition: opacity var(--t2);
 }
 
 /* ════════ SHORTCUTS PANEL ════════ */

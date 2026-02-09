@@ -46,7 +46,7 @@ function renderPropList(list) {
         </div>
         <div class="prop-col prop-col-date">
           <div class="prop-col-label">Date</div>
-          <div class="prop-col-val" style="font-weight:500;color:var(--text3);font-size:12px">${fmtDate(p.date)}</div>
+          <div class="prop-col-val prop-col-date-val">${fmtDate(p.date)}</div>
         </div>
       </div>
       <div class="prop-actions">

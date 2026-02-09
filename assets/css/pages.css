@@ -106,6 +106,9 @@
   color: var(--text);
   letter-spacing: -0.5px;
   line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stat-label {
@@ -176,8 +179,14 @@
   font-size: 12px;
   color: var(--text3);
   display: flex;
-  gap: 8px;
+  gap: 6px;
   margin-top: 1px;
+  align-items: center;
+}
+.resume-meta span + span::before {
+  content: '·';
+  margin-right: 6px;
+  color: var(--text5);
 }
 
 .resume-btn {
@@ -373,7 +382,10 @@
   background: var(--muted);
   padding: 3px;
   border-radius: var(--r-pill);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.filter-tabs::-webkit-scrollbar { display: none; }
 
 .filter-tab {
   display: inline-flex;
@@ -414,6 +426,9 @@
 }
 .filter-tab.dimmed:hover {
   opacity: 0.7;
+}
+.filter-tab.on.dimmed {
+  opacity: 1;
 }
 
 /* Pagination */
@@ -593,6 +608,12 @@
 
 .prop-col-date {
   min-width: 70px;
+}
+
+.prop-col-date-val {
+  font-weight: 500 !important;
+  color: var(--text3) !important;
+  font-size: 12px !important;
 }
 
 .prop-actions {
@@ -1954,6 +1975,7 @@
   flex-shrink: 0;
   cursor: pointer;
   accent-color: var(--primary);
+  margin: 0;
 }
 
 .bulk-bar {
