@@ -3,12 +3,12 @@
 // ════════════════════════════════════════
 
 const OB_COUNTRIES = [
-    { value: 'IN', label: 'India' }, { value: 'US', label: 'United States' }, { value: 'GB', label: 'United Kingdom' },
-    { value: 'CA', label: 'Canada' }, { value: 'AU', label: 'Australia' }, { value: 'DE', label: 'Germany' },
-    { value: 'FR', label: 'France' }, { value: 'SG', label: 'Singapore' }, { value: 'AE', label: 'UAE' },
-    { value: 'JP', label: 'Japan' }, { value: 'NL', label: 'Netherlands' }, { value: 'SE', label: 'Sweden' },
-    { value: 'CH', label: 'Switzerland' }, { value: 'NZ', label: 'New Zealand' }, { value: 'IE', label: 'Ireland' },
-    { value: 'OTHER', label: 'Other' }
+    { value: 'IN', label: '\ud83c\uddee\ud83c\uddf3 India' }, { value: 'US', label: '\ud83c\uddfa\ud83c\uddf8 United States' }, { value: 'GB', label: '\ud83c\uddec\ud83c\udde7 United Kingdom' },
+    { value: 'CA', label: '\ud83c\udde8\ud83c\udde6 Canada' }, { value: 'AU', label: '\ud83c\udde6\ud83c\uddfa Australia' }, { value: 'DE', label: '\ud83c\udde9\ud83c\uddea Germany' },
+    { value: 'FR', label: '\ud83c\uddeb\ud83c\uddf7 France' }, { value: 'SG', label: '\ud83c\uddf8\ud83c\uddec Singapore' }, { value: 'AE', label: '\ud83c\udde6\ud83c\uddea UAE' },
+    { value: 'JP', label: '\ud83c\uddef\ud83c\uddf5 Japan' }, { value: 'NL', label: '\ud83c\uddf3\ud83c\uddf1 Netherlands' }, { value: 'SE', label: '\ud83c\uddf8\ud83c\uddea Sweden' },
+    { value: 'CH', label: '\ud83c\udde8\ud83c\udded Switzerland' }, { value: 'NZ', label: '\ud83c\uddf3\ud83c\uddff New Zealand' }, { value: 'IE', label: '\ud83c\uddee\ud83c\uddea Ireland' },
+    { value: 'OTHER', label: '\ud83c\udf10 Other' }
 ];
 
 let obStep = 1;

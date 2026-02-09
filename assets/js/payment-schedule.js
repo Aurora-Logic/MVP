@@ -8,7 +8,7 @@ function renderPaymentSchedule(p) {
     const milestones = p.paymentSchedule || [];
     const mode = p.paymentScheduleMode || 'percentage';
     const t = calcTotals(p);
-    const c = p.currency || '₹';
+    const c = p.currency || defaultCurrency();
 
     let rows = '';
     milestones.forEach((m, i) => {
@@ -100,7 +100,7 @@ function updateScheduleBar() {
     const p = cur(); if (!p) return;
     collectPaymentScheduleData(p);
     const t = calcTotals(p);
-    const c = p.currency || '₹';
+    const c = p.currency || defaultCurrency();
     const barEl = document.getElementById('scheduleBar');
     if (barEl) barEl.innerHTML = buildScheduleBarHtml(p.paymentSchedule || [], p.paymentScheduleMode || 'percentage', t.grand, c);
     // Update amount previews for percentage mode
@@ -130,7 +130,7 @@ function validateSchedule() {
         }
     } else {
         const sum = milestones.reduce((s, m) => s + (m.amount || 0), 0);
-        const c = p.currency || '₹';
+        const c = p.currency || defaultCurrency();
         if (sum === t.grand) {
             el.innerHTML = `<div class="ps-valid"><i data-lucide="check-circle" style="width:14px;height:14px"></i> Schedule matches total ${fmtCur(t.grand, c)}</div>`;
         } else {
@@ -159,7 +159,7 @@ function collectPaymentScheduleData(p) {
 function buildSchedulePdfHtml(p, c, bc) {
     const milestones = (p.paymentSchedule || []).filter(m => m.name);
     if (!milestones.length) return '';
-    const cur = c || '₹';
+    const cur = c || defaultCurrency();
     const mode = p.paymentScheduleMode || 'percentage';
     const t = calcTotals(p);
     const colors = ['#007AFF', '#AF52DE', '#34C759', '#FF9500', '#FF3B30', '#5AC8FA'];

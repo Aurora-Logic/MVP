@@ -63,12 +63,13 @@ function buildHBar(label, won, total, color) {
 }
 
 function buildValueBreakdown(proposals) {
-    const c = proposals[0]?.currency || '₹';
+    const c = proposals[0]?.currency || defaultCurrency();
+    const isINR = c === '₹';
     const ranges = [
-        { label: c === '₹' ? '< ₹10K' : '< 1K', min: 0, max: c === '₹' ? 10000 : 1000 },
-        { label: c === '₹' ? '₹10K – ₹50K' : '1K – 10K', min: c === '₹' ? 10000 : 1000, max: c === '₹' ? 50000 : 10000 },
-        { label: c === '₹' ? '₹50K – ₹1L' : '10K – 50K', min: c === '₹' ? 50000 : 10000, max: c === '₹' ? 100000 : 50000 },
-        { label: c === '₹' ? '> ₹1L' : '> 50K', min: c === '₹' ? 100000 : 50000, max: Infinity }
+        { label: isINR ? '< ₹10K' : `< ${c}1K`, min: 0, max: isINR ? 10000 : 1000 },
+        { label: isINR ? '₹10K – ₹50K' : `${c}1K – ${c}10K`, min: isINR ? 10000 : 1000, max: isINR ? 50000 : 10000 },
+        { label: isINR ? '₹50K – ₹1L' : `${c}10K – ${c}50K`, min: isINR ? 50000 : 10000, max: isINR ? 100000 : 50000 },
+        { label: isINR ? '> ₹1L' : `> ${c}50K`, min: isINR ? 100000 : 50000, max: Infinity }
     ];
     let html = '';
     ranges.forEach(r => {
@@ -129,7 +130,7 @@ function buildTemplateBreakdown(proposals) {
 function exportAnalyticsReport() {
     const proposals = getFilteredProposals(analyticsFilter);
     const stats = computeAnalytics(proposals);
-    const c = proposals[0]?.currency || '₹';
+    const c = proposals[0]?.currency || defaultCurrency();
 
     const lines = [
         'ProposalKit Analytics Report',

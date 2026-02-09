@@ -109,7 +109,7 @@ function buildDonutChart(proposals) {
 function buildAnalyticsWidget() {
     const proposals = getFilteredProposals(analyticsFilter);
     const stats = computeAnalytics(proposals);
-    const c = proposals[0]?.currency || '₹';
+    const c = proposals[0]?.currency || defaultCurrency();
     const filters = ['month', '3mo', 'year', 'all'];
     const labels = { month: '30d', '3mo': '3mo', year: '1yr', all: 'All' };
     const hasBreakdowns = typeof openAnalyticsBreakdowns === 'function';

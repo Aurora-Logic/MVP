@@ -18,7 +18,7 @@ function createProp(tpl) {
         client: { name: '', contact: '', email: '', phone: '' },
         sections: JSON.parse(JSON.stringify(tpl.sections || [])),
         lineItems: JSON.parse(JSON.stringify(tpl.lineItems || [])),
-        currency: '\u20B9', paymentTerms: tpl.paymentTerms || '', version: 1, coverPage: false,
+        currency: defaultCurrency(), paymentTerms: tpl.paymentTerms || '', version: 1, coverPage: false,
         packagesEnabled: false, packages: null, packageFeatures: [],
         addOns: [], paymentSchedule: [], paymentScheduleMode: 'percentage',
         notes: [{ text: 'Proposal created', time: Date.now(), type: 'system' }],

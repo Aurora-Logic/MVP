@@ -128,6 +128,31 @@ function safeLsSet(key, val) {
     catch (e) { console.error('localStorage write error:', key, e); toast('Storage error', 'error'); return false; }
 }
 
+// Sanitize HTML — allow safe inline formatting tags from EditorJS, strip everything else
+function sanitizeHtml(html) {
+    if (!html || typeof html !== 'string') return '';
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    // Remove all script, iframe, object, embed, form, style elements
+    div.querySelectorAll('script,iframe,object,embed,form,style,link,meta,base,svg').forEach(el => el.remove());
+    // Remove event handler attributes and dangerous attrs from all elements
+    div.querySelectorAll('*').forEach(el => {
+        [...el.attributes].forEach(attr => {
+            const name = attr.name.toLowerCase();
+            if (name.startsWith('on') || name === 'srcdoc' || name === 'formaction' || name === 'xlink:href') {
+                el.removeAttribute(attr.name);
+            }
+            if (name === 'href' || name === 'src' || name === 'action') {
+                const val = (attr.value || '').trim().toLowerCase();
+                if (val.startsWith('javascript:') || val.startsWith('data:text') || val.startsWith('vbscript:')) {
+                    el.removeAttribute(attr.name);
+                }
+            }
+        });
+    });
+    return div.innerHTML;
+}
+
 // Sanitize data URLs — reject SVGs with embedded scripts/handlers
 function sanitizeDataUrl(dataUrl) {
     if (!dataUrl || typeof dataUrl !== 'string') return dataUrl;
@@ -192,6 +217,9 @@ function rgbToHex(rgb) {
     if (!m || m.length < 3) return rgb;
     return '#' + m.slice(0, 3).map(n => parseInt(n).toString(16).padStart(2, '0')).join('');
 }
+
+const COUNTRY_CURRENCY = { IN: '₹', US: '$', GB: '£', CA: 'C$', AU: 'A$', DE: '€', FR: '€', SG: 'S$', AE: 'د.إ', JP: '¥', NL: '€', SE: 'kr', CH: 'CHF', NZ: 'NZ$', IE: '€' };
+function defaultCurrency() { return COUNTRY_CURRENCY[CONFIG?.country] || '₹'; }
 
 const COLORS = ['#18181b', '#2563eb', '#7c3aed', '#dc2626', '#d97706', '#16a34a', '#0891b2', '#be185d'];
 const COLOR_NAMES = { '#18181b': '#09090b', '#2563eb': '#1e40af', '#7c3aed': '#5b21b6', '#dc2626': '#991b1b', '#d97706': '#92400e', '#16a34a': '#166534', '#0891b2': '#155e75', '#be185d': '#9d174d' };

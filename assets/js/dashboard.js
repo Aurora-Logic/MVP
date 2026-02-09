@@ -157,7 +157,7 @@ function renderDashboard() {
       </div>
       <div class="stat-card">
         <div class="stat-top"><div class="stat-icon si-value"><i data-lucide="banknote"></i></div></div>
-        <div class="stat-val">${fmtCur(totalValue, CONFIG?.currency || 'INR')}</div>
+        <div class="stat-val">${fmtCur(totalValue, defaultCurrency())}</div>
         <div class="stat-label">Total Pipeline Value</div>
       </div>
     </div>

@@ -11,7 +11,7 @@ function buildPricingInsights(p) {
     if (totals.length < 2) { el.innerHTML = ''; return; }
     const avg = Math.round(totals.reduce((a, b) => a + b, 0) / totals.length);
     const thisTotal = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
-    const c = p.currency || '₹';
+    const c = p.currency || defaultCurrency();
     const diff = thisTotal - avg;
     const pct = avg > 0 ? Math.round(Math.abs(diff) / avg * 100) : 0;
     let msg = '', icon = 'trending-up', color = 'var(--blue)';

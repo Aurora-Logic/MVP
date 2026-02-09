@@ -53,12 +53,13 @@ function renderPricing(p) {
     const curEl = document.getElementById('fCur');
     if (curEl) {
         csel(curEl, {
-            value: p.currency || '₹', small: true,
+            value: p.currency || defaultCurrency(), small: true,
             items: [
-                { value: '₹', label: '₹ INR' }, { value: '$', label: '$ USD' }, { value: '€', label: '€ EUR' },
-                { value: '£', label: '£ GBP' }, { value: 'A$', label: 'A$ AUD' }, { value: 'C$', label: 'C$ CAD' },
-                { value: 'S$', label: 'S$ SGD' }, { value: 'د.إ', label: 'د.إ AED' }, { value: '¥', label: '¥ JPY' },
-                { value: '¥CN', label: '¥ CNY' }
+                { value: '₹', label: '\ud83c\uddee\ud83c\uddf3 ₹ INR' }, { value: '$', label: '\ud83c\uddfa\ud83c\uddf8 $ USD' }, { value: '€', label: '\ud83c\uddea\ud83c\uddfa € EUR' },
+                { value: '£', label: '\ud83c\uddec\ud83c\udde7 £ GBP' }, { value: 'A$', label: '\ud83c\udde6\ud83c\uddfa A$ AUD' }, { value: 'C$', label: '\ud83c\udde8\ud83c\udde6 C$ CAD' },
+                { value: 'S$', label: '\ud83c\uddf8\ud83c\uddec S$ SGD' }, { value: 'د.إ', label: '\ud83c\udde6\ud83c\uddea د.إ AED' }, { value: '¥', label: '\ud83c\uddef\ud83c\uddf5 ¥ JPY' },
+                { value: '¥CN', label: '\ud83c\udde8\ud83c\uddf3 ¥ CNY' }, { value: 'kr', label: '\ud83c\uddf8\ud83c\uddea kr SEK' }, { value: 'CHF', label: '\ud83c\udde8\ud83c\udded CHF' },
+                { value: 'NZ$', label: '\ud83c\uddf3\ud83c\uddff NZ$ NZD' }
             ],
             onChange: () => { reTotal(); dirty(); }
         });
@@ -235,7 +236,7 @@ function addLine() {
     }
     const tr = document.createElement('tr');
     tr.className = 'li-row';
-    const c = cselGetValue(document.getElementById('fCur')) || '\u20B9';
+    const c = cselGetValue(document.getElementById('fCur')) || defaultCurrency();
     const uniqueId = 'li-' + Date.now() + Math.random().toString(36).slice(2, 5);
     tr.innerHTML = `<td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="editorjs-container li-desc-editor" id="${uniqueId}"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, c)}</td><td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>`;
     body.appendChild(tr);
@@ -249,14 +250,14 @@ function reRow(inp) {
     const row = inp.closest('tr');
     const q = Math.max(0, parseFloat(row.querySelector('.lq').value) || 0);
     const r = Math.max(0, parseFloat(row.querySelector('.lr').value) || 0);
-    const c = cselGetValue(document.getElementById('fCur')) || '\u20B9';
+    const c = cselGetValue(document.getElementById('fCur')) || defaultCurrency();
     row.querySelector('.li-amt').textContent = fmtCur(q * r, c);
     reTotal();
 }
 
 function reTotal() {
     let subtotal = 0;
-    const c = cselGetValue(document.getElementById('fCur')) || '\u20B9';
+    const c = cselGetValue(document.getElementById('fCur')) || defaultCurrency();
     document.querySelectorAll('.li-row').forEach(row => {
         const q = Math.max(0, parseFloat(row.querySelector('.lq')?.value) || 0);
         const r = Math.max(0, parseFloat(row.querySelector('.lr')?.value) || 0);

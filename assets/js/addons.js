@@ -6,7 +6,7 @@ function renderAddOns(p) {
     const el = document.getElementById('addOnsSection');
     if (!el) return;
     const addOns = p.addOns || [];
-    const c = p.currency || '₹';
+    const c = p.currency || defaultCurrency();
 
     let rows = '';
     addOns.forEach((ao, i) => {
@@ -85,7 +85,7 @@ function collectAddOnsData(p) {
 function buildAddOnsPdfHtml(p, c, bc) {
     const addOns = (p.addOns || []).filter(a => a.desc);
     if (!addOns.length) return '';
-    const cur = c || '₹';
+    const cur = c || defaultCurrency();
     let h = `<div style="margin-top:20px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Optional Add-Ons</div>`;
     addOns.forEach(ao => {
         const icon = ao.selected ? '☑' : '☐';

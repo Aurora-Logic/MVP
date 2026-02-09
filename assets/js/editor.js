@@ -75,7 +75,7 @@ function loadEditor(id) {
 
 function refreshStatsBar() {
     const p = cur(); if (!p) return;
-    const c = cselGetValue(document.getElementById('fCur')) || p.currency || '₹';
+    const c = cselGetValue(document.getElementById('fCur')) || p.currency || defaultCurrency();
     // Read live line item values from DOM (before debounced save)
     let subtotal = 0;
     const liRows = document.querySelectorAll('.li-row');

@@ -44,7 +44,7 @@ function editorJsToHtml(content, p = null) {
     if (!content.blocks || !Array.isArray(content.blocks)) return '';
 
     let html = content.blocks.map(block => {
-        let text = block.data?.text || '';
+        let text = sanitizeHtml(block.data?.text || '');
         if (p) text = replaceVariables(text, p);
 
         switch (block.type) {
@@ -54,7 +54,7 @@ function editorJsToHtml(content, p = null) {
             case 'paragraph':
                 return `<div style="margin-bottom:6px">${text}</div>`;
             case 'list':
-                let items = (block.data?.items || []).map(item => typeof item === 'object' ? (item.content || item.text || '') : item);
+                let items = (block.data?.items || []).map(item => sanitizeHtml(typeof item === 'object' ? (item.content || item.text || '') : item));
                 if (p) items = items.map(item => replaceVariables(item, p));
                 const style = block.data?.style === 'ordered' ? 'ol' : 'ul';
                 const listItems = items.map(item => `<li>${item}</li>`).join('');
@@ -64,12 +64,12 @@ function editorJsToHtml(content, p = null) {
             case 'checklist':
                 const checkItems = (block.data?.items || []).map(ci => {
                     const checked = ci.checked ? '\u2611' : '\u2610';
-                    return `<div style="margin:2px 0">${checked} ${ci.text || ''}</div>`;
+                    return `<div style="margin:2px 0">${checked} ${sanitizeHtml(ci.text || '')}</div>`;
                 }).join('');
                 return `<div style="margin:6px 0">${checkItems}</div>`;
             case 'table':
                 const rows = (block.data?.content || []).map(row => {
-                    const cells = row.map(cell => `<td style="border:1px solid #e4e4e7;padding:6px 10px;font-size:12px">${cell}</td>`).join('');
+                    const cells = row.map(cell => `<td style="border:1px solid #e4e4e7;padding:6px 10px;font-size:12px">${sanitizeHtml(cell)}</td>`).join('');
                     return `<tr>${cells}</tr>`;
                 }).join('');
                 return `<table style="border-collapse:collapse;width:100%;margin:8px 0">${rows}</table>`;
@@ -89,7 +89,7 @@ function editorJsToHtml(content, p = null) {
 
 function buildPreview(mode) {
     const p = cur(); if (!p) return;
-    const c = p.currency || '\u20B9';
+    const c = p.currency || defaultCurrency();
     const bc = CONFIG?.color || '#18181b';
     const t = calcTotals(p);
     const isInvoice = mode === 'invoice';

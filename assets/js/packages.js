@@ -6,7 +6,7 @@ function renderPackages(p) {
     const el = document.getElementById('pkgSection');
     if (!el) return;
     const enabled = p.packagesEnabled || false;
-    const c = p.currency || '₹';
+    const c = p.currency || defaultCurrency();
 
     if (!enabled) {
         el.innerHTML = `<div class="card card-p pkg-toggle-card" style="margin-bottom:14px">
@@ -156,7 +156,7 @@ function buildPackagesPdfHtml(p, c, bc) {
     const pkgs = p.packages || [];
     const features = p.packageFeatures || [];
     if (!pkgs.length) return '';
-    const cur = c || '₹';
+    const cur = c || defaultCurrency();
 
     let h = `<div style="margin-top:20px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Pricing Packages</div>`;
     h += '<div style="display:flex;gap:12px;margin-bottom:12px">';

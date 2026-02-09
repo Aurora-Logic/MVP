@@ -28,7 +28,7 @@ function renderClients() {
       </div>
       <div class="cc-stats">
         <div class="cc-stat"><strong>${propCount}</strong> proposals</div>
-        <div class="cc-stat"><strong>${fmtCur(totalVal, '\u20B9')}</strong> total value</div>
+        <div class="cc-stat"><strong>${fmtCur(totalVal, DB.find(p => p.client.name === c.name || p.client.email === c.email)?.currency || defaultCurrency())}</strong> total value</div>
       </div>
     </div>`;
     }).join('');
@@ -138,7 +138,7 @@ function showClientInsight(idx) {
         <div class="ci-metric"><div class="ci-metric-val">${props.length}</div><div class="ci-metric-label">Total</div></div>
         <div class="ci-metric"><div class="ci-metric-val" style="color:var(--green)">${accepted.length}</div><div class="ci-metric-label">Accepted</div></div>
         <div class="ci-metric"><div class="ci-metric-val" style="color:var(--red)">${declined.length}</div><div class="ci-metric-label">Declined</div></div>
-        <div class="ci-metric"><div class="ci-metric-val">${fmtCur(totalVal, '₹')}</div><div class="ci-metric-label">Total Value</div></div>
+        <div class="ci-metric"><div class="ci-metric-val">${fmtCur(totalVal, props[0]?.currency || defaultCurrency())}</div><div class="ci-metric-label">Total Value</div></div>
         <div class="ci-metric"><div class="ci-metric-val">${avgDays > 0 ? avgDays + 'd' : '—'}</div><div class="ci-metric-label">Avg Response</div></div>
     </div>
     <div style="font-size:14px;font-weight:700;margin-bottom:10px">Proposal History</div>
@@ -173,7 +173,7 @@ function createProposalForClient(idx) {
         id, status: 'draft', title: 'Proposal for ' + c.name, number: num, date: today, validUntil: valid,
         sender: { company: CONFIG?.company || '', email: CONFIG?.email || '', address: CONFIG?.address || '' },
         client: { name: c.name || '', contact: c.contact || '', email: c.email || '', phone: c.phone || '' },
-        sections: [], lineItems: [], currency: '₹', paymentTerms: '', version: 1, coverPage: false,
+        sections: [], lineItems: [], currency: defaultCurrency(), paymentTerms: '', version: 1, coverPage: false,
         packagesEnabled: false, packages: null, packageFeatures: [], addOns: [], paymentSchedule: [],
         paymentScheduleMode: 'percentage',
         notes: [{ text: 'Proposal created for ' + c.name, time: Date.now(), type: 'system' }],
