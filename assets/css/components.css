@@ -543,11 +543,12 @@ input[type="number"] {
   background: var(--blue);
   color: white;
   font-size: 9px;
-  padding: 1px 6px;
+  padding: 1px 5px;
   border-radius: var(--r-pill);
   font-weight: 700;
   letter-spacing: 0.3px;
-  vertical-align: middle;
+  vertical-align: 1px;
+  margin-left: 4px;
 }
 
 /* ════════ MODALS / DIALOGS ════════ */

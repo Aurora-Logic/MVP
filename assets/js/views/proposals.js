@@ -34,17 +34,17 @@ function renderPropList(list) {
       <div class="prop-cols">
         <div class="prop-col">
           <div class="prop-col-label">Status</div>
-          <div class="prop-col-val"><span class="badge badge-${p.status}" style="font-size:10px;padding:2px 7px"><span class="badge-dot" style="width:5px;height:5px"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></div>
+          <div class="prop-col-val"><span class="badge badge-${p.status}"><span class="badge-dot"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></div>
         </div>
         <div class="prop-col">
           <div class="prop-col-label">Score</div>
           <div class="prop-col-val">${buildScoreBadge(p)}</div>
         </div>
-        <div class="prop-col" style="min-width:100px">
+        <div class="prop-col prop-col-value">
           <div class="prop-col-label">Value</div>
           <div class="prop-col-val mono">${fmtCur(val, p.currency)}</div>
         </div>
-        <div class="prop-col" style="min-width:70px">
+        <div class="prop-col prop-col-date">
           <div class="prop-col-label">Date</div>
           <div class="prop-col-val" style="font-weight:500;color:var(--text3);font-size:12px">${fmtDate(p.date)}</div>
         </div>
@@ -54,12 +54,9 @@ function renderPropList(list) {
         <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();unarchiveProp('${pid}')" data-tooltip="Restore" data-side="bottom" data-align="center"><i data-lucide="archive-restore"></i></button>
         <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();delProp('${pid}')" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="trash-2"></i></button>
         ` : `
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();emailProposal('${pid}')" data-tooltip="Email" data-side="bottom" data-align="center"><i data-lucide="mail"></i></button>
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();quickPreview('${pid}')" data-tooltip="Preview" data-side="bottom" data-align="center"><i data-lucide="eye"></i></button>
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();dupProp('${pid}')" data-tooltip="Duplicate" data-side="bottom" data-align="center"><i data-lucide="copy"></i></button>
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();doQuickExport('${pid}')" data-tooltip="Export" data-side="bottom" data-align="center"><i data-lucide="download"></i></button>
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();showStatusMenu(event,'${pid}')" data-tooltip="Status" data-side="bottom" data-align="center"><i data-lucide="check-circle"></i></button>
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();showCtx(event,'${pid}')" data-tooltip="More" data-side="bottom" data-align="center"><i data-lucide="more-horizontal"></i></button>
+        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();emailProposal('${pid}')" data-tooltip="Email" data-side="bottom"><i data-lucide="mail"></i></button>
+        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();dupProp('${pid}')" data-tooltip="Duplicate" data-side="bottom"><i data-lucide="copy"></i></button>
+        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();showCtx(event,'${pid}')" data-tooltip="More" data-side="bottom"><i data-lucide="more-horizontal"></i></button>
         `}
       </div>
     </div>`;
@@ -100,7 +97,7 @@ function showStatusMenu(event, id) {
         </button>`
   ).join('');
 
-  dropdown.style.cssText = `position:fixed;left:${event.clientX}px;top:${event.clientY}px;z-index:9999`;
+  dropdown.style.cssText = `position:fixed;left:${Math.min(event.clientX, window.innerWidth - 160)}px;top:${Math.min(event.clientY, window.innerHeight - 200)}px;z-index:950`;
   document.body.appendChild(dropdown);
   lucide.createIcons();
 
@@ -191,12 +188,12 @@ function renderProposals() {
       <div class="dash-toolbar-right">
         <div class="filter-tabs">
           <button class="filter-tab${currentFilter === 'all' ? ' on' : ''}" onclick="setFilter('all')">All <span class="fc">${counts.all}</span></button>
-          <button class="filter-tab${currentFilter === 'draft' ? ' on' : ''}" onclick="setFilter('draft')">Draft <span class="fc">${counts.draft}</span></button>
-          <button class="filter-tab${currentFilter === 'sent' ? ' on' : ''}" onclick="setFilter('sent')">Sent <span class="fc">${counts.sent}</span></button>
-          <button class="filter-tab${currentFilter === 'accepted' ? ' on' : ''}" onclick="setFilter('accepted')">Won <span class="fc">${counts.accepted}</span></button>
-          <button class="filter-tab${currentFilter === 'declined' ? ' on' : ''}" onclick="setFilter('declined')">Lost <span class="fc">${counts.declined}</span></button>
-          <button class="filter-tab${currentFilter === 'expired' ? ' on' : ''}" onclick="setFilter('expired')">Expired <span class="fc">${counts.expired}</span></button>
-          <button class="filter-tab${currentFilter === 'archived' ? ' on' : ''}" onclick="setFilter('archived')"><i data-lucide="archive" style="width:12px;height:12px"></i> Archived <span class="fc">${counts.archived}</span></button>
+          <button class="filter-tab${currentFilter === 'draft' ? ' on' : ''}${!counts.draft ? ' dimmed' : ''}" onclick="setFilter('draft')">Draft <span class="fc">${counts.draft}</span></button>
+          <button class="filter-tab${currentFilter === 'sent' ? ' on' : ''}${!counts.sent ? ' dimmed' : ''}" onclick="setFilter('sent')">Sent <span class="fc">${counts.sent}</span></button>
+          <button class="filter-tab${currentFilter === 'accepted' ? ' on' : ''}${!counts.accepted ? ' dimmed' : ''}" onclick="setFilter('accepted')">Won <span class="fc">${counts.accepted}</span></button>
+          <button class="filter-tab${currentFilter === 'declined' ? ' on' : ''}${!counts.declined ? ' dimmed' : ''}" onclick="setFilter('declined')">Lost <span class="fc">${counts.declined}</span></button>
+          <button class="filter-tab${currentFilter === 'expired' ? ' on' : ''}${!counts.expired ? ' dimmed' : ''}" onclick="setFilter('expired')">Expired <span class="fc">${counts.expired}</span></button>
+          <button class="filter-tab${currentFilter === 'archived' ? ' on' : ''}${!counts.archived ? ' dimmed' : ''}" onclick="setFilter('archived')"><i data-lucide="archive" style="width:12px;height:12px"></i> Archived <span class="fc">${counts.archived}</span></button>
         </div>
         <button class="sort-btn" onclick="toggleSortProposals()" id="sortBtnP"><i data-lucide="arrow-up-down"></i> ${currentSort === 'date' ? 'Newest' : currentSort === 'value' ? 'Highest' : currentSort === 'name' ? 'A-Z' : 'Newest'}</button>
         <div class="view-toggle">
