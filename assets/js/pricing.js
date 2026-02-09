@@ -163,11 +163,7 @@ function initSingleLiEditor(el, initialData) {
             table: { class: Table, inlineToolbar: true },
             quote: { class: Quote, inlineToolbar: true },
             marker: Marker,
-            delimiter: Delimiter,
-            underline: Underline,
-            inlineCode: InlineCode,
-            code: Code,
-            embed: Embed
+            delimiter: Delimiter
         };
 
         el._editor = new EditorJS({
