@@ -199,6 +199,7 @@ function finishOb() {
         else CONFIG.color = CONFIG.color || '#18181b';
     }
     saveConfig();
+    if (typeof pushToCloud === 'function') pushToCloud();
     // Celebration animation before transitioning
     const obEl = document.getElementById('obContent');
     if (obEl) {

@@ -710,7 +710,12 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Supabase config (same as main app)
+        const SB_URL = 'https://fhttdaouzyfvfegvrpil.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZodHRkYW91enlmdmZlZ3ZycGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3MzQ1NzIsImV4cCI6MjA4NjMxMDU3Mn0.wUrvbM2Jaeuta90XJZCSgyeL7DqE3T3upwWe9wRaZLA';
+
         // Get token from URL
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('p');
@@ -754,27 +759,33 @@
 
         // persist() removed — client page is read-only to prevent data tampering
 
-        function init() {
+        async function init() {
             if (!token) {
                 showError('Invalid Link', 'This proposal link is invalid or expired.');
                 return;
             }
 
+            // Try Supabase first (works for external viewers on different devices)
+            if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                try {
+                    const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+                    const { data } = await sbClient.rpc('get_shared_proposal', { token });
+                    if (data) {
+                        proposal = data;
+                        if (proposal.clientResponse) { showResponded(proposal.clientResponse.status); return; }
+                        renderProposal();
+                        return;
+                    }
+                } catch (e) { console.warn('Cloud fetch failed, trying localStorage:', e); }
+            }
+
+            // Fallback: localStorage (same-device, offline)
             proposal = DB.find(p => p.shareToken === token);
             if (!proposal) {
                 showError('Proposal Not Found', 'This proposal may have been deleted or the link is incorrect.');
                 return;
             }
-
-            // Check if already responded
-            if (proposal.clientResponse) {
-                showResponded(proposal.clientResponse.status);
-                return;
-            }
-
-            // View tracking is handled server-side in production
-            // Client page is read-only to prevent localStorage tampering
-
+            if (proposal.clientResponse) { showResponded(proposal.clientResponse.status); return; }
             renderProposal();
         }
 
@@ -1132,7 +1143,18 @@
                 if (canvas) clientSignature = canvas.toDataURL('image/png');
             }
 
-            // Store response in a separate key — main app merges on next load
+            // Try cloud response first
+            if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                try {
+                    const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+                    await sbClient.rpc('submit_client_response', {
+                        p_token: token, p_status: status, p_comment: comment,
+                        p_client_name: clientName, p_client_signature: clientSignature
+                    });
+                } catch (e) { console.warn('Cloud response failed, saving locally:', e); }
+            }
+
+            // Also store locally as fallback
             try {
                 const responses = JSON.parse(localStorage.getItem('pk_client_responses') || '[]');
                 const response = {

@@ -1,0 +1,66 @@
+# ════════════════════════════════════════
+# CI — Validate on every push & PR
+# ════════════════════════════════════════
+name: CI
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+jobs:
+  validate:
+    name: Validate JavaScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Syntax check all JS files
+        run: |
+          FAIL=0
+          for f in assets/js/core/*.js assets/js/views/*.js assets/js/editor/*.js assets/js/export/*.js assets/js/boot.js; do
+            if ! node -c "$f" 2>&1; then
+              FAIL=1
+            fi
+          done
+          if [ $FAIL -eq 1 ]; then
+            echo "::error::JavaScript syntax errors found"
+            exit 1
+          fi
+          echo "All JS files passed syntax check"
+
+      - name: Validate HTML structure
+        run: |
+          for f in index.html client.html landing.html; do
+            if [ -f "$f" ]; then
+              echo "Checking $f exists and is non-empty..."
+              if [ ! -s "$f" ]; then
+                echo "::error::$f is empty"
+                exit 1
+              fi
+            fi
+          done
+          echo "All HTML files valid"
+
+      - name: Check for common issues
+        run: |
+          # Ensure no console.log left in production (allow console.warn/error)
+          LOGS=$(grep -rn "console\.log(" assets/js/ --include="*.js" || true)
+          if [ -n "$LOGS" ]; then
+            echo "::warning::console.log statements found (consider removing for production):"
+            echo "$LOGS"
+          fi
+          # Ensure no debugger statements
+          DEBUGGER=$(grep -rn "debugger" assets/js/ --include="*.js" || true)
+          if [ -n "$DEBUGGER" ]; then
+            echo "::error::debugger statements found — remove before releasing"
+            echo "$DEBUGGER"
+            exit 1
+          fi
+          echo "No blocking issues found"

@@ -4,6 +4,36 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.4 (build 20260210) — 2026-02-10
+
+### Features
+- **Cloud Sync & Auth** — Supabase integration with email + Google OAuth sign-in
+- Two-way cloud sync: proposals, clients, settings, and libraries sync across devices
+- Shared proposal links now load from cloud (cross-device, no same-browser requirement)
+- Account card in Settings showing email, sync status, and sign-out
+- Offline mode with automatic reconnect sync
+- "Continue offline" option on auth screen for PWA/offline use
+
+### Infrastructure
+- CI/CD pipelines: GitHub Actions for validation, staging deploy, production deploy
+- Automatic GitHub Releases created on version tags
+- Staging environment with visual banner indicator
+
+### Files Changed
+- `assets/js/core/supabase.js` — NEW: Supabase client initialization
+- `assets/js/core/auth.js` — NEW: Auth UI (login/signup/reset), session management
+- `assets/js/core/sync.js` — NEW: Two-way cloud sync layer with conflict resolution
+- `assets/js/core/store.js` — Sync hooks in persist/saveConfig/saveClients, cloud-aware logout
+- `assets/js/boot.js` — Auth-aware initApp(), v2.4
+- `assets/js/core/onboarding.js` — Push to cloud after onboarding finish
+- `assets/js/views/settings.js` — Account card with email/plan/sync/signout
+- `client.html` — Cloud-first proposal loading, cloud response submission
+- `index.html` — Supabase CDN, 3 new script tags, sync indicator
+- `assets/css/pages.css` — Auth form, Google button, sync indicator styles
+- `.github/workflows/` — CI, staging deploy, production deploy, release workflows
+
+---
+
 ## v2.3 (build 20260210) — 2026-02-10
 
 ### Features

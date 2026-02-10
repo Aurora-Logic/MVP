@@ -2993,3 +2993,148 @@
   background: var(--border);
   margin: 6px 0;
 }
+
+/* ════════ AUTH SCREEN ════════ */
+
+.auth-form {
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 8px 0;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.auth-desc {
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.auth-google-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--border) !important;
+  border-radius: 9999px !important;
+  background: var(--card) !important;
+  color: var(--text) !important;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--t);
+}
+
+.auth-google-btn:hover {
+  background: var(--muted) !important;
+  border-color: var(--border-h) !important;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  gap: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-divider span {
+  font-size: 12px;
+  color: var(--text4);
+  white-space: nowrap;
+}
+
+.auth-error {
+  font-size: 13px;
+  color: var(--red);
+  margin: 8px 0;
+  display: none;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+.auth-links a {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+.auth-offline {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.auth-offline a {
+  color: var(--text4);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color var(--t);
+}
+
+.auth-offline a:hover {
+  color: var(--text3);
+}
+
+/* ════════ SYNC INDICATOR ════════ */
+
+.sync-indicator {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text4);
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.sync-syncing { color: var(--blue); }
+.sync-synced { color: var(--green); }
+.sync-error { color: var(--red); }
+.sync-offline { color: var(--text4); }
+
+/* ════════ ACCOUNT CARD ════════ */
+
+.acct-sync {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text4);
+  font-weight: 500;
+}

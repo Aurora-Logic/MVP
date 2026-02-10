@@ -1,0 +1,47 @@
+# ════════════════════════════════════════
+# RELEASE — Auto-create GitHub Release on tag
+# ════════════════════════════════════════
+name: Create Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          # Extract the section for this version from CHANGELOG.md
+          # Matches from ## vX.X to the next ## or EOF
+          NOTES=$(awk "/^## ${VERSION//./\\.}/{found=1; next} /^## v/{if(found) exit} found{print}" CHANGELOG.md)
+          if [ -z "$NOTES" ]; then
+            NOTES="Release $VERSION"
+          fi
+          # Write to file for multiline support
+          echo "$NOTES" > /tmp/release_notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          name: ${{ steps.version.outputs.VERSION }}
+          body_path: /tmp/release_notes.md
+          draft: false
+          prerelease: false
+          generate_release_notes: false

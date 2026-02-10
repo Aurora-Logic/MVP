@@ -20,15 +20,38 @@ function getCountryTaxHtml() {
     return `<div class="fg"><label class="fl">Tax / Registration ID</label><input type="text" id="setTaxId" value="${esc(CONFIG?.taxId || '')}" oninput="saveSettings()"></div>`;
 }
 
+function buildAccountCard() {
+    const user = sbSession?.user;
+    if (!user) return '';
+    const email = user.email || '';
+    const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
+    const since = user.created_at ? fmtDate(user.created_at) : '';
+    const statusLabel = navigator.onLine ? (syncStatus === 'syncing' ? 'Syncing...' : 'Synced') : 'Offline';
+    const statusIcon = navigator.onLine ? (syncStatus === 'syncing' ? 'refresh-cw' : 'check-circle') : 'wifi-off';
+    return `<div class="card card-p" style="margin-bottom:14px">
+        <div class="card-head"><div><div class="card-t">Account</div><div class="card-d">Signed in as ${esc(email)}</div></div>
+            <span class="acct-sync"><i data-lucide="${statusIcon}" style="width:14px;height:14px"></i> ${statusLabel}</span>
+        </div>
+        ${name ? `<div style="font-size:13px;color:var(--text3);margin-bottom:8px">${esc(name)}</div>` : ''}
+        ${since ? `<div style="font-size:12px;color:var(--text4);margin-bottom:12px">Member since ${since}</div>` : ''}
+        <div class="sec-header-actions">
+            <button class="btn-sm-outline" onclick="if(typeof pushToCloud==='function')pushToCloud().then(()=>toast('Data synced'))"><i data-lucide="refresh-cw"></i> Sync Now</button>
+            <button class="btn-sm-destructive" onclick="logoutApp()"><i data-lucide="log-out"></i> Sign Out</button>
+        </div>
+    </div>`;
+}
+
 function renderSettings() {
     CUR = null;
     document.getElementById('topTitle').textContent = 'Settings';
     document.getElementById('topRight').innerHTML = '';
     const b = CONFIG?.bank || {};
     const body = document.getElementById('bodyScroll');
+    const acctHtml = typeof isLoggedIn === 'function' && isLoggedIn() ? buildAccountCard() : '';
     body.innerHTML = `
     <div class="settings-grid">
       <div class="settings-col">
+        ${acctHtml}
         <div class="card card-p" style="margin-bottom:14px">
           <div class="card-head"><div><div class="card-t">Organization Details</div><div class="card-d">Auto-filled into every new proposal</div></div></div>
           <div class="fg"><label class="fl">Company Name</label><input type="text" id="setCo" value="${esc(CONFIG?.company)}" oninput="saveSettings()"></div>

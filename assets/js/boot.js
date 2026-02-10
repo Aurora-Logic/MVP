@@ -3,12 +3,17 @@
 // ════════════════════════════════════════
 
 function initApp() {
-    if (CONFIG) {
-        document.getElementById('onboard').classList.add('hide');
-        document.getElementById('appShell').style.display = 'flex';
-        bootApp();
+    if (typeof initAuth === 'function') {
+        initAuth();
     } else {
-        renderOnboarding();
+        // Offline fallback (Supabase CDN not loaded)
+        if (CONFIG) {
+            document.getElementById('onboard').classList.add('hide');
+            document.getElementById('appShell').style.display = 'flex';
+            bootApp();
+        } else {
+            renderOnboarding();
+        }
     }
 }
 
@@ -25,14 +30,14 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.3';
+const APP_VERSION = '2.4';
 const APP_BUILD = '20260210';
 const WHATS_NEW_ITEMS = [
-    { icon: 'upload', title: 'Import Data', desc: 'Import proposals, clients, and settings from a JSON backup file.' },
-    { icon: 'indian-rupee', title: 'UPI & QR Payments', desc: 'Add your UPI ID and auto-generate QR codes on PDF invoices.' },
-    { icon: 'wallet', title: 'Payment Tracking', desc: 'Record multiple payments per proposal, track dues, and generate receipts.' },
-    { icon: 'layout-template', title: 'Landing Page', desc: 'New marketing landing page with features showcase, pricing, and FAQ.' },
-    { icon: 'wand-2', title: 'Onboarding Polish', desc: 'Skip any step, celebration animation, and smarter empty states throughout.' }
+    { icon: 'cloud', title: 'Cloud Sync', desc: 'Your proposals, clients, and settings now sync across all your devices automatically.' },
+    { icon: 'log-in', title: 'User Accounts', desc: 'Sign in with Google or email to access your data from anywhere.' },
+    { icon: 'share-2', title: 'Cloud Sharing', desc: 'Shared proposal links now work across devices — no same-browser requirement.' },
+    { icon: 'shield-check', title: 'Secure & Private', desc: 'Row-level security ensures only you can access your data.' },
+    { icon: 'wifi-off', title: 'Offline Mode', desc: 'Continue working offline — data syncs automatically when you reconnect.' }
 ];
 
 function checkWhatsNew() {
