@@ -7,43 +7,64 @@ let authMode = 'login'; // login | signup | reset
 async function initAuth() {
     initSupabase();
     if (!sb()) {
-        // Offline fallback — no Supabase SDK
         offlineBoot();
         return;
     }
 
     // Detect OAuth callback (hash contains access_token from Google redirect)
     const hash = window.location.hash;
-    const isOAuthCallback = hash && (hash.includes('access_token=') || hash.includes('error='));
+    const isOAuthCallback = hash && hash.includes('access_token=');
+    const hasOAuthError = hash && hash.includes('error=');
 
-    if (isOAuthCallback) {
+    if (isOAuthCallback || hasOAuthError) {
         // Show loading while processing OAuth callback
         const el = document.getElementById('obContent');
         if (el) {
             document.getElementById('appShell').style.display = 'none';
             document.getElementById('onboard').classList.remove('hide');
+            if (hasOAuthError) {
+                el.innerHTML = '<div class="auth-form" style="text-align:center"><div style="font-size:36px;margin-bottom:12px">&#9888;&#65039;</div><div class="auth-title">Sign-in failed</div><div class="auth-desc">Google authentication was cancelled or failed. Please try again.</div><button class="btn" style="margin-top:16px" onclick="authMode=\'login\';renderAuthScreen()">Back to Sign In</button></div>';
+                // Clean hash
+                if (window.history.replaceState) window.history.replaceState(null, '', window.location.pathname);
+                return;
+            }
             el.innerHTML = '<div class="auth-form" style="text-align:center"><div style="font-size:36px;margin-bottom:12px">&#128274;</div><div class="auth-title">Signing you in...</div><div class="auth-desc">Please wait while we complete authentication.</div></div>';
         }
     }
 
-    // getSession() will auto-detect and parse OAuth hash tokens
-    try {
-        const { data, error } = await sb().auth.getSession();
-        if (error && isOAuthCallback) {
-            // OAuth error — show auth screen with error
-            renderAuthScreen();
-            showAuthError('Authentication failed. Please try again.');
-            return;
+    // If OAuth callback, manually parse hash and set session
+    if (isOAuthCallback) {
+        try {
+            const params = new URLSearchParams(hash.substring(1));
+            const accessToken = params.get('access_token');
+            const refreshToken = params.get('refresh_token');
+            if (accessToken && refreshToken) {
+                const { data, error } = await sb().auth.setSession({
+                    access_token: accessToken,
+                    refresh_token: refreshToken
+                });
+                if (!error && data?.session) {
+                    sbSession = data.session;
+                }
+            }
+        } catch (e) {
+            console.warn('OAuth token exchange failed:', e);
         }
-        sbSession = data?.session || null;
-    } catch (e) { sbSession = null; }
-
-    // Clean up OAuth hash from URL
-    if (isOAuthCallback && window.history.replaceState) {
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        // Clean hash from URL
+        if (window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
     }
 
-    // Listen for auth state changes (for future sign-in/out events)
+    // If not OAuth callback, check existing session
+    if (!sbSession) {
+        try {
+            const { data } = await sb().auth.getSession();
+            sbSession = data?.session || null;
+        } catch (e) { sbSession = null; }
+    }
+
+    // Listen for auth state changes (future events only)
     let authBooted = false;
     sb().auth.onAuthStateChange(async (event, session) => {
         sbSession = session;
@@ -52,18 +73,17 @@ async function initAuth() {
             await onSignedIn();
         } else if (event === 'SIGNED_OUT') {
             sbSession = null;
+            renderAuthScreen();
         }
     });
 
     if (sbSession) {
-        // Already logged in — pull data and boot
         authBooted = true;
         await pullAndBoot();
     } else if (!isOAuthCallback) {
-        // Show auth screen (only if not mid-OAuth callback)
         renderAuthScreen();
     }
-    // If isOAuthCallback and no session yet, onAuthStateChange will handle it
+    // OAuth callback with no session yet — onAuthStateChange handles it
 }
 
 function offlineBoot() {
@@ -312,4 +332,7 @@ async function doLogout() {
         try { await sb().auth.signOut(); } catch (e) { console.warn('Signout error:', e); }
     }
     sbSession = null;
+    // Clear auth-related storage
+    sessionStorage.removeItem('pk_csrf');
+    // onAuthStateChange SIGNED_OUT will call renderAuthScreen()
 }

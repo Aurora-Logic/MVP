@@ -18,6 +18,8 @@ function initSupabase() {
             auth: {
                 autoRefreshToken: true,
                 persistSession: true,
+                detectSessionInUrl: true,
+                flowType: 'implicit',
                 storage: localStorage
             }
         });
@@ -31,6 +33,57 @@ function initSupabase() {
 function sb() { return sbClient; }
 
 function isLoggedIn() { return !!sbSession; }
+
+// Get current JWT access token (for authenticated API calls)
+function getAccessToken() {
+    return sbSession?.access_token || null;
+}
+
+// Get JWT expiry timestamp
+function getTokenExpiry() {
+    return sbSession?.expires_at ? sbSession.expires_at * 1000 : null;
+}
+
+// Check if current JWT is expired or about to expire (within 60s)
+function isTokenExpired() {
+    const exp = getTokenExpiry();
+    if (!exp) return true;
+    return Date.now() > (exp - 60000);
+}
+
+// Force refresh the JWT token
+async function refreshToken() {
+    if (!sb()) return null;
+    try {
+        const { data, error } = await sb().auth.refreshSession();
+        if (error) { console.warn('Token refresh failed:', error.message); return null; }
+        sbSession = data?.session || null;
+        return sbSession;
+    } catch (e) { return null; }
+}
+
+// Get a valid access token, refreshing if needed
+async function getValidToken() {
+    if (!isLoggedIn()) return null;
+    if (isTokenExpired()) await refreshToken();
+    return getAccessToken();
+}
+
+// Generate CSRF token for sensitive operations
+function generateCsrfToken() {
+    const arr = new Uint8Array(32);
+    crypto.getRandomValues(arr);
+    const token = Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+    sessionStorage.setItem('pk_csrf', token);
+    return token;
+}
+
+// Validate CSRF token
+function validateCsrfToken(token) {
+    const stored = sessionStorage.getItem('pk_csrf');
+    if (!stored || !token) return false;
+    return stored === token;
+}
 
 async function getUser() {
     if (!sb()) return null;
