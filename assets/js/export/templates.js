@@ -56,17 +56,18 @@ function buildBankFooterHtml(bc) {
     if (b.swift) rows.push(['SWIFT / BIC', esc(b.swift)]);
     if (b.upi && CONFIG?.country === 'IN') rows.push(['UPI ID', esc(b.upi)]);
     if (!rows.length) return '';
-    const tbl = rows.map(r => `<tr><td style="font-size:11px;color:#a1a1aa;padding:3px 12px 3px 0;white-space:nowrap">${r[0]}</td><td style="font-size:11px;color:#3f3f46;font-weight:500;padding:3px 0">${r[1]}</td></tr>`).join('');
+    const tbl = rows.map(r => `<tr><td style="font-size:10px;color:${bc || '#18181b'};padding:5px 14px 5px 0;white-space:nowrap;border-bottom:1px solid #f4f4f5;font-weight:600">${r[0]}</td><td style="font-size:11px;color:#3f3f46;font-weight:500;padding:5px 0;border-bottom:1px solid #f4f4f5">${r[1]}</td></tr>`).join('');
     let qrHtml = '';
     if (b.upi && CONFIG?.country === 'IN' && typeof qrcode === 'function') {
         try {
             const upiUrl = 'upi://pay?pa=' + encodeURIComponent(b.upi) + '&pn=' + encodeURIComponent(CONFIG?.company || CONFIG?.name || '') + '&cu=INR';
             const qr = qrcode(0, 'M'); qr.addData(upiUrl); qr.make();
-            const qrSrc = qr.createDataURL(4, 0);
-            qrHtml = `<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><img src="${qrSrc}" style="width:80px;height:80px;border:1px solid #e4e4e7;border-radius:4px" alt="UPI QR"><div style="font-size:10px;color:#a1a1aa;line-height:1.5">Scan to pay via UPI<br><span style="font-size:11px;color:#3f3f46;font-weight:500">${esc(b.upi)}</span></div></div>`;
+            const qrSrc = qr.createDataURL(3, 0);
+            qrHtml = `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><img src="${qrSrc}" style="width:64px;height:64px;border:1px solid #e4e4e7;border-radius:4px" alt="UPI QR"><div style="font-size:9px;color:#a1a1aa;text-align:center">Scan to pay</div></div>`;
         } catch (e) { /* QR generation failed — degrade gracefully */ }
     }
-    return `<div style="margin-top:28px;padding-top:18px;border-top:1px solid #e4e4e7;page-break-inside:avoid;break-inside:avoid"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:${bc || '#18181b'};margin-bottom:8px">Bank Details</div><table style="border-collapse:collapse">${tbl}</table>${qrHtml}</div>`;
+    const innerLayout = qrHtml ? `<div style="display:flex;gap:20px;align-items:flex-start"><table style="border-collapse:collapse;flex:1">${tbl}</table>${qrHtml}</div>` : `<table style="border-collapse:collapse">${tbl}</table>`;
+    return `<div style="margin-top:28px;padding-top:18px;border-top:1px solid #e4e4e7;page-break-inside:avoid;break-inside:avoid"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:${bc || '#18181b'};margin-bottom:8px">Bank Details</div>${innerLayout}</div>`;
 }
 
 function buildCoverHtml(p, bc) {
