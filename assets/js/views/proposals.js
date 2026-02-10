@@ -149,7 +149,7 @@ function renderProposals() {
       <div class="first-run">
         <div class="fr-icon"><i data-lucide="rocket"></i></div>
         <div class="fr-title">Create your first proposal</div>
-        <div class="fr-desc">ProposalKit helps you build professional proposals in minutes.</div>
+        <div class="fr-desc">Build professional proposals in minutes.</div>
         <div class="fr-actions">
           <button class="btn" onclick="openNewModal()"><i data-lucide="plus"></i> New Proposal</button>
           <button class="btn-outline" onclick="fromTpl('web')"><i data-lucide="zap"></i> Try Web Template</button>

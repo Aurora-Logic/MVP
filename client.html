@@ -898,7 +898,7 @@
                     <div class="header-inner">
                         <div class="logo">
                             ${CONFIG?.logo ? `<img src="${esc(CONFIG.logo)}" class="logo-img">` : ''}
-                            <span class="logo-text">${esc(p.sender?.company || CONFIG?.company || 'ProposalKit')}</span>
+                            <span class="logo-text">${esc(p.sender?.company || CONFIG?.company || '')}</span>
                         </div>
                         <div class="header-actions">
                             <button class="btn btn-out btn-sm" onclick="window.print()"><i data-lucide="printer"></i> Print</button>

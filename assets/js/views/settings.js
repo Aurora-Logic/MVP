@@ -76,6 +76,14 @@ function renderSettings() {
           </div>
           <div class="fg"><div class="color-row" id="setColors"></div></div>
           <div class="fg"><label class="fl">Font Family</label><div id="setFont"></div></div>
+          <div class="fg" style="margin-top:8px;padding-top:12px;border-top:1px solid var(--border)">
+            <label class="fl">White Label</label>
+            <label class="toggle-row">
+              <input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()">
+              <span class="toggle-label">Remove ProposalKit branding</span>
+            </label>
+            <div class="fh">Replaces ProposalKit name with your company name in sidebar, page titles, client portal, and exports</div>
+          </div>
         </div>
         <div class="card card-p" style="margin-bottom:14px">
           <div class="card-head"><div><div class="card-t">Your Signature</div><div class="card-d">Draw your signature to include in proposals</div></div></div>
@@ -213,6 +221,8 @@ function saveSettings() {
     CONFIG.address = v('setAddr', CONFIG.address);
     CONFIG.website = v('setWebsite', CONFIG.website);
     CONFIG.font = cselGetValue(document.getElementById('setFont')) || CONFIG.font || 'Inter';
+    const wlEl = document.getElementById('setWhiteLabel');
+    if (wlEl) CONFIG.whiteLabel = wlEl.checked;
     // Country-specific tax fields with validation
     const c = CONFIG.country;
     if (c === 'IN') {
@@ -273,8 +283,19 @@ function exportData() {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'proposalkit-export.json';
+    const slug = CONFIG?.whiteLabel && CONFIG?.company ? CONFIG.company.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'proposalkit';
+    a.download = slug + '-export.json';
     a.click();
     URL.revokeObjectURL(a.href);
     toast('Data exported');
+}
+
+function applyWhiteLabel() {
+    const brand = document.querySelector('.side-brand');
+    if (brand) brand.textContent = CONFIG?.whiteLabel ? (CONFIG?.company || 'ProposalKit') : 'ProposalKit';
+    refreshSide();
+}
+
+function appName() {
+    return CONFIG?.whiteLabel && CONFIG?.company ? CONFIG.company : 'ProposalKit';
 }

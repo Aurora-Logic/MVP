@@ -133,7 +133,7 @@ function exportAnalyticsReport() {
     const c = proposals[0]?.currency || defaultCurrency();
 
     const lines = [
-        'ProposalKit Analytics Report',
+        (typeof appName === 'function' ? appName() : 'ProposalKit') + ' Analytics Report',
         '═'.repeat(40),
         `Generated: ${new Date().toLocaleDateString()}`,
         `Period: ${analyticsFilter === 'all' ? 'All time' : analyticsFilter}`,

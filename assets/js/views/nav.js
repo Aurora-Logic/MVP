@@ -27,7 +27,8 @@ function destroyAllEditors() {
 function goNav(view) {
     closeMobileSidebar();
     const titles = { dashboard: 'Dashboard', proposals: 'Proposals', clients: 'Clients', analytics: 'Analytics', settings: 'Settings' };
-    document.title = (titles[view] || 'ProposalKit') + ' — ProposalKit';
+    const an = typeof appName === 'function' ? appName() : 'ProposalKit';
+    document.title = (titles[view] || an) + ' \u2014 ' + an;
     const topSearch = document.getElementById('topSearch');
     if (topSearch) topSearch.style.display = (view === 'analytics' || view === 'settings') ? 'none' : '';
     document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));

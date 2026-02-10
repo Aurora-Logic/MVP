@@ -199,6 +199,8 @@ function refreshSide() {
     document.getElementById('propCnt').textContent = active.length;
     const cntEl = document.getElementById('clientCnt');
     if (cntEl) cntEl.textContent = CLIENTS.length;
+    const brand = document.querySelector('.side-brand');
+    if (brand) brand.textContent = typeof appName === 'function' ? appName() : 'ProposalKit';
     const list = document.getElementById('recentList');
     list.innerHTML = '';
     active.slice(0, 8).forEach(p => {

@@ -72,7 +72,7 @@
 - [ ] 6.1 Team / multi-user
 - [ ] 6.2 AI writing assistant
 - [ ] 6.3 Integrations (Zapier, Drive, Slack)
-- [ ] 6.4 White-label mode
+- [x] 6.4 White-label mode — `settings.js`, `nav.js`, `boot.js`
 - [ ] 6.5 Proposal comparison (diff view)
 - [ ] 6.6 Multi-document derivatives
 
@@ -84,4 +84,4 @@
 - Phase 3: 6 features ✅ COMPLETE
 - Phase 4: 5 features ✅ COMPLETE
 - 6-month: 6 features (5 done, 1 remaining — 5.1 accounts/cloud) ← CURRENT
-- 1-year: 6 features (scale)
+- 1-year: 6 features (1 done, 5 remaining)

@@ -17,7 +17,7 @@ function loadEditor(id) {
     document.querySelector('[data-nav="editor"]')?.classList.add('on');
 
     document.getElementById('topTitle').innerHTML = `<span class="breadcrumb-link" onclick="renderProposals();document.querySelectorAll('[data-nav]').forEach(b=>b.classList.remove('on'));document.querySelector('[data-nav=&quot;editor&quot;]')?.classList.add('on')">Proposals</span><span class="breadcrumb-sep">/</span>${esc(p.title || 'Untitled')}`;
-    document.title = (p.title || 'Untitled') + ' — ProposalKit';
+    document.title = (p.title || 'Untitled') + ' \u2014 ' + (typeof appName === 'function' ? appName() : 'ProposalKit');
 
     // Calc stats for bar
     const t = (typeof calcTotals === 'function') ? calcTotals(p) : { grand: (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0) };
