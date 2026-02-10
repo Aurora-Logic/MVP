@@ -1,3 +1,6 @@
 
 # Embedded git repos
 .claude/skills/anthropic-skills/
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.agent/rules/snyk_rules.md

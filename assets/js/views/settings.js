@@ -9,7 +9,8 @@ function getCountryTaxHtml() {
         <div class="fr">
             <div class="fg"><label class="fl">PAN</label><input type="text" id="setPan" value="${esc(CONFIG?.pan || '')}" oninput="saveSettings()" maxlength="10"><div class="fh">Permanent Account Number</div></div>
             <div class="fg"><label class="fl">UDYAM Registration</label><input type="text" id="setUdyam" value="${esc(CONFIG?.udyam || '')}" oninput="saveSettings()"><div class="fh">MSME Registration Number</div></div>
-        </div>`;
+        </div>
+        <div class="fg"><label class="fl">LUT Number</label><input type="text" id="setLut" value="${esc(CONFIG?.lut || '')}" oninput="saveSettings()" maxlength="20"><div class="fh">Letter of Undertaking (for zero-rated exports)</div></div>`;
     if (c === 'US') return `
         <div class="fg"><label class="fl">EIN</label><input type="text" id="setEin" value="${esc(CONFIG?.ein || '')}" oninput="saveSettings()" maxlength="10"><div class="fh">Federal Employer Identification Number</div></div>`;
     if (['GB','DE','FR','NL','SE','IE'].includes(c)) return `
@@ -233,17 +234,18 @@ function saveSettings() {
     CONFIG.webhookUrl = v('setWebhookUrl', CONFIG.webhookUrl);
     // Clear stale tax fields from other countries
     const c = CONFIG.country;
-    if (c !== 'IN') { CONFIG.gstin = ''; CONFIG.pan = ''; CONFIG.udyam = ''; }
+    if (c !== 'IN') { CONFIG.gstin = ''; CONFIG.pan = ''; CONFIG.udyam = ''; CONFIG.lut = ''; }
     if (c !== 'US') { CONFIG.ein = ''; }
     if (!['GB','DE','FR','NL','SE','IE'].includes(c)) { CONFIG.vatNumber = ''; }
     if (c !== 'AU') { CONFIG.abn = ''; }
     // Country-specific tax fields with validation
     if (c === 'IN') {
-        const gstin = v('setGstin', CONFIG.gstin), pan = v('setPan', CONFIG.pan), udyam = v('setUdyam', CONFIG.udyam);
-        CONFIG.gstin = gstin; CONFIG.pan = pan; CONFIG.udyam = udyam;
+        const gstin = v('setGstin', CONFIG.gstin), pan = v('setPan', CONFIG.pan), udyam = v('setUdyam', CONFIG.udyam), lut = v('setLut', CONFIG.lut);
+        CONFIG.gstin = gstin; CONFIG.pan = pan; CONFIG.udyam = udyam; CONFIG.lut = lut;
         if (gstin && !validateTaxId('gstin', gstin)) markInvalid('setGstin', 'Invalid GSTIN'); else clearInvalid('setGstin');
         if (pan && !validateTaxId('pan', pan)) markInvalid('setPan', 'Invalid PAN'); else clearInvalid('setPan');
         if (udyam && !validateTaxId('udyam', udyam)) markInvalid('setUdyam', 'Invalid UDYAM'); else clearInvalid('setUdyam');
+        if (lut && !validateTaxId('lut', lut)) markInvalid('setLut', 'Invalid LUT'); else clearInvalid('setLut');
     } else if (c === 'US') {
         const ein = v('setEin', CONFIG.ein); CONFIG.ein = ein;
         if (ein && !validateTaxId('ein', ein)) markInvalid('setEin', 'Invalid EIN'); else clearInvalid('setEin');

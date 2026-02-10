@@ -104,7 +104,8 @@ function getCountryFields(country) {
         <div class="fr">
             <div class="fg"><label class="fl">PAN</label><input type="text" id="obPan" placeholder="e.g. AAAAA0000A" value="${esc(CONFIG?.pan || '')}" maxlength="10"><div class="fh">Permanent Account Number</div></div>
             <div class="fg"><label class="fl">UDYAM Registration</label><input type="text" id="obUdyam" placeholder="e.g. UDYAM-MH-00-0000000" value="${esc(CONFIG?.udyam || '')}"><div class="fh">MSME Registration Number</div></div>
-        </div>`;
+        </div>
+        <div class="fg"><label class="fl">LUT Number</label><input type="text" id="obLut" placeholder="LUT number from GST portal" value="${esc(CONFIG?.lut || '')}" maxlength="20"><div class="fh">Letter of Undertaking (for zero-rated exports)</div></div>`;
     if (country === 'US') return `
         <div class="fg"><label class="fl">EIN (Employer ID)</label><input type="text" id="obEin" placeholder="e.g. 12-3456789" value="${esc(CONFIG?.ein || '')}" maxlength="10"><div class="fh">Federal Employer Identification Number</div></div>`;
     if (country === 'GB' || country === 'DE' || country === 'FR' || country === 'NL' || country === 'SE' || country === 'IE') return `
@@ -140,6 +141,8 @@ function validateObTaxIds() {
         if (gstin && !validateTaxId('gstin', gstin)) { toast('Invalid GSTIN format (e.g. 27AAAAA0000A1Z5)', 'warning'); return false; }
         if (pan && !validateTaxId('pan', pan)) { toast('Invalid PAN format (e.g. AAAAA0000A)', 'warning'); return false; }
         if (udyam && !validateTaxId('udyam', udyam)) { toast('Invalid UDYAM format (e.g. UDYAM-MH-00-0000000)', 'warning'); return false; }
+        const lut = document.getElementById('obLut')?.value?.trim();
+        if (lut && !validateTaxId('lut', lut)) { toast('Invalid LUT number', 'warning'); return false; }
     } else if (c === 'US') {
         const ein = document.getElementById('obEin')?.value?.trim();
         if (ein && !validateTaxId('ein', ein)) { toast('Invalid EIN format (e.g. 12-3456789)', 'warning'); return false; }
@@ -167,7 +170,7 @@ function collectObStep() {
         CONFIG.country = cselGetValue(document.getElementById('obCountry')) || CONFIG.country || '';
         CONFIG.address = v('obAddr');
         // Country-specific
-        if (CONFIG.country === 'IN') { CONFIG.gstin = v('obGstin'); CONFIG.pan = v('obPan'); CONFIG.udyam = v('obUdyam'); }
+        if (CONFIG.country === 'IN') { CONFIG.gstin = v('obGstin'); CONFIG.pan = v('obPan'); CONFIG.udyam = v('obUdyam'); CONFIG.lut = v('obLut'); }
         else if (CONFIG.country === 'US') { CONFIG.ein = v('obEin'); }
         else if (['GB','DE','FR','NL','SE','IE'].includes(CONFIG.country)) { CONFIG.vatNumber = v('obVat'); }
         else if (CONFIG.country === 'AU') { CONFIG.abn = v('obAbn'); }

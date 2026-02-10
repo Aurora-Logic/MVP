@@ -54,14 +54,14 @@ function buildSowHtml(p, c, bc, t, rows, secs, logo) {
     h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;padding:16px;border:1px solid #e4e4e7;border-radius:8px">
         <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">Provider</div>
             <div style="font-size:13px;font-weight:600">${esc(p.sender.company)}</div>
-            <div style="font-size:11px;color:#71717a;margin-top:2px">${buildSenderDetails()}</div></div>
+            <div style="font-size:11px;color:#71717a;margin-top:2px">${buildSenderDetails()}</div>${buildSenderTaxLine()}</div>
         <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">Client</div>
             <div style="font-size:13px;font-weight:600">${esc(p.client.name)}</div>
             <div style="font-size:11px;color:#71717a;margin-top:2px">${[p.client.contact, p.client.email].filter(Boolean).map(v => esc(v)).join('<br>')}</div></div>
     </div>`;
     let secNum = 1;
     secs.forEach(s => {
-        h += `<div style="margin-bottom:20px">
+        h += `<div style="margin-bottom:24px">
             <div style="font-size:14px;font-weight:700;color:${bc};margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid ${bc}">${secNum}. ${esc(s.title)}</div>
             <div style="color:#3f3f46;font-size:13px;line-height:1.7">${editorJsToHtml(s.content, p)}</div>
         </div>`;
@@ -71,6 +71,7 @@ function buildSowHtml(p, c, bc, t, rows, secs, logo) {
         h += `<div style="font-size:14px;font-weight:700;color:${bc};margin:24px 0 8px;padding-bottom:6px;border-bottom:2px solid ${bc}">${secNum}. Deliverables & Pricing</div>`;
         h += buildPricingHtml(rows, c, t, bc, 'modern');
     }
+    h += buildBankFooterHtml(bc);
     h += buildSignatureBlock(p, bc);
     return h;
 }
@@ -87,28 +88,30 @@ function buildContractHtml(p, c, bc, t, rows, secs, logo) {
         <strong>${esc(p.sender.company)}</strong> ("Provider") and <strong>${esc(p.client.name)}</strong> ("Client"),
         collectively referred to as the "Parties".
     </div>`;
+    h += `${buildSenderTaxLine()}`;
     let clause = 1;
     secs.forEach(s => {
-        h += `<div style="margin-bottom:16px">
+        h += `<div style="margin-bottom:24px">
             <div style="font-size:13px;font-weight:700;color:#18181b;margin-bottom:6px">${clause}. ${esc(s.title).toUpperCase()}</div>
             <div style="color:#3f3f46;font-size:13px;line-height:1.7;padding-left:16px">${editorJsToHtml(s.content, p)}</div>
         </div>`;
         clause++;
     });
     if (rows.length) {
-        h += `<div style="font-size:13px;font-weight:700;color:#18181b;margin:20px 0 8px">${clause}. COMPENSATION</div>`;
+        h += `<div style="font-size:13px;font-weight:700;color:#18181b;margin:24px 0 8px">${clause}. COMPENSATION</div>`;
         h += `<div style="padding-left:16px">`;
         h += buildPricingHtml(rows, c, t, bc, 'modern');
         h += `</div>`;
         clause++;
     }
     if (p.paymentTerms) {
-        h += `<div style="font-size:13px;font-weight:700;color:#18181b;margin:20px 0 8px">${clause}. PAYMENT TERMS</div>`;
+        h += `<div style="font-size:13px;font-weight:700;color:#18181b;margin:24px 0 8px">${clause}. PAYMENT TERMS</div>`;
         h += `<div style="color:#3f3f46;font-size:13px;line-height:1.7;padding-left:16px">${editorJsToHtml(p.paymentTerms, p)}</div>`;
         clause++;
     }
-    h += `<div style="font-size:13px;font-weight:700;color:#18181b;margin:20px 0 8px">${clause}. TERM</div>`;
+    h += `<div style="font-size:13px;font-weight:700;color:#18181b;margin:24px 0 8px">${clause}. TERM</div>`;
     h += `<div style="color:#3f3f46;font-size:13px;line-height:1.7;padding-left:16px">This Agreement shall commence on ${fmtDate(p.date)} and remain in effect until ${fmtDate(p.validUntil)}, unless terminated earlier by either Party with 30 days written notice.</div>`;
+    h += buildBankFooterHtml(bc);
     h += buildSignatureBlock(p, bc);
     return h;
 }
@@ -130,13 +133,14 @@ function buildReceiptHtml(p, c, bc, t, rows, secs, logo) {
             <div style="font-size:11px;color:#71717a">${esc(p.client.email)}</div></div>
         <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">Received By</div>
             <div style="font-size:13px;font-weight:600">${esc(p.sender.company)}</div>
-            <div style="font-size:11px;color:#71717a">${buildSenderDetails()}</div></div>
+            <div style="font-size:11px;color:#71717a">${buildSenderDetails()}</div>${buildSenderTaxLine()}</div>
     </div>`;
     if (rows.length) h += buildPricingHtml(rows, c, t, bc, 'modern');
     h += `<div style="text-align:center;margin-top:24px;padding:20px;background:${bc}0D;border-radius:8px">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc}">Total Paid</div>
         <div style="font-size:28px;font-weight:800;color:${bc};font-family:'JetBrains Mono',monospace">${fmtCur(t.grand, c)}</div>
     </div>`;
+    h += buildBankFooterHtml(bc);
     h += '</div>';
     return h;
 }
