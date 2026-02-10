@@ -213,7 +213,7 @@ function renderProposals() {
           <button class="filter-tab${currentFilter === 'archived' ? ' on' : ''}${!counts.archived ? ' dimmed' : ''}" onclick="setFilter('archived')"><i data-lucide="archive"></i> Archived <span class="fc">${counts.archived}</span></button>
         </div>
         <button class="sort-btn" onclick="toggleSortProposals()" id="sortBtnP"><i data-lucide="arrow-up-down"></i> ${currentSort === 'date' ? 'Newest' : currentSort === 'value' ? 'Highest' : currentSort === 'name' ? 'A-Z' : 'Newest'}</button>
-        ${typeof quickRecordPayment === 'function' && counts.dues > 0 ? `<button class="sort-btn" onclick="showPaymentPickerMenu(event)" style="color:#34C759"><i data-lucide="indian-rupee"></i> Record Payment</button>` : ''}
+        ${typeof quickRecordPayment === 'function' && counts.dues > 0 ? `<button class="sort-btn" onclick="showPaymentPickerMenu(event)" style="color:var(--green)"><i data-lucide="indian-rupee"></i> Record Payment</button>` : ''}
         <div class="view-toggle">
           <button class="vt-btn${viewMode === 'list' ? ' on' : ''}" onclick="setViewMode('list')" data-tooltip="List view" data-side="bottom"><i data-lucide="list"></i></button>
           <button class="vt-btn${viewMode === 'kanban' ? ' on' : ''}" onclick="setViewMode('kanban')" data-tooltip="Board view" data-side="bottom"><i data-lucide="kanban"></i></button>

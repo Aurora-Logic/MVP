@@ -593,8 +593,8 @@ input[type="number"] {
 }
 
 .toggle-row input[type="checkbox"]:checked {
-  background: var(--black) !important;
-  border-color: var(--black) !important;
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
 }
 
 .toggle-row input[type="checkbox"]:checked::after {

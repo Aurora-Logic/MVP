@@ -91,8 +91,8 @@
 }
 
 .si-dues {
-  background: #FF3B3014;
-  color: #FF3B30;
+  background: var(--red-bg);
+  color: var(--red);
 }
 
 /* Dues banner */
@@ -102,15 +102,15 @@
   gap: 14px;
   padding: 16px 20px;
   border-radius: var(--r2);
-  background: #FF3B300A;
-  border: 1px solid #FF3B3018;
+  background: var(--red-bg);
+  border: 1px solid var(--red-bg);
   margin-bottom: 16px;
 }
 .dues-banner-icon {
   width: 40px;
   height: 40px;
-  background: #FF3B30;
-  color: white;
+  background: var(--red);
+  color: var(--white);
   border-radius: var(--r2);
   display: flex;
   align-items: center;
@@ -122,7 +122,7 @@
 .dues-banner-val {
   font-size: 20px;
   font-weight: 800;
-  color: #FF3B30;
+  color: var(--red);
   font-family: var(--mono);
 }
 .dues-banner-label {
@@ -1442,8 +1442,8 @@
 .pay-row-num {
   width: 24px;
   height: 24px;
-  background: #34C75914;
-  color: #34C759;
+  background: var(--green-bg);
+  color: var(--green);
   border-radius: 50%;
   display: flex;
   align-items: center;

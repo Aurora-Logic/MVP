@@ -34,15 +34,14 @@ function renderPayments(p) {
         </div>`;
     });
 
-    const statusColors = { unpaid: '#FF3B30', partial: '#FF9500', paid: '#34C759' };
+    const statusCls = { unpaid: 'declined', partial: 'expired', paid: 'accepted' };
     const statusLabels = { unpaid: 'Unpaid', partial: 'Partially Paid', paid: 'Fully Paid' };
-    const statusBgs = { unpaid: '#FF3B3014', partial: '#FF950014', paid: '#34C75914' };
 
     el.innerHTML = `<div class="card card-p">
         <div class="card-head">
             <div><div class="card-t">Payments Received</div><div class="card-d">Record actual payments from client</div></div>
             <div style="display:flex;gap:8px;align-items:center">
-                <span class="badge" style="background:${statusBgs[pt.status]};color:${statusColors[pt.status]}"><span class="badge-dot" style="background:${statusColors[pt.status]}"></span> ${statusLabels[pt.status]}</span>
+                <span class="badge badge-${statusCls[pt.status]}"><span class="badge-dot"></span> ${statusLabels[pt.status]}</span>
                 <button class="btn-sm-outline" onclick="addPayment()"><i data-lucide="plus"></i> Record</button>
             </div>
         </div>
@@ -62,8 +61,8 @@ function buildPaymentSummaryHtml(pt, c) {
     if (pt.amountPaid <= 0 && pt.grand <= 0) return '';
     return `<div class="pay-summary">
         <div class="pay-summary-row"><span>Total Amount</span><span class="mono">${fmtCur(pt.grand, c)}</span></div>
-        <div class="pay-summary-row"><span>Amount Paid</span><span class="mono" style="color:#34C759">${fmtCur(pt.amountPaid, c)}</span></div>
-        <div class="pay-summary-row pay-summary-balance"><span>Balance Due</span><span class="mono" style="color:${pt.balanceDue > 0 ? '#FF3B30' : '#34C759'}">${fmtCur(pt.balanceDue, c)}</span></div>
+        <div class="pay-summary-row"><span>Amount Paid</span><span class="mono" style="color:var(--green)">${fmtCur(pt.amountPaid, c)}</span></div>
+        <div class="pay-summary-row pay-summary-balance"><span>Balance Due</span><span class="mono" style="color:${pt.balanceDue > 0 ? 'var(--red)' : 'var(--green)'}">${fmtCur(pt.balanceDue, c)}</span></div>
     </div>`;
 }
 
@@ -126,10 +125,9 @@ function collectPaymentsData(p) {
 function paymentStatusBadge(p) {
     if (p.status !== 'accepted') return '';
     const pt = paymentTotals(p);
-    const colors = { unpaid: '#FF3B30', partial: '#FF9500', paid: '#34C759' };
-    const bgs = { unpaid: '#FF3B3014', partial: '#FF950014', paid: '#34C75914' };
+    const cls = { unpaid: 'declined', partial: 'expired', paid: 'accepted' };
     const labels = { unpaid: 'Unpaid', partial: 'Partial', paid: 'Paid' };
-    return `<span class="badge" style="background:${bgs[pt.status]};color:${colors[pt.status]};font-size:10px;padding:2px 8px"><span class="badge-dot" style="background:${colors[pt.status]}"></span> ${labels[pt.status]}</span>`;
+    return `<span class="badge badge-${cls[pt.status]}" style="font-size:10px;padding:2px 8px"><span class="badge-dot"></span> ${labels[pt.status]}</span>`;
 }
 
 function buildPaymentsReceiptHtml(p, c, bc) {
@@ -162,16 +160,17 @@ function quickRecordPayment(pid) {
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap';
     wrap.innerHTML = `<div class="modal" style="max-width:420px">
-        <div class="modal-head"><div class="modal-t">Record Payment</div><button class="modal-close" onclick="this.closest('.modal-wrap').remove()"><i data-lucide="x"></i></button></div>
-        <div class="modal-body">
-            <div style="margin-bottom:12px;font-size:13px;color:var(--text3)">${esc(p.title || 'Untitled')} — Balance: <strong style="color:#FF3B30">${fmtCur(pt.balanceDue, c)}</strong></div>
-            <div class="fg"><label class="fl">Amount</label><input type="number" id="qpAmt" value="${pt.balanceDue}" min="0" step="500"></div>
-            <div class="fr">
-                <div class="fg"><label class="fl">Date</label><input type="text" id="qpDate" data-datepicker data-value="${today}"></div>
-                <div class="fg"><label class="fl">Method</label><div id="qpMethod"></div></div>
-            </div>
-            <div class="fg"><label class="fl">Note</label><input type="text" id="qpNote" placeholder="Optional"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div class="modal-t">Record Payment</div>
+            <button class="btn-sm-icon-ghost" onclick="this.closest('.modal-wrap').remove()"><i data-lucide="x"></i></button>
         </div>
+        <div style="margin-bottom:12px;font-size:13px;color:var(--text3)">${esc(p.title || 'Untitled')} — Balance: <strong style="color:var(--red)">${fmtCur(pt.balanceDue, c)}</strong></div>
+        <div class="fg"><label class="fl">Amount</label><input type="number" id="qpAmt" value="${pt.balanceDue}" min="0" step="500"></div>
+        <div class="fr">
+            <div class="fg"><label class="fl">Date</label><input type="text" id="qpDate" data-datepicker data-value="${today}"></div>
+            <div class="fg"><label class="fl">Method</label><div id="qpMethod"></div></div>
+        </div>
+        <div class="fg"><label class="fl">Note</label><input type="text" id="qpNote" placeholder="Optional"></div>
         <div class="modal-foot"><button class="btn" onclick="saveQuickPayment('${pid}')">Save Payment</button></div>
     </div>`;
     document.body.appendChild(wrap);
@@ -215,7 +214,7 @@ function showPaymentPickerMenu(event) {
     dd.innerHTML = dues.slice(0, 10).map(p => {
         const pt = paymentTotals(p);
         const c = p.currency || defaultCurrency();
-        return `<button class="status-opt" onclick="quickRecordPayment('${p.id}')" style="flex-direction:column;align-items:flex-start;gap:2px"><span style="font-weight:600;font-size:12px">${esc(p.title || 'Untitled')}</span><span style="font-size:11px;color:#FF3B30">Due: ${fmtCur(pt.balanceDue, c)}</span></button>`;
+        return `<button class="status-opt" onclick="quickRecordPayment('${p.id}')" style="flex-direction:column;align-items:flex-start;gap:2px"><span style="font-weight:600;font-size:12px">${esc(p.title || 'Untitled')}</span><span style="font-size:11px;color:var(--red)">Due: ${fmtCur(pt.balanceDue, c)}</span></button>`;
     }).join('');
     dd.style.left = Math.min(event.clientX, window.innerWidth - 260) + 'px';
     dd.style.top = Math.min(event.clientY + 8, window.innerHeight - 320) + 'px';

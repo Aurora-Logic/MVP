@@ -43,6 +43,7 @@ function renderPackages(p) {
         (f.tiers || []).forEach((t, ti) => {
             const icon = t === 'check' ? 'check' : (t === 'dash' ? 'minus' : 'x');
             const color = t === 'check' ? 'var(--green)' : (t === 'dash' ? 'var(--text4)' : 'var(--red)');
+
             cells += `<td class="pkg-feat-cell" onclick="setFeatureTier(${fi},${ti})"><i data-lucide="${icon}" style="width:16px;height:16px;color:${color}"></i></td>`;
         });
         featureRows += `<tr>
