@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProposalKit — Professional Proposals & Invoices in Minutes</title>
+<meta name="description" content="Create stunning proposals, invoices, and contracts with 13 PDF templates. Track payments, manage clients, and close deals faster. Free forever for individuals.">
+<meta name="keywords" content="proposal software, invoice generator, freelancer tools, quotation maker, PDF proposals, payment tracking">
+<meta property="og:title" content="ProposalKit — Professional Proposals in Minutes">
+<meta property="og:description" content="Create stunning proposals, invoices, and contracts. 13 PDF templates. Payment tracking. Client management. Free forever.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ Reset & Base ═══ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:#18181b;line-height:1.6;background:#fff;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{font:inherit;cursor:pointer;border:none;background:none}
+
+/* ═══ Utility ═══ */
+.container{max-width:1140px;margin:0 auto;padding:0 24px}
+.mono{font-family:'JetBrains Mono',monospace}
+.text-center{text-align:center}
+.muted{color:#71717a}
+.accent{color:#007AFF}
+
+/* ═══ Nav ═══ */
+.lp-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);border-bottom:1px solid #f4f4f5;transition:box-shadow .2s}
+.lp-nav.scrolled{box-shadow:0 1px 12px rgba(0,0,0,.06)}
+.lp-nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.lp-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.5px}
+.lp-logo svg{width:28px;height:28px}
+.lp-nav-links{display:flex;align-items:center;gap:32px}
+.lp-nav-links a{font-size:14px;font-weight:500;color:#52525b;transition:color .15s}
+.lp-nav-links a:hover{color:#18181b}
+.lp-nav-cta{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;background:#18181b;color:#fff;border-radius:9999px;font-size:13px;font-weight:600;transition:all .15s}
+.lp-nav-cta:hover{background:#09090b;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+
+/* ═══ Hero ═══ */
+.lp-hero{padding:140px 0 80px;position:relative;overflow:hidden}
+.lp-hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,#007AFF08 0%,transparent 70%);pointer-events:none}
+.lp-hero::after{content:'';position:absolute;bottom:-100px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,#AF52DE06 0%,transparent 70%);pointer-events:none}
+.lp-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:#f4f4f5;border-radius:9999px;font-size:12px;font-weight:600;color:#52525b;margin-bottom:24px}
+.lp-badge-dot{width:6px;height:6px;border-radius:50%;background:#34C759;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.lp-h1{font-size:clamp(36px, 5.5vw, 64px);font-weight:900;letter-spacing:-2px;line-height:1.08;color:#09090b;margin-bottom:20px}
+.lp-h1 span{background:linear-gradient(135deg,#007AFF,#AF52DE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lp-sub{font-size:clamp(16px, 2vw, 20px);color:#71717a;max-width:560px;margin:0 auto 36px;line-height:1.7}
+.lp-hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#18181b;color:#fff;border-radius:9999px;font-size:15px;font-weight:700;transition:all .15s}
+.btn-primary:hover{background:#09090b;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.btn-outline{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#fff;color:#18181b;border:1.5px solid #e4e4e7;border-radius:9999px;font-size:15px;font-weight:600;transition:all .15s}
+.btn-outline:hover{border-color:#d4d4d8;background:#fafafa;transform:translateY(-1px)}
+.lp-hero-note{margin-top:16px;font-size:13px;color:#a1a1aa}
+.lp-hero-visual{margin-top:60px;position:relative}
+.lp-hero-mockup{width:100%;max-width:960px;margin:0 auto;border-radius:12px;border:1px solid #e4e4e7;box-shadow:0 24px 80px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);background:#fafafa;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.lp-mockup-inner{width:100%;height:100%;display:flex}
+.lp-mockup-side{width:200px;background:#fff;border-right:1px solid #f4f4f5;padding:16px;flex-shrink:0}
+.lp-mockup-main{flex:1;padding:20px;background:#fafafa}
+.lp-mockup-bar{height:8px;border-radius:4px;margin-bottom:8px}
+.lp-mockup-bar.w1{width:60%;background:#e4e4e7}
+.lp-mockup-bar.w2{width:40%;background:#f4f4f5}
+.lp-mockup-bar.w3{width:80%;background:#e4e4e7}
+.lp-mockup-card{background:#fff;border:1px solid #f4f4f5;border-radius:8px;padding:14px;margin-top:12px}
+.lp-mockup-card .lp-mockup-bar{margin-bottom:6px}
+
+/* ═══ Logos / Social Proof ═══ */
+.lp-proof{padding:48px 0;border-bottom:1px solid #f4f4f5}
+.lp-proof-text{font-size:13px;font-weight:600;color:#a1a1aa;text-transform:uppercase;letter-spacing:1px;margin-bottom:20px}
+.lp-proof-stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.lp-stat{text-align:center}
+.lp-stat-num{font-size:28px;font-weight:800;color:#18181b;letter-spacing:-.5px}
+.lp-stat-label{font-size:12px;color:#71717a;margin-top:2px}
+
+/* ═══ Features ═══ */
+.lp-features{padding:100px 0}
+.lp-section-label{display:inline-block;padding:4px 12px;background:#007AFF0D;color:#007AFF;border-radius:9999px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px}
+.lp-h2{font-size:clamp(28px, 4vw, 42px);font-weight:800;letter-spacing:-1px;line-height:1.15;color:#09090b;margin-bottom:16px}
+.lp-section-sub{font-size:16px;color:#71717a;max-width:520px;margin:0 auto 48px}
+.lp-feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.lp-feat-card{padding:28px;border-radius:12px;border:1px solid #f4f4f5;background:#fff;transition:all .2s ease-out}
+.lp-feat-card:hover{border-color:#e4e4e7;transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.06)}
+.lp-feat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:18px}
+.lp-feat-icon.blue{background:#007AFF12;color:#007AFF}
+.lp-feat-icon.green{background:#34C75912;color:#34C759}
+.lp-feat-icon.purple{background:#AF52DE12;color:#AF52DE}
+.lp-feat-icon.orange{background:#FF950012;color:#FF9500}
+.lp-feat-icon.red{background:#FF3B3012;color:#FF3B30}
+.lp-feat-icon.teal{background:#5AC8FA12;color:#5AC8FA}
+.lp-feat-t{font-size:15px;font-weight:700;color:#18181b;margin-bottom:6px}
+.lp-feat-d{font-size:13px;color:#71717a;line-height:1.6}
+
+/* ═══ Templates Showcase ═══ */
+.lp-templates{padding:100px 0;background:#fafafa;border-top:1px solid #f4f4f5;border-bottom:1px solid #f4f4f5}
+.lp-tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:48px}
+.lp-tpl-card{background:#fff;border:1px solid #e4e4e7;border-radius:10px;padding:20px 16px;text-align:center;transition:all .2s ease-out}
+.lp-tpl-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.06);border-color:#d4d4d8}
+.lp-tpl-preview{width:100%;aspect-ratio:3/4;background:#f9fafb;border-radius:6px;border:1px solid #f4f4f5;margin-bottom:12px;display:flex;flex-direction:column;padding:12px;gap:4px}
+.lp-tpl-line{height:3px;border-radius:2px;background:#e4e4e7}
+.lp-tpl-line.head{width:50%;height:5px;background:#18181b;margin-bottom:4px}
+.lp-tpl-line.sub{width:35%;background:#d4d4d8}
+.lp-tpl-line.w60{width:60%}
+.lp-tpl-line.w80{width:80%}
+.lp-tpl-line.w40{width:40%}
+.lp-tpl-line.accent-line{background:#007AFF40}
+.lp-tpl-block{display:flex;gap:4px;margin-top:4px}
+.lp-tpl-block div{flex:1;height:20px;border-radius:3px;background:#f4f4f5}
+.lp-tpl-name{font-size:13px;font-weight:600;color:#18181b}
+.lp-tpl-tag{font-size:11px;color:#a1a1aa;margin-top:2px}
+
+/* ═══ How it Works ═══ */
+.lp-how{padding:100px 0}
+.lp-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px}
+.lp-step{text-align:center;position:relative}
+.lp-step-num{width:48px;height:48px;border-radius:50%;background:#18181b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;margin:0 auto 16px}
+.lp-step-t{font-size:16px;font-weight:700;margin-bottom:8px}
+.lp-step-d{font-size:13px;color:#71717a;max-width:280px;margin:0 auto;line-height:1.6}
+
+/* ═══ Pricing ═══ */
+.lp-pricing{padding:100px 0;background:#fafafa;border-top:1px solid #f4f4f5;border-bottom:1px solid #f4f4f5}
+.lp-currency-toggle{display:inline-flex;background:#e4e4e7;border-radius:9999px;padding:3px;margin-bottom:36px}
+.lp-cur-btn{padding:6px 18px;border-radius:9999px;font-size:13px;font-weight:600;color:#71717a;transition:all .15s;cursor:pointer}
+.lp-cur-btn.active{background:#fff;color:#18181b;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.lp-price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:960px;margin:0 auto}
+.lp-price-card{background:#fff;border:1px solid #e4e4e7;border-radius:16px;padding:32px 28px;text-align:left;position:relative;transition:all .2s ease-out}
+.lp-price-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.06)}
+.lp-price-card.featured{border-color:#18181b;border-width:2px}
+.lp-price-pop{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#18181b;color:#fff;padding:4px 14px;border-radius:9999px;font-size:11px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.lp-price-name{font-size:18px;font-weight:700;margin-bottom:4px}
+.lp-price-desc{font-size:13px;color:#71717a;margin-bottom:20px;line-height:1.5}
+.lp-price-amount{font-size:40px;font-weight:900;letter-spacing:-2px;color:#09090b}
+.lp-price-amount .lp-price-period{font-size:14px;font-weight:500;color:#a1a1aa;letter-spacing:0}
+.lp-price-amount .lp-price-currency{font-size:18px;font-weight:700;vertical-align:super;margin-right:2px}
+.lp-price-free{font-size:40px;font-weight:900;letter-spacing:-1px;color:#34C759}
+.lp-price-features{list-style:none;margin:24px 0;display:flex;flex-direction:column;gap:10px}
+.lp-price-features li{font-size:13px;color:#52525b;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.lp-price-features li::before{content:'';display:inline-block;width:16px;height:16px;min-width:16px;border-radius:50%;background:#34C75914;background-image:url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 5L4 7L8 3' stroke='%2334C759' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;margin-top:2px}
+.btn-price{display:block;width:100%;padding:12px;border-radius:9999px;font-size:14px;font-weight:700;text-align:center;transition:all .15s;margin-top:auto}
+.btn-price.dark{background:#18181b;color:#fff}
+.btn-price.dark:hover{background:#09090b;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.btn-price.light{background:#f4f4f5;color:#18181b}
+.btn-price.light:hover{background:#e4e4e7}
+
+/* ═══ Highlights ═══ */
+.lp-highlights{padding:100px 0}
+.lp-hl-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:48px}
+.lp-hl-grid+.lp-hl-grid{margin-top:80px}
+.lp-hl-visual{background:#f9fafb;border:1px solid #f4f4f5;border-radius:12px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
+.lp-hl-chart{width:100%;display:flex;flex-direction:column;gap:10px}
+.lp-hl-bar-row{display:flex;align-items:center;gap:10px}
+.lp-hl-bar-label{font-size:11px;color:#71717a;width:50px;text-align:right;flex-shrink:0}
+.lp-hl-bar{height:28px;border-radius:6px;transition:width .6s ease-out}
+.lp-hl-text h3{font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:12px}
+.lp-hl-text p{font-size:14px;color:#71717a;line-height:1.7;margin-bottom:16px}
+.lp-hl-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.lp-hl-list li{font-size:13px;color:#52525b;display:flex;align-items:center;gap:8px}
+.lp-hl-list li::before{content:'';width:6px;height:6px;border-radius:50%;background:#007AFF;flex-shrink:0}
+
+/* ═══ FAQ ═══ */
+.lp-faq{padding:100px 0;background:#fafafa;border-top:1px solid #f4f4f5;border-bottom:1px solid #f4f4f5}
+.lp-faq-grid{max-width:720px;margin:48px auto 0;display:flex;flex-direction:column;gap:1px;background:#e4e4e7;border-radius:12px;overflow:hidden}
+.lp-faq-item{background:#fff;padding:0}
+.lp-faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;font-size:14px;font-weight:600;color:#18181b;cursor:pointer;transition:background .15s}
+.lp-faq-q:hover{background:#fafafa}
+.lp-faq-q .arrow{transition:transform .2s;color:#a1a1aa;font-size:18px}
+.lp-faq-item.open .arrow{transform:rotate(180deg)}
+.lp-faq-a{font-size:13px;color:#71717a;line-height:1.7;padding:0 24px 18px;display:none}
+.lp-faq-item.open .lp-faq-a{display:block}
+
+/* ═══ CTA ═══ */
+.lp-cta{padding:100px 0}
+.lp-cta-box{background:#18181b;border-radius:20px;padding:64px 48px;text-align:center;position:relative;overflow:hidden}
+.lp-cta-box::before{content:'';position:absolute;top:-100px;right:-100px;width:300px;height:300px;background:radial-gradient(circle,#007AFF15,transparent);pointer-events:none}
+.lp-cta-box h2{font-size:clamp(28px, 4vw, 40px);font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:12px}
+.lp-cta-box p{font-size:16px;color:#a1a1aa;margin-bottom:32px;max-width:480px;margin-left:auto;margin-right:auto}
+.btn-white{display:inline-flex;align-items:center;gap:8px;padding:14px 36px;background:#fff;color:#18181b;border-radius:9999px;font-size:15px;font-weight:700;transition:all .15s}
+.btn-white:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,255,255,.15)}
+
+/* ═══ Footer ═══ */
+.lp-footer{padding:48px 0;border-top:1px solid #f4f4f5}
+.lp-footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.lp-footer-left{font-size:13px;color:#a1a1aa}
+.lp-footer-links{display:flex;gap:24px}
+.lp-footer-links a{font-size:13px;color:#71717a;transition:color .15s}
+.lp-footer-links a:hover{color:#18181b}
+
+/* ═══ Responsive ═══ */
+@media(max-width:900px){
+    .lp-feat-grid{grid-template-columns:repeat(2,1fr)}
+    .lp-tpl-grid{grid-template-columns:repeat(2,1fr)}
+    .lp-price-grid{grid-template-columns:1fr;max-width:400px}
+    .lp-hl-grid{grid-template-columns:1fr;gap:32px}
+    .lp-hl-grid.reverse{direction:ltr}
+    .lp-steps{grid-template-columns:1fr;gap:40px}
+    .lp-nav-links a:not(.lp-nav-cta){display:none}
+    .lp-mockup-side{width:140px}
+}
+@media(max-width:600px){
+    .lp-feat-grid{grid-template-columns:1fr}
+    .lp-tpl-grid{grid-template-columns:repeat(2,1fr)}
+    .lp-proof-stats{gap:28px}
+    .lp-hero{padding:120px 0 60px}
+    .lp-cta-box{padding:48px 24px}
+    .container{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ Navigation ═══ -->
+<nav class="lp-nav" id="lpNav">
+<div class="container lp-nav-inner">
+    <a href="#" class="lp-logo">
+        <svg viewBox="0 0 28 28" fill="none"><rect x="2" y="4" width="18" height="22" rx="3" stroke="#18181b" stroke-width="2.2"/><path d="M7 10h8M7 14h5M7 18h6" stroke="#18181b" stroke-width="1.8" stroke-linecap="round"/><rect x="14" y="2" width="12" height="10" rx="3" fill="#007AFF" stroke="#007AFF" stroke-width="1"/><path d="M17.5 5.5l2 2 3-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ProposalKit
+    </a>
+    <div class="lp-nav-links">
+        <a href="#features">Features</a>
+        <a href="#templates">Templates</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="index.html" class="lp-nav-cta">Open App &rarr;</a>
+    </div>
+</div>
+</nav>
+
+<!-- ═══ Hero ═══ -->
+<section class="lp-hero" id="hero">
+<div class="container text-center">
+    <div class="lp-badge"><span class="lp-badge-dot"></span> Free &amp; open-source</div>
+    <h1 class="lp-h1">Proposals that<br><span>win clients</span></h1>
+    <p class="lp-sub">Create stunning proposals, invoices, and contracts in minutes. 13 professional PDF templates. Payment tracking. Client management. All in your browser.</p>
+    <div class="lp-hero-btns">
+        <a href="index.html" class="btn-primary">Start Free &rarr;</a>
+        <a href="#features" class="btn-outline">See Features</a>
+    </div>
+    <p class="lp-hero-note">No signup required. Works offline. Your data stays on your device.</p>
+
+    <div class="lp-hero-visual">
+        <div class="lp-hero-mockup">
+            <div class="lp-mockup-side">
+                <div class="lp-mockup-bar w2" style="background:#007AFF30;height:10px;border-radius:6px;margin-bottom:14px"></div>
+                <div class="lp-mockup-bar w1" style="margin-bottom:12px"></div>
+                <div class="lp-mockup-bar w3" style="margin-bottom:6px"></div>
+                <div class="lp-mockup-bar w2" style="margin-bottom:6px"></div>
+                <div class="lp-mockup-bar w1" style="margin-bottom:20px"></div>
+                <div class="lp-mockup-bar" style="width:90%;background:#f4f4f5;margin-bottom:6px"></div>
+                <div class="lp-mockup-bar" style="width:70%;background:#f4f4f5;margin-bottom:6px"></div>
+                <div class="lp-mockup-bar" style="width:85%;background:#f4f4f5"></div>
+            </div>
+            <div class="lp-mockup-main">
+                <div style="display:flex;gap:8px;margin-bottom:16px">
+                    <div style="padding:6px 14px;background:#18181b;color:#fff;border-radius:9999px;font-size:10px;font-weight:600">Details</div>
+                    <div style="padding:6px 14px;background:#fff;border:1px solid #e4e4e7;border-radius:9999px;font-size:10px;color:#71717a">Sections</div>
+                    <div style="padding:6px 14px;background:#fff;border:1px solid #e4e4e7;border-radius:9999px;font-size:10px;color:#71717a">Pricing</div>
+                </div>
+                <div class="lp-mockup-card">
+                    <div class="lp-mockup-bar" style="width:30%;height:6px;background:#18181b;margin-bottom:10px"></div>
+                    <div class="lp-mockup-bar w3" style="margin-bottom:4px"></div>
+                    <div class="lp-mockup-bar w1" style="margin-bottom:4px"></div>
+                    <div class="lp-mockup-bar" style="width:50%"></div>
+                </div>
+                <div class="lp-mockup-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                        <div class="lp-mockup-bar" style="width:25%;height:6px;background:#18181b;margin:0"></div>
+                        <div style="padding:3px 10px;background:#34C75914;border-radius:9999px;font-size:9px;color:#34C759;font-weight:600">Accepted</div>
+                    </div>
+                    <div style="display:flex;gap:8px">
+                        <div style="flex:3;height:24px;background:#f4f4f5;border-radius:4px"></div>
+                        <div style="flex:1;height:24px;background:#f4f4f5;border-radius:4px"></div>
+                        <div style="flex:1;height:24px;background:#007AFF15;border-radius:4px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ═══ Social Proof ═══ -->
+<section class="lp-proof">
+<div class="container text-center">
+    <p class="lp-proof-text">Built for modern businesses</p>
+    <div class="lp-proof-stats">
+        <div class="lp-stat"><div class="lp-stat-num">13</div><div class="lp-stat-label">PDF Templates</div></div>
+        <div class="lp-stat"><div class="lp-stat-num">13+</div><div class="lp-stat-label">Currencies</div></div>
+        <div class="lp-stat"><div class="lp-stat-num">100%</div><div class="lp-stat-label">Offline Ready</div></div>
+        <div class="lp-stat"><div class="lp-stat-num">0</div><div class="lp-stat-label">Dependencies</div></div>
+    </div>
+</div>
+</section>
+
+<!-- ═══ Features ═══ -->
+<section class="lp-features" id="features">
+<div class="container text-center">
+    <span class="lp-section-label">Features</span>
+    <h2 class="lp-h2">Everything you need to<br>close deals faster</h2>
+    <p class="lp-section-sub">From first draft to signed contract. All the tools, none of the bloat.</p>
+
+    <div class="lp-feat-grid">
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon blue">&#9998;</div>
+            <div class="lp-feat-t">Rich Text Editor</div>
+            <div class="lp-feat-d">Full Editor.js integration with headings, lists, tables, quotes, code blocks, and checklists. Drag to reorder sections.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon green">&#36;</div>
+            <div class="lp-feat-t">Smart Pricing</div>
+            <div class="lp-feat-d">Line items, packages, add-ons, payment schedules, discounts, tax, and 13+ currencies with automatic calculations.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon purple">&#127912;</div>
+            <div class="lp-feat-t">13 PDF Templates</div>
+            <div class="lp-feat-d">Modern, Minimal, Executive, Nord, Bold, and more. Each one print-ready with your brand colors and logo.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon orange">&#128200;</div>
+            <div class="lp-feat-t">Analytics Dashboard</div>
+            <div class="lp-feat-d">Win rates, pipeline value, revenue forecast, monthly trends, and breakdowns by client, value range, and template.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon red">&#128176;</div>
+            <div class="lp-feat-t">Payment Tracking</div>
+            <div class="lp-feat-d">Record multiple partial payments. Track dues across proposals. Generate receipts with paid/partial/unpaid status.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon teal">&#128279;</div>
+            <div class="lp-feat-t">Client Portal</div>
+            <div class="lp-feat-d">Share secure links with clients. They can view, accept with digital signature, and you track every response.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon blue">&#129302;</div>
+            <div class="lp-feat-t">AI Writing Assistant</div>
+            <div class="lp-feat-d">Powered by Claude. Improve, expand, shorten, or fix grammar in any section. Custom prompts supported.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon green">&#128101;</div>
+            <div class="lp-feat-t">Team &amp; Roles</div>
+            <div class="lp-feat-d">Admin, Editor, and Viewer roles. Track who edited what with full version history and diff comparison.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon purple">&#128196;</div>
+            <div class="lp-feat-t">SOW, Contracts &amp; Receipts</div>
+            <div class="lp-feat-d">Generate Statement of Work, Service Agreements, and Payment Receipts from any proposal in one click.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon orange">&#127760;</div>
+            <div class="lp-feat-t">Works Offline</div>
+            <div class="lp-feat-d">Full PWA support. Create proposals on a plane, in a caf&eacute;, anywhere. Your data stays on your device.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon red">&#128273;</div>
+            <div class="lp-feat-t">White-Label Mode</div>
+            <div class="lp-feat-d">Replace ProposalKit branding with your own. Custom logo, brand color, and font for a fully branded experience.</div>
+        </div>
+        <div class="lp-feat-card">
+            <div class="lp-feat-icon teal">&#9889;</div>
+            <div class="lp-feat-t">Keyboard-First</div>
+            <div class="lp-feat-d">Command palette (&#8984;K), shortcuts for everything, autosave, undo/redo, and a completeness score to ship faster.</div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ═══ Templates ═══ -->
+<section class="lp-templates" id="templates">
+<div class="container text-center">
+    <span class="lp-section-label">Templates</span>
+    <h2 class="lp-h2">13 professional templates</h2>
+    <p class="lp-section-sub">Each template adapts to your brand color, logo, and content. Switch anytime.</p>
+
+    <div class="lp-tpl-grid">
+        <div class="lp-tpl-card">
+            <div class="lp-tpl-preview">
+                <div class="lp-tpl-line head"></div>
+                <div class="lp-tpl-line sub"></div>
+                <div class="lp-tpl-block"><div></div><div></div></div>
+                <div class="lp-tpl-line w80" style="margin-top:8px"></div>
+                <div class="lp-tpl-line w60"></div>
+                <div class="lp-tpl-line accent-line w80" style="margin-top:auto"></div>
+            </div>
+            <div class="lp-tpl-name">Modern</div>
+            <div class="lp-tpl-tag">Clean &amp; contemporary</div>
+        </div>
+        <div class="lp-tpl-card">
+            <div class="lp-tpl-preview" style="background:#18181b">
+                <div class="lp-tpl-line" style="width:50%;height:5px;background:#fff;margin-bottom:4px"></div>
+                <div class="lp-tpl-line" style="width:35%;background:#ffffff40"></div>
+                <div style="display:flex;gap:4px;margin-top:8px"><div style="flex:1;height:20px;border-radius:3px;background:#ffffff15"></div><div style="flex:1;height:20px;border-radius:3px;background:#ffffff15"></div></div>
+                <div class="lp-tpl-line" style="width:80%;background:#ffffff20;margin-top:auto"></div>
+            </div>
+            <div class="lp-tpl-name">Classic</div>
+            <div class="lp-tpl-tag">Bold header bar</div>
+        </div>
+        <div class="lp-tpl-card">
+            <div class="lp-tpl-preview">
+                <div class="lp-tpl-line head" style="width:70%"></div>
+                <div style="width:40px;height:3px;background:#007AFF;border-radius:2px;margin:6px 0"></div>
+                <div class="lp-tpl-line w60"></div>
+                <div class="lp-tpl-line w80"></div>
+                <div class="lp-tpl-line w40" style="margin-top:auto"></div>
+            </div>
+            <div class="lp-tpl-name">Minimal</div>
+            <div class="lp-tpl-tag">Less is more</div>
+        </div>
+        <div class="lp-tpl-card">
+            <div class="lp-tpl-preview">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><div class="lp-tpl-line" style="width:30%"></div><div class="lp-tpl-line" style="width:20%"></div></div>
+                <div class="lp-tpl-block" style="margin:0"><div style="height:28px"></div><div style="height:28px"></div><div style="height:28px"></div><div style="height:28px"></div></div>
+                <div class="lp-tpl-line w80" style="margin-top:8px"></div>
+                <div class="lp-tpl-line w60"></div>
+            </div>
+            <div class="lp-tpl-name">Tabular</div>
+            <div class="lp-tpl-tag">Data-focused layout</div>
+        </div>
+        <div class="lp-tpl-card">
+            <div class="lp-tpl-preview">
+                <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:6px;border-bottom:3px solid #18181b;margin-bottom:6px"><div class="lp-tpl-line" style="width:20%;background:#e4e4e7;height:4px"></div><div class="lp-tpl-line head" style="width:35%;margin:0"></div></div>
+                <div class="lp-tpl-block"><div></div><div></div></div>
+                <div class="lp-tpl-line w80" style="margin-top:8px"></div>
+            </div>
+            <div class="lp-tpl-name">Executive</div>
+            <div class="lp-tpl-tag">C-suite ready</div>
+        </div>
+        <div class="lp-tpl-card">
+            <div class="lp-tpl-preview">
+                <div style="height:4px;background:linear-gradient(90deg,#007AFF,#007AFF88);border-radius:0;margin:-12px -12px 8px"></div>
+                <div class="lp-tpl-line head" style="width:60%"></div>
+                <div class="lp-tpl-line sub"></div>
+                <div class="lp-tpl-block" style="margin-top:8px"><div style="border:1px solid #e4e4e7;background:#fff"></div><div style="border:1px solid #e4e4e7;background:#fff"></div></div>
+            </div>
+            <div class="lp-tpl-name">Stripe</div>
+            <div class="lp-tpl-tag">Gradient accent</div>
+        </div>
+        <div class="lp-tpl-card">
+            <div class="lp-tpl-preview">
+                <div class="lp-tpl-line head" style="width:80%;margin:0 auto 4px;height:6px"></div>
+                <div class="lp-tpl-line" style="width:30%;background:#d4d4d8;margin:0 auto"></div>
+                <div class="lp-tpl-block" style="margin-top:10px"><div style="background:#f9fafb;border:1px solid #f4f4f5"></div><div style="background:#f9fafb;border:1px solid #f4f4f5"></div></div>
+                <div class="lp-tpl-line w80" style="margin-top:auto"></div>
+            </div>
+            <div class="lp-tpl-name">Nord</div>
+            <div class="lp-tpl-tag">Scandinavian clean</div>
+        </div>
+        <div class="lp-tpl-card">
+            <div class="lp-tpl-preview">
+                <div style="background:#18181b;margin:-12px -12px 8px;padding:10px 12px;border-radius:0 0 8px 8px">
+                    <div class="lp-tpl-line" style="width:60%;height:5px;background:#fff;margin-bottom:4px"></div>
+                    <div class="lp-tpl-line" style="width:40%;background:#ffffff50"></div>
+                </div>
+                <div class="lp-tpl-block"><div></div><div></div></div>
+                <div class="lp-tpl-line w60" style="margin-top:6px"></div>
+            </div>
+            <div class="lp-tpl-name">Bold</div>
+            <div class="lp-tpl-tag">Dark hero header</div>
+        </div>
+    </div>
+    <p style="margin-top:20px;font-size:13px;color:#a1a1aa">+ Compact, Sidebar, Formal, American, Clean</p>
+</div>
+</section>
+
+<!-- ═══ How it Works ═══ -->
+<section class="lp-how" id="how">
+<div class="container text-center">
+    <span class="lp-section-label">How it works</span>
+    <h2 class="lp-h2">Three steps to a signed deal</h2>
+    <div class="lp-steps">
+        <div class="lp-step">
+            <div class="lp-step-num">1</div>
+            <div class="lp-step-t">Create your proposal</div>
+            <div class="lp-step-d">Add sections, pricing, terms, and branding. Choose from 13 templates. Autosave keeps your work safe.</div>
+        </div>
+        <div class="lp-step">
+            <div class="lp-step-num">2</div>
+            <div class="lp-step-t">Share with your client</div>
+            <div class="lp-step-d">Generate a secure link or export as PDF. Clients can view and accept with a digital signature.</div>
+        </div>
+        <div class="lp-step">
+            <div class="lp-step-num">3</div>
+            <div class="lp-step-t">Track &amp; get paid</div>
+            <div class="lp-step-d">Monitor proposal status, record payments, track dues, and generate receipts. All from one dashboard.</div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ═══ Highlights ═══ -->
+<section class="lp-highlights">
+<div class="container">
+    <div class="lp-hl-grid">
+        <div class="lp-hl-visual">
+            <div class="lp-hl-chart">
+                <div class="lp-hl-bar-row"><span class="lp-hl-bar-label">Won</span><div class="lp-hl-bar" style="width:72%;background:#34C759"></div></div>
+                <div class="lp-hl-bar-row"><span class="lp-hl-bar-label">Sent</span><div class="lp-hl-bar" style="width:55%;background:#FF9500"></div></div>
+                <div class="lp-hl-bar-row"><span class="lp-hl-bar-label">Draft</span><div class="lp-hl-bar" style="width:38%;background:#007AFF"></div></div>
+                <div class="lp-hl-bar-row"><span class="lp-hl-bar-label">Lost</span><div class="lp-hl-bar" style="width:15%;background:#FF3B30"></div></div>
+            </div>
+        </div>
+        <div class="lp-hl-text">
+            <h3>Know your numbers</h3>
+            <p>Track win rates, pipeline value, revenue forecasts, and monthly trends. Break down performance by client, value range, and template.</p>
+            <ul class="lp-hl-list">
+                <li>Win rate and close-time metrics</li>
+                <li>6-month trend charts</li>
+                <li>Revenue forecast from pipeline</li>
+                <li>Export reports as CSV</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="lp-hl-grid" style="direction:rtl">
+        <div class="lp-hl-visual" style="direction:ltr">
+            <div style="width:100%;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border-radius:8px;border:1px solid #f4f4f5">
+                    <div><div style="font-size:12px;font-weight:600;color:#18181b">Website Redesign</div><div style="font-size:10px;color:#71717a">Acme Corp</div></div>
+                    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;padding:2px 8px;background:#FF950014;color:#FF9500;border-radius:9999px;font-weight:600">Partial</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#FF3B30">-$2,400</span></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border-radius:8px;border:1px solid #f4f4f5">
+                    <div><div style="font-size:12px;font-weight:600;color:#18181b">Brand Identity</div><div style="font-size:10px;color:#71717a">StartupX</div></div>
+                    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;padding:2px 8px;background:#34C75914;color:#34C759;border-radius:9999px;font-weight:600">Paid</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#34C759">$0</span></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border-radius:8px;border:1px solid #f4f4f5">
+                    <div><div style="font-size:12px;font-weight:600;color:#18181b">Mobile App Dev</div><div style="font-size:10px;color:#71717a">TechFlow</div></div>
+                    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;padding:2px 8px;background:#FF3B3014;color:#FF3B30;border-radius:9999px;font-weight:600">Unpaid</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#FF3B30">-$8,500</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="lp-hl-text" style="direction:ltr">
+            <h3>Never miss a payment</h3>
+            <p>Record partial payments, track outstanding dues across all proposals, and generate professional receipts with a single click.</p>
+            <ul class="lp-hl-list">
+                <li>Multiple payment records per proposal</li>
+                <li>UPI QR codes on PDFs (India)</li>
+                <li>Paid / Partial / Unpaid status badges</li>
+                <li>Quick-record from proposals list</li>
+            </ul>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ═══ Pricing ═══ -->
+<section class="lp-pricing" id="pricing">
+<div class="container text-center">
+    <span class="lp-section-label">Pricing</span>
+    <h2 class="lp-h2">Simple, transparent pricing</h2>
+    <p class="lp-section-sub">Start free. Upgrade when your business grows.</p>
+
+    <div class="lp-currency-toggle">
+        <span class="lp-cur-btn active" onclick="setCurrency('usd', this)">USD ($)</span>
+        <span class="lp-cur-btn" onclick="setCurrency('inr', this)">INR (&#8377;)</span>
+    </div>
+
+    <div class="lp-price-grid">
+        <!-- Free -->
+        <div class="lp-price-card">
+            <div class="lp-price-name">Free</div>
+            <div class="lp-price-desc">Perfect for getting started</div>
+            <div class="lp-price-free">$0</div>
+            <ul class="lp-price-features">
+                <li>Unlimited proposals</li>
+                <li>All 13 PDF templates</li>
+                <li>Client management</li>
+                <li>Payment tracking</li>
+                <li>Analytics dashboard</li>
+                <li>Offline + PWA</li>
+                <li>Data stays on your device</li>
+            </ul>
+            <a href="index.html" class="btn-price light">Get Started Free</a>
+        </div>
+
+        <!-- Pro -->
+        <div class="lp-price-card featured">
+            <div class="lp-price-pop">MOST POPULAR</div>
+            <div class="lp-price-name">Pro</div>
+            <div class="lp-price-desc">For freelancers and small teams</div>
+            <div class="lp-price-amount">
+                <span class="lp-price-currency" data-usd="$" data-inr="&#8377;">$</span><span data-usd="12" data-inr="499">12</span><span class="lp-price-period" data-usd="/month" data-inr="/month"> /month</span>
+            </div>
+            <ul class="lp-price-features">
+                <li>Everything in Free</li>
+                <li>AI Writing Assistant (Claude)</li>
+                <li>White-label mode</li>
+                <li>Team roles (Admin/Editor/Viewer)</li>
+                <li>Version history &amp; diff view</li>
+                <li>Webhook integrations</li>
+                <li>Priority support</li>
+            </ul>
+            <a href="index.html" class="btn-price dark">Start 14-Day Trial</a>
+        </div>
+
+        <!-- Business -->
+        <div class="lp-price-card">
+            <div class="lp-price-name">Business</div>
+            <div class="lp-price-desc">For agencies and growing teams</div>
+            <div class="lp-price-amount">
+                <span class="lp-price-currency" data-usd="$" data-inr="&#8377;">$</span><span data-usd="29" data-inr="1,499">29</span><span class="lp-price-period" data-usd="/month" data-inr="/month"> /month</span>
+            </div>
+            <ul class="lp-price-features">
+                <li>Everything in Pro</li>
+                <li>Unlimited team members</li>
+                <li>Cloud sync (coming soon)</li>
+                <li>Custom email templates</li>
+                <li>Bulk export</li>
+                <li>Section &amp; T&amp;C libraries</li>
+                <li>Dedicated support</li>
+            </ul>
+            <a href="index.html" class="btn-price light">Contact Sales</a>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section class="lp-faq" id="faq">
+<div class="container text-center">
+    <span class="lp-section-label">FAQ</span>
+    <h2 class="lp-h2">Frequently asked questions</h2>
+
+    <div class="lp-faq-grid">
+        <div class="lp-faq-item">
+            <div class="lp-faq-q" onclick="toggleFaq(this)">Is ProposalKit really free? <span class="arrow">&#x25BE;</span></div>
+            <div class="lp-faq-a">Yes. The Free plan includes unlimited proposals, all 13 PDF templates, client management, payment tracking, analytics, and offline support. No signup required, no credit card, no catch.</div>
+        </div>
+        <div class="lp-faq-item">
+            <div class="lp-faq-q" onclick="toggleFaq(this)">Where is my data stored? <span class="arrow">&#x25BE;</span></div>
+            <div class="lp-faq-a">All data is stored locally in your browser using LocalStorage. Nothing is sent to any server. You own your data completely. You can export/import your data as JSON at any time from Settings.</div>
+        </div>
+        <div class="lp-faq-item">
+            <div class="lp-faq-q" onclick="toggleFaq(this)">Does it work offline? <span class="arrow">&#x25BE;</span></div>
+            <div class="lp-faq-a">Yes. ProposalKit is a Progressive Web App (PWA) with full offline support. You can create, edit, and export proposals without an internet connection. Install it to your home screen for native-like experience.</div>
+        </div>
+        <div class="lp-faq-item">
+            <div class="lp-faq-q" onclick="toggleFaq(this)">Can clients sign proposals digitally? <span class="arrow">&#x25BE;</span></div>
+            <div class="lp-faq-a">Yes. When you share a proposal via secure link, clients can view it in a beautiful portal and accept it with a hand-drawn electronic signature. You'll see the acceptance status and signature in your dashboard.</div>
+        </div>
+        <div class="lp-faq-item">
+            <div class="lp-faq-q" onclick="toggleFaq(this)">Which currencies are supported? <span class="arrow">&#x25BE;</span></div>
+            <div class="lp-faq-a">ProposalKit supports 13+ currencies including INR, USD, EUR, GBP, AUD, CAD, SGD, AED, JPY, CNY, SEK, CHF, and NZD. Each currency formats correctly with proper locale and symbol placement.</div>
+        </div>
+        <div class="lp-faq-item">
+            <div class="lp-faq-q" onclick="toggleFaq(this)">Can I use my own branding? <span class="arrow">&#x25BE;</span></div>
+            <div class="lp-faq-a">Absolutely. Upload your company logo, pick a brand color, and choose a font. With White-Label mode, you can even replace the ProposalKit name with your own company name throughout the app and PDFs.</div>
+        </div>
+        <div class="lp-faq-item">
+            <div class="lp-faq-q" onclick="toggleFaq(this)">How does the AI assistant work? <span class="arrow">&#x25BE;</span></div>
+            <div class="lp-faq-a">The AI Writing Assistant is powered by Anthropic's Claude API. You bring your own API key (entered in Settings). It can improve, expand, shorten, or fix grammar in any proposal section. Custom prompts are also supported.</div>
+        </div>
+        <div class="lp-faq-item">
+            <div class="lp-faq-q" onclick="toggleFaq(this)">Is there a mobile app? <span class="arrow">&#x25BE;</span></div>
+            <div class="lp-faq-a">ProposalKit works on any device with a modern browser. On mobile, you can install it as a PWA from your browser's "Add to Home Screen" option for a native-like experience with offline support.</div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="lp-cta">
+<div class="container">
+    <div class="lp-cta-box">
+        <h2>Ready to win more clients?</h2>
+        <p>Join thousands of freelancers and agencies creating professional proposals with ProposalKit.</p>
+        <a href="index.html" class="btn-white">Start Free &mdash; No Signup Required &rarr;</a>
+    </div>
+</div>
+</section>
+
+<!-- ═══ Footer ═══ -->
+<footer class="lp-footer">
+<div class="container lp-footer-inner">
+    <div class="lp-footer-left">&copy; 2026 ProposalKit. Made with care.</div>
+    <div class="lp-footer-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="index.html">Open App</a>
+    </div>
+</div>
+</footer>
+
+<script>
+// Nav scroll effect
+const nav = document.getElementById('lpNav');
+window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+}, { passive: true });
+
+// FAQ toggle
+function toggleFaq(el) {
+    const item = el.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.lp-faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+}
+
+// Currency toggle
+function setCurrency(cur, btn) {
+    document.querySelectorAll('.lp-cur-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('[data-usd]').forEach(el => {
+        el.textContent = el.dataset[cur] || el.dataset.usd;
+    });
+}
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+</script>
+</body>
+</html>
