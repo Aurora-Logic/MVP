@@ -33,7 +33,7 @@ function openTCLib() {
 
     const renderItems = (filter) => {
         const filtered = filter === 'all' ? all : all.filter(t => t.category === filter);
-        if (!filtered.length) return '<div style="padding:20px;text-align:center;color:var(--text4)">No items in this category</div>';
+        if (!filtered.length) return '<div class="breakdown-empty">No items in this category</div>';
         return filtered.map((t) => {
             const idx = all.indexOf(t);
             return `<div class="tc-chip" onclick="insertTC(${idx})"><div class="tc-chip-t">${esc(t.title)}</div><div class="tc-chip-d">${esc(t.text.substring(0, 70))}...</div></div>`;
@@ -55,7 +55,7 @@ function openTCLib() {
             <div class="modal-t">Terms & Conditions Library</div>
             <div class="modal-d">Click any term to append it to your payment terms</div>
             <div class="tc-tabs">${tabs}</div>
-            <div class="tc-grid" id="tcGrid" style="max-height:340px;overflow-y:auto">${renderItems('all')}</div>
+            <div class="tc-grid tc-grid-scroll" id="tcGrid">${renderItems('all')}</div>
             <div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('tcModal').remove()">Close</button></div>
         </div>`;
     document.body.appendChild(wrap);
@@ -68,7 +68,7 @@ function filterTCLib(cat) {
     const filtered = cat === 'all' ? all : all.filter(t => t.category === cat);
     const grid = document.getElementById('tcGrid');
     if (!filtered.length) {
-        grid.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text4)">No items in this category</div>';
+        grid.innerHTML = '<div class="breakdown-empty">No items in this category</div>';
     } else {
         grid.innerHTML = filtered.map((t) => {
             const idx = all.indexOf(t);

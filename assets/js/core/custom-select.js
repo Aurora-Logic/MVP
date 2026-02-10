@@ -27,7 +27,7 @@ function csel(el, opts) {
         if (g) menuHtml += `<div class="csel-group-label">${esc(g)}</div>`;
         grouped[g].forEach(i => {
             const isOn = i.value === opts.value;
-            menuHtml += `<div class="csel-opt${isOn ? ' on' : ''}" data-val="${esc(i.value)}" data-label="${esc(i.label)}"${i.icon ? ' data-icon="' + esc(i.icon) + '"' : ''}>`;
+            menuHtml += `<div class="csel-opt${isOn ? ' on' : ''}" role="option" aria-selected="${isOn}" data-val="${esc(i.value)}" data-label="${esc(i.label)}"${i.icon ? ' data-icon="' + esc(i.icon) + '"' : ''}>`;
             if (i.icon) menuHtml += `<i data-lucide="${i.icon}" class="csel-opt-icon"></i>`;
             menuHtml += `<span>${esc(i.label)}</span>`;
             if (i.desc) menuHtml += `<span class="csel-opt-desc">${esc(i.desc)}</span>`;
@@ -38,7 +38,7 @@ function csel(el, opts) {
 
     if (opts.searchable) {
         // Searchable: trigger is an input you can type in directly
-        el.innerHTML = `<input type="text" class="csel-trigger csel-input" value="${esc(displayLabel)}" placeholder="${esc(opts.placeholder || 'Search...')}" autocomplete="off"><div class="csel-menu">${menuHtml}</div>`;
+        el.innerHTML = `<input type="text" class="csel-trigger csel-input" value="${esc(displayLabel)}" placeholder="${esc(opts.placeholder || 'Search...')}" autocomplete="off" role="combobox" aria-expanded="false" aria-haspopup="listbox"><div class="csel-menu" role="listbox">${menuHtml}</div>`;
         const inp = el.querySelector('.csel-input');
         inp.addEventListener('focus', () => {
             inp.select();
@@ -56,7 +56,7 @@ function csel(el, opts) {
             }
         });
     } else {
-        el.innerHTML = `<button type="button" class="csel-trigger" onclick="cselToggle(this.parentElement)">${selected ? (selected.icon ? `<i data-lucide="${selected.icon}" class="csel-icon"></i>` : '') + esc(selected.label) : `<span class="csel-placeholder">${esc(opts.placeholder || 'Select...')}</span>`}</button><div class="csel-menu">${menuHtml}</div>`;
+        el.innerHTML = `<button type="button" class="csel-trigger" aria-haspopup="listbox" aria-expanded="false" onclick="cselToggle(this.parentElement)">${selected ? (selected.icon ? `<i data-lucide="${selected.icon}" class="csel-icon"></i>` : '') + esc(selected.label) : `<span class="csel-placeholder">${esc(opts.placeholder || 'Select...')}</span>`}</button><div class="csel-menu" role="listbox">${menuHtml}</div>`;
     }
 
     // Bind option clicks
@@ -71,9 +71,11 @@ function csel(el, opts) {
             } else {
                 el.querySelector('.csel-trigger').innerHTML = (ic ? `<i data-lucide="${ic}" class="csel-icon"></i>` : '') + esc(lbl);
             }
-            el.querySelectorAll('.csel-opt').forEach(o => o.classList.remove('on'));
+            el.querySelectorAll('.csel-opt').forEach(o => { o.classList.remove('on'); o.setAttribute('aria-selected', 'false'); });
             opt.classList.add('on');
+            opt.setAttribute('aria-selected', 'true');
             el.classList.remove('open');
+            el.querySelector('.csel-trigger')?.setAttribute('aria-expanded', 'false');
             // Reset filter
             _cselFilterMenu(el, '');
             lucide.createIcons();
@@ -86,8 +88,9 @@ function csel(el, opts) {
 
 function cselOpen(el) {
     if (!el || el.classList.contains('open')) return;
-    document.querySelectorAll('.csel.open').forEach(s => { if (s !== el) s.classList.remove('open'); });
+    document.querySelectorAll('.csel.open').forEach(s => { if (s !== el) { s.classList.remove('open'); s.querySelector('.csel-trigger')?.setAttribute('aria-expanded', 'false'); } });
     el.classList.add('open');
+    el.querySelector('.csel-trigger')?.setAttribute('aria-expanded', 'true');
     const menu = el.querySelector('.csel-menu');
     if (menu) {
         menu.classList.remove('above');
@@ -132,6 +135,6 @@ function cselGetValue(el) {
 // Close on outside click
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.csel')) {
-        document.querySelectorAll('.csel.open').forEach(s => s.classList.remove('open'));
+        document.querySelectorAll('.csel.open').forEach(s => { s.classList.remove('open'); s.querySelector('.csel-trigger')?.setAttribute('aria-expanded', 'false'); });
     }
 });

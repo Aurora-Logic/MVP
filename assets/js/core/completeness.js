@@ -68,14 +68,14 @@ function buildCompletenessHtml(p) {
                     stroke-dasharray="${score}, 100" stroke-linecap="round"/>
             </svg>
         </div>
-        <span style="font-size:12px;font-weight:600;color:${color}">${score}%</span>
+        <span class="score-badge" style="color:${color}">${score}%</span>
     </div>`;
 }
 
 function buildScoreBadge(p) {
     const { score } = calcCompleteness(p);
     const color = getCompletenessColor(score);
-    return `<span style="font-size:10px;font-weight:700;color:${color};background:color-mix(in srgb, ${color} 12%, transparent);padding:2px 6px;border-radius:9999px">${score}%</span>`;
+    return `<span class="score-badge" style="color:${color};background:color-mix(in srgb, ${color} 12%, transparent)">${score}%</span>`;
 }
 
 function showCompletenessDetail() {
@@ -94,12 +94,12 @@ function showCompletenessDetail() {
 
     let checkItems = '';
     for (const [tab, items] of Object.entries(grouped)) {
-        checkItems += `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text4);margin:10px 0 4px">${tabLabels[tab]}</div>`;
+        checkItems += `<div class="comp-group-label">${tabLabels[tab]}</div>`;
         items.forEach(c => {
-            checkItems += `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px">
-                <i data-lucide="${c.done ? 'check-circle' : 'circle'}" style="width:15px;height:15px;color:${c.done ? 'var(--green)' : 'var(--text5)'}"></i>
-                <span style="flex:1;color:${c.done ? 'var(--text)' : 'var(--text3)'}">${c.label}</span>
-                <span style="font-size:10px;font-weight:600;color:${c.done ? 'var(--green)' : 'var(--text5)'}">${c.done ? '+' : ''}${c.weight}pts</span>
+            checkItems += `<div class="comp-check-row">
+                <i data-lucide="${c.done ? 'check-circle' : 'circle'}" class="comp-check-icon" style="color:${c.done ? 'var(--green)' : 'var(--text5)'}"></i>
+                <span class="comp-check-label" style="color:${c.done ? 'var(--text)' : 'var(--text3)'}">${c.label}</span>
+                <span class="comp-check-pts" style="color:${c.done ? 'var(--green)' : 'var(--text5)'}">${c.done ? '+' : ''}${c.weight}pts</span>
                 ${!c.done ? `<button class="btn-sm-ghost" style="font-size:11px;padding:2px 8px" onclick="document.getElementById('completenessModal').remove();navigateToTab('${c.tab}')">Improve</button>` : ''}
             </div>`;
         });
@@ -109,16 +109,16 @@ function showCompletenessDetail() {
         <div class="modal modal-sm" onclick="event.stopPropagation()">
             <div class="modal-t">Proposal Score</div>
             <div class="modal-d">Weighted best-practice checks for stronger proposals</div>
-            <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
-                <div style="font-size:32px;font-weight:800;color:${color}">${score}%</div>
-                <div style="flex:1;height:6px;background:var(--muted);border-radius:3px;overflow:hidden">
-                    <div style="width:${score}%;height:100%;background:${color};border-radius:3px;transition:width .3s"></div>
+            <div class="comp-score-row">
+                <div class="comp-score-val" style="color:${color}">${score}%</div>
+                <div class="comp-progress-wrap">
+                    <div class="comp-progress-fill" style="width:${score}%;background:${color}"></div>
                 </div>
             </div>
-            <div style="margin-bottom:16px">${checkItems}</div>
-            ${missing.length ? `<div style="padding:10px;background:var(--muted);border-radius:8px;font-size:12px;color:var(--text3)">
-                <strong style="color:var(--text)">Quick wins:</strong> ${esc(missing.slice(0, 3).map(m => m.tip).join('. '))}
-            </div>` : '<div style="padding:10px;background:var(--green-bg);border-radius:8px;font-size:12px;color:var(--green);font-weight:500">Your proposal looks great!</div>'}
+            <div class="comp-checks-list">${checkItems}</div>
+            ${missing.length ? `<div class="comp-quick-wins">
+                <strong>Quick wins:</strong> ${esc(missing.slice(0, 3).map(m => m.tip).join('. '))}
+            </div>` : '<div class="comp-all-good">Your proposal looks great!</div>'}
             <div class="modal-foot" style="margin-top:12px">
                 <button class="btn-sm-outline" onclick="document.getElementById('completenessModal').remove()">Close</button>
             </div>

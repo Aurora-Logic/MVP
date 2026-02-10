@@ -10,17 +10,17 @@ function openAnalyticsBreakdowns() {
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap'; wrap.id = 'analyticsBreakdownsModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-    wrap.innerHTML = `<div class="modal" style="width:600px;max-height:85vh;overflow-y:auto" onclick="event.stopPropagation()">
-        <div class="modal-t" style="display:flex;align-items:center;gap:8px"><i data-lucide="bar-chart-3" style="width:18px;height:18px"></i> Win Rate Breakdowns</div>
+    wrap.innerHTML = `<div class="modal breakdown-modal-body" onclick="event.stopPropagation()">
+        <div class="modal-t"><i data-lucide="bar-chart-3" class="modal-t-icon"></i> Win Rate Breakdowns</div>
         <div class="modal-d">Analyze your win rates across different dimensions</div>
-        <div class="an-breakdown-tabs" style="margin:14px 0 16px">
+        <div class="breakdown-tabs">
             <button class="filter-tab on" onclick="setBreakdownTab('value',this)">By Value</button>
             <button class="filter-tab" onclick="setBreakdownTab('client',this)">By Client</button>
             <button class="filter-tab" onclick="setBreakdownTab('month',this)">By Month</button>
             <button class="filter-tab" onclick="setBreakdownTab('template',this)">By Template</button>
         </div>
         <div id="breakdownContent">${getBreakdownContent('value')}</div>
-        <div class="modal-foot" style="margin-top:16px">
+        <div class="modal-foot">
             <button class="btn-sm-outline" onclick="document.getElementById('analyticsBreakdownsModal').remove()">Close</button>
             <button class="btn-sm" onclick="exportAnalyticsReport()"><i data-lucide="download"></i> Export Report</button>
         </div>
@@ -58,7 +58,7 @@ function buildHBar(label, won, total, color) {
         <div class="an-hbar-track">
             <div class="an-hbar-fill" style="width:${pct}%;background:${color || 'var(--green)'}"></div>
         </div>
-        <div class="an-hbar-val">${pct}% <span style="color:var(--text4);font-weight:400">(${won}/${total})</span></div>
+        <div class="an-hbar-val">${pct}% <span class="an-hbar-ratio">(${won}/${total})</span></div>
     </div>`;
 }
 
@@ -78,7 +78,7 @@ function buildValueBreakdown(proposals) {
         const won = inRange.filter(p => p.status === 'accepted').length;
         if (decided.length > 0) html += buildHBar(r.label, won, decided.length, 'var(--green)');
     });
-    return html || '<div style="padding:20px;text-align:center;color:var(--text4);font-size:13px">Not enough decided proposals yet</div>';
+    return html || '<div class="breakdown-empty">Not enough decided proposals yet</div>';
 }
 
 function buildClientBreakdown(proposals) {
@@ -90,7 +90,7 @@ function buildClientBreakdown(proposals) {
         else if (p.status === 'declined') { clientMap[name].decided++; }
     });
     const sorted = Object.entries(clientMap).filter(([, v]) => v.decided > 0).sort((a, b) => b[1].decided - a[1].decided).slice(0, 10);
-    if (!sorted.length) return '<div style="padding:20px;text-align:center;color:var(--text4);font-size:13px">Not enough decided proposals yet</div>';
+    if (!sorted.length) return '<div class="breakdown-empty">Not enough decided proposals yet</div>';
     return sorted.map(([name, v]) => buildHBar(name, v.won, v.decided, 'var(--blue)')).join('');
 }
 
@@ -111,7 +111,7 @@ function buildMonthBreakdown(proposals) {
         const won = inMonth.filter(p => p.status === 'accepted').length;
         if (decided.length > 0) html += buildHBar(m.label, won, decided.length, 'var(--purple)');
     });
-    return html || '<div style="padding:20px;text-align:center;color:var(--text4);font-size:13px">Not enough decided proposals yet</div>';
+    return html || '<div class="breakdown-empty">Not enough decided proposals yet</div>';
 }
 
 function buildTemplateBreakdown(proposals) {
@@ -123,7 +123,7 @@ function buildTemplateBreakdown(proposals) {
         else if (p.status === 'declined') { tplMap[tpl].decided++; }
     });
     const sorted = Object.entries(tplMap).filter(([, v]) => v.decided > 0).sort((a, b) => b[1].decided - a[1].decided);
-    if (!sorted.length) return '<div style="padding:20px;text-align:center;color:var(--text4);font-size:13px">Not enough decided proposals yet</div>';
+    if (!sorted.length) return '<div class="breakdown-empty">Not enough decided proposals yet</div>';
     return sorted.map(([name, v]) => buildHBar(name.charAt(0).toUpperCase() + name.slice(1), v.won, v.decided, 'var(--amber)')).join('');
 }
 

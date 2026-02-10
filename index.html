@@ -15,10 +15,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Tailwind CSS v4 Browser CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Lucide Icons (pinned) -->
+    <script src="https://unpkg.com/lucide@0.460.0"></script>
+    <!-- Tailwind CSS v4 Browser CDN (pinned) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.0.0"></script>
     <!-- Inline theme detection (prevent FOUC) -->
     <script>
         (function () {
@@ -122,7 +122,7 @@
     <div class="overlay" id="ov" onclick="closePreview()"></div>
     <div class="preview" id="prevPanel">
         <div class="prev-top">
-            <i data-lucide="eye" style="width:16px;height:16px;color:var(--text3)"></i>
+            <i data-lucide="eye" class="prev-top-icon"></i>
             <span class="prev-top-t">Preview</span>
             <div class="tpl-picker" id="tplPicker">
                 <button class="tpl-pick on" onclick="setDocTpl('modern',this)">Modern</button>
@@ -139,7 +139,7 @@
                 <button class="tpl-pick" onclick="setDocTpl('classic',this)">Classic</button>
                 <button class="tpl-pick" onclick="setDocTpl('tabular',this)">Tabular</button>
             </div>
-            <div style="display:flex;gap:6px">
+            <div class="prev-top-actions">
                 <button class="btn-sm-outline" onclick="doExport('invoice')"><i data-lucide="receipt"></i> As
                     Invoice</button>
                 <button class="btn-sm" onclick="doExport('proposal')"><i data-lucide="download"></i> Export

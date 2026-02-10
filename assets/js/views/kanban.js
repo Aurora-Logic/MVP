@@ -24,7 +24,7 @@ function renderKanban() {
         const colValue = items.reduce((a, p) => a + (p.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0), 0);
         return `<div class="kanban-col" data-status="${col.status}">
             <div class="kanban-col-head">
-                <div class="kanban-col-title"><i data-lucide="${col.icon}" style="width:14px;height:14px;color:${col.color}"></i> ${col.label} <span class="kanban-count">${items.length}</span></div>
+                <div class="kanban-col-title"><i data-lucide="${col.icon}" class="kanban-col-icon" style="color:${col.color}"></i> ${col.label} <span class="kanban-count">${items.length}</span></div>
                 <div class="kanban-col-val">${fmtCur(colValue, defaultCurrency())}</div>
             </div>
             <div class="kanban-col-body" data-status="${col.status}">

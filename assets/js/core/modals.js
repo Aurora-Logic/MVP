@@ -26,7 +26,7 @@ function openNewModal() {
     if (curCat === 'saved') {
         const saved = safeGetStorage('pk_templates', []);
         if (!saved.length) {
-            cards = '<div class="empty" style="padding:30px"><div class="empty-t" style="font-size:13px">No saved templates</div><div class="empty-d" style="font-size:12px">Open a proposal and use Save as Template to create one.</div></div>';
+            cards = '<div class="empty empty-sm"><div class="empty-t">No saved templates</div><div class="empty-d">Open a proposal and use Save as Template to create one.</div></div>';
         } else {
             cards = saved.map((t, idx) => {
                 const secs = (t.sections || []).length;

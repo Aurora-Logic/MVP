@@ -95,7 +95,7 @@ function secBlockHtml(s, i) {
     </div>
     <div class="sec-bd">
       <div class="fg"><label class="fl">Title</label><input type="text" class="sec-ti" value="${esc(s.title)}" placeholder="e.g. Executive Summary" oninput="updSecName(this);dirty()"></div>
-      <div class="fg" style="margin:0"><label class="fl">Content</label>
+      <div class="fg fg-flush"><label class="fl">Content</label>
         <div class="editorjs-container" id="sec-editor-${i}"></div>
       </div>
     </div>
@@ -223,10 +223,10 @@ function openLibrary() {
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap'; wrap.id = 'libModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-    wrap.innerHTML = `<div class="modal" style="width:450px" onclick="event.stopPropagation()">
+    wrap.innerHTML = `<div class="modal modal-sec-lib" onclick="event.stopPropagation()">
         <div class="modal-t">Section Library</div>
         <div class="modal-d">Click to insert into your proposal</div>
-        <div class="lib-tabs" style="display:flex;gap:2px;background:var(--muted);padding:2px;border-radius:9999px;margin-bottom:12px">
+        <div class="lib-tabs lib-tabs-bar">
             <button class="filter-tab on" id="libTabSections" onclick="setLibTab('sections',this)">Sections</button>
             ${typeof renderPacksTab === 'function' ? '<button class="filter-tab" id="libTabPacks" onclick="setLibTab(\'packs\',this)">Packs</button>' : ''}
         </div>
@@ -240,9 +240,9 @@ function openLibrary() {
                 <span class="lib-cat" data-cat="pricing" onclick="setLibCat(this)">Pricing</span>
                 <span class="lib-cat" data-cat="general" onclick="setLibCat(this)">General</span>
             </div>
-            <div id="libList" style="max-height:280px;overflow-y:auto"></div>
+            <div id="libList" class="lib-list-scroll"></div>
         </div>
-        <div id="libPacksView" style="display:none;max-height:340px;overflow-y:auto"></div>
+        <div id="libPacksView" class="lib-packs-view" style="display:none"></div>
         <div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('libModal').remove()">Close</button></div>
     </div>`;
     document.body.appendChild(wrap);

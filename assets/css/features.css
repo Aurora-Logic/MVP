@@ -701,3 +701,184 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ════════ COMPLETENESS MODAL ════════ */
+
+.comp-score-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.comp-score-val {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.comp-progress-wrap {
+  flex: 1;
+  height: 6px;
+  background: var(--muted);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.comp-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .3s;
+}
+
+.comp-group-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--text4);
+  margin: 10px 0 4px;
+}
+
+.comp-check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.comp-check-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.comp-check-label {
+  flex: 1;
+}
+
+.comp-check-pts {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.comp-quick-wins {
+  padding: 10px;
+  background: var(--muted);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.comp-quick-wins strong {
+  color: var(--text);
+}
+
+.comp-all-good {
+  padding: 10px;
+  background: var(--green-bg);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 500;
+}
+
+.comp-checks-list {
+  margin-bottom: 16px;
+}
+
+/* Score badge inline */
+.score-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 9999px;
+}
+
+/* ════════ BREAKDOWN MODAL ════════ */
+
+.breakdown-modal-body {
+  width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.breakdown-tabs {
+  margin: 14px 0 16px;
+}
+
+.breakdown-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--text4);
+  font-size: 13px;
+}
+
+/* ════════ CSV IMPORT MODAL ════════ */
+
+.csv-modal-body {
+  width: 520px;
+}
+
+.csv-map-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.csv-map-label {
+  font-size: 11px;
+}
+
+.csv-preview-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.csv-table-wrap {
+  overflow-x: auto;
+  max-height: 180px;
+}
+
+/* ════════ T&C LIBRARY SCROLL ════════ */
+
+.tc-grid-scroll {
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+/* ════════ SECTION LIBRARY SCROLL ════════ */
+
+.lib-list-scroll {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* ════════ MODAL ICON HEADER ════════ */
+
+.modal-t-icon {
+  width: 18px;
+  height: 18px;
+  vertical-align: -3px;
+  margin-right: 6px;
+}
+
+/* ════════ LIBRARY TABS BAR ════════ */
+
+.lib-tabs-bar {
+  display: flex;
+  gap: 2px;
+  background: var(--muted);
+  padding: 2px;
+  border-radius: 9999px;
+  margin-bottom: 12px;
+}
+
+/* ════════ LIBRARY PACKS VIEW ════════ */
+
+.lib-packs-view {
+  max-height: 340px;
+  overflow-y: auto;
+}

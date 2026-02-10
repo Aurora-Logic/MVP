@@ -66,10 +66,10 @@ function buildBarChart(proposals) {
     }).join('')}
     </div>
     <div class="an-legend">
-        <span class="an-legend-item"><span class="an-dot" style="background:var(--green)"></span>Won</span>
-        <span class="an-legend-item"><span class="an-dot" style="background:var(--blue)"></span>Pending</span>
-        <span class="an-legend-item"><span class="an-dot" style="background:var(--red)"></span>Lost</span>
-        <span class="an-legend-item"><span class="an-dot" style="background:var(--amber)"></span>Expired</span>
+        <span class="an-legend-item"><span class="an-dot an-dot-green"></span>Won</span>
+        <span class="an-legend-item"><span class="an-dot an-dot-blue"></span>Pending</span>
+        <span class="an-legend-item"><span class="an-dot an-dot-red"></span>Lost</span>
+        <span class="an-legend-item"><span class="an-dot an-dot-amber"></span>Expired</span>
     </div>`;
 }
 
@@ -97,11 +97,11 @@ function buildDonutChart(proposals) {
             <div class="an-donut-center"><div class="an-donut-val">${total}</div><div class="an-donut-label">Total</div></div>
         </div>
         <div class="an-donut-legend">
-            ${draft ? `<div class="an-donut-item"><span class="an-dot" style="background:var(--text4)"></span>Draft <strong>${draft}</strong></div>` : ''}
-            ${sent ? `<div class="an-donut-item"><span class="an-dot" style="background:var(--blue)"></span>Sent <strong>${sent}</strong></div>` : ''}
-            ${accepted ? `<div class="an-donut-item"><span class="an-dot" style="background:var(--green)"></span>Won <strong>${accepted}</strong></div>` : ''}
-            ${declined ? `<div class="an-donut-item"><span class="an-dot" style="background:var(--red)"></span>Lost <strong>${declined}</strong></div>` : ''}
-            ${expired ? `<div class="an-donut-item"><span class="an-dot" style="background:var(--amber)"></span>Expired <strong>${expired}</strong></div>` : ''}
+            ${draft ? `<div class="an-donut-item"><span class="an-dot an-dot-gray"></span>Draft <strong>${draft}</strong></div>` : ''}
+            ${sent ? `<div class="an-donut-item"><span class="an-dot an-dot-blue"></span>Sent <strong>${sent}</strong></div>` : ''}
+            ${accepted ? `<div class="an-donut-item"><span class="an-dot an-dot-green"></span>Won <strong>${accepted}</strong></div>` : ''}
+            ${declined ? `<div class="an-donut-item"><span class="an-dot an-dot-red"></span>Lost <strong>${declined}</strong></div>` : ''}
+            ${expired ? `<div class="an-donut-item"><span class="an-dot an-dot-amber"></span>Expired <strong>${expired}</strong></div>` : ''}
         </div>
     </div>`;
 }
@@ -117,7 +117,7 @@ function buildAnalyticsWidget() {
     return `<div class="an-widget">
         <div class="an-header">
             <div><div class="an-title">Analytics</div><div class="an-subtitle">${stats.total} proposal${stats.total !== 1 ? 's' : ''} in period</div></div>
-            <div style="display:flex;align-items:center;gap:6px">
+            <div class="an-header-actions">
                 <div class="an-filters">
                     ${filters.map(f => `<button class="an-filter${analyticsFilter === f ? ' on' : ''}" onclick="setAnalyticsFilter('${f}')">${labels[f]}</button>`).join('')}
                 </div>

@@ -1892,6 +1892,10 @@
   margin-top: 12px;
 }
 
+.ob-btn-fill {
+  flex: 1;
+}
+
 .ob-bank-card {
   background: var(--muted);
   border-radius: var(--r2);
@@ -1966,11 +1970,22 @@
   flex-shrink: 0;
 }
 
+.prev-top-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text3);
+}
+
 .prev-top-t {
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
   margin-right: auto;
+}
+
+.prev-top-actions {
+  display: flex;
+  gap: 6px;
 }
 
 .tpl-picker {
@@ -2486,6 +2501,113 @@
   font-weight: 600;
   color: var(--text);
   flex-shrink: 0;
+}
+
+.an-hbar-ratio {
+  color: var(--text4);
+  font-weight: 400;
+}
+
+/* Analytics legend dots (color classes) */
+.an-dot-green { background: var(--green); }
+.an-dot-blue { background: var(--blue); }
+.an-dot-red { background: var(--red); }
+.an-dot-amber { background: var(--amber); }
+.an-dot-gray { background: var(--text4); }
+
+/* Analytics header actions */
+.an-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Kanban column icon */
+.kanban-col-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Pricing layout helpers */
+.pricing-cur-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pricing-cur-label {
+  margin: 0;
+  font-size: 10px;
+}
+
+.pricing-cur-sel {
+  width: 100px;
+}
+
+.pricing-summary-area {
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.pricing-summary-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.pricing-summary-col {
+  width: 260px;
+}
+
+.pricing-disc-row {
+  gap: 8px;
+}
+
+.pricing-disc-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.pricing-disc-sign {
+  font-size: 12px;
+  color: var(--text4);
+}
+
+.pricing-disc-field {
+  width: 90px;
+  padding: 4px 8px;
+  font-size: 12px;
+  text-align: right;
+}
+
+.pricing-tax-field {
+  width: 55px;
+  padding: 4px 8px;
+  font-size: 12px;
+  text-align: right;
+}
+
+.pricing-tax-val {
+  min-width: 70px;
+  text-align: right;
+}
+
+.pricing-tc-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Section form margin reset */
+.fg-flush {
+  margin: 0;
+}
+
+/* Library modal width */
+.modal-sec-lib {
+  width: 450px;
 }
 
 /* Responsive */

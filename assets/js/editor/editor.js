@@ -4,6 +4,7 @@
 
 function loadEditor(id) {
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    if (typeof destroyAllEditors === 'function') destroyAllEditors();
     CUR = id;
     undoStack = [];
     redoStack = [];
@@ -29,11 +30,11 @@ function loadEditor(id) {
     }
 
     document.getElementById('topRight').innerHTML = `
-    <div class="tabs" id="edTabs">
-      <button class="tab on" onclick="edTab(this,'details')">Details</button>
-      <button class="tab" onclick="edTab(this,'sections')">Sections</button>
-      <button class="tab" onclick="edTab(this,'pricing')">Pricing</button>
-      <button class="tab" onclick="edTab(this,'notes')">Notes</button>
+    <div class="tabs" id="edTabs" role="tablist" aria-label="Editor tabs">
+      <button class="tab on" role="tab" aria-selected="true" onclick="edTab(this,'details')">Details</button>
+      <button class="tab" role="tab" aria-selected="false" onclick="edTab(this,'sections')">Sections</button>
+      <button class="tab" role="tab" aria-selected="false" onclick="edTab(this,'pricing')">Pricing</button>
+      <button class="tab" role="tab" aria-selected="false" onclick="edTab(this,'notes')">Notes</button>
     </div>
     <button class="btn-sm-outline" onclick="openPreview()" data-tooltip="Preview (⌘P)" data-side="bottom"><i data-lucide="eye"></i> Preview</button>
     <button class="btn-sm-outline" onclick="shareProposal()"><i data-lucide="share-2"></i> Share</button>
@@ -58,7 +59,7 @@ function loadEditor(id) {
         <button class="btn-sm-icon-ghost" onclick="typeof redo==='function'&&redo()" data-tooltip="Redo (⌘⇧Z)" data-side="bottom"><i data-lucide="redo-2"></i></button>
         <span class="ver-badge">v${p.version || 1}</span>
         <button class="btn-sm-icon-ghost" onclick="bumpVersion()" data-tooltip="Bump version" data-side="bottom"><i data-lucide="arrow-up-circle"></i></button>
-        <div class="cover-toggle ${p.coverPage ? 'on' : ''}" onclick="toggleCover()" title="Add cover page to PDF">
+        <div class="cover-toggle ${p.coverPage ? 'on' : ''}" onclick="toggleCover()" title="Add cover page to PDF" role="switch" aria-checked="${p.coverPage ? 'true' : 'false'}" aria-label="Cover page">
           <i data-lucide="book-open"></i> Cover
           <div class="switch"></div>
         </div>
@@ -125,8 +126,9 @@ function refreshStatsBar() {
 }
 
 function edTab(el, tab) {
-    document.querySelectorAll('#edTabs .tab').forEach(t => t.classList.remove('on'));
+    document.querySelectorAll('#edTabs .tab').forEach(t => { t.classList.remove('on'); t.setAttribute('aria-selected', 'false'); });
     el.classList.add('on');
+    el.setAttribute('aria-selected', 'true');
     ['Details', 'Sections', 'Pricing', 'Notes'].forEach(t => {
         const panel = document.getElementById('ed' + t);
         if (panel) panel.style.display = t.toLowerCase() === tab ? 'block' : 'none';

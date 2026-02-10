@@ -2,6 +2,28 @@
 // NAVIGATION + MOBILE + KEYBOARD
 // ════════════════════════════════════════
 
+function destroyAllEditors() {
+    // Destroy section editors
+    if (typeof sectionEditors === 'object' && sectionEditors) {
+        Object.values(sectionEditors).forEach(e => {
+            if (e && typeof e.destroy === 'function') try { e.destroy(); } catch (err) { }
+        });
+        sectionEditors = {};
+    }
+    // Destroy payment terms editor
+    if (paymentTermsEditor && typeof paymentTermsEditor.destroy === 'function') {
+        try { paymentTermsEditor.destroy(); } catch (e) { }
+        paymentTermsEditor = null;
+    }
+    // Destroy line item editors
+    document.querySelectorAll('.li-desc-editor').forEach(el => {
+        if (el._editor && typeof el._editor.destroy === 'function') {
+            try { el._editor.destroy(); } catch (e) { }
+            el._editor = null;
+        }
+    });
+}
+
 function goNav(view) {
     closeMobileSidebar();
     const titles = { dashboard: 'Dashboard', proposals: 'Proposals', clients: 'Clients', analytics: 'Analytics', settings: 'Settings' };
@@ -11,6 +33,8 @@ function goNav(view) {
     document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
     const btn = document.querySelector(`[data-nav="${view}"]`);
     if (btn) btn.classList.add('on');
+    // Destroy EditorJS instances when leaving editor
+    if (view !== 'editor') destroyAllEditors();
     // Hide TOC on non-editor views
     if (view !== 'editor' && typeof hideTOC === 'function') hideTOC();
     if (view === 'dashboard') renderDashboard();

@@ -18,7 +18,7 @@ function buildPricingInsights(p) {
     if (pct < 10) { msg = 'This proposal is close to your average'; icon = 'minus'; color = 'var(--text3)'; }
     else if (diff > 0) { msg = `${pct}% above your avg (${fmtCur(avg, c)})`; icon = 'trending-up'; color = 'var(--green)'; }
     else { msg = `${pct}% below your avg (${fmtCur(avg, c)})`; icon = 'trending-down'; color = 'var(--amber)'; }
-    el.innerHTML = `<div class="pi-banner" style="margin-bottom:14px"><i data-lucide="${icon}" style="width:16px;height:16px;color:${color}"></i><span class="pi-text">${msg}</span><span class="pi-stat">${DB.length} proposals · Avg ${fmtCur(avg, c)}</span></div>`;
+    el.innerHTML = `<div class="pi-banner"><i data-lucide="${icon}" style="color:${color}"></i><span class="pi-text">${msg}</span><span class="pi-stat">${DB.length} proposals · Avg ${fmtCur(avg, c)}</span></div>`;
     lucide.createIcons();
 }
 
@@ -28,12 +28,12 @@ function openCsvImport() {
     wrap.className = 'modal-wrap';
     wrap.id = 'csvModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-    wrap.innerHTML = `<div class="modal" style="width:520px" onclick="event.stopPropagation()">
-        <div class="modal-t"><i data-lucide="file-spreadsheet" style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"></i> Import Line Items</div>
+    wrap.innerHTML = `<div class="modal csv-modal-body" onclick="event.stopPropagation()">
+        <div class="modal-t"><i data-lucide="file-spreadsheet" class="modal-t-icon"></i> Import Line Items</div>
         <div class="modal-d">Paste CSV data or upload a .csv file</div>
         <div class="fg">
             <label class="fl">Upload CSV File</label>
-            <input type="file" id="csvFileInput" accept=".csv,.tsv,.txt" onchange="handleCsvFile(this)" style="font-size:13px">
+            <input type="file" id="csvFileInput" accept=".csv,.tsv,.txt" onchange="handleCsvFile(this)">
         </div>
         <div class="fg">
             <label class="fl">Or Paste CSV Data</label>
@@ -131,15 +131,15 @@ function renderCsvPreview() {
     const preview = document.getElementById('csvPreview');
     const fields = ['desc', 'detail', 'qty', 'rate'];
     const labels = { desc: 'Description', detail: 'Detail', qty: 'Quantity', rate: 'Rate' };
-    let mapHtml = '<div class="csv-map" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">';
+    let mapHtml = '<div class="csv-map-grid">';
     fields.forEach(f => {
         const opts = headers.map((h, i) => `<option value="${i}" ${_csvMap[f] === i ? 'selected' : ''}>${esc(h)}</option>`).join('');
-        mapHtml += `<div class="fg" style="margin:0"><label class="fl" style="font-size:11px">${labels[f]}</label><select class="csv-map-select" data-field="${f}" onchange="updateCsvMap(this)""><option value="-1">— Skip —</option>${opts}</select></div>`;
+        mapHtml += `<div class="fg" style="margin:0"><label class="fl csv-map-label">${labels[f]}</label><select class="csv-map-select" data-field="${f}" onchange="updateCsvMap(this)"><option value="-1">— Skip —</option>${opts}</select></div>`;
     });
     mapHtml += '</div>';
 
     const showRows = rows.slice(0, 5);
-    let tableHtml = '<div style="overflow-x:auto;max-height:180px"><table class="li-tbl" style="font-size:12px"><thead><tr>';
+    let tableHtml = '<div class="csv-table-wrap"><table class="li-tbl" style="font-size:12px"><thead><tr>';
     tableHtml += '<th>Description</th><th>Detail</th><th>Qty</th><th>Rate</th></tr></thead><tbody>';
     showRows.forEach(row => {
         const desc = _csvMap.desc >= 0 ? (row[_csvMap.desc] || '') : '';
@@ -148,10 +148,10 @@ function renderCsvPreview() {
         const rate = _csvMap.rate >= 0 ? (row[_csvMap.rate] || '') : '';
         tableHtml += `<tr><td>${esc(desc)}</td><td>${esc(detail)}</td><td>${esc(qty)}</td><td>${esc(rate)}</td></tr>`;
     });
-    if (rows.length > 5) tableHtml += `<tr><td colspan="4" style="text-align:center;color:var(--text4)">...and ${rows.length - 5} more row${rows.length - 5 > 1 ? 's' : ''}</td></tr>`;
+    if (rows.length > 5) tableHtml += `<tr><td colspan="4" class="breakdown-empty">...and ${rows.length - 5} more row${rows.length - 5 > 1 ? 's' : ''}</td></tr>`;
     tableHtml += '</tbody></table></div>';
 
-    preview.innerHTML = `<div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px">${rows.length} row${rows.length > 1 ? 's' : ''} detected — Map columns:</div>${mapHtml}<div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px">Preview:</div>${tableHtml}`;
+    preview.innerHTML = `<div class="csv-preview-header">${rows.length} row${rows.length > 1 ? 's' : ''} detected — Map columns:</div>${mapHtml}<div class="csv-preview-header">Preview:</div>${tableHtml}`;
     document.getElementById('csvConfirmBtn').style.display = '';
 }
 

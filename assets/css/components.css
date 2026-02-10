@@ -541,7 +541,7 @@ input[type="number"] {
 
 .badge-new {
   background: var(--blue);
-  color: white;
+  color: var(--white);
   font-size: 9px;
   padding: 1px 5px;
   border-radius: var(--r-pill);
@@ -1139,7 +1139,7 @@ dialog.command-dialog::backdrop {
   left: 2px;
   width: 14px;
   height: 14px;
-  background: white;
+  background: var(--white);
   border-radius: 50%;
   transition: transform var(--t2);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
@@ -1477,9 +1477,9 @@ dialog.command-dialog::backdrop {
 
 .modal .btn-sm-destructive {
   background: var(--red);
-  color: white;
+  color: var(--white);
 }
 
 .modal .btn-sm-destructive:hover {
-  background: #e6352b;
+  background: var(--red-h, #e6352b);
 }

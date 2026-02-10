@@ -44,7 +44,7 @@ function getObStepHtml(step) {
                 <div class="fg"><label class="fl">Phone</label><input type="tel" id="obPhone" placeholder="+91 98765 43210" value="${esc(CONFIG?.phone || '')}"></div>
                 <div class="fg"><label class="fl">Website</label><input type="url" id="obWebsite" placeholder="https://yourstudio.com" value="${esc(CONFIG?.website || '')}"></div>
             </div>
-            <button class="btn w-full" onclick="obNext()" style="margin-top:8px">Continue <i data-lucide="arrow-right"></i></button>
+            <div class="ob-btn-row"><button class="btn w-full" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button></div>
         </div>`;
     if (step === 2) return `
         <div class="ob-step-header"><i data-lucide="map-pin" class="ob-step-icon"></i><div><div class="ob-title">Where you operate</div><div class="ob-desc">Country-specific fields help generate compliant invoices and proposals.</div></div></div>
@@ -56,7 +56,7 @@ function getObStepHtml(step) {
             <div id="obCountryFields"></div>
             <div class="ob-btn-row">
                 <button class="btn-ghost" onclick="obPrev()"><i data-lucide="arrow-left"></i> Back</button>
-                <button class="btn" style="flex:1" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button>
+                <button class="btn ob-btn-fill" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button>
             </div>
         </div>`;
     if (step === 3) return `
@@ -76,7 +76,7 @@ function getObStepHtml(step) {
             <div class="ob-btn-row">
                 <button class="btn-ghost" onclick="obPrev()"><i data-lucide="arrow-left"></i> Back</button>
                 <button class="btn-outline" onclick="obNext()">Skip</button>
-                <button class="btn" style="flex:1" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button>
+                <button class="btn ob-btn-fill" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button>
             </div>
         </div>`;
     if (step === 4) return `
@@ -92,7 +92,7 @@ function getObStepHtml(step) {
             <div class="ob-btn-row">
                 <button class="btn-ghost" onclick="obPrev()"><i data-lucide="arrow-left"></i> Back</button>
                 <button class="btn-outline" onclick="finishOb()">Skip</button>
-                <button class="btn" style="flex:1" onclick="finishOb()">Start Creating <i data-lucide="rocket"></i></button>
+                <button class="btn ob-btn-fill" onclick="finishOb()">Start Creating <i data-lucide="rocket"></i></button>
             </div>
         </div>`;
     return '';
@@ -123,6 +123,10 @@ function onCountryChange(val) {
 
 function obNext() {
     collectObStep();
+    if (obStep === 1) {
+        const name = document.getElementById('obName')?.value?.trim();
+        if (!name) { toast('Please enter your name', 'warning'); document.getElementById('obName')?.focus(); return; }
+    }
     if (obStep === 2 && !validateObTaxIds()) return;
     if (obStep < 4) { obStep++; renderOnboarding(); }
 }
