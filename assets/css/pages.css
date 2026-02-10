@@ -3100,15 +3100,18 @@
   border-top: 1px solid var(--border);
 }
 
-.auth-offline a {
-  color: var(--text4);
-  text-decoration: none;
-  font-size: 13px;
-  transition: color var(--t);
+.auth-offline-btn {
+  width: 100%;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.auth-offline a:hover {
-  color: var(--text3);
+.auth-offline-hint {
+  color: var(--text4);
+  font-size: 12px;
+  margin-top: 8px;
 }
 
 /* ════════ SYNC INDICATOR ════════ */

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — ProposalKit</title>
+    <meta name="description" content="ProposalKit privacy policy. Your data stays on your device unless you opt into cloud sync.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #18181b; line-height: 1.7; background: #fff; }
+        .wrap { max-width: 720px; margin: 0 auto; padding: 60px 24px 80px; }
+        a { color: #007AFF; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+        .subtitle { color: #71717a; font-size: 14px; margin-bottom: 40px; }
+        h2 { font-size: 20px; font-weight: 700; margin: 32px 0 12px; }
+        h3 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; }
+        p, li { font-size: 15px; color: #3f3f46; margin-bottom: 12px; }
+        ul { padding-left: 24px; margin-bottom: 16px; }
+        li { margin-bottom: 6px; }
+        .back { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; margin-bottom: 32px; }
+        .back:hover { text-decoration: none; opacity: 0.8; }
+        hr { border: none; border-top: 1px solid #e4e4e7; margin: 32px 0; }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <a href="landing.html" class="back">&larr; Back to ProposalKit</a>
+
+        <h1>Privacy Policy</h1>
+        <p class="subtitle">Last updated: February 10, 2026</p>
+
+        <h2>1. Overview</h2>
+        <p>ProposalKit ("we", "us", "the app") is a proposal builder application created by Delta System. We are committed to protecting your privacy and being transparent about what data we collect.</p>
+
+        <h2>2. Data Storage</h2>
+
+        <h3>Local-Only Mode (Default)</h3>
+        <p>By default, ProposalKit stores all data in your browser's localStorage. This means:</p>
+        <ul>
+            <li>Your proposals, clients, settings, and templates stay on your device</li>
+            <li>No data is sent to our servers</li>
+            <li>Clearing your browser data will delete your ProposalKit data</li>
+            <li>Data is not accessible from other devices</li>
+        </ul>
+
+        <h3>Cloud Sync Mode (Opt-in)</h3>
+        <p>If you create an account and enable cloud sync, your data is stored in a Supabase-hosted PostgreSQL database:</p>
+        <ul>
+            <li>Your proposals, clients, settings, and templates are synced to the cloud</li>
+            <li>Data is encrypted in transit (TLS) and at rest</li>
+            <li>Row-level security ensures only you can access your data</li>
+            <li>You can delete your account and all cloud data at any time</li>
+        </ul>
+
+        <h2>3. Information We Collect</h2>
+
+        <h3>Account Information (Cloud Sync only)</h3>
+        <ul>
+            <li>Email address</li>
+            <li>Name (if provided)</li>
+            <li>Authentication data (managed by Supabase Auth)</li>
+        </ul>
+
+        <h3>Proposal Data</h3>
+        <ul>
+            <li>Proposal content, pricing, client details, and settings you enter</li>
+            <li>This data is only stored locally or in your cloud account — never shared with third parties</li>
+        </ul>
+
+        <h3>Analytics (if enabled)</h3>
+        <p>We may use privacy-friendly analytics (Plausible) to understand how the app is used. This collects:</p>
+        <ul>
+            <li>Page views and referrer data</li>
+            <li>No cookies, no personal data, no tracking across sites</li>
+            <li>Fully GDPR compliant</li>
+        </ul>
+
+        <h2>4. Information We Do NOT Collect</h2>
+        <ul>
+            <li>We do not track your IP address for analytics</li>
+            <li>We do not sell or share your data with third parties</li>
+            <li>We do not use advertising cookies or trackers</li>
+            <li>We do not read or access your proposal content</li>
+        </ul>
+
+        <h2>5. Third-Party Services</h2>
+        <ul>
+            <li><strong>Supabase</strong> — Cloud database and authentication (if you opt into cloud sync). <a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase Privacy Policy</a></li>
+            <li><strong>Google OAuth</strong> — If you sign in with Google. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a></li>
+            <li><strong>Vercel</strong> — Hosting. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel Privacy Policy</a></li>
+            <li><strong>CDN providers</strong> — jsDelivr, unpkg, Google Fonts for loading libraries and fonts</li>
+        </ul>
+
+        <h2>6. Shared Proposals</h2>
+        <p>When you share a proposal via link, the recipient can view the proposal content. Shared proposals are accessible to anyone with the link. You can revoke access by regenerating the share token.</p>
+
+        <h2>7. Data Retention</h2>
+        <ul>
+            <li><strong>Local mode:</strong> Data persists until you clear your browser data or uninstall</li>
+            <li><strong>Cloud mode:</strong> Data persists until you delete your account</li>
+            <li>We do not retain data after account deletion</li>
+        </ul>
+
+        <h2>8. Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+            <li>Access all your data (it's visible in the app)</li>
+            <li>Export your data (via the app's export features)</li>
+            <li>Delete your data (clear localStorage or delete your cloud account)</li>
+            <li>Use the app without creating an account</li>
+        </ul>
+
+        <h2>9. Children's Privacy</h2>
+        <p>ProposalKit is not directed at children under 13. We do not knowingly collect data from children.</p>
+
+        <h2>10. Changes to This Policy</h2>
+        <p>We may update this policy from time to time. Changes will be posted on this page with an updated date. Continued use of the app after changes constitutes acceptance.</p>
+
+        <hr>
+
+        <h2>Contact</h2>
+        <p>If you have questions about this privacy policy, contact us at <strong>hello@deltasystem.dev</strong></p>
+
+        <p style="margin-top: 32px; font-size: 13px; color: #a1a1aa;">&copy; 2026 ProposalKit by Delta System</p>
+    </div>
+</body>
+
+</html>

@@ -2,6 +2,24 @@
 // MODALS & TOASTS
 // ════════════════════════════════════════
 
+function trapFocus(modal) {
+    const sel = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+    const els = modal.querySelectorAll(sel);
+    if (!els.length) return;
+    const first = els[0], last = els[els.length - 1];
+    modal._trapHandler = function(e) {
+        if (e.key !== 'Tab') return;
+        if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
+        else { if (document.activeElement === last) { e.preventDefault(); first.focus(); } }
+    };
+    modal.addEventListener('keydown', modal._trapHandler);
+    first.focus();
+}
+
+function releaseFocus(modal) {
+    if (modal._trapHandler) { modal.removeEventListener('keydown', modal._trapHandler); delete modal._trapHandler; }
+}
+
 function openNewModal() {
     const modal = document.getElementById('newModalInner');
     const curCat = window._newModalCat || 'general';
@@ -90,7 +108,9 @@ function openNewModal() {
         onChange: (val) => { CONFIG.font = val; saveConfig(); applyFont(val); }
     });
 
-    document.getElementById('newModal').classList.add('show');
+    const nm = document.getElementById('newModal');
+    nm.classList.add('show');
+    trapFocus(nm);
     lucide.createIcons();
 }
 
@@ -102,7 +122,9 @@ function pickNewModalColor(c) {
 
 function closeNewModal(e) {
     if (e && e.target !== e.currentTarget) return;
-    document.getElementById('newModal').classList.remove('show');
+    const nm = document.getElementById('newModal');
+    releaseFocus(nm);
+    nm.classList.remove('show');
 }
 
 function toast(msg, type = 'success') {
@@ -165,6 +187,6 @@ function confirmDialog(message, onConfirm, opts = {}) {
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
     const confirmBtn = document.getElementById('confirmBtn');
-    confirmBtn.onclick = () => { wrap.remove(); onConfirm(); };
-    confirmBtn.focus();
+    confirmBtn.onclick = () => { releaseFocus(wrap); wrap.remove(); onConfirm(); };
+    trapFocus(wrap);
 }

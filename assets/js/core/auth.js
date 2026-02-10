@@ -11,16 +11,44 @@ async function initAuth() {
         offlineBoot();
         return;
     }
-    // Check existing session
+
+    // Detect OAuth callback (hash contains access_token from Google redirect)
+    const hash = window.location.hash;
+    const isOAuthCallback = hash && (hash.includes('access_token=') || hash.includes('error='));
+
+    if (isOAuthCallback) {
+        // Show loading while processing OAuth callback
+        const el = document.getElementById('obContent');
+        if (el) {
+            document.getElementById('appShell').style.display = 'none';
+            document.getElementById('onboard').classList.remove('hide');
+            el.innerHTML = '<div class="auth-form" style="text-align:center"><div style="font-size:36px;margin-bottom:12px">&#128274;</div><div class="auth-title">Signing you in...</div><div class="auth-desc">Please wait while we complete authentication.</div></div>';
+        }
+    }
+
+    // getSession() will auto-detect and parse OAuth hash tokens
     try {
-        const { data } = await sb().auth.getSession();
+        const { data, error } = await sb().auth.getSession();
+        if (error && isOAuthCallback) {
+            // OAuth error — show auth screen with error
+            renderAuthScreen();
+            showAuthError('Authentication failed. Please try again.');
+            return;
+        }
         sbSession = data?.session || null;
     } catch (e) { sbSession = null; }
 
-    // Listen for auth state changes
+    // Clean up OAuth hash from URL
+    if (isOAuthCallback && window.history.replaceState) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+
+    // Listen for auth state changes (for future sign-in/out events)
+    let authBooted = false;
     sb().auth.onAuthStateChange(async (event, session) => {
         sbSession = session;
-        if (event === 'SIGNED_IN' && session) {
+        if (event === 'SIGNED_IN' && session && !authBooted) {
+            authBooted = true;
             await onSignedIn();
         } else if (event === 'SIGNED_OUT') {
             sbSession = null;
@@ -29,11 +57,13 @@ async function initAuth() {
 
     if (sbSession) {
         // Already logged in — pull data and boot
+        authBooted = true;
         await pullAndBoot();
-    } else {
-        // Show auth screen
+    } else if (!isOAuthCallback) {
+        // Show auth screen (only if not mid-OAuth callback)
         renderAuthScreen();
     }
+    // If isOAuthCallback and no session yet, onAuthStateChange will handle it
 }
 
 function offlineBoot() {
@@ -114,7 +144,10 @@ function getLoginHtml() {
                 <a href="#" onclick="authMode='reset';renderAuthScreen();return false">Forgot password?</a>
             </div>
             <div class="auth-offline">
-                <a href="#" onclick="skipAuth();return false">Continue offline <i data-lucide="arrow-right" style="width:14px;height:14px;vertical-align:middle"></i></a>
+                <button class="btn-outline auth-offline-btn" onclick="skipAuth()">
+                    <i data-lucide="wifi-off" style="width:16px;height:16px"></i> Continue without account
+                </button>
+                <div class="auth-offline-hint">Your data stays on this device only</div>
             </div>
         </div>`;
 }
@@ -140,7 +173,10 @@ function getSignupHtml() {
                 <span>Already have an account? <a href="#" onclick="authMode='login';renderAuthScreen();return false">Sign in</a></span>
             </div>
             <div class="auth-offline">
-                <a href="#" onclick="skipAuth();return false">Continue offline <i data-lucide="arrow-right" style="width:14px;height:14px;vertical-align:middle"></i></a>
+                <button class="btn-outline auth-offline-btn" onclick="skipAuth()">
+                    <i data-lucide="wifi-off" style="width:16px;height:16px"></i> Continue without account
+                </button>
+                <div class="auth-offline-hint">Your data stays on this device only</div>
             </div>
         </div>`;
 }

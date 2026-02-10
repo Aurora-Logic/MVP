@@ -5,12 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProposalKit — Professional Proposals in Minutes</title>
-    <meta name="description" content="Build professional proposals in minutes. Export polished PDFs.">
+    <meta name="description" content="Create professional proposals with 13 PDF templates. Track payments, manage clients, and close deals faster. Free forever.">
+    <meta property="og:title" content="ProposalKit — Professional Proposals">
+    <meta property="og:description" content="Create stunning proposals, invoices, and contracts. 13 PDF templates. Payment tracking. Client management.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://proposalkit.vercel.app/">
+    <meta property="og:image" content="https://proposalkit.vercel.app/assets/icons/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ProposalKit — Professional Proposals">
+    <meta name="twitter:description" content="Create professional proposals with 13 PDF templates. Free forever.">
+    <meta name="twitter:image" content="https://proposalkit.vercel.app/assets/icons/og-image.png">
     <meta name="theme-color" content="#18181b">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://api.anthropic.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://api.anthropic.com https://plausible.io;">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+    <!-- Analytics (Plausible — no cookies, GDPR compliant) -->
+    <script defer data-domain="proposalkit.vercel.app" src="https://plausible.io/js/script.js"></script>
     <!-- Inter Font (replacing DM Sans) + JetBrains Mono -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -19,8 +31,8 @@
     <script src="https://unpkg.com/lucide@0.460.0"></script>
     <!-- Tailwind CSS v4 Browser CDN (pinned) -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.0.0"></script>
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase JS Client (pinned) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1"></script>
     <!-- Inline theme detection (prevent FOUC) -->
     <script>
         (function () {

@@ -2,6 +2,18 @@
 // BOOT — App initialization (loaded last)
 // ════════════════════════════════════════
 
+// Global error boundary
+window.onerror = function(msg, src, line, col, err) {
+    const info = `${msg} at ${src}:${line}:${col}`;
+    console.error('[ProposalKit Error]', info, err);
+    if (typeof toast === 'function') toast('Something went wrong. Please refresh.', 'error');
+    return false;
+};
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('[ProposalKit Unhandled Promise]', e.reason);
+    if (typeof toast === 'function') toast('Something went wrong. Please refresh.', 'error');
+});
+
 function initApp() {
     if (typeof initAuth === 'function') {
         initAuth();
