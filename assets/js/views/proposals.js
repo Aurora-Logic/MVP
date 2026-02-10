@@ -5,7 +5,18 @@
 function renderPropList(list) {
   const wrap = document.getElementById('propListWrap');
   if (!list.length) {
-    wrap.innerHTML = `<div class="empty" style="padding:50px 20px"><div class="empty-icon"><i data-lucide="search"></i></div><div class="empty-t">No proposals found</div><div class="empty-d">${currentFilter !== 'all' ? 'No ' + currentFilter + ' proposals yet. Change the filter or create a new one.' : 'Try a different search term or create a new proposal.'}</div>${currentFilter !== 'all' ? '<button class="btn-sm-outline" onclick="setFilter(\'all\')"><i data-lucide="x"></i> Clear filter</button>' : '<button class="btn-sm" onclick="openNewModal()"><i data-lucide="plus"></i> Create Proposal</button>'}</div>`;
+    const filterIcons = { draft: 'file-text', sent: 'send', accepted: 'check-circle', declined: 'x-circle', expired: 'clock', dues: 'wallet', archived: 'archive' };
+    const filterIcon = filterIcons[currentFilter] || 'search';
+    const filterLabel = currentFilter !== 'all' ? currentFilter.charAt(0).toUpperCase() + currentFilter.slice(1) : '';
+    wrap.innerHTML = `<div class="empty" style="padding:60px 20px">
+        <div class="empty-icon" style="width:48px;height:48px;border-radius:50%;background:var(--muted);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="${esc(filterIcon)}" style="width:20px;height:20px;color:var(--text4)"></i></div>
+        <div class="empty-t">${currentFilter !== 'all' ? 'No ' + esc(filterLabel) + ' proposals' : 'No results found'}</div>
+        <div class="empty-d">${currentFilter !== 'all' ? 'Proposals will appear here once they have the "' + esc(filterLabel) + '" status.' : 'Try a different search term or create a new proposal.'}</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+            ${currentFilter !== 'all' ? '<button class="btn-sm-outline" onclick="setFilter(\'all\')"><i data-lucide="x"></i> Clear filter</button>' : ''}
+            <button class="btn-sm" onclick="openNewModal()"><i data-lucide="plus"></i> New Proposal</button>
+        </div>
+    </div>`;
     lucide.createIcons();
     return;
   }

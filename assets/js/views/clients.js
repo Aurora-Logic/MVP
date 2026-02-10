@@ -9,7 +9,19 @@ function renderClients() {
     const body = document.getElementById('bodyScroll');
 
     if (!CLIENTS.length) {
-        body.innerHTML = `<div class="empty"><div class="empty-icon"><i data-lucide="users"></i></div><div class="empty-t">No clients yet</div><div class="empty-d">Add clients to quickly fill proposal details. They'll appear when creating new proposals.</div><button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add Client</button></div>`;
+        body.innerHTML = `<div class="empty" style="padding:60px 20px">
+            <div class="empty-icon" style="width:56px;height:56px;border-radius:50%;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="users" style="width:24px;height:24px;color:var(--blue)"></i></div>
+            <div class="empty-t">Build your client database</div>
+            <div class="empty-d">Save client details once, reuse on every proposal. No more retyping names and emails.</div>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+                <button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add Client</button>
+            </div>
+            <div style="display:flex;gap:24px;justify-content:center;margin-top:32px;color:var(--text4);font-size:12px">
+                <span><i data-lucide="zap" style="width:12px;height:12px;vertical-align:-1px"></i> Auto-fill proposals</span>
+                <span><i data-lucide="bar-chart-3" style="width:12px;height:12px;vertical-align:-1px"></i> Track per-client stats</span>
+                <span><i data-lucide="repeat" style="width:12px;height:12px;vertical-align:-1px"></i> Reuse across proposals</span>
+            </div>
+        </div>`;
         lucide.createIcons(); return;
     }
 

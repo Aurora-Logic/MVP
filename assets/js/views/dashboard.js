@@ -129,9 +129,10 @@ function renderDashboard() {
           <button class="btn-outline" onclick="fromTpl('web')"><i data-lucide="zap"></i> Try Web Dev Template</button>
         </div>
         <div class="fr-features">
-          <div class="fr-feat"><div class="fr-feat-icon"><i data-lucide="layout-template"></i></div><div class="fr-feat-t">4 Templates</div><div class="fr-feat-d">Web, Design, Consulting, or start blank</div></div>
+          <div class="fr-feat"><div class="fr-feat-icon"><i data-lucide="layout-template"></i></div><div class="fr-feat-t">13 Templates</div><div class="fr-feat-d">Modern, Classic, Minimal, and 10 more</div></div>
           <div class="fr-feat"><div class="fr-feat-icon"><i data-lucide="palette"></i></div><div class="fr-feat-t">Your Brand</div><div class="fr-feat-d">Logo & colors on every proposal</div></div>
-          <div class="fr-feat"><div class="fr-feat-icon"><i data-lucide="download"></i></div><div class="fr-feat-t">PDF Export</div><div class="fr-feat-d">One-click professional exports</div></div>
+          <div class="fr-feat"><div class="fr-feat-icon"><i data-lucide="download"></i></div><div class="fr-feat-t">PDF Export</div><div class="fr-feat-d">One-click polished PDF exports</div></div>
+          <div class="fr-feat"><div class="fr-feat-icon"><i data-lucide="share-2"></i></div><div class="fr-feat-t">Client Portal</div><div class="fr-feat-d">Share links & get digital acceptance</div></div>
         </div>
       </div>`;
     lucide.createIcons();

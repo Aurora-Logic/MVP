@@ -25,13 +25,14 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.2';
+const APP_VERSION = '2.3';
+const APP_BUILD = '20260210';
 const WHATS_NEW_ITEMS = [
-    { icon: 'sparkles', title: 'AI Writing Assistant', desc: 'Use Anthropic Claude to improve, expand, shorten, or fix grammar in any section.' },
-    { icon: 'users', title: 'Team & Multi-User', desc: 'Create local team profiles with roles (Admin, Editor, Viewer) and switch between them.' },
-    { icon: 'file-down', title: 'Export Formats', desc: 'Export proposals as Markdown, CSV, or standalone HTML. Send data via webhooks.' },
-    { icon: 'file-plus-2', title: 'SOW, Contract & Receipt', desc: 'Generate Statement of Work, Service Agreement, or Payment Receipt from any proposal.' },
-    { icon: 'git-compare', title: 'Version Comparison', desc: 'Compare proposal versions side by side to see what changed between snapshots.' }
+    { icon: 'upload', title: 'Import Data', desc: 'Import proposals, clients, and settings from a JSON backup file.' },
+    { icon: 'indian-rupee', title: 'UPI & QR Payments', desc: 'Add your UPI ID and auto-generate QR codes on PDF invoices.' },
+    { icon: 'wallet', title: 'Payment Tracking', desc: 'Record multiple payments per proposal, track dues, and generate receipts.' },
+    { icon: 'layout-template', title: 'Landing Page', desc: 'New marketing landing page with features showcase, pricing, and FAQ.' },
+    { icon: 'wand-2', title: 'Onboarding Polish', desc: 'Skip any step, celebration animation, and smarter empty states throughout.' }
 ];
 
 function checkWhatsNew() {

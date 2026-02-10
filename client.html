@@ -827,6 +827,9 @@
 
         function renderProposal() {
             const p = proposal;
+            // Dynamic page title: "[Proposal Title] from [Company]"
+            const senderName = p.sender?.company || p.sender?.name || '';
+            document.title = (p.title || 'Proposal') + (senderName ? ' from ' + senderName : '') + ' — ProposalKit';
             const total = (p.lineItems || []).reduce((sum, item) => sum + (item.qty || 0) * (item.rate || 0), 0);
             const discount = p.discount || 0;
             const taxRate = p.taxRate || 0;

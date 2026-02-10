@@ -17,6 +17,7 @@ function renderOnboarding() {
     const el = document.getElementById('obContent');
     if (!el) return;
     const steps = ['About You', 'Location & Tax', 'Payment', 'Branding'];
+    document.title = steps[obStep - 1] + ' — Setup — ProposalKit';
     const progress = `<div class="ob-progress"><div class="ob-progress-bar" style="width:${(obStep / 4) * 100}%"></div></div>
         <div class="ob-steps">${steps.map((s, i) => `<span class="ob-step-label${i + 1 === obStep ? ' on' : i + 1 < obStep ? ' done' : ''}">${s}</span>`).join('')}</div>`;
     el.innerHTML = progress + getObStepHtml(obStep);
@@ -44,7 +45,7 @@ function getObStepHtml(step) {
                 <div class="fg"><label class="fl">Phone</label><input type="tel" id="obPhone" placeholder="+91 98765 43210" value="${esc(CONFIG?.phone || '')}"></div>
                 <div class="fg"><label class="fl">Website</label><input type="url" id="obWebsite" placeholder="https://yourstudio.com" value="${esc(CONFIG?.website || '')}"></div>
             </div>
-            <div class="ob-btn-row"><button class="btn w-full" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button></div>
+            <div class="ob-btn-row"><button class="btn-outline" onclick="obStep=2;renderOnboarding()">Skip for now</button><button class="btn ob-btn-fill" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button></div>
         </div>`;
     if (step === 2) return `
         <div class="ob-step-header"><i data-lucide="map-pin" class="ob-step-icon"></i><div><div class="ob-title">Where you operate</div><div class="ob-desc">Country-specific fields help generate compliant invoices and proposals.</div></div></div>
@@ -56,6 +57,7 @@ function getObStepHtml(step) {
             <div id="obCountryFields"></div>
             <div class="ob-btn-row">
                 <button class="btn-ghost" onclick="obPrev()"><i data-lucide="arrow-left"></i> Back</button>
+                <button class="btn-outline" onclick="obStep=3;renderOnboarding()">Skip for now</button>
                 <button class="btn ob-btn-fill" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button>
             </div>
         </div>`;
@@ -197,10 +199,21 @@ function finishOb() {
         else CONFIG.color = CONFIG.color || '#18181b';
     }
     saveConfig();
-    document.getElementById('onboard').classList.add('hide');
-    document.getElementById('appShell').style.display = 'flex';
-    bootApp();
-    toast('Welcome to ProposalKit!');
+    // Celebration animation before transitioning
+    const obEl = document.getElementById('obContent');
+    if (obEl) {
+        obEl.innerHTML = `<div style="text-align:center;padding:60px 20px;animation:fadeIn .4s ease-out">
+            <div style="font-size:48px;margin-bottom:16px">&#127881;</div>
+            <div style="font-size:22px;font-weight:700;color:var(--text,#09090b);margin-bottom:8px">You're all set!</div>
+            <div style="font-size:14px;color:var(--text3,#71717a);max-width:320px;margin:0 auto">Your workspace is ready. Let's create your first proposal.</div>
+        </div>`;
+    }
+    setTimeout(() => {
+        document.getElementById('onboard').classList.add('hide');
+        document.getElementById('appShell').style.display = 'flex';
+        bootApp();
+        toast('Welcome to ProposalKit!');
+    }, 1200);
 }
 
 function renderColorSwatches(containerId, selected) {

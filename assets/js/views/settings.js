@@ -94,15 +94,19 @@ function renderSettings() {
           <div class="sig-wrap" id="sigWrap"><div id="sigDisplay"></div></div>
         </div>
         <div class="card card-p">
-          <div class="card-head"><div><div class="card-t">Data Management</div><div class="card-d">Export or clear your local data</div></div></div>
+          <div class="card-head"><div><div class="card-t">Data Management</div><div class="card-d">Export, import, or clear your local data</div></div></div>
           <div class="fg"><label class="fl">Webhook URL</label>
             <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
             <div class="fh">POST proposal data to this URL on export</div>
           </div>
           <div class="sec-header-actions">
             <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export All Data</button>
+            <button class="btn-sm-outline" onclick="importData()"><i data-lucide="upload"></i> Import Data</button>
             <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear All Data</button>
           </div>
+        </div>
+        <div style="text-align:center;padding:16px 0 4px;font-size:11px;color:var(--text4)">
+          ${typeof appName === 'function' ? appName() : 'ProposalKit'} v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : '?'}${typeof APP_BUILD !== 'undefined' ? ' (build ' + APP_BUILD + ')' : ''}
         </div>
       </div>
     </div>`;
@@ -305,6 +309,57 @@ function exportData() {
     a.click();
     URL.revokeObjectURL(a.href);
     toast('Data exported');
+}
+
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const data = JSON.parse(reader.result);
+                if (!data || typeof data !== 'object') throw new Error('Invalid format');
+                const counts = [];
+                if (data.config && typeof data.config === 'object') {
+                    Object.assign(CONFIG, data.config);
+                    localStorage.setItem('pk_config', JSON.stringify(CONFIG));
+                    counts.push('config');
+                }
+                if (Array.isArray(data.proposals) && data.proposals.length) {
+                    const existingIds = new Set(DB.map(p => p.id));
+                    let added = 0;
+                    data.proposals.forEach(p => {
+                        if (p.id && !existingIds.has(p.id)) { DB.push(p); added++; }
+                    });
+                    persist();
+                    counts.push(added + ' proposals');
+                }
+                if (Array.isArray(data.clients) && data.clients.length) {
+                    const existingIds = new Set(CLIENTS.map(cl => cl.id));
+                    let added = 0;
+                    data.clients.forEach(cl => {
+                        if (cl.id && !existingIds.has(cl.id)) { CLIENTS.push(cl); added++; }
+                    });
+                    localStorage.setItem('pk_clients', JSON.stringify(CLIENTS));
+                    counts.push(added + ' clients');
+                }
+                if (Array.isArray(data.sectionLibrary)) localStorage.setItem('pk_seclib', JSON.stringify(data.sectionLibrary));
+                if (Array.isArray(data.tcLibrary)) localStorage.setItem('pk_tclib', JSON.stringify(data.tcLibrary));
+                if (Array.isArray(data.emailTemplates)) localStorage.setItem('pk_email_tpl', JSON.stringify(data.emailTemplates));
+                if (Array.isArray(data.proposalTemplates)) localStorage.setItem('pk_templates', JSON.stringify(data.proposalTemplates));
+                toast('Imported: ' + (counts.join(', ') || 'data'));
+                if (typeof renderSettings === 'function') renderSettings();
+            } catch (e) {
+                toast('Invalid file — could not parse JSON', 'error');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
 }
 
 function applyWhiteLabel() {

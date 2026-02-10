@@ -3,604 +3,524 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ProposalKit — Professional Proposals & Invoices in Minutes</title>
-<meta name="description" content="Create stunning proposals, invoices, and contracts with 13 PDF templates. Track payments, manage clients, and close deals faster. Free forever for individuals.">
+<title>ProposalKit — Professional Proposals in Minutes</title>
+<meta name="description" content="Create stunning proposals, invoices, and contracts with 13 PDF templates. Track payments, manage clients, and close deals faster. Free forever.">
 <meta name="keywords" content="proposal software, invoice generator, freelancer tools, quotation maker, PDF proposals, payment tracking">
 <meta property="og:title" content="ProposalKit — Professional Proposals in Minutes">
 <meta property="og:description" content="Create stunning proposals, invoices, and contracts. 13 PDF templates. Payment tracking. Client management. Free forever.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
 <style>
-/* ═══ Reset & Base ═══ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:#18181b;line-height:1.6;background:#fff;overflow-x:hidden}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Inter',system-ui,sans-serif;color:#000;line-height:1.5;background:#fff;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+::selection{background:rgba(0,151,254,.12)}
 a{color:inherit;text-decoration:none}
+a:focus-visible{outline:2px solid #0097fe;outline-offset:2px;border-radius:4px}
 img{max-width:100%;display:block}
 button{font:inherit;cursor:pointer;border:none;background:none}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+.wrap-sm{max-width:1000px;margin:0 auto;padding:0 24px}
 
-/* ═══ Utility ═══ */
-.container{max-width:1140px;margin:0 auto;padding:0 24px}
-.mono{font-family:'JetBrains Mono',monospace}
-.text-center{text-align:center}
-.muted{color:#71717a}
-.accent{color:#007AFF}
+/* ── Nav (floating frosted glass pill) ── */
+.nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;width:auto;max-width:780px;animation:navIn 500ms ease-out both}
+.nav-pill{display:flex;align-items:center;gap:4px;padding:6px 6px 6px 18px;background:rgba(255,255,255,.48);backdrop-filter:blur(12px) saturate(1.6);-webkit-backdrop-filter:blur(12px) saturate(1.6);border-radius:40px;border:1px solid rgba(255,255,255,.6);box-shadow:0 0 0 1px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.06),0 4px 8px rgba(0,0,0,.04),0 12px 24px rgba(0,0,0,.03);transition:background .3s,border-color .3s,box-shadow .3s}
+.nav.scrolled .nav-pill{background:rgba(255,255,255,.82);border-color:rgba(0,0,0,.06);box-shadow:0 0 0 1px rgba(0,0,0,.04),0 2px 4px rgba(0,0,0,.06),0 8px 16px rgba(0,0,0,.06)}
+@keyframes navIn{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.nav-logo{display:flex;align-items:center;gap:7px;font-weight:700;font-size:15px;letter-spacing:-.3px;flex-shrink:0;color:#000;transition:opacity .15s}
+.nav-logo:hover{opacity:.7}
+.nav-logo svg{width:20px;height:20px}
+.nav-links{display:flex;align-items:center;gap:2px;flex-shrink:0;margin-left:12px}
+.nav-links a{font-size:13.5px;font-weight:500;color:#525252;padding:7px 14px;border-radius:24px;transition:color .15s,background .15s}
+.nav-links a:hover{color:#000;background:rgba(0,0,0,.04)}
+.nav-links a.active{color:#000;background:rgba(0,0,0,.06)}
+.nav-actions{display:flex;align-items:center;gap:6px;margin-left:8px;flex-shrink:0}
+.nav-login{font-size:13.5px;font-weight:500;color:#525252;padding:7px 16px;border-radius:24px;transition:color .15s,background .15s;display:inline-flex;align-items:center}
+.nav-login:hover{color:#000;background:rgba(0,0,0,.04)}
+.nav-cta{padding:7px 18px;background:#000;color:#fff !important;border-radius:24px;font-size:13px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.nav-cta:hover{background:#1a1a1a;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+/* Mobile menu */
+.nav-hamburger{display:none;width:36px;height:36px;border-radius:50%;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;margin-left:4px;flex-shrink:0}
+.nav-hamburger:hover{background:rgba(0,0,0,.04)}
+.nav-hamburger svg{width:18px;height:18px;color:#525252}
+.nav-mobile{display:none;position:absolute;top:calc(100% + 8px);right:0;background:rgba(255,255,255,.92);backdrop-filter:blur(16px) saturate(1.6);-webkit-backdrop-filter:blur(16px) saturate(1.6);border-radius:16px;border:1px solid rgba(0,0,0,.06);box-shadow:0 4px 16px rgba(0,0,0,.08),0 12px 32px rgba(0,0,0,.06);padding:8px;min-width:200px;opacity:0;transform:translateY(-4px);transition:opacity .2s ease-out,transform .2s ease-out;pointer-events:none}
+.nav-mobile.open{display:flex;flex-direction:column;opacity:1;transform:translateY(0);pointer-events:auto}
+.nav-mobile a{font-size:14px;font-weight:500;color:#525252;padding:10px 16px;border-radius:10px;transition:background .15s,color .15s}
+.nav-mobile a:hover{background:rgba(0,0,0,.04);color:#000}
+.nav-mobile .nav-mobile-cta{margin-top:4px;padding:10px 16px;background:#000;color:#fff;border-radius:10px;text-align:center;font-weight:500;font-size:14px}
+.nav-mobile .nav-mobile-cta:hover{background:#1a1a1a;color:#fff}
 
-/* ═══ Nav ═══ */
-.lp-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);border-bottom:1px solid #f4f4f5;transition:box-shadow .2s}
-.lp-nav.scrolled{box-shadow:0 1px 12px rgba(0,0,0,.06)}
-.lp-nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
-.lp-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.5px}
-.lp-logo svg{width:28px;height:28px}
-.lp-nav-links{display:flex;align-items:center;gap:32px}
-.lp-nav-links a{font-size:14px;font-weight:500;color:#52525b;transition:color .15s}
-.lp-nav-links a:hover{color:#18181b}
-.lp-nav-cta{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;background:#18181b;color:#fff;border-radius:9999px;font-size:13px;font-weight:600;transition:all .15s}
-.lp-nav-cta:hover{background:#09090b;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+/* ── Hero ── */
+.hero{padding:140px 0 80px;text-align:center;position:relative;overflow:hidden}
 
-/* ═══ Hero ═══ */
-.lp-hero{padding:140px 0 80px;position:relative;overflow:hidden}
-.lp-hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,#007AFF08 0%,transparent 70%);pointer-events:none}
-.lp-hero::after{content:'';position:absolute;bottom:-100px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,#AF52DE06 0%,transparent 70%);pointer-events:none}
-.lp-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:#f4f4f5;border-radius:9999px;font-size:12px;font-weight:600;color:#52525b;margin-bottom:24px}
-.lp-badge-dot{width:6px;height:6px;border-radius:50%;background:#34C759;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.lp-h1{font-size:clamp(36px, 5.5vw, 64px);font-weight:900;letter-spacing:-2px;line-height:1.08;color:#09090b;margin-bottom:20px}
-.lp-h1 span{background:linear-gradient(135deg,#007AFF,#AF52DE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.lp-sub{font-size:clamp(16px, 2vw, 20px);color:#71717a;max-width:560px;margin:0 auto 36px;line-height:1.7}
-.lp-hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#18181b;color:#fff;border-radius:9999px;font-size:15px;font-weight:700;transition:all .15s}
-.btn-primary:hover{background:#09090b;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
-.btn-outline{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#fff;color:#18181b;border:1.5px solid #e4e4e7;border-radius:9999px;font-size:15px;font-weight:600;transition:all .15s}
-.btn-outline:hover{border-color:#d4d4d8;background:#fafafa;transform:translateY(-1px)}
-.lp-hero-note{margin-top:16px;font-size:13px;color:#a1a1aa}
-.lp-hero-visual{margin-top:60px;position:relative}
-.lp-hero-mockup{width:100%;max-width:960px;margin:0 auto;border-radius:12px;border:1px solid #e4e4e7;box-shadow:0 24px 80px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);background:#fafafa;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.lp-mockup-inner{width:100%;height:100%;display:flex}
-.lp-mockup-side{width:200px;background:#fff;border-right:1px solid #f4f4f5;padding:16px;flex-shrink:0}
-.lp-mockup-main{flex:1;padding:20px;background:#fafafa}
-.lp-mockup-bar{height:8px;border-radius:4px;margin-bottom:8px}
-.lp-mockup-bar.w1{width:60%;background:#e4e4e7}
-.lp-mockup-bar.w2{width:40%;background:#f4f4f5}
-.lp-mockup-bar.w3{width:80%;background:#e4e4e7}
-.lp-mockup-card{background:#fff;border:1px solid #f4f4f5;border-radius:8px;padding:14px;margin-top:12px}
-.lp-mockup-card .lp-mockup-bar{margin-bottom:6px}
+/* Concentric circle orb */
+.hero-orb{position:absolute;top:-220px;left:50%;transform:translateX(-50%);width:900px;height:900px;border-radius:50%;padding:55px;box-shadow:inset 0 0 10px rgba(0,0,0,.03);pointer-events:none;z-index:0}
+.hero-orb-mid{width:100%;height:100%;border-radius:50%;padding:55px;background:rgba(0,0,0,.012);box-shadow:inset 0 0 10px rgba(0,0,0,.04)}
+.hero-orb-inner{width:100%;height:100%;border-radius:50%;background:rgba(0,0,0,.012);box-shadow:inset 0 0 10px rgba(0,0,0,.05);position:relative;overflow:hidden}
+/* Colored gradient orbs inside */
+.orb{position:absolute;border-radius:50%;pointer-events:none}
+.orb-blue{width:280px;height:280px;top:20%;left:10%;background:radial-gradient(50% 50% at 50% 50%,rgba(0,151,254,.22) 0%,transparent 100%)}
+.orb-green{width:240px;height:240px;top:50%;right:15%;background:radial-gradient(50% 50% at 50% 50%,rgba(0,173,9,.2) 0%,transparent 100%)}
+.orb-pink{width:260px;height:260px;top:10%;right:25%;background:radial-gradient(50% 50% at 50% 50%,rgba(243,71,255,.18) 0%,transparent 100%)}
+.orb-orange{width:220px;height:220px;bottom:20%;left:25%;background:radial-gradient(50% 50% at 50% 50%,rgba(227,148,0,.2) 0%,transparent 100%)}
+.orb-purple{width:200px;height:200px;bottom:10%;right:10%;background:radial-gradient(50% 50% at 50% 50%,rgba(153,102,255,.2) 0%,transparent 100%)}
+.orb-red{width:180px;height:180px;top:35%;left:35%;background:radial-gradient(50% 50% at 50% 50%,rgba(255,71,71,.15) 0%,transparent 100%)}
 
-/* ═══ Logos / Social Proof ═══ */
-.lp-proof{padding:48px 0;border-bottom:1px solid #f4f4f5}
-.lp-proof-text{font-size:13px;font-weight:600;color:#a1a1aa;text-transform:uppercase;letter-spacing:1px;margin-bottom:20px}
-.lp-proof-stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
-.lp-stat{text-align:center}
-.lp-stat-num{font-size:28px;font-weight:800;color:#18181b;letter-spacing:-.5px}
-.lp-stat-label{font-size:12px;color:#71717a;margin-top:2px}
+.hero .wrap{position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:#fff;border-radius:8px;font-size:14px;font-weight:700;font-style:italic;color:#000;margin-bottom:28px;box-shadow:0 1px 3px rgba(0,0,0,.06);animation:fadeUp 500ms ease-out both}
+.hero h1{font-size:clamp(36px,6vw,64px);font-weight:500;letter-spacing:-.04em;line-height:1.2;color:#000;margin-bottom:20px;animation:fadeUp 500ms ease-out 80ms both}
+.hero h1 strong{font-weight:700}
+.hero-sub{font-size:16px;color:#525252;max-width:480px;margin:0 auto 36px;line-height:1.5;animation:fadeUp 500ms ease-out 160ms both}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp 500ms ease-out 240ms both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.btn-dark{display:inline-flex;align-items:center;gap:6px;padding:10px 24px;background:#000;color:#fff;border-radius:8px;font-size:14px;font-weight:500;transition:all .15s}
+.btn-dark:hover{background:#1a1a1a;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.btn-outline{display:inline-flex;align-items:center;gap:6px;padding:10px 24px;background:#fff;color:#000;border:1px solid #d4d4d4;border-radius:8px;font-size:14px;font-weight:500;backdrop-filter:blur(6px);transition:all .15s}
+.btn-outline:hover{border-color:#a3a3a3;background:#fafafa}
+.hero-note{margin-top:16px;font-size:13px;color:#a3a3a3;animation:fadeUp 500ms ease-out 320ms both}
 
-/* ═══ Features ═══ */
-.lp-features{padding:100px 0}
-.lp-section-label{display:inline-block;padding:4px 12px;background:#007AFF0D;color:#007AFF;border-radius:9999px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px}
-.lp-h2{font-size:clamp(28px, 4vw, 42px);font-weight:800;letter-spacing:-1px;line-height:1.15;color:#09090b;margin-bottom:16px}
-.lp-section-sub{font-size:16px;color:#71717a;max-width:520px;margin:0 auto 48px}
-.lp-feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.lp-feat-card{padding:28px;border-radius:12px;border:1px solid #f4f4f5;background:#fff;transition:all .2s ease-out}
-.lp-feat-card:hover{border-color:#e4e4e7;transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.06)}
-.lp-feat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:18px}
-.lp-feat-icon.blue{background:#007AFF12;color:#007AFF}
-.lp-feat-icon.green{background:#34C75912;color:#34C759}
-.lp-feat-icon.purple{background:#AF52DE12;color:#AF52DE}
-.lp-feat-icon.orange{background:#FF950012;color:#FF9500}
-.lp-feat-icon.red{background:#FF3B3012;color:#FF3B30}
-.lp-feat-icon.teal{background:#5AC8FA12;color:#5AC8FA}
-.lp-feat-t{font-size:15px;font-weight:700;color:#18181b;margin-bottom:6px}
-.lp-feat-d{font-size:13px;color:#71717a;line-height:1.6}
+/* ── Rainbow bar ── */
+.rainbow-bar{height:2px;margin-top:48px;background:linear-gradient(97deg,#FF4747 0%,#E39400 18%,#00AD09 38%,#0097FE 58%,#96F 77%,#F347FF 100%);border-radius:2px;animation:fadeUp 600ms ease-out 400ms both;opacity:.5}
 
-/* ═══ Templates Showcase ═══ */
-.lp-templates{padding:100px 0;background:#fafafa;border-top:1px solid #f4f4f5;border-bottom:1px solid #f4f4f5}
-.lp-tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:48px}
-.lp-tpl-card{background:#fff;border:1px solid #e4e4e7;border-radius:10px;padding:20px 16px;text-align:center;transition:all .2s ease-out}
-.lp-tpl-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.06);border-color:#d4d4d8}
-.lp-tpl-preview{width:100%;aspect-ratio:3/4;background:#f9fafb;border-radius:6px;border:1px solid #f4f4f5;margin-bottom:12px;display:flex;flex-direction:column;padding:12px;gap:4px}
-.lp-tpl-line{height:3px;border-radius:2px;background:#e4e4e7}
-.lp-tpl-line.head{width:50%;height:5px;background:#18181b;margin-bottom:4px}
-.lp-tpl-line.sub{width:35%;background:#d4d4d8}
-.lp-tpl-line.w60{width:60%}
-.lp-tpl-line.w80{width:80%}
-.lp-tpl-line.w40{width:40%}
-.lp-tpl-line.accent-line{background:#007AFF40}
-.lp-tpl-block{display:flex;gap:4px;margin-top:4px}
-.lp-tpl-block div{flex:1;height:20px;border-radius:3px;background:#f4f4f5}
-.lp-tpl-name{font-size:13px;font-weight:600;color:#18181b}
-.lp-tpl-tag{font-size:11px;color:#a1a1aa;margin-top:2px}
+/* ── Trusted By ── */
+.trusted{padding:48px 0}
+.trusted-row{display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap}
+.trusted-item{display:flex;flex-direction:column;align-items:center;text-align:center}
+.trusted-val{font-size:28px;font-weight:700;color:#000;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.trusted-label{font-size:12px;color:#737373;font-weight:500;margin-top:2px}
 
-/* ═══ How it Works ═══ */
-.lp-how{padding:100px 0}
-.lp-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px}
-.lp-step{text-align:center;position:relative}
-.lp-step-num{width:48px;height:48px;border-radius:50%;background:#18181b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;margin:0 auto 16px}
-.lp-step-t{font-size:16px;font-weight:700;margin-bottom:8px}
-.lp-step-d{font-size:13px;color:#71717a;max-width:280px;margin:0 auto;line-height:1.6}
+/* ── Section common ── */
+.section{padding:96px 0}
+.section-head{max-width:520px;margin:0 auto 48px;text-align:center}
+.section-head .label{font-size:14px;font-weight:600;color:#0097fe;margin-bottom:10px}
+.section-head h2{font-size:clamp(26px,3.5vw,36px);font-weight:500;letter-spacing:-.03em;line-height:1.2;color:#000;margin-bottom:12px}
+.section-head p{font-size:16px;color:#525252;line-height:1.5}
 
-/* ═══ Pricing ═══ */
-.lp-pricing{padding:100px 0;background:#fafafa;border-top:1px solid #f4f4f5;border-bottom:1px solid #f4f4f5}
-.lp-currency-toggle{display:inline-flex;background:#e4e4e7;border-radius:9999px;padding:3px;margin-bottom:36px}
-.lp-cur-btn{padding:6px 18px;border-radius:9999px;font-size:13px;font-weight:600;color:#71717a;transition:all .15s;cursor:pointer}
-.lp-cur-btn.active{background:#fff;color:#18181b;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.lp-price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:960px;margin:0 auto}
-.lp-price-card{background:#fff;border:1px solid #e4e4e7;border-radius:16px;padding:32px 28px;text-align:left;position:relative;transition:all .2s ease-out}
-.lp-price-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.06)}
-.lp-price-card.featured{border-color:#18181b;border-width:2px}
-.lp-price-pop{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#18181b;color:#fff;padding:4px 14px;border-radius:9999px;font-size:11px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
-.lp-price-name{font-size:18px;font-weight:700;margin-bottom:4px}
-.lp-price-desc{font-size:13px;color:#71717a;margin-bottom:20px;line-height:1.5}
-.lp-price-amount{font-size:40px;font-weight:900;letter-spacing:-2px;color:#09090b}
-.lp-price-amount .lp-price-period{font-size:14px;font-weight:500;color:#a1a1aa;letter-spacing:0}
-.lp-price-amount .lp-price-currency{font-size:18px;font-weight:700;vertical-align:super;margin-right:2px}
-.lp-price-free{font-size:40px;font-weight:900;letter-spacing:-1px;color:#34C759}
-.lp-price-features{list-style:none;margin:24px 0;display:flex;flex-direction:column;gap:10px}
-.lp-price-features li{font-size:13px;color:#52525b;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
-.lp-price-features li::before{content:'';display:inline-block;width:16px;height:16px;min-width:16px;border-radius:50%;background:#34C75914;background-image:url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 5L4 7L8 3' stroke='%2334C759' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;margin-top:2px}
-.btn-price{display:block;width:100%;padding:12px;border-radius:9999px;font-size:14px;font-weight:700;text-align:center;transition:all .15s;margin-top:auto}
-.btn-price.dark{background:#18181b;color:#fff}
-.btn-price.dark:hover{background:#09090b;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
-.btn-price.light{background:#f4f4f5;color:#18181b}
-.btn-price.light:hover{background:#e4e4e7}
+/* ── Reveal ── */
+.reveal{opacity:0;transform:translateY(10px);transition:opacity 400ms ease-out,transform 400ms ease-out}
+.reveal.visible{opacity:1;transform:translateY(0)}
 
-/* ═══ Highlights ═══ */
-.lp-highlights{padding:100px 0}
-.lp-hl-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:48px}
-.lp-hl-grid+.lp-hl-grid{margin-top:80px}
-.lp-hl-visual{background:#f9fafb;border:1px solid #f4f4f5;border-radius:12px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
-.lp-hl-chart{width:100%;display:flex;flex-direction:column;gap:10px}
-.lp-hl-bar-row{display:flex;align-items:center;gap:10px}
-.lp-hl-bar-label{font-size:11px;color:#71717a;width:50px;text-align:right;flex-shrink:0}
-.lp-hl-bar{height:28px;border-radius:6px;transition:width .6s ease-out}
-.lp-hl-text h3{font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:12px}
-.lp-hl-text p{font-size:14px;color:#71717a;line-height:1.7;margin-bottom:16px}
-.lp-hl-list{list-style:none;display:flex;flex-direction:column;gap:8px}
-.lp-hl-list li{font-size:13px;color:#52525b;display:flex;align-items:center;gap:8px}
-.lp-hl-list li::before{content:'';width:6px;height:6px;border-radius:50%;background:#007AFF;flex-shrink:0}
+/* ── Features (horizontal auto-scroll) ── */
+.feat-scroll-wrap{position:relative;overflow:hidden;margin:0 -24px;padding:0 0 20px}
+.feat-scroll-wrap::before,.feat-scroll-wrap::after{content:'';position:absolute;top:0;bottom:20px;width:80px;z-index:2;pointer-events:none}
+.feat-scroll-wrap::before{left:0;background:linear-gradient(90deg,#fff 0%,transparent 100%)}
+.feat-scroll-wrap::after{right:0;background:linear-gradient(270deg,#fff 0%,transparent 100%)}
+.feat-track{display:flex;gap:20px;animation:featScroll 40s linear infinite;width:max-content;padding:4px 0}
+.feat-track:hover{animation-play-state:paused}
+@keyframes featScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.feat{background:#fff;border:1px solid #e5e5e5;border-radius:20px;padding:24px 22px;min-width:280px;max-width:280px;flex-shrink:0;transition:all .2s ease-out;position:relative}
+.feat:hover{box-shadow:0 4px 16px rgba(0,0,0,.05);border-color:#d4d4d4;transform:translateY(-2px)}
+.feat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;backdrop-filter:blur(6px)}
+.feat-t{font-size:16px;font-weight:500;color:#000;margin-bottom:5px;letter-spacing:-.01em}
+.feat-d{font-size:13px;color:#525252;line-height:1.5}
 
-/* ═══ FAQ ═══ */
-.lp-faq{padding:100px 0;background:#fafafa;border-top:1px solid #f4f4f5;border-bottom:1px solid #f4f4f5}
-.lp-faq-grid{max-width:720px;margin:48px auto 0;display:flex;flex-direction:column;gap:1px;background:#e4e4e7;border-radius:12px;overflow:hidden}
-.lp-faq-item{background:#fff;padding:0}
-.lp-faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;font-size:14px;font-weight:600;color:#18181b;cursor:pointer;transition:background .15s}
-.lp-faq-q:hover{background:#fafafa}
-.lp-faq-q .arrow{transition:transform .2s;color:#a1a1aa;font-size:18px}
-.lp-faq-item.open .arrow{transform:rotate(180deg)}
-.lp-faq-a{font-size:13px;color:#71717a;line-height:1.7;padding:0 24px 18px;display:none}
-.lp-faq-item.open .lp-faq-a{display:block}
+/* ── Section glow tops ── */
+.glow-blue{background:radial-gradient(50% 60% at 50% 0%,rgba(0,151,254,.07) 0%,#fff 100%)}
+.glow-blue .feat-scroll-wrap::before{background:linear-gradient(90deg,#f5f9ff 0%,transparent 100%)}
+.glow-blue .feat-scroll-wrap::after{background:linear-gradient(270deg,#f5f9ff 0%,transparent 100%)}
+.glow-pink{background:radial-gradient(50% 60% at 50% 0%,rgba(243,71,255,.06) 0%,#fff 100%)}
+.glow-green{background:radial-gradient(50% 60% at 50% 0%,rgba(0,173,9,.06) 0%,#fff 100%)}
+.glow-orange{background:radial-gradient(50% 60% at 50% 0%,rgba(227,148,0,.06) 0%,#fff 100%)}
 
-/* ═══ CTA ═══ */
-.lp-cta{padding:100px 0}
-.lp-cta-box{background:#18181b;border-radius:20px;padding:64px 48px;text-align:center;position:relative;overflow:hidden}
-.lp-cta-box::before{content:'';position:absolute;top:-100px;right:-100px;width:300px;height:300px;background:radial-gradient(circle,#007AFF15,transparent);pointer-events:none}
-.lp-cta-box h2{font-size:clamp(28px, 4vw, 40px);font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:12px}
-.lp-cta-box p{font-size:16px;color:#a1a1aa;margin-bottom:32px;max-width:480px;margin-left:auto;margin-right:auto}
-.btn-white{display:inline-flex;align-items:center;gap:8px;padding:14px 36px;background:#fff;color:#18181b;border-radius:9999px;font-size:15px;font-weight:700;transition:all .15s}
-.btn-white:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,255,255,.15)}
+/* ── Templates (grid showcase) ── */
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px}
+.tpl-card{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:14px 12px 12px;text-align:center;transition:all .2s ease-out;cursor:default}
+.tpl-card:hover{border-color:#d4d4d4;box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
+.tpl-preview{width:100%;aspect-ratio:3/4;border-radius:10px;margin-bottom:10px;position:relative;overflow:hidden;background:#f8f8f8;border:1px solid #ececec}
+.tpl-preview-inner{position:absolute;inset:8px;display:flex;flex-direction:column;gap:3px}
+.tpl-bar{height:3px;border-radius:1px;background:#e0e0e0}
+.tpl-bar.brand{height:4px;border-radius:2px}
+.tpl-bar.w30{width:30%}.tpl-bar.w50{width:50%}.tpl-bar.w70{width:70%}.tpl-bar.w80{width:80%}.tpl-bar.w90{width:90%}.tpl-bar.w100{width:100%}
+.tpl-block{flex:1;border-radius:2px;background:#f0f0f0;margin-top:2px}
+.tpl-name{font-size:12px;font-weight:500;color:#525252}
 
-/* ═══ Footer ═══ */
-.lp-footer{padding:48px 0;border-top:1px solid #f4f4f5}
-.lp-footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-.lp-footer-left{font-size:13px;color:#a1a1aa}
-.lp-footer-links{display:flex;gap:24px}
-.lp-footer-links a{font-size:13px;color:#71717a;transition:color .15s}
-.lp-footer-links a:hover{color:#18181b}
+/* ── Steps ── */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;position:relative}
+.steps::before{content:'';position:absolute;top:28px;left:15%;right:15%;height:1px;background:#e5e5e5}
+.step{text-align:center;position:relative;z-index:1}
+.step-num{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#0097fe;background:#fff;margin:0 auto 18px;border:1px solid #e5e5e5;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.step-t{font-size:16px;font-weight:600;color:#000;margin-bottom:6px}
+.step-d{font-size:14px;color:#525252;line-height:1.5;max-width:280px;margin:0 auto}
 
-/* ═══ Responsive ═══ */
+/* ── Highlights ── */
+.hl-row{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;text-align:left}
+.hl-row+.hl-row{margin-top:80px}
+.hl-visual{border:1px solid #e5e5e5;border-radius:20px;padding:32px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.hl-text h3{font-size:26px;font-weight:500;letter-spacing:-.03em;margin-bottom:10px;color:#000}
+.hl-text p{font-size:15px;color:#525252;line-height:1.5;margin-bottom:18px}
+.hl-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.hl-list li{font-size:14px;color:#525252;display:flex;align-items:center;gap:10px;line-height:1.4}
+.hl-list li .hl-check{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── Pricing ── */
+.cur-toggle{display:inline-flex;background:#f5f5f5;border-radius:8px;padding:3px;margin-bottom:40px;border:1px solid #e5e5e5}
+.cur-btn{padding:6px 18px;border-radius:6px;font-size:14px;font-weight:500;color:#a3a3a3;transition:all .15s;cursor:pointer}
+.cur-btn.active{background:#fff;color:#000;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:940px;margin:0 auto;text-align:left}
+.price-card{background:#fff;border:1px solid #e5e5e5;border-radius:20px;padding:32px 28px;display:flex;flex-direction:column;transition:all .2s ease-out}
+.price-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.05);border-color:#d4d4d4}
+.price-card.featured{border-color:rgba(0,151,254,.4);background:linear-gradient(180deg,rgba(0,151,254,.04) 0%,#fff 50%)}
+.price-card.featured:hover{box-shadow:0 8px 24px rgba(0,151,254,.1);border-color:rgba(0,151,254,.5)}
+.price-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#0097fe;background:rgba(0,151,254,.1);padding:5px 12px;border-radius:8px;margin-bottom:14px;width:fit-content}
+.price-name{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.01em}
+.price-desc{font-size:14px;color:#737373;margin-bottom:20px;line-height:1.5}
+.price-amt{font-size:40px;font-weight:800;letter-spacing:-.04em;color:#000;margin-bottom:4px}
+.price-amt .period{font-size:14px;font-weight:400;color:#a3a3a3;letter-spacing:0}
+.price-amt .cur{font-size:16px;font-weight:700;vertical-align:super;margin-right:1px}
+.price-free{font-size:40px;font-weight:800;letter-spacing:-.03em;color:#000;margin-bottom:4px}
+.price-feats{list-style:none;margin:20px 0;display:flex;flex-direction:column;gap:10px;flex:1}
+.price-feats li{font-size:14px;color:#525252;display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.price-feats li::before{content:'';display:inline-block;width:16px;height:16px;min-width:16px;border-radius:50%;background-image:url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 5L4 7L8 3' stroke='%230097fe' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-color:rgba(0,151,254,.08);margin-top:2px}
+.price-btn{display:block;width:100%;padding:11px;border-radius:8px;font-size:14px;font-weight:500;text-align:center;transition:all .15s;margin-top:auto}
+.price-btn.dark{background:#000;color:#fff}
+.price-btn.dark:hover{background:#1a1a1a;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.price-btn.blue{background:#0097fe;color:#fff}
+.price-btn.blue:hover{background:#0088e8;box-shadow:0 4px 16px rgba(0,151,254,.3)}
+.price-btn.light{background:#f5f5f5;color:#000;border:1px solid #e5e5e5}
+.price-btn.light:hover{background:#ebebeb;border-color:#d4d4d4}
+
+/* ── FAQ ── */
+.faq-list{max-width:640px;margin:0 auto;text-align:left}
+.faq-item{border-bottom:1px solid #e5e5e5}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:20px 0;font-size:15px;font-weight:500;color:#000;cursor:pointer;transition:color .15s}
+.faq-q:hover{color:#0097fe}
+.faq-q .arr{width:20px;height:20px;flex-shrink:0;margin-left:12px;transition:transform .25s ease-out;color:#a3a3a3}
+.faq-item.open .arr{transform:rotate(180deg);color:#0097fe}
+.faq-a{font-size:14px;color:#525252;line-height:1.6;max-height:0;overflow:hidden;transition:max-height .3s ease-out,padding .3s ease-out;padding:0}
+.faq-item.open .faq-a{max-height:200px;padding:0 0 20px}
+
+/* ── CTA ── */
+.cta-section{padding:96px 0 64px}
+.cta-box{position:relative;overflow:hidden;border-radius:24px;padding:72px 48px;text-align:center;background:linear-gradient(180deg,#0a0a0a 0%,#1a1a2e 100%);border:1px solid rgba(255,255,255,.08);box-shadow:0 0 0 1px rgba(0,0,0,.1),0 8px 40px rgba(0,0,0,.15)}
+.cta-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(97deg,#FF4747 0%,#E39400 18%,#00AD09 38%,#0097FE 58%,#96F 77%,#F347FF 100%)}
+.cta-box::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(0,151,254,.1) 0%,transparent 70%);pointer-events:none}
+.cta-box h2{font-size:clamp(26px,3.5vw,36px);font-weight:600;color:#fff;letter-spacing:-.03em;margin-bottom:12px;position:relative;z-index:1}
+.cta-box p{font-size:16px;color:rgba(255,255,255,.6);margin-bottom:32px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.5;position:relative;z-index:1}
+.cta-box .btn-dark{background:#fff;color:#000;position:relative;z-index:1}
+.cta-box .btn-dark:hover{background:#f5f5f5;box-shadow:0 4px 16px rgba(255,255,255,.2)}
+.cta-box .btn-outline{border-color:rgba(255,255,255,.2);color:#fff;background:transparent;position:relative;z-index:1}
+.cta-box .btn-outline:hover{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.06)}
+
+/* ── Footer ── */
+.footer{padding:32px 0;border-top:1px solid #e5e5e5}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-left{font-size:12px;color:#737373}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:12px;color:#737373;transition:color .15s}
+.footer-links a:hover{color:#000}
+
+/* ── Responsive ── */
 @media(max-width:900px){
-    .lp-feat-grid{grid-template-columns:repeat(2,1fr)}
-    .lp-tpl-grid{grid-template-columns:repeat(2,1fr)}
-    .lp-price-grid{grid-template-columns:1fr;max-width:400px}
-    .lp-hl-grid{grid-template-columns:1fr;gap:32px}
-    .lp-hl-grid.reverse{direction:ltr}
-    .lp-steps{grid-template-columns:1fr;gap:40px}
-    .lp-nav-links a:not(.lp-nav-cta){display:none}
-    .lp-mockup-side{width:140px}
+    .price-grid{grid-template-columns:1fr;max-width:380px}
+    .hl-row{grid-template-columns:1fr;gap:32px}
+    .hl-row.reverse{direction:ltr}
+    .steps{grid-template-columns:1fr;gap:28px}
+    .steps::before{display:none}
+    .nav-links,.nav-actions .nav-login{display:none}
+    .nav-hamburger{display:flex}
+    .nav-pill{padding:6px 6px 6px 16px}
+    .hero-orb{width:600px;height:600px;top:-120px}
+    .feat{min-width:260px;max-width:260px}
+    .tpl-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
 }
 @media(max-width:600px){
-    .lp-feat-grid{grid-template-columns:1fr}
-    .lp-tpl-grid{grid-template-columns:repeat(2,1fr)}
-    .lp-proof-stats{gap:28px}
-    .lp-hero{padding:120px 0 60px}
-    .lp-cta-box{padding:48px 24px}
-    .container{padding:0 16px}
+    .trusted-row{gap:28px}
+    .hero{padding:120px 0 64px}
+    .cta-box{padding:48px 28px}
+    .wrap{padding:0 16px}
+    .section{padding:72px 0}
+    .hero-orb{width:420px;height:420px;top:-80px}
+    .nav{max-width:calc(100vw - 32px)}
+    .feat{min-width:240px;max-width:240px;padding:20px 18px}
+    .tpl-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
+    .tpl-card{padding:10px 8px 8px}
+    .tpl-name{font-size:11px}
 }
+@media print{.nav,.cta-section{display:none}}
 </style>
 </head>
 <body>
 
-<!-- ═══ Navigation ═══ -->
-<nav class="lp-nav" id="lpNav">
-<div class="container lp-nav-inner">
-    <a href="#" class="lp-logo">
-        <svg viewBox="0 0 28 28" fill="none"><rect x="2" y="4" width="18" height="22" rx="3" stroke="#18181b" stroke-width="2.2"/><path d="M7 10h8M7 14h5M7 18h6" stroke="#18181b" stroke-width="1.8" stroke-linecap="round"/><rect x="14" y="2" width="12" height="10" rx="3" fill="#007AFF" stroke="#007AFF" stroke-width="1"/><path d="M17.5 5.5l2 2 3-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<!-- Nav (floating frosted glass pill) -->
+<nav class="nav" id="mainNav">
+<div class="nav-pill">
+    <a href="#" class="nav-logo">
+        <svg viewBox="0 0 22 22" fill="none"><rect x="1" y="3" width="14" height="17" rx="2.5" stroke="#000" stroke-width="1.8"/><path d="M5 8h6M5 11h4M5 14h5" stroke="#000" stroke-width="1.4" stroke-linecap="round"/><rect x="11" y="1" width="9" height="8" rx="2.5" fill="#000"/><path d="M13.5 4l1.5 1.5L18 3" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         ProposalKit
     </a>
-    <div class="lp-nav-links">
+    <div class="nav-links">
         <a href="#features">Features</a>
         <a href="#templates">Templates</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
-        <a href="index.html" class="lp-nav-cta">Open App &rarr;</a>
+    </div>
+    <div class="nav-actions">
+        <a href="index.html" class="nav-login">Log in</a>
+        <a href="index.html" class="nav-cta">Get Started <span>&rarr;</span></a>
+    </div>
+    <div class="nav-hamburger" onclick="toggleMobileMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+        <a href="#features" onclick="closeMobileMenu()">Features</a>
+        <a href="#templates" onclick="closeMobileMenu()">Templates</a>
+        <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+        <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
+        <a href="index.html" class="nav-mobile-cta">Get Started &rarr;</a>
     </div>
 </div>
 </nav>
 
-<!-- ═══ Hero ═══ -->
-<section class="lp-hero" id="hero">
-<div class="container text-center">
-    <div class="lp-badge"><span class="lp-badge-dot"></span> Free &amp; open-source</div>
-    <h1 class="lp-h1">Proposals that<br><span>win clients</span></h1>
-    <p class="lp-sub">Create stunning proposals, invoices, and contracts in minutes. 13 professional PDF templates. Payment tracking. Client management. All in your browser.</p>
-    <div class="lp-hero-btns">
-        <a href="index.html" class="btn-primary">Start Free &rarr;</a>
-        <a href="#features" class="btn-outline">See Features</a>
+<!-- Hero -->
+<section class="hero">
+<!-- Concentric orb with colored gradients -->
+<div class="hero-orb">
+    <div class="hero-orb-mid">
+        <div class="hero-orb-inner">
+            <div class="orb orb-blue"></div>
+            <div class="orb orb-green"></div>
+            <div class="orb orb-pink"></div>
+            <div class="orb orb-orange"></div>
+            <div class="orb orb-purple"></div>
+            <div class="orb orb-red"></div>
+        </div>
     </div>
-    <p class="lp-hero-note">No signup required. Works offline. Your data stays on your device.</p>
+</div>
+<div class="wrap">
+    <div class="hero-badge">ProposalKit v2 is live</div>
+    <h1>Create <strong>proposals</strong><br>that win clients</h1>
+    <p class="hero-sub">Beautiful proposals, invoices, and contracts. 13 templates, payment tracking, and client management &mdash; all in your browser.</p>
+    <div class="hero-actions">
+        <a href="index.html" class="btn-dark">Try it for free &rarr;</a>
+        <a href="#pricing" class="btn-outline">Check plans</a>
+    </div>
+    <p class="hero-note">No account needed &bull; Works offline &bull; Data stays on your device</p>
+    <div class="rainbow-bar"></div>
+</div>
+</section>
 
-    <div class="lp-hero-visual">
-        <div class="lp-hero-mockup">
-            <div class="lp-mockup-side">
-                <div class="lp-mockup-bar w2" style="background:#007AFF30;height:10px;border-radius:6px;margin-bottom:14px"></div>
-                <div class="lp-mockup-bar w1" style="margin-bottom:12px"></div>
-                <div class="lp-mockup-bar w3" style="margin-bottom:6px"></div>
-                <div class="lp-mockup-bar w2" style="margin-bottom:6px"></div>
-                <div class="lp-mockup-bar w1" style="margin-bottom:20px"></div>
-                <div class="lp-mockup-bar" style="width:90%;background:#f4f4f5;margin-bottom:6px"></div>
-                <div class="lp-mockup-bar" style="width:70%;background:#f4f4f5;margin-bottom:6px"></div>
-                <div class="lp-mockup-bar" style="width:85%;background:#f4f4f5"></div>
-            </div>
-            <div class="lp-mockup-main">
-                <div style="display:flex;gap:8px;margin-bottom:16px">
-                    <div style="padding:6px 14px;background:#18181b;color:#fff;border-radius:9999px;font-size:10px;font-weight:600">Details</div>
-                    <div style="padding:6px 14px;background:#fff;border:1px solid #e4e4e7;border-radius:9999px;font-size:10px;color:#71717a">Sections</div>
-                    <div style="padding:6px 14px;background:#fff;border:1px solid #e4e4e7;border-radius:9999px;font-size:10px;color:#71717a">Pricing</div>
-                </div>
-                <div class="lp-mockup-card">
-                    <div class="lp-mockup-bar" style="width:30%;height:6px;background:#18181b;margin-bottom:10px"></div>
-                    <div class="lp-mockup-bar w3" style="margin-bottom:4px"></div>
-                    <div class="lp-mockup-bar w1" style="margin-bottom:4px"></div>
-                    <div class="lp-mockup-bar" style="width:50%"></div>
-                </div>
-                <div class="lp-mockup-card">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                        <div class="lp-mockup-bar" style="width:25%;height:6px;background:#18181b;margin:0"></div>
-                        <div style="padding:3px 10px;background:#34C75914;border-radius:9999px;font-size:9px;color:#34C759;font-weight:600">Accepted</div>
-                    </div>
-                    <div style="display:flex;gap:8px">
-                        <div style="flex:3;height:24px;background:#f4f4f5;border-radius:4px"></div>
-                        <div style="flex:1;height:24px;background:#f4f4f5;border-radius:4px"></div>
-                        <div style="flex:1;height:24px;background:#007AFF15;border-radius:4px"></div>
-                    </div>
-                </div>
-            </div>
+<!-- Trusted By / Stats -->
+<section class="trusted reveal">
+<div class="wrap-sm">
+    <div class="trusted-row">
+        <div class="trusted-item"><div class="trusted-val">13</div><div class="trusted-label">PDF Templates</div></div>
+        <div class="trusted-item"><div class="trusted-val">13+</div><div class="trusted-label">Currencies</div></div>
+        <div class="trusted-item"><div class="trusted-val">100%</div><div class="trusted-label">Offline-Ready</div></div>
+        <div class="trusted-item"><div class="trusted-val">0</div><div class="trusted-label">Server Dependencies</div></div>
+    </div>
+</div>
+</section>
+
+<!-- Features -->
+<section class="section glow-blue" id="features">
+<div class="wrap">
+    <div class="section-head reveal">
+        <div class="label">Features</div>
+        <h2>Everything you need to close deals</h2>
+        <p>From first draft to signed contract. All the tools, none of the bloat.</p>
+    </div>
+
+    <div class="feat-scroll-wrap reveal">
+        <div class="feat-track" id="featTrack">
+            <div class="feat" style="--fc:rgba(0,151,254,.15);--fi:#0097fe"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div class="feat-t">Rich Text Editor</div><div class="feat-d">Headings, lists, tables, quotes, code blocks, and checklists. Drag to reorder.</div></div>
+            <div class="feat" style="--fc:rgba(0,173,9,.15);--fi:#00AD09"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="feat-t">Smart Pricing</div><div class="feat-d">Line items, packages, add-ons, payment schedules, discounts, and tax.</div></div>
+            <div class="feat" style="--fc:rgba(243,71,255,.15);--fi:#F347FF"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="feat-t">13 PDF Templates</div><div class="feat-d">Modern, Minimal, Executive, Nord, Bold, and more. Print-ready.</div></div>
+            <div class="feat" style="--fc:rgba(227,148,0,.15);--fi:#E39400"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="feat-t">Analytics</div><div class="feat-d">Win rates, pipeline value, revenue forecast, and breakdowns by client.</div></div>
+            <div class="feat" style="--fc:rgba(255,71,71,.15);--fi:#FF4747"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="feat-t">Payment Tracking</div><div class="feat-d">Record partial payments. Track dues. Generate receipts automatically.</div></div>
+            <div class="feat" style="--fc:rgba(153,102,255,.15);--fi:#9966FF"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><div class="feat-t">Client Portal</div><div class="feat-d">Share secure links. Clients accept with digital signature.</div></div>
+            <div class="feat" style="--fc:rgba(0,151,254,.15);--fi:#0097fe"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="feat-t">AI Writing Assistant</div><div class="feat-d">Powered by Claude. Improve, expand, shorten, or fix grammar.</div></div>
+            <div class="feat" style="--fc:rgba(0,173,9,.15);--fi:#00AD09"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="feat-t">Team &amp; Roles</div><div class="feat-d">Admin, Editor, Viewer roles. Version history with diff.</div></div>
+            <div class="feat" style="--fc:rgba(243,71,255,.15);--fi:#F347FF"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div><div class="feat-t">SOW &amp; Contracts</div><div class="feat-d">Generate SOW, Service Agreements, and Receipts from proposals.</div></div>
+            <div class="feat" style="--fc:rgba(227,148,0,.15);--fi:#E39400"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><div class="feat-t">Works Offline</div><div class="feat-d">Full PWA support. Create proposals anywhere, anytime.</div></div>
+            <div class="feat" style="--fc:rgba(255,71,71,.15);--fi:#FF4747"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="feat-t">White-Label Mode</div><div class="feat-d">Your logo, brand color, company name. Fully branded.</div></div>
+            <div class="feat" style="--fc:rgba(153,102,255,.15);--fi:#9966FF"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div><div class="feat-t">Keyboard-First</div><div class="feat-d">Command palette, shortcuts, autosave, completeness score.</div></div>
+            <!-- Duplicate set for seamless loop -->
+            <div class="feat" style="--fc:rgba(0,151,254,.15);--fi:#0097fe" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div class="feat-t">Rich Text Editor</div><div class="feat-d">Headings, lists, tables, quotes, code blocks, and checklists. Drag to reorder.</div></div>
+            <div class="feat" style="--fc:rgba(0,173,9,.15);--fi:#00AD09" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="feat-t">Smart Pricing</div><div class="feat-d">Line items, packages, add-ons, payment schedules, discounts, and tax.</div></div>
+            <div class="feat" style="--fc:rgba(243,71,255,.15);--fi:#F347FF" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="feat-t">13 PDF Templates</div><div class="feat-d">Modern, Minimal, Executive, Nord, Bold, and more. Print-ready.</div></div>
+            <div class="feat" style="--fc:rgba(227,148,0,.15);--fi:#E39400" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="feat-t">Analytics</div><div class="feat-d">Win rates, pipeline value, revenue forecast, and breakdowns by client.</div></div>
+            <div class="feat" style="--fc:rgba(255,71,71,.15);--fi:#FF4747" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="feat-t">Payment Tracking</div><div class="feat-d">Record partial payments. Track dues. Generate receipts automatically.</div></div>
+            <div class="feat" style="--fc:rgba(153,102,255,.15);--fi:#9966FF" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><div class="feat-t">Client Portal</div><div class="feat-d">Share secure links. Clients accept with digital signature.</div></div>
+            <div class="feat" style="--fc:rgba(0,151,254,.15);--fi:#0097fe" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="feat-t">AI Writing Assistant</div><div class="feat-d">Powered by Claude. Improve, expand, shorten, or fix grammar.</div></div>
+            <div class="feat" style="--fc:rgba(0,173,9,.15);--fi:#00AD09" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="feat-t">Team &amp; Roles</div><div class="feat-d">Admin, Editor, Viewer roles. Version history with diff.</div></div>
+            <div class="feat" style="--fc:rgba(243,71,255,.15);--fi:#F347FF" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div><div class="feat-t">SOW &amp; Contracts</div><div class="feat-d">Generate SOW, Service Agreements, and Receipts from proposals.</div></div>
+            <div class="feat" style="--fc:rgba(227,148,0,.15);--fi:#E39400" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><div class="feat-t">Works Offline</div><div class="feat-d">Full PWA support. Create proposals anywhere, anytime.</div></div>
+            <div class="feat" style="--fc:rgba(255,71,71,.15);--fi:#FF4747" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="feat-t">White-Label Mode</div><div class="feat-d">Your logo, brand color, company name. Fully branded.</div></div>
+            <div class="feat" style="--fc:rgba(153,102,255,.15);--fi:#9966FF" aria-hidden="true"><div class="feat-icon" style="background:var(--fc)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--fi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div><div class="feat-t">Keyboard-First</div><div class="feat-d">Command palette, shortcuts, autosave, completeness score.</div></div>
         </div>
     </div>
 </div>
 </section>
 
-<!-- ═══ Social Proof ═══ -->
-<section class="lp-proof">
-<div class="container text-center">
-    <p class="lp-proof-text">Built for modern businesses</p>
-    <div class="lp-proof-stats">
-        <div class="lp-stat"><div class="lp-stat-num">13</div><div class="lp-stat-label">PDF Templates</div></div>
-        <div class="lp-stat"><div class="lp-stat-num">13+</div><div class="lp-stat-label">Currencies</div></div>
-        <div class="lp-stat"><div class="lp-stat-num">100%</div><div class="lp-stat-label">Offline Ready</div></div>
-        <div class="lp-stat"><div class="lp-stat-num">0</div><div class="lp-stat-label">Dependencies</div></div>
+<!-- Templates -->
+<section class="section glow-pink" id="templates">
+<div class="wrap">
+    <div class="section-head reveal">
+        <div class="label">Templates</div>
+        <h2>13 professional templates</h2>
+        <p>Each adapts to your brand color, logo, and content. Switch anytime.</p>
+    </div>
+    <div class="tpl-grid reveal">
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar brand w50" style="background:#0a0a0a"></div><div class="tpl-bar w70"></div><div class="tpl-bar w90"></div><div class="tpl-block"></div><div class="tpl-bar w30"></div></div></div><div class="tpl-name">Modern</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar brand w100" style="background:#18181b"></div><div class="tpl-bar w80"></div><div class="tpl-bar w60"></div><div class="tpl-block"></div><div class="tpl-bar w50"></div></div></div><div class="tpl-name">Classic</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar w30" style="background:#a1a1aa"></div><div class="tpl-bar w50"></div><div class="tpl-block"></div><div class="tpl-bar w70"></div></div></div><div class="tpl-name">Minimal</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar brand w100" style="background:#52525b"></div><div class="tpl-bar w100"></div><div class="tpl-bar w100"></div><div class="tpl-bar w100"></div><div class="tpl-bar w100"></div></div></div><div class="tpl-name">Tabular</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar brand w70" style="background:#0a0a0a"></div><div class="tpl-bar w50"></div><div class="tpl-block"></div><div class="tpl-bar w30" style="background:#0a0a0a"></div></div></div><div class="tpl-name">Executive</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar brand w60" style="background:#0097fe"></div><div class="tpl-bar w80"></div><div class="tpl-block" style="background:#eef5ff"></div><div class="tpl-bar w50"></div></div></div><div class="tpl-name">Stripe</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar brand w50" style="background:#8B9DAF"></div><div class="tpl-bar w70" style="background:#d4dde8"></div><div class="tpl-block" style="background:#edf1f5"></div><div class="tpl-bar w30"></div></div></div><div class="tpl-name">Nord</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar brand w90" style="background:#2d2d2d"></div><div class="tpl-bar w60" style="background:#2d2d2d"></div><div class="tpl-block"></div><div class="tpl-bar w70"></div></div></div><div class="tpl-name">Bold</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar w30"></div><div class="tpl-bar w90"></div><div class="tpl-bar w90"></div><div class="tpl-bar w90"></div><div class="tpl-bar w30"></div></div></div><div class="tpl-name">Compact</div></div>
+        <div class="tpl-card"><div class="tpl-preview" style="display:flex"><div style="width:30%;background:#f0f0f0;border-right:1px solid #e8e8e8"></div><div class="tpl-preview-inner" style="flex:1"><div class="tpl-bar w70"></div><div class="tpl-bar w50"></div><div class="tpl-block"></div></div></div><div class="tpl-name">Sidebar</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar brand w100" style="background:#374151;height:6px"></div><div class="tpl-bar w60"></div><div class="tpl-bar w80"></div><div class="tpl-block"></div></div></div><div class="tpl-name">Formal</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar brand w100" style="background:#1E40AF;height:6px"></div><div class="tpl-bar w50"></div><div class="tpl-block" style="background:#eff3ff"></div><div class="tpl-bar w70"></div></div></div><div class="tpl-name">American</div></div>
+        <div class="tpl-card"><div class="tpl-preview"><div class="tpl-preview-inner"><div class="tpl-bar w30" style="background:#d0d0d0"></div><div class="tpl-bar w70"></div><div class="tpl-block"></div><div class="tpl-bar w50"></div></div></div><div class="tpl-name">Clean</div></div>
     </div>
 </div>
 </section>
 
-<!-- ═══ Features ═══ -->
-<section class="lp-features" id="features">
-<div class="container text-center">
-    <span class="lp-section-label">Features</span>
-    <h2 class="lp-h2">Everything you need to<br>close deals faster</h2>
-    <p class="lp-section-sub">From first draft to signed contract. All the tools, none of the bloat.</p>
-
-    <div class="lp-feat-grid">
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon blue">&#9998;</div>
-            <div class="lp-feat-t">Rich Text Editor</div>
-            <div class="lp-feat-d">Full Editor.js integration with headings, lists, tables, quotes, code blocks, and checklists. Drag to reorder sections.</div>
+<!-- How it Works -->
+<section class="section">
+<div class="wrap">
+    <div class="section-head reveal">
+        <div class="label">How it works</div>
+        <h2>Three steps to a signed deal</h2>
+    </div>
+    <div class="steps">
+        <div class="step reveal">
+            <div class="step-num">1</div>
+            <div class="step-t">Create your proposal</div>
+            <div class="step-d">Add sections, pricing, terms, and branding. Choose from 13 templates. Autosave keeps your work safe.</div>
         </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon green">&#36;</div>
-            <div class="lp-feat-t">Smart Pricing</div>
-            <div class="lp-feat-d">Line items, packages, add-ons, payment schedules, discounts, tax, and 13+ currencies with automatic calculations.</div>
+        <div class="step reveal" style="transition-delay:100ms">
+            <div class="step-num">2</div>
+            <div class="step-t">Share with your client</div>
+            <div class="step-d">Generate a secure link or export as PDF. Clients view and accept with a digital signature.</div>
         </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon purple">&#127912;</div>
-            <div class="lp-feat-t">13 PDF Templates</div>
-            <div class="lp-feat-d">Modern, Minimal, Executive, Nord, Bold, and more. Each one print-ready with your brand colors and logo.</div>
-        </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon orange">&#128200;</div>
-            <div class="lp-feat-t">Analytics Dashboard</div>
-            <div class="lp-feat-d">Win rates, pipeline value, revenue forecast, monthly trends, and breakdowns by client, value range, and template.</div>
-        </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon red">&#128176;</div>
-            <div class="lp-feat-t">Payment Tracking</div>
-            <div class="lp-feat-d">Record multiple partial payments. Track dues across proposals. Generate receipts with paid/partial/unpaid status.</div>
-        </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon teal">&#128279;</div>
-            <div class="lp-feat-t">Client Portal</div>
-            <div class="lp-feat-d">Share secure links with clients. They can view, accept with digital signature, and you track every response.</div>
-        </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon blue">&#129302;</div>
-            <div class="lp-feat-t">AI Writing Assistant</div>
-            <div class="lp-feat-d">Powered by Claude. Improve, expand, shorten, or fix grammar in any section. Custom prompts supported.</div>
-        </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon green">&#128101;</div>
-            <div class="lp-feat-t">Team &amp; Roles</div>
-            <div class="lp-feat-d">Admin, Editor, and Viewer roles. Track who edited what with full version history and diff comparison.</div>
-        </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon purple">&#128196;</div>
-            <div class="lp-feat-t">SOW, Contracts &amp; Receipts</div>
-            <div class="lp-feat-d">Generate Statement of Work, Service Agreements, and Payment Receipts from any proposal in one click.</div>
-        </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon orange">&#127760;</div>
-            <div class="lp-feat-t">Works Offline</div>
-            <div class="lp-feat-d">Full PWA support. Create proposals on a plane, in a caf&eacute;, anywhere. Your data stays on your device.</div>
-        </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon red">&#128273;</div>
-            <div class="lp-feat-t">White-Label Mode</div>
-            <div class="lp-feat-d">Replace ProposalKit branding with your own. Custom logo, brand color, and font for a fully branded experience.</div>
-        </div>
-        <div class="lp-feat-card">
-            <div class="lp-feat-icon teal">&#9889;</div>
-            <div class="lp-feat-t">Keyboard-First</div>
-            <div class="lp-feat-d">Command palette (&#8984;K), shortcuts for everything, autosave, undo/redo, and a completeness score to ship faster.</div>
+        <div class="step reveal" style="transition-delay:200ms">
+            <div class="step-num">3</div>
+            <div class="step-t">Track &amp; get paid</div>
+            <div class="step-d">Monitor status, record payments, track dues, and generate receipts. All from one dashboard.</div>
         </div>
     </div>
 </div>
 </section>
 
-<!-- ═══ Templates ═══ -->
-<section class="lp-templates" id="templates">
-<div class="container text-center">
-    <span class="lp-section-label">Templates</span>
-    <h2 class="lp-h2">13 professional templates</h2>
-    <p class="lp-section-sub">Each template adapts to your brand color, logo, and content. Switch anytime.</p>
-
-    <div class="lp-tpl-grid">
-        <div class="lp-tpl-card">
-            <div class="lp-tpl-preview">
-                <div class="lp-tpl-line head"></div>
-                <div class="lp-tpl-line sub"></div>
-                <div class="lp-tpl-block"><div></div><div></div></div>
-                <div class="lp-tpl-line w80" style="margin-top:8px"></div>
-                <div class="lp-tpl-line w60"></div>
-                <div class="lp-tpl-line accent-line w80" style="margin-top:auto"></div>
-            </div>
-            <div class="lp-tpl-name">Modern</div>
-            <div class="lp-tpl-tag">Clean &amp; contemporary</div>
-        </div>
-        <div class="lp-tpl-card">
-            <div class="lp-tpl-preview" style="background:#18181b">
-                <div class="lp-tpl-line" style="width:50%;height:5px;background:#fff;margin-bottom:4px"></div>
-                <div class="lp-tpl-line" style="width:35%;background:#ffffff40"></div>
-                <div style="display:flex;gap:4px;margin-top:8px"><div style="flex:1;height:20px;border-radius:3px;background:#ffffff15"></div><div style="flex:1;height:20px;border-radius:3px;background:#ffffff15"></div></div>
-                <div class="lp-tpl-line" style="width:80%;background:#ffffff20;margin-top:auto"></div>
-            </div>
-            <div class="lp-tpl-name">Classic</div>
-            <div class="lp-tpl-tag">Bold header bar</div>
-        </div>
-        <div class="lp-tpl-card">
-            <div class="lp-tpl-preview">
-                <div class="lp-tpl-line head" style="width:70%"></div>
-                <div style="width:40px;height:3px;background:#007AFF;border-radius:2px;margin:6px 0"></div>
-                <div class="lp-tpl-line w60"></div>
-                <div class="lp-tpl-line w80"></div>
-                <div class="lp-tpl-line w40" style="margin-top:auto"></div>
-            </div>
-            <div class="lp-tpl-name">Minimal</div>
-            <div class="lp-tpl-tag">Less is more</div>
-        </div>
-        <div class="lp-tpl-card">
-            <div class="lp-tpl-preview">
-                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><div class="lp-tpl-line" style="width:30%"></div><div class="lp-tpl-line" style="width:20%"></div></div>
-                <div class="lp-tpl-block" style="margin:0"><div style="height:28px"></div><div style="height:28px"></div><div style="height:28px"></div><div style="height:28px"></div></div>
-                <div class="lp-tpl-line w80" style="margin-top:8px"></div>
-                <div class="lp-tpl-line w60"></div>
-            </div>
-            <div class="lp-tpl-name">Tabular</div>
-            <div class="lp-tpl-tag">Data-focused layout</div>
-        </div>
-        <div class="lp-tpl-card">
-            <div class="lp-tpl-preview">
-                <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:6px;border-bottom:3px solid #18181b;margin-bottom:6px"><div class="lp-tpl-line" style="width:20%;background:#e4e4e7;height:4px"></div><div class="lp-tpl-line head" style="width:35%;margin:0"></div></div>
-                <div class="lp-tpl-block"><div></div><div></div></div>
-                <div class="lp-tpl-line w80" style="margin-top:8px"></div>
-            </div>
-            <div class="lp-tpl-name">Executive</div>
-            <div class="lp-tpl-tag">C-suite ready</div>
-        </div>
-        <div class="lp-tpl-card">
-            <div class="lp-tpl-preview">
-                <div style="height:4px;background:linear-gradient(90deg,#007AFF,#007AFF88);border-radius:0;margin:-12px -12px 8px"></div>
-                <div class="lp-tpl-line head" style="width:60%"></div>
-                <div class="lp-tpl-line sub"></div>
-                <div class="lp-tpl-block" style="margin-top:8px"><div style="border:1px solid #e4e4e7;background:#fff"></div><div style="border:1px solid #e4e4e7;background:#fff"></div></div>
-            </div>
-            <div class="lp-tpl-name">Stripe</div>
-            <div class="lp-tpl-tag">Gradient accent</div>
-        </div>
-        <div class="lp-tpl-card">
-            <div class="lp-tpl-preview">
-                <div class="lp-tpl-line head" style="width:80%;margin:0 auto 4px;height:6px"></div>
-                <div class="lp-tpl-line" style="width:30%;background:#d4d4d8;margin:0 auto"></div>
-                <div class="lp-tpl-block" style="margin-top:10px"><div style="background:#f9fafb;border:1px solid #f4f4f5"></div><div style="background:#f9fafb;border:1px solid #f4f4f5"></div></div>
-                <div class="lp-tpl-line w80" style="margin-top:auto"></div>
-            </div>
-            <div class="lp-tpl-name">Nord</div>
-            <div class="lp-tpl-tag">Scandinavian clean</div>
-        </div>
-        <div class="lp-tpl-card">
-            <div class="lp-tpl-preview">
-                <div style="background:#18181b;margin:-12px -12px 8px;padding:10px 12px;border-radius:0 0 8px 8px">
-                    <div class="lp-tpl-line" style="width:60%;height:5px;background:#fff;margin-bottom:4px"></div>
-                    <div class="lp-tpl-line" style="width:40%;background:#ffffff50"></div>
-                </div>
-                <div class="lp-tpl-block"><div></div><div></div></div>
-                <div class="lp-tpl-line w60" style="margin-top:6px"></div>
-            </div>
-            <div class="lp-tpl-name">Bold</div>
-            <div class="lp-tpl-tag">Dark hero header</div>
-        </div>
-    </div>
-    <p style="margin-top:20px;font-size:13px;color:#a1a1aa">+ Compact, Sidebar, Formal, American, Clean</p>
-</div>
-</section>
-
-<!-- ═══ How it Works ═══ -->
-<section class="lp-how" id="how">
-<div class="container text-center">
-    <span class="lp-section-label">How it works</span>
-    <h2 class="lp-h2">Three steps to a signed deal</h2>
-    <div class="lp-steps">
-        <div class="lp-step">
-            <div class="lp-step-num">1</div>
-            <div class="lp-step-t">Create your proposal</div>
-            <div class="lp-step-d">Add sections, pricing, terms, and branding. Choose from 13 templates. Autosave keeps your work safe.</div>
-        </div>
-        <div class="lp-step">
-            <div class="lp-step-num">2</div>
-            <div class="lp-step-t">Share with your client</div>
-            <div class="lp-step-d">Generate a secure link or export as PDF. Clients can view and accept with a digital signature.</div>
-        </div>
-        <div class="lp-step">
-            <div class="lp-step-num">3</div>
-            <div class="lp-step-t">Track &amp; get paid</div>
-            <div class="lp-step-d">Monitor proposal status, record payments, track dues, and generate receipts. All from one dashboard.</div>
-        </div>
-    </div>
-</div>
-</section>
-
-<!-- ═══ Highlights ═══ -->
-<section class="lp-highlights">
-<div class="container">
-    <div class="lp-hl-grid">
-        <div class="lp-hl-visual">
-            <div class="lp-hl-chart">
-                <div class="lp-hl-bar-row"><span class="lp-hl-bar-label">Won</span><div class="lp-hl-bar" style="width:72%;background:#34C759"></div></div>
-                <div class="lp-hl-bar-row"><span class="lp-hl-bar-label">Sent</span><div class="lp-hl-bar" style="width:55%;background:#FF9500"></div></div>
-                <div class="lp-hl-bar-row"><span class="lp-hl-bar-label">Draft</span><div class="lp-hl-bar" style="width:38%;background:#007AFF"></div></div>
-                <div class="lp-hl-bar-row"><span class="lp-hl-bar-label">Lost</span><div class="lp-hl-bar" style="width:15%;background:#FF3B30"></div></div>
+<!-- Highlights -->
+<section class="section glow-orange">
+<div class="wrap">
+    <div class="hl-row reveal">
+        <div class="hl-visual" style="background:linear-gradient(145deg,#fef9f0,#fff8ee);border-color:#f5deb3">
+            <div style="width:100%;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:12px"><span style="font-size:12px;color:#E39400;width:32px;text-align:right;flex-shrink:0;font-weight:600">Won</span><div style="height:28px;border-radius:8px;background:linear-gradient(90deg,#E39400,#d4a217);width:72%;box-shadow:0 2px 8px rgba(227,148,0,.15)"></div></div>
+                <div style="display:flex;align-items:center;gap:12px"><span style="font-size:12px;color:#E39400;width:32px;text-align:right;flex-shrink:0;font-weight:600">Sent</span><div style="height:28px;border-radius:8px;background:#f5deb3;width:55%"></div></div>
+                <div style="display:flex;align-items:center;gap:12px"><span style="font-size:12px;color:#E39400;width:32px;text-align:right;flex-shrink:0;font-weight:600">Draft</span><div style="height:28px;border-radius:8px;background:#fef3d0;width:38%"></div></div>
+                <div style="display:flex;align-items:center;gap:12px"><span style="font-size:12px;color:#E39400;width:32px;text-align:right;flex-shrink:0;font-weight:600">Lost</span><div style="height:28px;border-radius:8px;background:#fef9ee;width:15%"></div></div>
             </div>
         </div>
-        <div class="lp-hl-text">
+        <div class="hl-text">
             <h3>Know your numbers</h3>
-            <p>Track win rates, pipeline value, revenue forecasts, and monthly trends. Break down performance by client, value range, and template.</p>
-            <ul class="lp-hl-list">
-                <li>Win rate and close-time metrics</li>
-                <li>6-month trend charts</li>
-                <li>Revenue forecast from pipeline</li>
-                <li>Export reports as CSV</li>
+            <p>Track win rates, pipeline value, and revenue forecasts. Break down performance by client, value range, and template.</p>
+            <ul class="hl-list">
+                <li><span class="hl-check" style="background:rgba(227,148,0,.12)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E39400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Win rate and close-time metrics</li>
+                <li><span class="hl-check" style="background:rgba(227,148,0,.12)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E39400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>6-month trend charts</li>
+                <li><span class="hl-check" style="background:rgba(227,148,0,.12)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E39400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Revenue forecast from pipeline</li>
+                <li><span class="hl-check" style="background:rgba(227,148,0,.12)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E39400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Export reports as CSV</li>
             </ul>
         </div>
     </div>
 
-    <div class="lp-hl-grid" style="direction:rtl">
-        <div class="lp-hl-visual" style="direction:ltr">
+    <div class="hl-row reveal" style="direction:rtl">
+        <div class="hl-visual" style="direction:ltr;background:linear-gradient(145deg,#f0fdf4,#f0fdfa);border-color:#bbf7d0">
             <div style="width:100%;display:flex;flex-direction:column;gap:8px">
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border-radius:8px;border:1px solid #f4f4f5">
-                    <div><div style="font-size:12px;font-weight:600;color:#18181b">Website Redesign</div><div style="font-size:10px;color:#71717a">Acme Corp</div></div>
-                    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;padding:2px 8px;background:#FF950014;color:#FF9500;border-radius:9999px;font-weight:600">Partial</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#FF3B30">-$2,400</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#fff;border-radius:12px;border:1px solid #d1fae5;box-shadow:0 1px 3px rgba(0,0,0,.03)">
+                    <div><div style="font-size:13px;font-weight:600;color:#000">Website Redesign</div><div style="font-size:11px;color:#737373;margin-top:1px">Acme Corp</div></div>
+                    <div style="font-size:12px;font-weight:500;color:#737373">Partial &mdash; <span style="color:#E39400;font-weight:600">$2,400 due</span></div>
                 </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border-radius:8px;border:1px solid #f4f4f5">
-                    <div><div style="font-size:12px;font-weight:600;color:#18181b">Brand Identity</div><div style="font-size:10px;color:#71717a">StartupX</div></div>
-                    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;padding:2px 8px;background:#34C75914;color:#34C759;border-radius:9999px;font-weight:600">Paid</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#34C759">$0</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#fff;border-radius:12px;border:1px solid #d1fae5;box-shadow:0 1px 3px rgba(0,0,0,.03)">
+                    <div><div style="font-size:13px;font-weight:600;color:#000">Brand Identity</div><div style="font-size:11px;color:#737373;margin-top:1px">StartupX</div></div>
+                    <div style="display:inline-flex;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600;background:rgba(0,173,9,.1);color:#00AD09">Paid</div>
                 </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border-radius:8px;border:1px solid #f4f4f5">
-                    <div><div style="font-size:12px;font-weight:600;color:#18181b">Mobile App Dev</div><div style="font-size:10px;color:#71717a">TechFlow</div></div>
-                    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;padding:2px 8px;background:#FF3B3014;color:#FF3B30;border-radius:9999px;font-weight:600">Unpaid</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#FF3B30">-$8,500</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#fff;border-radius:12px;border:1px solid #d1fae5;box-shadow:0 1px 3px rgba(0,0,0,.03)">
+                    <div><div style="font-size:13px;font-weight:600;color:#000">Mobile App Dev</div><div style="font-size:11px;color:#737373;margin-top:1px">TechFlow</div></div>
+                    <div style="font-size:12px;font-weight:500;color:#737373">Unpaid &mdash; <span style="color:#FF4747;font-weight:600">$8,500 due</span></div>
                 </div>
             </div>
         </div>
-        <div class="lp-hl-text" style="direction:ltr">
+        <div class="hl-text" style="direction:ltr">
             <h3>Never miss a payment</h3>
-            <p>Record partial payments, track outstanding dues across all proposals, and generate professional receipts with a single click.</p>
-            <ul class="lp-hl-list">
-                <li>Multiple payment records per proposal</li>
-                <li>UPI QR codes on PDFs (India)</li>
-                <li>Paid / Partial / Unpaid status badges</li>
-                <li>Quick-record from proposals list</li>
+            <p>Record partial payments, track outstanding dues, and generate receipts with a single click.</p>
+            <ul class="hl-list">
+                <li><span class="hl-check" style="background:rgba(0,173,9,.1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00AD09" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Multiple payments per proposal</li>
+                <li><span class="hl-check" style="background:rgba(0,173,9,.1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00AD09" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>UPI QR codes on PDFs (India)</li>
+                <li><span class="hl-check" style="background:rgba(0,173,9,.1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00AD09" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Paid / Partial / Unpaid tracking</li>
+                <li><span class="hl-check" style="background:rgba(0,173,9,.1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00AD09" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Quick-record from any view</li>
             </ul>
         </div>
     </div>
 </div>
 </section>
 
-<!-- ═══ Pricing ═══ -->
-<section class="lp-pricing" id="pricing">
-<div class="container text-center">
-    <span class="lp-section-label">Pricing</span>
-    <h2 class="lp-h2">Simple, transparent pricing</h2>
-    <p class="lp-section-sub">Start free. Upgrade when your business grows.</p>
-
-    <div class="lp-currency-toggle">
-        <span class="lp-cur-btn active" onclick="setCurrency('usd', this)">USD ($)</span>
-        <span class="lp-cur-btn" onclick="setCurrency('inr', this)">INR (&#8377;)</span>
+<!-- Pricing -->
+<section class="section glow-blue" id="pricing">
+<div class="wrap">
+    <div class="section-head reveal">
+        <div class="label">Pricing</div>
+        <h2>Simple, transparent pricing</h2>
+        <p>Start free. Upgrade when your business grows.</p>
     </div>
 
-    <div class="lp-price-grid">
-        <!-- Free -->
-        <div class="lp-price-card">
-            <div class="lp-price-name">Free</div>
-            <div class="lp-price-desc">Perfect for getting started</div>
-            <div class="lp-price-free">$0</div>
-            <ul class="lp-price-features">
+    <div style="text-align:center" class="reveal">
+        <div class="cur-toggle">
+            <span class="cur-btn active" onclick="setCurrency('usd',this)">USD</span>
+            <span class="cur-btn" onclick="setCurrency('inr',this)">INR</span>
+        </div>
+    </div>
+
+    <div class="price-grid reveal">
+        <div class="price-card">
+            <div class="price-name">Free</div>
+            <div class="price-desc">For individuals getting started</div>
+            <div class="price-free">$0</div>
+            <ul class="price-feats">
                 <li>Unlimited proposals</li>
                 <li>All 13 PDF templates</li>
                 <li>Client management</li>
                 <li>Payment tracking</li>
                 <li>Analytics dashboard</li>
                 <li>Offline + PWA</li>
-                <li>Data stays on your device</li>
+                <li>Data stays on device</li>
             </ul>
-            <a href="index.html" class="btn-price light">Get Started Free</a>
+            <a href="index.html" class="price-btn light">Get Started</a>
         </div>
 
-        <!-- Pro -->
-        <div class="lp-price-card featured">
-            <div class="lp-price-pop">MOST POPULAR</div>
-            <div class="lp-price-name">Pro</div>
-            <div class="lp-price-desc">For freelancers and small teams</div>
-            <div class="lp-price-amount">
-                <span class="lp-price-currency" data-usd="$" data-inr="&#8377;">$</span><span data-usd="12" data-inr="499">12</span><span class="lp-price-period" data-usd="/month" data-inr="/month"> /month</span>
+        <div class="price-card featured">
+            <div class="price-badge">Most Popular</div>
+            <div class="price-name">Pro</div>
+            <div class="price-desc">For freelancers and small teams</div>
+            <div class="price-amt">
+                <span class="cur" data-usd="$" data-inr="&#8377;">$</span><span data-usd="12" data-inr="499">12</span><span class="period" data-usd="/mo" data-inr="/mo"> /mo</span>
             </div>
-            <ul class="lp-price-features">
+            <ul class="price-feats">
                 <li>Everything in Free</li>
-                <li>AI Writing Assistant (Claude)</li>
+                <li>AI Writing Assistant</li>
                 <li>White-label mode</li>
-                <li>Team roles (Admin/Editor/Viewer)</li>
-                <li>Version history &amp; diff view</li>
+                <li>Team roles</li>
+                <li>Version history &amp; diff</li>
                 <li>Webhook integrations</li>
                 <li>Priority support</li>
             </ul>
-            <a href="index.html" class="btn-price dark">Start 14-Day Trial</a>
+            <a href="index.html" class="price-btn blue">Start 14-Day Trial</a>
         </div>
 
-        <!-- Business -->
-        <div class="lp-price-card">
-            <div class="lp-price-name">Business</div>
-            <div class="lp-price-desc">For agencies and growing teams</div>
-            <div class="lp-price-amount">
-                <span class="lp-price-currency" data-usd="$" data-inr="&#8377;">$</span><span data-usd="29" data-inr="1,499">29</span><span class="lp-price-period" data-usd="/month" data-inr="/month"> /month</span>
+        <div class="price-card">
+            <div class="price-name">Business</div>
+            <div class="price-desc">For agencies and growing teams</div>
+            <div class="price-amt">
+                <span class="cur" data-usd="$" data-inr="&#8377;">$</span><span data-usd="29" data-inr="1,499">29</span><span class="period" data-usd="/mo" data-inr="/mo"> /mo</span>
             </div>
-            <ul class="lp-price-features">
+            <ul class="price-feats">
                 <li>Everything in Pro</li>
                 <li>Unlimited team members</li>
                 <li>Cloud sync (coming soon)</li>
@@ -609,71 +529,76 @@ button{font:inherit;cursor:pointer;border:none;background:none}
                 <li>Section &amp; T&amp;C libraries</li>
                 <li>Dedicated support</li>
             </ul>
-            <a href="index.html" class="btn-price light">Contact Sales</a>
+            <a href="index.html" class="price-btn dark">Contact Sales</a>
         </div>
     </div>
 </div>
 </section>
 
-<!-- ═══ FAQ ═══ -->
-<section class="lp-faq" id="faq">
-<div class="container text-center">
-    <span class="lp-section-label">FAQ</span>
-    <h2 class="lp-h2">Frequently asked questions</h2>
+<!-- FAQ -->
+<section class="section glow-green" id="faq">
+<div class="wrap">
+    <div class="section-head reveal">
+        <div class="label">FAQ</div>
+        <h2>Frequently asked questions</h2>
+    </div>
 
-    <div class="lp-faq-grid">
-        <div class="lp-faq-item">
-            <div class="lp-faq-q" onclick="toggleFaq(this)">Is ProposalKit really free? <span class="arrow">&#x25BE;</span></div>
-            <div class="lp-faq-a">Yes. The Free plan includes unlimited proposals, all 13 PDF templates, client management, payment tracking, analytics, and offline support. No signup required, no credit card, no catch.</div>
+    <div class="faq-list reveal">
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Is ProposalKit really free? <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="faq-a">Yes. The Free plan includes unlimited proposals, all 13 PDF templates, client management, payment tracking, analytics, and offline support. No signup, no credit card.</div>
         </div>
-        <div class="lp-faq-item">
-            <div class="lp-faq-q" onclick="toggleFaq(this)">Where is my data stored? <span class="arrow">&#x25BE;</span></div>
-            <div class="lp-faq-a">All data is stored locally in your browser using LocalStorage. Nothing is sent to any server. You own your data completely. You can export/import your data as JSON at any time from Settings.</div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Where is my data stored? <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="faq-a">All data is stored locally in your browser. Nothing is sent to any server. You can export and import your data as JSON at any time from Settings.</div>
         </div>
-        <div class="lp-faq-item">
-            <div class="lp-faq-q" onclick="toggleFaq(this)">Does it work offline? <span class="arrow">&#x25BE;</span></div>
-            <div class="lp-faq-a">Yes. ProposalKit is a Progressive Web App (PWA) with full offline support. You can create, edit, and export proposals without an internet connection. Install it to your home screen for native-like experience.</div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Does it work offline? <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="faq-a">Yes. ProposalKit is a Progressive Web App with full offline support. Create, edit, and export proposals without an internet connection.</div>
         </div>
-        <div class="lp-faq-item">
-            <div class="lp-faq-q" onclick="toggleFaq(this)">Can clients sign proposals digitally? <span class="arrow">&#x25BE;</span></div>
-            <div class="lp-faq-a">Yes. When you share a proposal via secure link, clients can view it in a beautiful portal and accept it with a hand-drawn electronic signature. You'll see the acceptance status and signature in your dashboard.</div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Can clients sign proposals digitally? <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="faq-a">Yes. Share a secure link and clients can view the proposal in a clean portal and accept with a hand-drawn electronic signature.</div>
         </div>
-        <div class="lp-faq-item">
-            <div class="lp-faq-q" onclick="toggleFaq(this)">Which currencies are supported? <span class="arrow">&#x25BE;</span></div>
-            <div class="lp-faq-a">ProposalKit supports 13+ currencies including INR, USD, EUR, GBP, AUD, CAD, SGD, AED, JPY, CNY, SEK, CHF, and NZD. Each currency formats correctly with proper locale and symbol placement.</div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Which currencies are supported? <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="faq-a">13+ currencies including INR, USD, EUR, GBP, AUD, CAD, SGD, AED, JPY, CNY, SEK, CHF, and NZD. Each formats correctly with proper locale and symbol.</div>
         </div>
-        <div class="lp-faq-item">
-            <div class="lp-faq-q" onclick="toggleFaq(this)">Can I use my own branding? <span class="arrow">&#x25BE;</span></div>
-            <div class="lp-faq-a">Absolutely. Upload your company logo, pick a brand color, and choose a font. With White-Label mode, you can even replace the ProposalKit name with your own company name throughout the app and PDFs.</div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Can I use my own branding? <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="faq-a">Upload your logo, pick a brand color, and with White-Label mode replace the ProposalKit name with your own throughout the app and PDFs.</div>
         </div>
-        <div class="lp-faq-item">
-            <div class="lp-faq-q" onclick="toggleFaq(this)">How does the AI assistant work? <span class="arrow">&#x25BE;</span></div>
-            <div class="lp-faq-a">The AI Writing Assistant is powered by Anthropic's Claude API. You bring your own API key (entered in Settings). It can improve, expand, shorten, or fix grammar in any proposal section. Custom prompts are also supported.</div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">How does the AI assistant work? <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="faq-a">Powered by Anthropic's Claude API. Bring your own API key. It can improve, expand, shorten, or fix grammar in any section. Custom prompts supported.</div>
         </div>
-        <div class="lp-faq-item">
-            <div class="lp-faq-q" onclick="toggleFaq(this)">Is there a mobile app? <span class="arrow">&#x25BE;</span></div>
-            <div class="lp-faq-a">ProposalKit works on any device with a modern browser. On mobile, you can install it as a PWA from your browser's "Add to Home Screen" option for a native-like experience with offline support.</div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Is there a mobile app? <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="faq-a">ProposalKit works on any device with a modern browser. Install it as a PWA from "Add to Home Screen" for a native-like experience.</div>
         </div>
     </div>
 </div>
 </section>
 
-<!-- ═══ CTA ═══ -->
-<section class="lp-cta">
-<div class="container">
-    <div class="lp-cta-box">
-        <h2>Ready to win more clients?</h2>
-        <p>Join thousands of freelancers and agencies creating professional proposals with ProposalKit.</p>
-        <a href="index.html" class="btn-white">Start Free &mdash; No Signup Required &rarr;</a>
+<!-- CTA -->
+<section class="cta-section">
+<div class="wrap">
+    <div class="cta-box reveal">
+        <h2>Start getting proposals signed</h2>
+        <p>Create professional proposals in minutes. Free forever for individuals.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <a href="index.html" class="btn-dark">Try it for free &rarr;</a>
+            <a href="#pricing" class="btn-outline">Explore plans</a>
+        </div>
     </div>
 </div>
 </section>
 
-<!-- ═══ Footer ═══ -->
-<footer class="lp-footer">
-<div class="container lp-footer-inner">
-    <div class="lp-footer-left">&copy; 2026 ProposalKit. Made with care.</div>
-    <div class="lp-footer-links">
+<!-- Footer -->
+<footer class="footer">
+<div class="wrap footer-inner">
+    <div class="footer-left">&copy; 2026 ProposalKit &mdash; All rights reserved</div>
+    <div class="footer-links">
         <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
@@ -683,37 +608,24 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 </footer>
 
 <script>
-// Nav scroll effect
-const nav = document.getElementById('lpNav');
-window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 10);
-}, { passive: true });
-
-// FAQ toggle
-function toggleFaq(el) {
-    const item = el.parentElement;
-    const wasOpen = item.classList.contains('open');
-    document.querySelectorAll('.lp-faq-item').forEach(i => i.classList.remove('open'));
-    if (!wasOpen) item.classList.add('open');
-}
-
-// Currency toggle
-function setCurrency(cur, btn) {
-    document.querySelectorAll('.lp-cur-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('[data-usd]').forEach(el => {
-        el.textContent = el.dataset[cur] || el.dataset.usd;
-    });
-}
-
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-        e.preventDefault();
-        const target = document.querySelector(a.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-});
+function toggleFaq(el){const i=el.parentElement;const w=i.classList.contains('open');document.querySelectorAll('.faq-item').forEach(x=>x.classList.remove('open'));if(!w)i.classList.add('open')}
+function setCurrency(c,b){document.querySelectorAll('.cur-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('[data-usd]').forEach(el=>{el.textContent=el.dataset[c]||el.dataset.usd})}
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+const ro=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+/* Nav scroll effect */
+const nav=document.getElementById('mainNav');
+let lastScroll=0;
+window.addEventListener('scroll',()=>{const y=window.scrollY;nav.classList.toggle('scrolled',y>40);lastScroll=y},{passive:true});
+/* Active nav link on scroll */
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('.nav-links a');
+const sro=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.getAttribute('id');navLinks.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+id)});}});},{threshold:0,rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>sro.observe(s));
+/* Mobile menu */
+function toggleMobileMenu(){document.getElementById('navMobile').classList.toggle('open')}
+function closeMobileMenu(){document.getElementById('navMobile').classList.remove('open')}
+document.addEventListener('click',e=>{if(!e.target.closest('.nav-pill'))closeMobileMenu()});
 </script>
 </body>
 </html>
