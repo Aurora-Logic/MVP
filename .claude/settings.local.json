@@ -44,7 +44,12 @@
       "Bash(git -C /Users/virag/Downloads/MVP log --oneline -3)",
       "Bash(git -C /Users/virag/Downloads/MVP add:*)",
       "Bash(git -C /Users/virag/Downloads/MVP push)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(gh auth status:*)",
+      "Bash(ssh:*)",
+      "Bash(ssh-keyscan:*)",
+      "Bash(~/.ssh/known_hosts)"
     ]
   }
 }
