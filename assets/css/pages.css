@@ -624,13 +624,7 @@
 .prop-actions {
   display: flex;
   gap: 1px;
-  opacity: 0;
-  transition: opacity var(--t);
   flex-shrink: 0;
-}
-
-.prop-row:hover .prop-actions {
-  opacity: 1;
 }
 
 /* ════════ EDITOR / DETAILS ════════ */

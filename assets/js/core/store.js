@@ -74,6 +74,8 @@ function safeGetStorage(key, fallback) {
             const p = DB.find(x => x.id === r.proposalId && x.shareToken === r.token);
             if (p && !p.clientResponse) {
                 p.clientResponse = { status: r.status, respondedAt: r.respondedAt, comment: r.comment };
+                if (r.clientName) p.clientResponse.clientName = r.clientName;
+                if (r.clientSignature) p.clientResponse.clientSignature = r.clientSignature;
                 p.status = r.status;
                 merged++;
             }

@@ -24,12 +24,12 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '1.5';
+const APP_VERSION = '2.0';
 const WHATS_NEW_ITEMS = [
-    { icon: 'palette', title: '13 PDF Templates', desc: 'Modern, Clean, Executive, Nord, American, and 8 more professionally designed templates.' },
-    { icon: 'bookmark-plus', title: 'Save as Template', desc: 'Save any proposal as a reusable template for quick future use.' },
-    { icon: 'braces', title: 'Insert Variables', desc: 'Use {{client.name}}, {{proposal.total}}, and more in your sections.' },
-    { icon: 'kanban', title: 'Kanban Board View', desc: 'Visualize proposals as a drag-and-drop board by status.' }
+    { icon: 'mouse-pointer-click', title: 'Click to Change Status', desc: 'Click any status badge on the proposals page to quickly update it.' },
+    { icon: 'bar-chart-3', title: 'Analytics Breakdowns', desc: 'Win rate by value, client, month, and template — with exportable reports.' },
+    { icon: 'package', title: 'Section Packs', desc: '4 pre-built packs (SaaS, Agency, Consulting, Freelancer) ready to insert.' },
+    { icon: 'shield-check', title: 'Accessibility & Polish', desc: 'ARIA roles, keyboard navigation, and dozens of UI refinements.' }
 ];
 
 function checkWhatsNew() {
@@ -47,12 +47,12 @@ function showWhatsNew() {
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap'; wrap.id = 'whatsNewModal';
     wrap.onclick = (e) => { if (e.target === wrap) dismissWhatsNew(); };
-    wrap.innerHTML = `<div class="modal" style="width:420px" onclick="event.stopPropagation()">
-        <div style="text-align:center;margin-bottom:16px"><span style="font-size:28px">&#127881;</span></div>
-        <div class="modal-t" style="text-align:center">What's New in ProposalKit</div>
-        <div class="modal-d" style="text-align:center">Version ${APP_VERSION}</div>
+    wrap.innerHTML = `<div class="modal wn-modal" onclick="event.stopPropagation()">
+        <div class="wn-emoji">&#127881;</div>
+        <div class="modal-t wn-center">What's New in ProposalKit</div>
+        <div class="modal-d wn-center">Version ${APP_VERSION}</div>
         <div class="wn-list">${items}</div>
-        <div class="modal-foot" style="justify-content:center"><button class="btn-sm" onclick="dismissWhatsNew()">Got it</button></div>
+        <div class="modal-foot wn-center"><button class="btn-sm" onclick="dismissWhatsNew()">Got it</button></div>
     </div>`;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));

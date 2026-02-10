@@ -238,6 +238,11 @@ function ctxAction(action) {
     else if (action === 'dupClient') dupPropWithClient(ctxTarget);
     else if (action === 'export') { CUR = ctxTarget; doExport('proposal'); }
     else if (action === 'invoice') { CUR = ctxTarget; doExport('invoice'); }
+    else if (action === 'status') {
+        const ctx = document.getElementById('ctxMenu');
+        const rect = ctx ? ctx.getBoundingClientRect() : { left: 200, top: 200 };
+        if (typeof showStatusMenu === 'function') showStatusMenu({ clientX: rect.left, clientY: rect.top, stopPropagation: () => {} }, ctxTarget);
+    }
     else if (action === 'archive') archiveProp(ctxTarget);
     else if (action === 'unarchive') unarchiveProp(ctxTarget);
     else if (action === 'del') delProp(ctxTarget);

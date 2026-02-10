@@ -53,20 +53,20 @@
 - [x] 3.5 Bulk export (multi-select PDFs) — `export.js`
 - [x] 3.6 Proposal archive (soft-delete) — `create.js` + `dashboard.js`
 
-## ✨ PHASE 4 — Delight (Month 3)
+## ✨ PHASE 4 — Delight (Month 3) ✅ COMPLETE
 - [x] 4.1 Dark mode — `theme.js`
 - [x] 4.2 Full brand color picker — `settings.js`
 - [x] 4.3 Save as template (section library) — `sections.js`
-- [ ] 4.4 What's new modal
-- [ ] 4.5 PWA / installable app
+- [x] 4.4 What's new modal — `boot.js`
+- [x] 4.5 PWA / installable app — `sw.js`, `manifest.json`
 
 ## 📊 6-MONTH (Months 4–6)
 - [ ] 5.1 User accounts + cloud sync (Supabase)
 - [x] 5.2 Shareable proposal links — `create.js`
-- [ ] 5.3 Digital acceptance block
-- [ ] 5.4 Proposal scoring system
-- [ ] 5.5 Advanced analytics + forecasting
-- [ ] 5.6 Section template packs
+- [x] 5.3 Digital acceptance block — `client.html`, `preview.js`, `sharing.js`
+- [x] 5.4 Proposal scoring system — `completeness.js`
+- [x] 5.5 Advanced analytics + forecasting — `analytics-breakdowns.js`, `analytics.js`
+- [x] 5.6 Section template packs — `section-packs.js`
 
 ## 🏢 1-YEAR (Months 7–12)
 - [ ] 6.1 Team / multi-user
@@ -82,6 +82,6 @@
 - Phase 1: 8 features ✅ COMPLETE
 - Phase 2: 5 features ✅ COMPLETE
 - Phase 3: 6 features ✅ COMPLETE
-- Phase 4: 5 features (3 done, 2 remaining) ← CURRENT
-- 6-month: 6 features (1 done, 5 remaining)
+- Phase 4: 5 features ✅ COMPLETE
+- 6-month: 6 features (5 done, 1 remaining — 5.1 accounts/cloud) ← CURRENT
 - 1-year: 6 features (scale)

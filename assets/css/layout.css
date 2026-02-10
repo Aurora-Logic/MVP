@@ -496,6 +496,10 @@
   background: var(--text5);
   flex-shrink: 0;
 }
+.ps-accepted {
+  color: var(--green);
+  font-weight: 600;
+}
 .ps-right {
   display: flex;
   align-items: center;

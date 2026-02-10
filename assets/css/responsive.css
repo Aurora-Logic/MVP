@@ -147,10 +147,6 @@
   }
 
   /* Prop rows */
-  .prop-actions {
-    opacity: 1;
-  }
-
   .prop-row {
     padding: 10px 12px;
     gap: 10px;

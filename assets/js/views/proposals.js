@@ -34,7 +34,7 @@ function renderPropList(list) {
       <div class="prop-cols">
         <div class="prop-col">
           <div class="prop-col-label">Status</div>
-          <div class="prop-col-val"><span class="badge badge-${p.status}"><span class="badge-dot"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></div>
+          <div class="prop-col-val"><span class="badge badge-${p.status} badge-click" onclick="event.stopPropagation();showStatusMenu(event,'${pid}')"><span class="badge-dot"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)} <i data-lucide="chevron-down" class="badge-chevron"></i></span></div>
         </div>
         <div class="prop-col">
           <div class="prop-col-label">Score</div>
@@ -92,12 +92,13 @@ function showStatusMenu(event, id) {
   dropdown.className = 'status-dropdown';
   dropdown.innerHTML = statuses.map(s =>
     `<button class="status-opt" onclick="setProposalStatus('${escAttr(id)}','${escAttr(s.status)}')">
-            <i data-lucide="${s.icon}" style="width:14px;height:14px;color:${s.color}"></i>
+            <i data-lucide="${s.icon}" class="status-opt-icon" style="color:${s.color}"></i>
             <span>${s.label}</span>
         </button>`
   ).join('');
 
-  dropdown.style.cssText = `position:fixed;left:${Math.min(event.clientX, window.innerWidth - 160)}px;top:${Math.min(event.clientY, window.innerHeight - 200)}px;z-index:950`;
+  dropdown.style.left = Math.min(event.clientX, window.innerWidth - 160) + 'px';
+  dropdown.style.top = Math.min(event.clientY, window.innerHeight - 200) + 'px';
   document.body.appendChild(dropdown);
   lucide.createIcons();
 

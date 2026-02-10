@@ -136,5 +136,33 @@ function buildPreview(mode) {
     if (!isInvoice && p.packagesEnabled && typeof buildPackagesPdfHtml === 'function') html += buildPackagesPdfHtml(p, c, bc);
     if ((p.addOns || []).some(a => a.desc) && typeof buildAddOnsPdfHtml === 'function') html += buildAddOnsPdfHtml(p, c, bc);
     if ((p.paymentSchedule || []).some(m => m.name) && typeof buildSchedulePdfHtml === 'function') html += buildSchedulePdfHtml(p, c, bc);
+    // Acceptance block (only if client has accepted with signature)
+    if (p.clientResponse?.status === 'accepted' && (p.clientResponse.clientName || p.clientResponse.clientSignature)) {
+        html += buildAcceptanceBlockHtml(p, bc);
+    }
     document.getElementById('prevDoc').innerHTML = html;
+}
+
+function buildAcceptanceBlockHtml(p, bc) {
+    const cr = p.clientResponse;
+    const date = new Date(cr.respondedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const sigImg = cr.clientSignature?.startsWith('data:image/') ? cr.clientSignature : '';
+    const senderSig = CONFIG?.signature?.startsWith('data:image/') ? CONFIG.signature : '';
+    return `<div style="page-break-inside:avoid;margin-top:32px;padding:24px;border:1px solid #e4e4e7;border-radius:8px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:16px;color:${bc}">Acceptance</div>
+        <div style="display:flex;gap:40px">
+            <div style="flex:1">
+                <div style="font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Client</div>
+                ${cr.clientName ? `<div style="font-size:14px;font-weight:600;margin-bottom:4px">${esc(cr.clientName)}</div>` : ''}
+                <div style="font-size:12px;color:#71717a;margin-bottom:8px">${date}</div>
+                ${sigImg ? `<img src="${sigImg}" style="max-width:180px;height:auto;border-bottom:1px solid #e4e4e7;padding-bottom:4px" alt="Client signature">` : '<div style="border-bottom:1px solid #e4e4e7;width:180px;height:40px"></div>'}
+            </div>
+            <div style="flex:1">
+                <div style="font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Sender</div>
+                <div style="font-size:14px;font-weight:600;margin-bottom:4px">${esc(CONFIG?.name || CONFIG?.company || '')}</div>
+                <div style="font-size:12px;color:#71717a;margin-bottom:8px">${date}</div>
+                ${senderSig ? `<img src="${senderSig}" style="max-width:180px;height:auto;border-bottom:1px solid #e4e4e7;padding-bottom:4px" alt="Sender signature">` : '<div style="border-bottom:1px solid #e4e4e7;width:180px;height:40px"></div>'}
+            </div>
+        </div>
+    </div>`;
 }

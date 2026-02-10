@@ -85,7 +85,7 @@ function recordProposalView(token) {
     return p;
 }
 
-function respondToProposal(token, status, comment) {
+function respondToProposal(token, status, comment, opts) {
     const p = getProposalByToken(token);
     if (!p) return false;
 
@@ -94,6 +94,8 @@ function respondToProposal(token, status, comment) {
         respondedAt: Date.now(),
         comment: comment || ''
     };
+    if (opts?.clientName) p.clientResponse.clientName = opts.clientName;
+    if (opts?.clientSignature) p.clientResponse.clientSignature = opts.clientSignature;
 
     if (status === 'accepted') p.status = 'accepted';
     else if (status === 'declined') p.status = 'declined';

@@ -53,6 +53,7 @@ function loadEditor(id) {
       <div class="ps-sep"></div>
       <div class="ps-item" id="statSections"><i data-lucide="layers"></i> <span id="secCountVal">${(p.sections || []).length}</span> sections</div>
       <div class="ps-sep"></div>
+      ${p.clientResponse?.status === 'accepted' && p.clientResponse.clientName ? `<div class="ps-item ps-accepted"><i data-lucide="pen-line"></i> Signed by ${esc(p.clientResponse.clientName)}</div><div class="ps-sep"></div>` : ''}
       ${buildCompletenessHtml(p)}
       <div class="ps-right">
         <button class="btn-sm-icon-ghost" onclick="typeof undo==='function'&&undo()" data-tooltip="Undo (⌘Z)" data-side="bottom"><i data-lucide="undo-2"></i></button>

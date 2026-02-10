@@ -539,6 +539,21 @@ input[type="number"] {
   background: var(--amber);
 }
 
+.badge-click {
+  cursor: pointer;
+}
+
+.badge-click:hover {
+  filter: brightness(0.95);
+}
+
+.badge-chevron {
+  width: 10px;
+  height: 10px;
+  margin-left: 2px;
+  opacity: 0.6;
+}
+
 .badge-new {
   background: var(--blue);
   color: var(--white);
@@ -1217,6 +1232,21 @@ dialog.command-dialog::backdrop {
 }
 
 /* What's New */
+.wn-modal {
+  width: 420px;
+}
+
+.wn-center {
+  text-align: center;
+  justify-content: center;
+}
+
+.wn-emoji {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 28px;
+}
+
 .wn-list {
   display: flex;
   flex-direction: column;
@@ -1313,6 +1343,11 @@ dialog.command-dialog::backdrop {
 
 .status-opt:hover {
   background: var(--muted);
+}
+
+.status-opt-icon {
+  width: 14px;
+  height: 14px;
 }
 
 .so-dot {
