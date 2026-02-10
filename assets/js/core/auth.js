@@ -14,76 +14,68 @@ async function initAuth() {
     // Detect OAuth callback (hash contains access_token from Google redirect)
     const hash = window.location.hash;
     const isOAuthCallback = hash && hash.includes('access_token=');
-    const hasOAuthError = hash && hash.includes('error=');
+    const hasOAuthError = hash && (hash.includes('error=') || hash.includes('error_description='));
 
-    if (isOAuthCallback || hasOAuthError) {
-        // Show loading while processing OAuth callback
+    if (hasOAuthError) {
         const el = document.getElementById('obContent');
         if (el) {
             document.getElementById('appShell').style.display = 'none';
             document.getElementById('onboard').classList.remove('hide');
-            if (hasOAuthError) {
-                el.innerHTML = '<div class="auth-form" style="text-align:center"><div style="font-size:36px;margin-bottom:12px">&#9888;&#65039;</div><div class="auth-title">Sign-in failed</div><div class="auth-desc">Google authentication was cancelled or failed. Please try again.</div><button class="btn" style="margin-top:16px" onclick="authMode=\'login\';renderAuthScreen()">Back to Sign In</button></div>';
-                // Clean hash
-                if (window.history.replaceState) window.history.replaceState(null, '', window.location.pathname);
-                return;
-            }
+            el.innerHTML = '<div class="auth-form" style="text-align:center"><div style="font-size:36px;margin-bottom:12px">&#9888;&#65039;</div><div class="auth-title">Sign-in failed</div><div class="auth-desc">Google authentication was cancelled or failed. Please try again.</div><button class="btn" style="margin-top:16px" onclick="authMode=\'login\';renderAuthScreen()">Back to Sign In</button></div>';
+        }
+        if (window.history.replaceState) window.history.replaceState(null, '', window.location.pathname);
+        return;
+    }
+
+    if (isOAuthCallback) {
+        // Show loading while Supabase SDK processes the OAuth token from the hash
+        const el = document.getElementById('obContent');
+        if (el) {
+            document.getElementById('appShell').style.display = 'none';
+            document.getElementById('onboard').classList.remove('hide');
             el.innerHTML = '<div class="auth-form" style="text-align:center"><div style="font-size:36px;margin-bottom:12px">&#128274;</div><div class="auth-title">Signing you in...</div><div class="auth-desc">Please wait while we complete authentication.</div></div>';
         }
     }
 
-    // If OAuth callback, manually parse hash and set session
-    if (isOAuthCallback) {
-        try {
-            const params = new URLSearchParams(hash.substring(1));
-            const accessToken = params.get('access_token');
-            const refreshToken = params.get('refresh_token');
-            if (accessToken && refreshToken) {
-                const { data, error } = await sb().auth.setSession({
-                    access_token: accessToken,
-                    refresh_token: refreshToken
-                });
-                if (!error && data?.session) {
-                    sbSession = data.session;
-                }
-            }
-        } catch (e) {
-            console.warn('OAuth token exchange failed:', e);
-        }
-        // Clean hash from URL
-        if (window.history.replaceState) {
-            window.history.replaceState(null, '', window.location.pathname + window.location.search);
-        }
-    }
-
-    // If not OAuth callback, check existing session
-    if (!sbSession) {
-        try {
-            const { data } = await sb().auth.getSession();
-            sbSession = data?.session || null;
-        } catch (e) { sbSession = null; }
-    }
-
-    // Listen for auth state changes (future events only)
+    // Set up auth state listener FIRST (before getSession triggers detectSessionInUrl)
     let authBooted = false;
     sb().auth.onAuthStateChange(async (event, session) => {
         sbSession = session;
-        if (event === 'SIGNED_IN' && session && !authBooted) {
+        // Clean hash after SDK processes it
+        if (window.location.hash.includes('access_token=') && window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && !authBooted) {
             authBooted = true;
-            await onSignedIn();
+            await pullAndBoot();
+        } else if (event === 'INITIAL_SESSION' && !session && !authBooted) {
+            authBooted = true;
+            renderAuthScreen();
         } else if (event === 'SIGNED_OUT') {
             sbSession = null;
             renderAuthScreen();
         }
     });
 
-    if (sbSession) {
-        authBooted = true;
-        await pullAndBoot();
-    } else if (!isOAuthCallback) {
-        renderAuthScreen();
+    // getSession() triggers Supabase SDK to detect hash tokens (detectSessionInUrl: true)
+    // and fire onAuthStateChange with INITIAL_SESSION
+    try {
+        const { data } = await sb().auth.getSession();
+        sbSession = data?.session || null;
+    } catch (e) { sbSession = null; }
+
+    // Fallback: if onAuthStateChange hasn't fired yet (rare), boot manually
+    if (!authBooted) {
+        if (sbSession) {
+            authBooted = true;
+            await pullAndBoot();
+        } else if (!isOAuthCallback) {
+            // No session and not waiting for OAuth — show login
+            authBooted = true;
+            renderAuthScreen();
+        }
+        // If OAuth callback with no session yet, onAuthStateChange will handle it
     }
-    // OAuth callback with no session yet — onAuthStateChange handles it
 }
 
 function offlineBoot() {
@@ -289,9 +281,11 @@ async function doSignup() {
 async function doGoogleLogin() {
     if (!sb()) { showAuthError('Cloud features unavailable'); return; }
     try {
+        // Use current origin (works on localhost, Vercel, custom domains)
+        const redirectUrl = window.location.origin + window.location.pathname;
         const { error } = await sb().auth.signInWithOAuth({
             provider: 'google',
-            options: { redirectTo: window.location.origin + '/index.html' }
+            options: { redirectTo: redirectUrl }
         });
         if (error) showAuthError(error.message);
     } catch (e) {
