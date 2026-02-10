@@ -84,6 +84,7 @@
                 <div id="recentList"></div>
             </div>
             <div class="side-foot">
+                <button class="side-foot-btn" onclick="typeof showUserSwitcher==='function'&&showUserSwitcher()" id="sideUserBtn"><i data-lucide="user"></i><span id="sideUserName"></span></button>
                 <button class="side-foot-btn" data-nav="settings" onclick="goNav('settings')"><i
                         data-lucide="settings"></i><span>Settings</span></button>
                 <button class="side-foot-btn" onclick="toggleTheme()" id="sideThemeBtn"><i data-lucide="sun"
@@ -140,8 +141,10 @@
                 <button class="tpl-pick" onclick="setDocTpl('tabular',this)">Tabular</button>
             </div>
             <div class="prev-top-actions">
+                <button class="btn-sm-outline" onclick="typeof showExportMenu==='function'&&showExportMenu(this)"><i data-lucide="file-down"></i> Export As</button>
                 <button class="btn-sm-outline" onclick="doExport('invoice')"><i data-lucide="receipt"></i> As
                     Invoice</button>
+                <button class="btn-sm-outline" onclick="typeof openDerivativesMenu==='function'&&openDerivativesMenu(this)"><i data-lucide="file-plus-2"></i> Generate</button>
                 <button class="btn-sm" onclick="doExport('proposal')"><i data-lucide="download"></i> Export
                     PDF</button>
                 <button class="btn-icon-outline" onclick="closePreview()" data-tooltip="Close (Esc)" data-side="bottom"
@@ -165,6 +168,10 @@
         <div class="ctx-item" role="menuitem" onclick="ctxAction('dupClient')"><i data-lucide="users"></i> Duplicate for Client</div>
         <div class="ctx-item" role="menuitem" onclick="ctxAction('export')"><i data-lucide="download"></i> Export PDF</div>
         <div class="ctx-item" role="menuitem" onclick="ctxAction('invoice')"><i data-lucide="receipt"></i> Export as Invoice</div>
+        <div class="ctx-sep" role="separator"></div>
+        <div class="ctx-item" role="menuitem" onclick="ctxAction('sow')"><i data-lucide="file-check"></i> Generate SOW</div>
+        <div class="ctx-item" role="menuitem" onclick="ctxAction('contract')"><i data-lucide="file-pen"></i> Generate Contract</div>
+        <div class="ctx-item" role="menuitem" onclick="ctxAction('receipt')"><i data-lucide="receipt"></i> Generate Receipt</div>
         <div class="ctx-sep" role="separator"></div>
         <div class="ctx-item" role="menuitem" onclick="ctxAction('status')"><i data-lucide="circle-dot"></i> Change Status</div>
         <div class="ctx-sep" role="separator"></div>
@@ -197,6 +204,7 @@
     <script src="assets/js/core/shortcuts.js"></script>
     <script src="assets/js/core/completeness.js"></script>
     <script src="assets/js/core/onboarding.js"></script>
+    <script src="assets/js/core/team.js"></script>
     <!-- CDN: Editor.js + plugins -->
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.29.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.7"></script>
@@ -224,6 +232,7 @@
     <script src="assets/js/editor/editor.js"></script>
     <script src="assets/js/editor/details.js"></script>
     <script src="assets/js/editor/sections.js"></script>
+    <script src="assets/js/editor/ai-assistant.js"></script>
     <script src="assets/js/editor/structured-sections.js"></script>
     <script src="assets/js/editor/section-packs.js"></script>
     <script src="assets/js/editor/pricing.js"></script>
@@ -238,6 +247,9 @@
     <script src="assets/js/export/templates.js"></script>
     <script src="assets/js/export/pdf-templates2.js"></script>
     <script src="assets/js/export/export.js"></script>
+    <script src="assets/js/export/integrations.js"></script>
+    <script src="assets/js/export/derivatives.js"></script>
+    <script src="assets/js/export/diff-view.js"></script>
     <script src="assets/js/export/email.js"></script>
     <script src="assets/js/views/clients.js"></script>
     <script src="assets/js/export/signature.js"></script>

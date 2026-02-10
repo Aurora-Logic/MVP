@@ -64,6 +64,8 @@ function renderSettings() {
         </div>
       </div>
       <div class="settings-col">
+        ${typeof renderTeamSettings === 'function' ? renderTeamSettings() : ''}
+        ${typeof renderAiSettingsCard === 'function' ? renderAiSettingsCard() : ''}
         <div class="card card-p" style="margin-bottom:14px">
           <div class="card-head"><div><div class="card-t">Branding</div><div class="card-d">Logo and colors for your proposals</div></div></div>
           <div class="fg">
@@ -91,6 +93,10 @@ function renderSettings() {
         </div>
         <div class="card card-p">
           <div class="card-head"><div><div class="card-t">Data Management</div><div class="card-d">Export or clear your local data</div></div></div>
+          <div class="fg"><label class="fl">Webhook URL</label>
+            <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
+            <div class="fh">POST proposal data to this URL on export</div>
+          </div>
           <div class="sec-header-actions">
             <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export All Data</button>
             <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear All Data</button>
@@ -223,8 +229,15 @@ function saveSettings() {
     CONFIG.font = cselGetValue(document.getElementById('setFont')) || CONFIG.font || 'Inter';
     const wlEl = document.getElementById('setWhiteLabel');
     if (wlEl) CONFIG.whiteLabel = wlEl.checked;
-    // Country-specific tax fields with validation
+    CONFIG.aiApiKey = v('setAiKey', CONFIG.aiApiKey);
+    CONFIG.webhookUrl = v('setWebhookUrl', CONFIG.webhookUrl);
+    // Clear stale tax fields from other countries
     const c = CONFIG.country;
+    if (c !== 'IN') { CONFIG.gstin = ''; CONFIG.pan = ''; CONFIG.udyam = ''; }
+    if (c !== 'US') { CONFIG.ein = ''; }
+    if (!['GB','DE','FR','NL','SE','IE'].includes(c)) { CONFIG.vatNumber = ''; }
+    if (c !== 'AU') { CONFIG.abn = ''; }
+    // Country-specific tax fields with validation
     if (c === 'IN') {
         const gstin = v('setGstin', CONFIG.gstin), pan = v('setPan', CONFIG.pan), udyam = v('setUdyam', CONFIG.udyam);
         CONFIG.gstin = gstin; CONFIG.pan = pan; CONFIG.udyam = udyam;

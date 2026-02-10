@@ -78,6 +78,22 @@ function buildCommandItems() {
             <i data-lucide="bookmark-plus"></i>
             <span>Save as Template</span>
         </div>
+        <div role="menuitem" data-filter="Export Markdown md" data-keywords="markdown export" onclick="cmdRun(()=>{if(CUR&&typeof exportMarkdown==='function')exportMarkdown();else toast('Open a proposal first')})">
+            <i data-lucide="file-text"></i>
+            <span>Export Markdown</span>
+        </div>
+        <div role="menuitem" data-filter="Export CSV spreadsheet" data-keywords="csv export items" onclick="cmdRun(()=>{if(CUR&&typeof exportCsv==='function')exportCsv();else toast('Open a proposal first')})">
+            <i data-lucide="table"></i>
+            <span>Export CSV</span>
+        </div>
+        <div role="menuitem" data-filter="Export HTML standalone" data-keywords="html export" onclick="cmdRun(()=>{if(CUR&&typeof exportStandaloneHtml==='function')exportStandaloneHtml();else toast('Open a proposal first')})">
+            <i data-lucide="code"></i>
+            <span>Export HTML</span>
+        </div>
+        <div role="menuitem" data-filter="Compare versions diff history" data-keywords="compare diff versions" onclick="cmdRun(()=>{if(CUR&&typeof openDiffView==='function')openDiffView();else toast('Open a proposal first')})">
+            <i data-lucide="git-compare"></i>
+            <span>Compare Versions</span>
+        </div>
     </div>`;
 
     // Navigation group

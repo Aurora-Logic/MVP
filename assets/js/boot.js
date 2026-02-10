@@ -14,6 +14,7 @@ function initApp() {
 
 function bootApp() {
     initSidebarState();
+    if (typeof initTeam === 'function') initTeam();
     refreshSide();
     goNav('dashboard');
     initKeyboardShortcuts();
@@ -24,12 +25,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.1';
+const APP_VERSION = '2.2';
 const WHATS_NEW_ITEMS = [
-    { icon: 'pen-line', title: 'Digital Acceptance', desc: 'Clients can sign proposals with name and signature directly from the shared link.' },
-    { icon: 'eye-off', title: 'White-Label Mode', desc: 'Remove ProposalKit branding from sidebar, page titles, exports, and client portal.' },
-    { icon: 'mouse-pointer-click', title: 'Click to Change Status', desc: 'Click any status badge on the proposals page to quickly update it.' },
-    { icon: 'shield-check', title: 'Accessibility & Polish', desc: 'ARIA roles, keyboard navigation, and dozens of UI refinements.' }
+    { icon: 'sparkles', title: 'AI Writing Assistant', desc: 'Use Anthropic Claude to improve, expand, shorten, or fix grammar in any section.' },
+    { icon: 'users', title: 'Team & Multi-User', desc: 'Create local team profiles with roles (Admin, Editor, Viewer) and switch between them.' },
+    { icon: 'file-down', title: 'Export Formats', desc: 'Export proposals as Markdown, CSV, or standalone HTML. Send data via webhooks.' },
+    { icon: 'file-plus-2', title: 'SOW, Contract & Receipt', desc: 'Generate Statement of Work, Service Agreement, or Payment Receipt from any proposal.' },
+    { icon: 'git-compare', title: 'Version Comparison', desc: 'Compare proposal versions side by side to see what changed between snapshots.' }
 ];
 
 function checkWhatsNew() {

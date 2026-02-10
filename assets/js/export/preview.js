@@ -105,7 +105,7 @@ function buildPreview(mode) {
         const a = (i.qty || 0) * (i.rate || 0);
         const detailHtml = editorJsToHtml(i.detail, p);
         const detail = detailHtml ? `<div style="font-size:11px;color:#71717a;margin-top:2px;line-height:1.5">${detailHtml}</div>` : '';
-        return { desc: `<div style="font-weight:600">${esc(i.desc)}</div>${detail}`, qty: i.qty, rate: c + (i.rate || 0).toLocaleString(c === '₹' ? 'en-IN' : 'en-US'), amt: c + a.toLocaleString(c === '₹' ? 'en-IN' : 'en-US') };
+        return { desc: `<div style="font-weight:600">${esc(i.desc)}</div>${detail}`, qty: i.qty, rate: fmtCur(i.rate || 0, c), amt: fmtCur(a, c) };
     });
     const secs = (p.sections || []).filter(s => s.title || s.content);
     const logoHtml = CONFIG?.logo ? `<img class="pd-logo" src="${esc(CONFIG.logo)}" style="max-height:36px;margin-bottom:16px">` : '';
@@ -131,11 +131,20 @@ function buildPreview(mode) {
         american: typeof buildAmericanTpl === 'function' ? buildAmericanTpl : null
     };
     const fn = tplFns[docTemplate] || buildModernTpl;
-    html += fn(p, c, bc, t, rows, secs, logoHtml, docTitle, docNum, isInvoice);
-    // Phase 2 PDF sections
-    if (!isInvoice && p.packagesEnabled && typeof buildPackagesPdfHtml === 'function') html += buildPackagesPdfHtml(p, c, bc);
-    if ((p.addOns || []).some(a => a.desc) && typeof buildAddOnsPdfHtml === 'function') html += buildAddOnsPdfHtml(p, c, bc);
-    if ((p.paymentSchedule || []).some(m => m.name) && typeof buildSchedulePdfHtml === 'function') html += buildSchedulePdfHtml(p, c, bc);
+    if (mode === 'sow' && typeof buildSowHtml === 'function') {
+        html += buildSowHtml(p, c, bc, t, rows, secs, logoHtml);
+    } else if (mode === 'contract' && typeof buildContractHtml === 'function') {
+        html += buildContractHtml(p, c, bc, t, rows, secs, logoHtml);
+    } else if (mode === 'receipt' && typeof buildReceiptHtml === 'function') {
+        html += buildReceiptHtml(p, c, bc, t, rows, secs, logoHtml);
+    } else {
+        html += fn(p, c, bc, t, rows, secs, logoHtml, docTitle, docNum, isInvoice);
+    }
+    // Phase 2 PDF sections (skip for derivatives)
+    const isDerivative = ['sow', 'contract', 'receipt'].includes(mode);
+    if (!isInvoice && !isDerivative && p.packagesEnabled && typeof buildPackagesPdfHtml === 'function') html += buildPackagesPdfHtml(p, c, bc);
+    if (!isDerivative && (p.addOns || []).some(a => a.desc) && typeof buildAddOnsPdfHtml === 'function') html += buildAddOnsPdfHtml(p, c, bc);
+    if (!isDerivative && (p.paymentSchedule || []).some(m => m.name) && typeof buildSchedulePdfHtml === 'function') html += buildSchedulePdfHtml(p, c, bc);
     // Acceptance block (only if client has accepted with signature)
     if (p.clientResponse?.status === 'accepted' && (p.clientResponse.clientName || p.clientResponse.clientSignature)) {
         html += buildAcceptanceBlockHtml(p, bc);

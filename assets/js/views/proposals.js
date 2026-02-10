@@ -107,6 +107,8 @@ function showStatusMenu(event, id) {
 }
 
 function setProposalStatus(id, status) {
+  const validStatuses = ['draft', 'sent', 'accepted', 'declined', 'expired'];
+  if (!validStatuses.includes(status)) return;
   const p = DB.find(x => x.id === id);
   if (!p) return;
   p.status = status;

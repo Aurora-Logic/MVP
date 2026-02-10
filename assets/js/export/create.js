@@ -22,7 +22,8 @@ function createProp(tpl) {
         packagesEnabled: false, packages: null, packageFeatures: [],
         addOns: [], paymentSchedule: [], paymentScheduleMode: 'percentage',
         notes: [{ text: 'Proposal created', time: Date.now(), type: 'system' }],
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        owner: CONFIG?.activeUserId || null
     };
     DB.unshift(p); persist();
     loadEditor(id);
@@ -150,6 +151,16 @@ function deleteSavedTpl(idx, e) {
 // ════════════════════════════════════════
 function bumpVersion() {
     const p = cur(); if (!p) return;
+    if (!p.versionHistory) p.versionHistory = [];
+    const snapshot = JSON.parse(JSON.stringify(p));
+    delete snapshot.versionHistory;
+    p.versionHistory.push({
+        version: p.version || 1,
+        snapshot: snapshot,
+        timestamp: Date.now(),
+        user: CONFIG?.activeUserId || null
+    });
+    if (p.versionHistory.length > 20) p.versionHistory.shift();
     p.version = (p.version || 1) + 1;
     p.notes = p.notes || [];
     p.notes.push({ text: `Version bumped to v${p.version}`, time: Date.now(), type: 'system' });
@@ -245,6 +256,9 @@ function ctxAction(action) {
         const rect = ctx ? ctx.getBoundingClientRect() : { left: 200, top: 200 };
         if (typeof showStatusMenu === 'function') showStatusMenu({ clientX: rect.left, clientY: rect.top, stopPropagation: () => {} }, ctxTarget);
     }
+    else if (action === 'sow') { if (typeof generateDerivative === 'function') { CUR = ctxTarget; generateDerivative('sow'); } }
+    else if (action === 'contract') { if (typeof generateDerivative === 'function') { CUR = ctxTarget; generateDerivative('contract'); } }
+    else if (action === 'receipt') { if (typeof generateDerivative === 'function') { CUR = ctxTarget; generateDerivative('receipt'); } }
     else if (action === 'archive') archiveProp(ctxTarget);
     else if (action === 'unarchive') unarchiveProp(ctxTarget);
     else if (action === 'del') delProp(ctxTarget);

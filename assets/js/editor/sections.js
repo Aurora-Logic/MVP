@@ -89,6 +89,7 @@ function secBlockHtml(s, i) {
       <span class="sec-chv"><i data-lucide="chevron-down"></i></span>
       <div class="sec-acts" onclick="event.stopPropagation()">
         <button class="btn-sm-icon-ghost" onclick="showInsertVariableDropdown(sectionEditors[${i}],this)" data-tooltip="Insert Variable" data-side="bottom" data-align="center"><i data-lucide="braces"></i></button>
+        ${typeof showAiPanel === 'function' ? `<button class="btn-sm-icon-ghost" onclick="showAiPanel(${i})" data-tooltip="AI Assistant" data-side="bottom"><i data-lucide="sparkles"></i></button>` : ''}
         <button class="btn-sm-icon-ghost" onclick="saveSectionToLib(this)" data-tooltip="Save to Library" data-side="bottom" data-align="center"><i data-lucide="bookmark"></i></button>
         <button class="btn-sm-icon-ghost" onclick="delSec(this)" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="trash-2"></i></button>
       </div>
@@ -103,6 +104,7 @@ function secBlockHtml(s, i) {
 }
 
 function addSec(type) {
+    if (typeof canEdit === 'function' && !canEdit()) { toast('Viewers cannot edit proposals', 'warning'); return; }
     const p = cur(); if (!p) return;
     if (type === 'testimonial') p.sections.push({ type: 'testimonial', title: 'Client Testimonial', testimonial: { quote: '', author: '', company: '', rating: 5 } });
     else if (type === 'case-study') p.sections.push({ type: 'case-study', title: 'Case Study', caseStudy: { challenge: '', solution: '', result: '' } });
@@ -129,6 +131,7 @@ function togSec(h) { h.closest('.sec-b').classList.toggle('open'); }
 function updSecName(inp) { inp.closest('.sec-b').querySelector('.sec-nm').textContent = inp.value || 'New Section'; }
 
 function delSec(btn) {
+    if (typeof canEdit === 'function' && !canEdit()) { toast('Viewers cannot edit proposals', 'warning'); return; }
     const block = btn.closest('.sec-b');
     const idx = parseInt(block.dataset.idx);
     const p = cur();

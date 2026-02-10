@@ -29,7 +29,22 @@
       "Bash(for f in assets/js/core/*.js assets/js/views/*.js assets/js/editor/*.js assets/js/export/*.js assets/js/boot.js)",
       "Bash(do node -c \"$f\")",
       "Bash(echo:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(for f in assets/js/**/*.js assets/js/boot.js)",
+      "Bash(for f in /Users/virag/Downloads/MVP/assets/js/views/proposals.js /Users/virag/Downloads/MVP/assets/js/core/completeness.js)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $f ===\")",
+      "Bash(python3:*)",
+      "Bash(do echo -n \"$f: \")",
+      "Bash(git -C /Users/virag/Downloads/MVP status)",
+      "Bash(git -C /Users/virag/Downloads/MVP diff:*)",
+      "Bash(git -C /Users/virag/Downloads/MVP log --oneline -3)",
+      "Bash(git -C /Users/virag/Downloads/MVP add:*)",
+      "Bash(git -C /Users/virag/Downloads/MVP push)",
+      "Bash(node -e:*)"
     ]
   }
 }

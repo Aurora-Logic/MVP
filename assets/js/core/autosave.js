@@ -40,7 +40,9 @@ function pushUndo() {
     redoStack = [];
 }
 
+let _viewerWarned = false;
 function dirty() {
+    if (typeof canEdit === 'function' && !canEdit()) { if (!_viewerWarned) { toast('Viewers cannot edit proposals', 'warning'); _viewerWarned = true; setTimeout(() => { _viewerWarned = false; }, 5000); } return; }
     clearTimeout(saveTimer);
     showSaveIndicator('saving');
     // Immediate UI updates (no debounce)
@@ -84,8 +86,8 @@ function dirty() {
 
 
 
-        p.discount = parseFloat(get('fDiscount')) || 0;
-        p.taxRate = parseFloat(get('fTaxRate')) || 0;
+        p.discount = Math.max(0, parseFloat(get('fDiscount')) || 0);
+        p.taxRate = Math.min(100, Math.max(0, parseFloat(get('fTaxRate')) || 0));
 
         // Sections - save from EditorJS or structured forms
         const secEls = document.querySelectorAll('.sec-b');
@@ -105,21 +107,23 @@ function dirty() {
                 const title = b.querySelector('.sec-ti')?.value || '';
                 let content = null;
 
-                // Try getting from EditorJS
-                if (typeof sectionEditors !== 'undefined' && sectionEditors[i] && typeof sectionEditors[i].save === 'function') {
+                // Try getting from EditorJS — use the editor keyed to this DOM element's holder
+                const editorHolder = b.querySelector('.editorjs-container');
+                const editorIdx = editorHolder ? parseInt(editorHolder.id?.replace('sec-editor-', '')) : i;
+                const editorKey = !isNaN(editorIdx) ? editorIdx : i;
+                if (typeof sectionEditors !== 'undefined' && sectionEditors[editorKey] && typeof sectionEditors[editorKey].save === 'function') {
                     try {
-                        content = await sectionEditors[i].save();
+                        content = await sectionEditors[editorKey].save();
                     } catch (err) {
                         console.warn('Error saving section ' + i, err);
-                        // Fallback to existing content if save fails to avoid data loss?
-                        // But existing content might be stale. 
-                        // If save fails, content remains null.
+                        // Keep existing content on save failure (fallback below)
                     }
                 }
 
-                // If content is still null (e.g. editor not ready or failed), try to keep existing?
-                if (!content && p.sections && p.sections[i]) {
-                    content = p.sections[i].content;
+                // If content is still null (e.g. editor not ready or failed), try to keep existing
+                const origIdx = parseInt(b.dataset.idx);
+                if (!content && p.sections && p.sections[!isNaN(origIdx) ? origIdx : i]) {
+                    content = p.sections[!isNaN(origIdx) ? origIdx : i].content;
                 }
                 // Or if it was initialized as empty object
                 if (!content) content = { blocks: [] };
@@ -158,6 +162,7 @@ function dirty() {
         if (typeof collectPaymentScheduleData === 'function') collectPaymentScheduleData(p);
 
         p.updatedAt = Date.now();
+        p.lastEditedBy = CONFIG?.activeUserId || null;
         persist();
         showSaveIndicator('saved');
         document.getElementById('topTitle').textContent = p.title || 'Untitled';

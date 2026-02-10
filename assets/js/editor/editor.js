@@ -60,6 +60,7 @@ function loadEditor(id) {
         <button class="btn-sm-icon-ghost" onclick="typeof redo==='function'&&redo()" data-tooltip="Redo (⌘⇧Z)" data-side="bottom"><i data-lucide="redo-2"></i></button>
         <span class="ver-badge">v${p.version || 1}</span>
         <button class="btn-sm-icon-ghost" onclick="bumpVersion()" data-tooltip="Bump version" data-side="bottom"><i data-lucide="arrow-up-circle"></i></button>
+        ${p.versionHistory?.length ? `<button class="btn-sm-icon-ghost" onclick="typeof openDiffView==='function'&&openDiffView()" data-tooltip="Compare versions" data-side="bottom"><i data-lucide="git-compare"></i></button>` : ''}
         <div class="cover-toggle ${p.coverPage ? 'on' : ''}" onclick="toggleCover()" title="Add cover page to PDF" role="switch" aria-checked="${p.coverPage ? 'true' : 'false'}" aria-label="Cover page">
           <i data-lucide="book-open"></i> Cover
           <div class="switch"></div>

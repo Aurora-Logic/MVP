@@ -68,13 +68,13 @@
 - [x] 5.5 Advanced analytics + forecasting — `analytics-breakdowns.js`, `analytics.js`
 - [x] 5.6 Section template packs — `section-packs.js`
 
-## 🏢 1-YEAR (Months 7–12)
-- [ ] 6.1 Team / multi-user
-- [ ] 6.2 AI writing assistant
-- [ ] 6.3 Integrations (Zapier, Drive, Slack)
+## 🏢 1-YEAR (Months 7–12) ✅ COMPLETE (except cloud sync)
+- [x] 6.1 Team / multi-user — `team.js`
+- [x] 6.2 AI writing assistant — `ai-assistant.js`
+- [x] 6.3 Integrations (Markdown, CSV, HTML, Webhook) — `integrations.js`
 - [x] 6.4 White-label mode — `settings.js`, `nav.js`, `boot.js`
-- [ ] 6.5 Proposal comparison (diff view)
-- [ ] 6.6 Multi-document derivatives
+- [x] 6.5 Proposal comparison (diff view) — `diff-view.js`
+- [x] 6.6 Multi-document derivatives (SOW, Contract, Receipt) — `derivatives.js`
 
 ---
 
@@ -83,5 +83,6 @@
 - Phase 2: 5 features ✅ COMPLETE
 - Phase 3: 6 features ✅ COMPLETE
 - Phase 4: 5 features ✅ COMPLETE
-- 6-month: 6 features (5 done, 1 remaining — 5.1 accounts/cloud) ← CURRENT
-- 1-year: 6 features (1 done, 5 remaining)
+- 6-month: 6 features (5 done, 1 remaining — 5.1 accounts/cloud)
+- 1-year: 6 features ✅ COMPLETE
+- **30 of 31 features complete** — Only 5.1 (Cloud Sync) remains

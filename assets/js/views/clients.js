@@ -82,7 +82,10 @@ function saveClient(idx) {
 function editClient(i) { openAddClient(i); }
 
 function delClient(i) {
-    confirmDialog('Delete this client?', () => {
+    const c = CLIENTS[i]; if (!c) return;
+    const propCount = DB.filter(p => p.client?.name === c.name || p.client?.email === c.email).length;
+    const msg = propCount > 0 ? `Delete this client? ${propCount} proposal(s) reference this client.` : 'Delete this client?';
+    confirmDialog(msg, () => {
         CLIENTS.splice(i, 1); saveClients(); renderClients(); toast('Client deleted');
     }, { title: 'Delete Client', confirmText: 'Delete' });
 }

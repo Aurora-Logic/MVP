@@ -243,6 +243,16 @@
     opacity: 1;
   }
 
+  /* Diff panel stacks vertically */
+  .diff-panel {
+    grid-template-columns: 1fr;
+  }
+
+  /* Export and user switcher menus constrain to viewport */
+  .export-menu, .user-switcher {
+    max-width: calc(100vw - 20px);
+  }
+
   /* Touch targets — Apple HIG 44px minimum */
   .side-btn { min-height: 44px; }
   .ri { min-height: 40px; }
@@ -251,6 +261,9 @@
   .ctx-item { min-height: 44px; }
   .csel-opt { min-height: 44px; }
   .status-opt { min-height: 44px; }
+  .export-menu-item { min-height: 44px; }
+  .user-sw-item { min-height: 44px; }
+  .ai-action-btn { min-height: 44px; }
 }
 
 /* ─── Below 480px (small mobile) ─── */

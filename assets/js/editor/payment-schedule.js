@@ -89,9 +89,20 @@ function removeMilestone(idx) {
     dirty();
 }
 
-function toggleScheduleMode(mode) {
+function toggleScheduleMode(newMode) {
     const p = cur(); if (!p) return;
-    p.paymentScheduleMode = mode;
+    const oldMode = p.paymentScheduleMode || 'percentage';
+    if (oldMode === newMode) return;
+    // Convert values before switching mode
+    const t = calcTotals(p);
+    (p.paymentSchedule || []).forEach(m => {
+        if (oldMode === 'percentage' && newMode === 'amount') {
+            m.amount = t.grand > 0 ? Math.round(t.grand * (m.percentage || 0) / 100) : 0;
+        } else if (oldMode === 'amount' && newMode === 'percentage') {
+            m.percentage = t.grand > 0 ? Math.round((m.amount || 0) / t.grand * 100) : 0;
+        }
+    });
+    p.paymentScheduleMode = newMode;
     persist();
     renderPaymentSchedule(p);
 }
@@ -182,7 +193,7 @@ function buildSchedulePdfHtml(p, c, bc) {
         const amt = mode === 'percentage' ? Math.round(t.grand * (m.percentage || 0) / 100) : (m.amount || 0);
         const pctLabel = mode === 'percentage' ? ` (${m.percentage}%)` : '';
         h += `<tr><td style="padding:8px 0;border-bottom:1px solid #f4f4f5"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${colors[i % colors.length]};margin-right:8px"></span>${esc(m.name)}${m.desc ? '<div style="font-size:11px;color:#a1a1aa;margin-left:16px">' + esc(m.desc) + '</div>' : ''}</td>`;
-        h += `<td style="padding:8px 0;border-bottom:1px solid #f4f4f5;text-align:right;font-family:var(--mono);font-weight:500">${currSymbol}${amt.toLocaleString(currSymbol === '₹' ? 'en-IN' : 'en-US')}${pctLabel}</td>`;
+        h += `<td style="padding:8px 0;border-bottom:1px solid #f4f4f5;text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;font-weight:500">${fmtCur(amt, currSymbol)}${pctLabel}</td>`;
         h += `<td style="padding:8px 0;border-bottom:1px solid #f4f4f5;text-align:right;font-size:12px;color:#71717a">${m.dueDate ? fmtDate(m.dueDate) : '—'}</td></tr>`;
     });
     h += '</tbody></table></div>';
