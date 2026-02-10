@@ -72,6 +72,7 @@ function getObStepHtml(step) {
                     <div class="fg"><label class="fl">IFSC / Sort Code</label><input type="text" id="obBankIfsc" placeholder="e.g. HDFC0001234" value="${esc(CONFIG?.bank?.ifsc || '')}"></div>
                     <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="obBankSwift" placeholder="e.g. HDFCINBB" value="${esc(CONFIG?.bank?.swift || '')}"></div>
                 </div>
+                ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="obBankUpi" placeholder="e.g. business@upi" value="${esc(CONFIG?.bank?.upi || '')}"><div class="fh">Shown as QR code on PDFs</div></div>` : ''}
             </div>
             <div class="ob-btn-row">
                 <button class="btn-ghost" onclick="obPrev()"><i data-lucide="arrow-left"></i> Back</button>
@@ -180,7 +181,7 @@ function collectObStep() {
         if (!CONFIG.bank) CONFIG.bank = {};
         CONFIG.bank.name = v('obBankName'); CONFIG.bank.holder = v('obBankHolder');
         CONFIG.bank.account = v('obBankAccount'); CONFIG.bank.ifsc = v('obBankIfsc');
-        CONFIG.bank.swift = v('obBankSwift');
+        CONFIG.bank.swift = v('obBankSwift'); CONFIG.bank.upi = v('obBankUpi');
     }
 }
 

@@ -40,6 +40,7 @@ function renderPropList(list) {
           <div class="prop-col-label">Score</div>
           <div class="prop-col-val">${buildScoreBadge(p)}</div>
         </div>
+        ${typeof paymentStatusBadge === 'function' && p.status === 'accepted' ? `<div class="prop-col"><div class="prop-col-label">Payment</div><div class="prop-col-val">${paymentStatusBadge(p)}</div></div>` : ''}
         <div class="prop-col prop-col-value">
           <div class="prop-col-label">Value</div>
           <div class="prop-col-val mono">${fmtCur(val, p.currency)}</div>
@@ -171,10 +172,11 @@ function renderProposals() {
   );
 
   const archivedCount = DB.filter(p => p.archived).length;
-  const counts = { all: filtered.length, draft: filtered.filter(p => p.status === 'draft').length, sent: filtered.filter(p => p.status === 'sent').length, accepted: filtered.filter(p => p.status === 'accepted').length, declined: filtered.filter(p => p.status === 'declined').length, expired: filtered.filter(p => p.status === 'expired').length, archived: archivedCount };
+  const duesCount = typeof paymentTotals === 'function' ? filtered.filter(p => p.status === 'accepted' && paymentTotals(p).balanceDue > 0).length : 0;
+  const counts = { all: filtered.length, draft: filtered.filter(p => p.status === 'draft').length, sent: filtered.filter(p => p.status === 'sent').length, accepted: filtered.filter(p => p.status === 'accepted').length, declined: filtered.filter(p => p.status === 'declined').length, expired: filtered.filter(p => p.status === 'expired').length, dues: duesCount, archived: archivedCount };
 
   // Apply filter
-  let display = isArchiveView ? filtered : (currentFilter === 'all' ? filtered : filtered.filter(p => p.status === currentFilter));
+  let display = isArchiveView ? filtered : (currentFilter === 'all' ? filtered : currentFilter === 'dues' ? filtered.filter(p => p.status === 'accepted' && typeof paymentTotals === 'function' && paymentTotals(p).balanceDue > 0) : filtered.filter(p => p.status === currentFilter));
   display = sortProposals(display);
 
   // Pagination
@@ -196,9 +198,11 @@ function renderProposals() {
           <button class="filter-tab${currentFilter === 'accepted' ? ' on' : ''}${!counts.accepted ? ' dimmed' : ''}" onclick="setFilter('accepted')">Won <span class="fc">${counts.accepted}</span></button>
           <button class="filter-tab${currentFilter === 'declined' ? ' on' : ''}${!counts.declined ? ' dimmed' : ''}" onclick="setFilter('declined')">Lost <span class="fc">${counts.declined}</span></button>
           <button class="filter-tab${currentFilter === 'expired' ? ' on' : ''}${!counts.expired ? ' dimmed' : ''}" onclick="setFilter('expired')">Expired <span class="fc">${counts.expired}</span></button>
+          ${typeof paymentTotals === 'function' ? `<button class="filter-tab${currentFilter === 'dues' ? ' on' : ''}${!counts.dues ? ' dimmed' : ''}" onclick="setFilter('dues')"><i data-lucide="wallet"></i> Dues <span class="fc">${counts.dues}</span></button>` : ''}
           <button class="filter-tab${currentFilter === 'archived' ? ' on' : ''}${!counts.archived ? ' dimmed' : ''}" onclick="setFilter('archived')"><i data-lucide="archive"></i> Archived <span class="fc">${counts.archived}</span></button>
         </div>
         <button class="sort-btn" onclick="toggleSortProposals()" id="sortBtnP"><i data-lucide="arrow-up-down"></i> ${currentSort === 'date' ? 'Newest' : currentSort === 'value' ? 'Highest' : currentSort === 'name' ? 'A-Z' : 'Newest'}</button>
+        ${typeof quickRecordPayment === 'function' && counts.dues > 0 ? `<button class="sort-btn" onclick="showPaymentPickerMenu(event)" style="color:#34C759"><i data-lucide="indian-rupee"></i> Record Payment</button>` : ''}
         <div class="view-toggle">
           <button class="vt-btn${viewMode === 'list' ? ' on' : ''}" onclick="setViewMode('list')" data-tooltip="List view" data-side="bottom"><i data-lucide="list"></i></button>
           <button class="vt-btn${viewMode === 'kanban' ? ' on' : ''}" onclick="setViewMode('kanban')" data-tooltip="Board view" data-side="bottom"><i data-lucide="kanban"></i></button>

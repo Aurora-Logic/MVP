@@ -55,6 +55,7 @@ function renderSettings() {
             <div class="fg"><label class="fl">IFSC / Sort Code</label><input type="text" id="setBankIfsc" value="${esc(b.ifsc)}" oninput="saveSettings()"></div>
             <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="setBankSwift" value="${esc(b.swift)}" oninput="saveSettings()"></div>
           </div>
+          ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="setBankUpi" value="${esc(b.upi || '')}" placeholder="e.g. business@upi" oninput="saveSettings()"><div class="fh">Shown as QR code on PDFs (India only)</div></div>` : ''}
         </div>
         <div class="card card-p" style="margin-bottom:14px">
           <div class="card-head">
@@ -261,6 +262,7 @@ function saveSettings() {
     CONFIG.bank.account = v('setBankAccount', CONFIG.bank.account);
     CONFIG.bank.ifsc = v('setBankIfsc', CONFIG.bank.ifsc);
     CONFIG.bank.swift = v('setBankSwift', CONFIG.bank.swift);
+    CONFIG.bank.upi = v('setBankUpi', CONFIG.bank.upi);
     // Color
     const sel = document.querySelector('#setColors .color-swatch.on');
     if (sel) { CONFIG.color = rgbToHex(sel.style.background) || sel.style.background; }

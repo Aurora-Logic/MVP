@@ -86,7 +86,7 @@ function buildAddOnsPdfHtml(p, c, bc) {
     const addOns = (p.addOns || []).filter(a => a.desc);
     if (!addOns.length) return '';
     const currSymbol = c || defaultCurrency();
-    let h = `<div style="margin-top:20px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Optional Add-Ons</div>`;
+    let h = `<div style="margin-top:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Optional Add-Ons</div>`;
     addOns.forEach(ao => {
         const icon = ao.selected ? '☑' : '☐';
         h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f4f4f5">

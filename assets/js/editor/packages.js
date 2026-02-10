@@ -158,7 +158,7 @@ function buildPackagesPdfHtml(p, c, bc) {
     if (!pkgs.length) return '';
     const currSymbol = c || defaultCurrency();
 
-    let h = `<div style="margin-top:20px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Pricing Packages</div>`;
+    let h = `<div style="margin-top:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Pricing Packages</div>`;
     h += '<div style="display:flex;gap:12px;margin-bottom:12px">';
     pkgs.forEach(pkg => {
         h += `<div style="flex:1;border:${pkg.recommended ? '2px solid ' + bc : '1px solid #e4e4e7'};border-radius:8px;padding:16px;text-align:center;position:relative">`;

@@ -18,7 +18,7 @@ function generateDerivative(type) {
     const font = CONFIG?.font || 'Inter';
     win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${labels[type] || type}</title>
 <link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'${font}',system-ui,sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}}</style>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'${font}',system-ui,sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}table{page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}img{page-break-inside:avoid;break-inside:avoid}}</style>
 </head><body>${html}</body></html>`);
     win.document.close();
     setTimeout(() => win.print(), 600);
@@ -51,7 +51,7 @@ function buildSowHtml(p, c, bc, t, rows, secs, logo) {
         <div style="font-size:22px;font-weight:800;color:#09090b;letter-spacing:-.5px">${esc(p.title)}</div>
         <div style="font-size:12px;color:#a1a1aa;margin-top:4px">${num} | ${fmtDate(p.date)}</div>
     </div>`;
-    h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;padding:16px;border:1px solid #e4e4e7;border-radius:8px">
+    h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;padding:16px;border:1px solid #e4e4e7;border-radius:8px;page-break-inside:avoid;break-inside:avoid">
         <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">Provider</div>
             <div style="font-size:13px;font-weight:600">${esc(p.sender.company)}</div>
             <div style="font-size:11px;color:#71717a;margin-top:2px">${buildSenderDetails()}</div>${buildSenderTaxLine()}</div>
@@ -119,15 +119,18 @@ function buildContractHtml(p, c, bc, t, rows, secs, logo) {
 function buildReceiptHtml(p, c, bc, t, rows, secs, logo) {
     const num = esc(p.number).replace('PROP', 'REC');
     const today = fmtDate(new Date().toISOString().split('T')[0]);
+    const pt = (typeof paymentTotals === 'function') ? paymentTotals(p) : { grand: t.grand, amountPaid: t.grand, balanceDue: 0, status: 'paid' };
+    const mono = "'JetBrains Mono',monospace";
     let h = '<div style="position:relative">';
-    h += '<div style="position:absolute;top:35%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:80px;font-weight:900;color:rgba(52,199,89,0.06);pointer-events:none;z-index:0;letter-spacing:8px">PAID</div>';
+    if (pt.status === 'paid') h += '<div style="position:absolute;top:35%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:80px;font-weight:900;color:rgba(52,199,89,0.06);pointer-events:none;z-index:0;letter-spacing:8px">PAID</div>';
+    else if (pt.status === 'partial') h += '<div style="position:absolute;top:35%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:64px;font-weight:900;color:rgba(255,149,0,0.06);pointer-events:none;z-index:0;letter-spacing:6px">PARTIAL</div>';
     h += logo;
     h += `<div style="text-align:center;margin-bottom:28px">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:${bc};font-weight:700;margin-bottom:6px">PAYMENT RECEIPT</div>
         <div style="font-size:18px;font-weight:800;color:#09090b">${num}</div>
         <div style="font-size:12px;color:#a1a1aa;margin-top:4px">Date: ${today}</div>
     </div>`;
-    h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;padding:16px;border:1px solid #e4e4e7;border-radius:8px">
+    h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;padding:16px;border:1px solid #e4e4e7;border-radius:8px;page-break-inside:avoid;break-inside:avoid">
         <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">Received From</div>
             <div style="font-size:13px;font-weight:600">${esc(p.client.name)}</div>
             <div style="font-size:11px;color:#71717a">${esc(p.client.email)}</div></div>
@@ -136,10 +139,18 @@ function buildReceiptHtml(p, c, bc, t, rows, secs, logo) {
             <div style="font-size:11px;color:#71717a">${buildSenderDetails()}</div>${buildSenderTaxLine()}</div>
     </div>`;
     if (rows.length) h += buildPricingHtml(rows, c, t, bc, 'modern');
-    h += `<div style="text-align:center;margin-top:24px;padding:20px;background:${bc}0D;border-radius:8px">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc}">Total Paid</div>
-        <div style="font-size:28px;font-weight:800;color:${bc};font-family:'JetBrains Mono',monospace">${fmtCur(t.grand, c)}</div>
-    </div>`;
+    if (typeof buildPaymentsReceiptHtml === 'function') h += buildPaymentsReceiptHtml(p, c, bc);
+    h += `<div style="text-align:center;margin-top:24px;padding:20px;background:${bc}0D;border-radius:8px;page-break-inside:avoid;break-inside:avoid">`;
+    if (pt.status === 'paid') {
+        h += `<div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc}">Total Paid</div>`;
+        h += `<div style="font-size:28px;font-weight:800;color:${bc};font-family:${mono}">${fmtCur(pt.amountPaid, c)}</div>`;
+    } else {
+        h += `<div style="display:flex;justify-content:space-around">`;
+        h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:#34C759">Amount Paid</div><div style="font-size:22px;font-weight:800;color:#34C759;font-family:${mono}">${fmtCur(pt.amountPaid, c)}</div></div>`;
+        h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:#FF3B30">Balance Due</div><div style="font-size:22px;font-weight:800;color:#FF3B30;font-family:${mono}">${fmtCur(pt.balanceDue, c)}</div></div>`;
+        h += '</div>';
+    }
+    h += '</div>';
     h += buildBankFooterHtml(bc);
     h += '</div>';
     return h;
@@ -148,7 +159,7 @@ function buildReceiptHtml(p, c, bc, t, rows, secs, logo) {
 function buildSignatureBlock(p, bc) {
     const senderSig = CONFIG?.signature?.startsWith('data:image/') ? CONFIG.signature : '';
     const clientSig = p.clientResponse?.clientSignature?.startsWith('data:image/') ? p.clientResponse.clientSignature : '';
-    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px;padding-top:20px;border-top:1px solid #e4e4e7">
+    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px;padding-top:20px;border-top:1px solid #e4e4e7;page-break-inside:avoid;break-inside:avoid">
         <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#a1a1aa;margin-bottom:8px">Provider</div>
             ${senderSig ? `<img src="${senderSig}" style="max-width:180px;height:auto;margin-bottom:4px" alt="Signature">` : '<div style="border-bottom:1px solid #333;width:180px;height:40px;margin-bottom:4px"></div>'}
             <div style="font-size:12px;font-weight:600">${esc(p.sender.company)}</div>

@@ -160,6 +160,7 @@ function dirty() {
         if (typeof collectPackagesData === 'function') collectPackagesData(p);
         if (typeof collectAddOnsData === 'function') collectAddOnsData(p);
         if (typeof collectPaymentScheduleData === 'function') collectPaymentScheduleData(p);
+        if (typeof collectPaymentsData === 'function') collectPaymentsData(p);
 
         p.updatedAt = Date.now();
         p.lastEditedBy = CONFIG?.activeUserId || null;

@@ -98,7 +98,7 @@ function collectStructuredSection(block) {
 function buildTestimonialPdfHtml(s, bc) {
     const t = s.testimonial || {};
     const stars = '★'.repeat(t.rating || 5) + '☆'.repeat(5 - (t.rating || 5));
-    return `<div style="margin-bottom:20px">
+    return `<div style="margin-bottom:20px;page-break-inside:avoid;break-inside:avoid">
     <div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid ${bc};color:${bc}">${esc(s.title)}</div>
     <div style="background:#fafafa;border-left:4px solid ${bc};padding:16px 20px;border-radius:0 8px 8px 0;margin:8px 0">
       <div style="font-size:14px;color:#3f3f46;line-height:1.7;font-style:italic">"${esc(t.quote)}"</div>
@@ -121,7 +121,7 @@ function buildCaseStudyPdfHtml(s, bc) {
         { label: 'Solution', icon: '💡', text: cs.solution, bg: '#f0fdf4', border: '#86efac' },
         { label: 'Result', icon: '🎯', text: cs.result, bg: '#eff6ff', border: '#93c5fd' }
     ];
-    let h = `<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid ${bc};color:${bc}">${esc(s.title)}</div>`;
+    let h = `<div style="margin-bottom:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid ${bc};color:${bc}">${esc(s.title)}</div>`;
     h += '<div style="display:flex;gap:12px">';
     panels.forEach(p => {
         h += `<div style="flex:1;background:${p.bg};border:1px solid ${p.border};border-radius:8px;padding:14px">

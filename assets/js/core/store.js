@@ -254,3 +254,10 @@ function taxLabel() {
 
 const COLORS = ['#18181b', '#2563eb', '#7c3aed', '#dc2626', '#d97706', '#16a34a', '#0891b2', '#be185d'];
 const COLOR_NAMES = { '#18181b': '#09090b', '#2563eb': '#1e40af', '#7c3aed': '#5b21b6', '#dc2626': '#991b1b', '#d97706': '#92400e', '#16a34a': '#166534', '#0891b2': '#155e75', '#be185d': '#9d174d' };
+
+function logoutApp() {
+    confirmDialog('Log out and clear all data? This will remove all proposals, settings, and clients. Make sure to export your data first.', () => {
+        ['pk_db', 'pk_config', 'pk_clients', 'pk_email_tpl', 'pk_seclib', 'pk_tclib', 'pk_templates', 'pk_dismissed', 'pk_theme'].forEach(k => localStorage.removeItem(k));
+        location.reload();
+    }, { title: 'Logout', confirmText: 'Logout & Clear', destructive: true });
+}

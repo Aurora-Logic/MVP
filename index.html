@@ -84,12 +84,13 @@
                 <div id="recentList"></div>
             </div>
             <div class="side-foot">
-                <button class="side-foot-btn" onclick="typeof showUserSwitcher==='function'&&showUserSwitcher()" id="sideUserBtn"><i data-lucide="user"></i><span id="sideUserName"></span></button>
+                <button class="side-foot-btn" onclick="typeof showUserSwitcher==='function'&&showUserSwitcher()" id="sideUserBtn" style="display:none"><i data-lucide="user"></i><span id="sideUserName"></span></button>
                 <button class="side-foot-btn" data-nav="settings" onclick="goNav('settings')"><i
                         data-lucide="settings"></i><span>Settings</span></button>
                 <button class="side-foot-btn" onclick="toggleTheme()" id="sideThemeBtn"><i data-lucide="sun"
                         class="theme-icon-light"></i><i data-lucide="moon"
                         class="theme-icon-dark"></i><span>Theme</span></button>
+                <button class="side-foot-btn" onclick="logoutApp()" id="sideLogoutBtn"><i data-lucide="log-out"></i><span>Logout</span></button>
             </div>
         </aside>
 
@@ -192,6 +193,9 @@
         </div>
     </div>
 
+    <!-- QR Code generator (UPI payments) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+
     <!-- Core: Foundation (loaded first, no deps) -->
     <script src="assets/js/core/store.js"></script>
     <script src="assets/js/core/utils.js"></script>
@@ -241,6 +245,7 @@
     <script src="assets/js/editor/packages.js"></script>
     <script src="assets/js/editor/addons.js"></script>
     <script src="assets/js/editor/payment-schedule.js"></script>
+    <script src="assets/js/editor/payments.js"></script>
     <script src="assets/js/editor/notes.js"></script>
     <!-- Export: PDF, preview, sharing -->
     <script src="assets/js/export/preview.js"></script>

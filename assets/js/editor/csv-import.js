@@ -133,8 +133,7 @@ function renderCsvPreview() {
     const labels = { desc: 'Description', detail: 'Detail', qty: 'Quantity', rate: 'Rate' };
     let mapHtml = '<div class="csv-map-grid">';
     fields.forEach(f => {
-        const opts = headers.map((h, i) => `<option value="${i}" ${_csvMap[f] === i ? 'selected' : ''}>${esc(h)}</option>`).join('');
-        mapHtml += `<div class="fg" style="margin:0"><label class="fl csv-map-label">${labels[f]}</label><select class="csv-map-select" data-field="${f}" onchange="updateCsvMap(this)"><option value="-1">— Skip —</option>${opts}</select></div>`;
+        mapHtml += `<div class="fg" style="margin:0"><label class="fl csv-map-label">${labels[f]}</label><div class="csv-map-select" data-field="${f}"></div></div>`;
     });
     mapHtml += '</div>';
 
@@ -152,11 +151,18 @@ function renderCsvPreview() {
     tableHtml += '</tbody></table></div>';
 
     preview.innerHTML = `<div class="csv-preview-header">${rows.length} row${rows.length > 1 ? 's' : ''} detected — Map columns:</div>${mapHtml}<div class="csv-preview-header">Preview:</div>${tableHtml}`;
+    if (typeof csel === 'function') {
+        const cselItems = [{ value: '-1', label: '— Skip —' }, ...headers.map((h, i) => ({ value: String(i), label: h }))];
+        preview.querySelectorAll('.csv-map-select').forEach(sel => {
+            const f = sel.dataset.field;
+            csel(sel, { value: String(_csvMap[f] ?? -1), small: true, items: cselItems, onChange: (v) => { _csvMap[f] = parseInt(v); renderCsvPreview(); } });
+        });
+    }
     document.getElementById('csvConfirmBtn').style.display = '';
 }
 
 function updateCsvMap(sel) {
-    _csvMap[sel.dataset.field] = parseInt(sel.value);
+    _csvMap[sel.dataset.field] = parseInt(typeof cselGetValue === 'function' ? cselGetValue(sel) : sel.value);
     renderCsvPreview();
 }
 

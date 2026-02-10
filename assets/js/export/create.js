@@ -20,7 +20,7 @@ function createProp(tpl) {
         lineItems: JSON.parse(JSON.stringify(tpl.lineItems || [])),
         currency: defaultCurrency(), paymentTerms: tpl.paymentTerms || '', version: 1, coverPage: false,
         packagesEnabled: false, packages: null, packageFeatures: [],
-        addOns: [], paymentSchedule: [], paymentScheduleMode: 'percentage',
+        addOns: [], paymentSchedule: [], paymentScheduleMode: 'percentage', payments: [],
         notes: [{ text: 'Proposal created', time: Date.now(), type: 'system' }],
         createdAt: Date.now(),
         owner: CONFIG?.activeUserId || null

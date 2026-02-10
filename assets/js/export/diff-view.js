@@ -10,9 +10,8 @@ function openDiffView() {
     }
     document.getElementById('diffModal')?.remove();
     const versions = p.versionHistory;
-    const leftOpts = versions.map((v, i) => `<option value="${i}">v${v.version} — ${timeAgo(v.timestamp)}</option>`).join('');
-    const rightOpts = `<option value="current">Current (v${p.version})</option>` +
-        versions.map((v, i) => `<option value="${i}">v${v.version} — ${timeAgo(v.timestamp)}</option>`).join('');
+    const leftItems = versions.map((v, i) => ({ value: String(i), label: `v${v.version} — ${timeAgo(v.timestamp)}` }));
+    const rightItems = [{ value: 'current', label: `Current (v${p.version})` }, ...leftItems];
 
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap'; wrap.id = 'diffModal';
@@ -25,12 +24,12 @@ function openDiffView() {
         <div class="diff-selectors">
             <div class="diff-sel">
                 <label class="fl">Left</label>
-                <select id="diffLeftSel" onchange="updateDiffView()">${leftOpts}</select>
+                <div id="diffLeftSel"></div>
             </div>
             <div class="diff-arrow"><i data-lucide="arrow-right"></i></div>
             <div class="diff-sel">
                 <label class="fl">Right</label>
-                <select id="diffRightSel" onchange="updateDiffView()">${rightOpts}</select>
+                <div id="diffRightSel"></div>
             </div>
         </div>
         <div id="diffSummary" class="diff-summary"></div>
@@ -45,13 +44,19 @@ function openDiffView() {
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
     lucide.createIcons();
+    if (typeof csel === 'function') {
+        csel(document.getElementById('diffLeftSel'), { value: '0', items: leftItems, onChange: () => updateDiffView() });
+        csel(document.getElementById('diffRightSel'), { value: 'current', items: rightItems, onChange: () => updateDiffView() });
+    }
     updateDiffView();
 }
 
 function updateDiffView() {
     const p = cur(); if (!p) return;
-    const leftIdx = parseInt(document.getElementById('diffLeftSel')?.value || '0');
-    const rightVal = document.getElementById('diffRightSel')?.value || 'current';
+    const leftEl = document.getElementById('diffLeftSel');
+    const rightEl = document.getElementById('diffRightSel');
+    const leftIdx = parseInt((typeof cselGetValue === 'function' ? cselGetValue(leftEl) : leftEl?.value) || '0');
+    const rightVal = (typeof cselGetValue === 'function' ? cselGetValue(rightEl) : rightEl?.value) || 'current';
     const left = p.versionHistory[leftIdx]?.snapshot;
     const right = rightVal === 'current' ? p : p.versionHistory[parseInt(rightVal)]?.snapshot;
     if (!left || !right) return;

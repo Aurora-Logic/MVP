@@ -32,7 +32,9 @@ function activeUser() {
 
 function updateSidebarUser() {
     const el = document.getElementById('sideUserName');
+    const btn = document.getElementById('sideUserBtn');
     const u = activeUser();
+    if (btn) btn.style.display = (CONFIG?.team?.length > 1) ? '' : 'none';
     if (el && u) el.textContent = u.name;
 }
 
@@ -144,13 +146,7 @@ function showAddMemberModal() {
         <div class="modal-t">Add Team Member</div>
         <div class="fg" style="margin-top:12px"><label class="fl">Name</label><input type="text" id="newMemberName" placeholder="Jane Smith"></div>
         <div class="fg"><label class="fl">Email</label><input type="email" id="newMemberEmail" placeholder="jane@example.com"></div>
-        <div class="fg"><label class="fl">Role</label>
-            <select id="newMemberRole">
-                <option value="editor">Editor — Can edit proposals</option>
-                <option value="viewer">Viewer — Read-only access</option>
-                <option value="admin">Admin — Full access</option>
-            </select>
-        </div>
+        <div class="fg"><label class="fl">Role</label><div id="newMemberRole"></div></div>
         <div class="modal-foot">
             <button class="btn-sm-outline" onclick="document.getElementById('addMemberModal').remove()">Cancel</button>
             <button class="btn-sm" onclick="doAddMember()">Add Member</button>
@@ -158,13 +154,20 @@ function showAddMemberModal() {
     </div>`;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
+    if (typeof csel === 'function') {
+        csel(document.getElementById('newMemberRole'), { value: 'editor', items: [
+            { value: 'editor', label: 'Editor', desc: 'Can edit proposals' },
+            { value: 'viewer', label: 'Viewer', desc: 'Read-only access' },
+            { value: 'admin', label: 'Admin', desc: 'Full access' }
+        ]});
+    }
     document.getElementById('newMemberName')?.focus();
 }
 
 function doAddMember() {
     const name = document.getElementById('newMemberName')?.value.trim();
     const email = document.getElementById('newMemberEmail')?.value.trim();
-    const role = document.getElementById('newMemberRole')?.value || 'editor';
+    const role = (typeof cselGetValue === 'function' ? cselGetValue(document.getElementById('newMemberRole')) : document.getElementById('newMemberRole')?.value) || 'editor';
     if (!name) { toast('Name is required'); return; }
     addTeamMember(name, email, role);
     document.getElementById('addMemberModal')?.remove();

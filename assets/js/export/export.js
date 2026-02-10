@@ -24,7 +24,7 @@ function doExport(mode) {
         if (!html) { hideLoading(); win.close(); return; }
         win.document.write(`<!DOCTYPE html><html><head><title>${esc(mode === 'invoice' ? 'Invoice' : p.title)}</title>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-      <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}}</style></head><body>${html}</body></html>`);
+      <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}table{page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}img{page-break-inside:avoid;break-inside:avoid}}</style></head><body>${html}</body></html>`);
         win.document.close();
         hideLoading();
         setTimeout(() => win.print(), 600);
@@ -93,7 +93,7 @@ function bulkExport() {
     } finally { CUR = origCUR; }
     win.document.write(`<!DOCTYPE html><html><head><title>Bulk Export - ${ids.length} Proposals</title>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-      <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}}</style></head><body>${combinedHtml}</body></html>`);
+      <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}table{page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}img{page-break-inside:avoid;break-inside:avoid}}</style></head><body>${combinedHtml}</body></html>`);
     win.document.close();
     hideLoading();
     setTimeout(() => win.print(), 600);

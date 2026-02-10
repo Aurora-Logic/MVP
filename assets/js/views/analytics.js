@@ -31,7 +31,8 @@ function computeAnalytics(proposals) {
 
     const forecast = Math.round(pipeline * (winRate / 100));
 
-    return { winRate, pipeline, avgValue, avgDays, forecast, total: proposals.length, accepted: accepted.length, decided: decided.length };
+    const outstanding = typeof paymentTotals === 'function' ? accepted.reduce((s, p) => s + paymentTotals(p).balanceDue, 0) : 0;
+    return { winRate, pipeline, avgValue, avgDays, forecast, outstanding, total: proposals.length, accepted: accepted.length, decided: decided.length };
 }
 
 function buildBarChart(proposals) {
@@ -126,7 +127,7 @@ function buildAnalyticsWidget() {
         </div>
         <div class="an-body">
             <div class="an-main">
-                <div class="an-metrics an-metrics-5">
+                <div class="an-metrics ${typeof paymentTotals === 'function' ? 'an-metrics-6' : 'an-metrics-5'}">
                     <div class="an-metric">
                         <div class="an-metric-val ${stats.winRate >= 50 ? 'good' : stats.winRate > 0 ? 'mid' : ''}">${stats.winRate}%</div>
                         <div class="an-metric-label">Win Rate</div>
@@ -152,6 +153,11 @@ function buildAnalyticsWidget() {
                         <div class="an-metric-label">Avg Close</div>
                         <div class="an-metric-sub">Days to accept</div>
                     </div>
+                    ${typeof paymentTotals === 'function' ? `<div class="an-metric">
+                        <div class="an-metric-val ${stats.outstanding > 0 ? 'mid' : 'good'}">${fmtCur(stats.outstanding, c)}</div>
+                        <div class="an-metric-label">Outstanding</div>
+                        <div class="an-metric-sub">Unpaid balance</div>
+                    </div>` : ''}
                 </div>
                 ${proposals.length >= 2 ? buildBarChart(proposals) : ''}
             </div>

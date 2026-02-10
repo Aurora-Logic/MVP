@@ -388,17 +388,17 @@
 /* Sidebar footer */
 .side-foot {
   display: flex;
+  flex-wrap: wrap;
   gap: 2px;
   padding: 8px;
   border-top: 1px solid var(--border);
-  overflow: hidden;
 }
 
 .side-foot-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 1;
+  gap: 6px;
+  flex: 1 0 auto;
   padding: 7px 10px;
   border: none;
   background: transparent;
@@ -409,6 +409,7 @@
   color: var(--text4);
   cursor: pointer;
   transition: all var(--t);
+  white-space: nowrap;
 }
 
 .side-foot-btn:hover {

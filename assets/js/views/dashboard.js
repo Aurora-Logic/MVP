@@ -2,6 +2,21 @@
 // DASHBOARD
 // ════════════════════════════════════════
 
+function buildDuesBanner(active) {
+    if (typeof paymentTotals !== 'function') return '';
+    const accepted = (active || activeDB()).filter(p => p.status === 'accepted');
+    if (!accepted.length) return '';
+    let totalDue = 0, countPartial = 0, countUnpaid = 0;
+    accepted.forEach(p => {
+        const pt = paymentTotals(p);
+        if (pt.balanceDue > 0) { totalDue += pt.balanceDue; if (pt.status === 'partial') countPartial++; else countUnpaid++; }
+    });
+    if (totalDue <= 0) return '';
+    const count = countPartial + countUnpaid;
+    const c = defaultCurrency();
+    return `<div class="dues-banner"><div class="dues-banner-icon"><i data-lucide="wallet"></i></div><div class="dues-banner-body"><div class="dues-banner-val">${fmtCur(totalDue, c)}</div><div class="dues-banner-label">Outstanding across ${count} proposal${count !== 1 ? 's' : ''} (${countUnpaid} unpaid, ${countPartial} partial)</div></div><button class="btn-sm-outline" onclick="setFilter('dues');goNav('editor')"><i data-lucide="arrow-right"></i> View</button></div>`;
+}
+
 function buildExpiryBanner() {
   const dismissed = safeGetStorage('pk_dismissed', []);
   const today = new Date();
@@ -139,6 +154,7 @@ function renderDashboard() {
 
     ${buildResumeCard()}
     ${buildExpiryBanner()}
+    ${typeof buildDuesBanner === 'function' ? buildDuesBanner(active) : ''}
 
     <div class="dash-grid">
       <div class="stat-card" onclick="goNav('editor')">
@@ -161,6 +177,11 @@ function renderDashboard() {
         <div class="stat-val">${fmtCur(totalValue, defaultCurrency())}</div>
         <div class="stat-label">Total Pipeline Value</div>
       </div>
+      ${typeof paymentTotals === 'function' ? `<div class="stat-card" onclick="setFilter('dues');goNav('editor')">
+        <div class="stat-top"><div class="stat-icon si-dues"><i data-lucide="wallet"></i></div></div>
+        <div class="stat-val">${fmtCur(active.filter(p => p.status === 'accepted').reduce((s, p) => s + paymentTotals(p).balanceDue, 0), defaultCurrency())}</div>
+        <div class="stat-label">Outstanding Dues</div>
+      </div>` : ''}
     </div>
 
     ${typeof buildAnalyticsWidget === 'function' && active.length >= 3 ? buildAnalyticsWidget() : ''}

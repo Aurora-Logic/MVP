@@ -90,6 +90,47 @@
   color: var(--amber);
 }
 
+.si-dues {
+  background: #FF3B3014;
+  color: #FF3B30;
+}
+
+/* Dues banner */
+.dues-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: var(--r2);
+  background: #FF3B300A;
+  border: 1px solid #FF3B3018;
+  margin-bottom: 16px;
+}
+.dues-banner-icon {
+  width: 40px;
+  height: 40px;
+  background: #FF3B30;
+  color: white;
+  border-radius: var(--r2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.dues-banner-icon svg { width: 20px; height: 20px; }
+.dues-banner-body { flex: 1; }
+.dues-banner-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: #FF3B30;
+  font-family: var(--mono);
+}
+.dues-banner-label {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
 .stat-change {
   font-size: 11px;
   font-weight: 500;
@@ -1388,6 +1429,58 @@
   color: var(--text4);
 }
 
+/* ════════ PAYMENTS RECEIVED ════════ */
+
+.pay-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.pay-row:last-child { border-bottom: none; }
+.pay-row-num {
+  width: 24px;
+  height: 24px;
+  background: #34C75914;
+  color: #34C759;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.pay-row-body { flex: 1; min-width: 0; }
+.pay-row-top { display: flex; gap: 8px; align-items: center; }
+.pay-date { width: 140px !important; }
+.pay-amt { width: 120px !important; font-family: var(--mono); text-align: right; }
+.pay-method { width: 110px !important; }
+.pay-method-sel { width: 120px; flex-shrink: 0; }
+.pay-note { margin-top: 6px; font-size: 12px !important; }
+.pay-summary {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.pay-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--text3);
+}
+.pay-summary-balance {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 2px solid var(--border);
+}
+
 /* ════════ NOTES ════════ */
 
 .note-item {
@@ -2449,10 +2542,9 @@
   color: var(--text);
 }
 
-/* 5-column analytics metrics */
-.an-metrics-5 {
-  grid-template-columns: repeat(5, 1fr);
-}
+/* 5/6-column analytics metrics */
+.an-metrics-5 { grid-template-columns: repeat(5, 1fr); }
+.an-metrics-6 { grid-template-columns: repeat(6, 1fr); }
 
 /* Horizontal bar chart (breakdowns) */
 .an-hbar-row {

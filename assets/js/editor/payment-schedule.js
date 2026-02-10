@@ -175,7 +175,7 @@ function buildSchedulePdfHtml(p, c, bc) {
     const t = calcTotals(p);
     const colors = ['#007AFF', '#AF52DE', '#34C759', '#FF9500', '#FF3B30', '#5AC8FA'];
 
-    let h = `<div style="margin-top:20px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Payment Schedule</div>`;
+    let h = `<div style="margin-top:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Payment Schedule</div>`;
     // Progress bar
     h += '<div style="display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:12px;background:#f4f4f5">';
     milestones.forEach((m, i) => {
