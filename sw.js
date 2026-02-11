@@ -2,7 +2,7 @@
 // SERVICE WORKER — Offline Support
 // ════════════════════════════════════════
 
-const CACHE_NAME = 'proposalkit-v5';
+const CACHE_NAME = 'proposalkit-v6';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

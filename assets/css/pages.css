@@ -2769,9 +2769,16 @@
   box-shadow: none;
 }
 
-/* Core editor element */
-.tiptap-wrap .tiptap {
-  outline: none;
+/* Core editor element — !important to beat Tailwind v4 preflight */
+.tiptap-wrap .tiptap,
+.tiptap-wrap .ProseMirror,
+.tiptap-wrap [contenteditable] {
+  outline: none !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 1em !important;
+  white-space: pre-wrap;
 }
 
 /* Typography */
