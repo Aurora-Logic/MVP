@@ -526,7 +526,7 @@
 }
 
 /* Editor fade-in */
-.editor-loading { opacity: 0; }
+.editor-loading { opacity: 0.5; }
 .editor-loaded {
   opacity: 1;
   transition: opacity var(--t2);

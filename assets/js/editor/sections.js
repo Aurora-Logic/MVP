@@ -46,6 +46,15 @@ function initSectionEditors(sections) {
         const html = migrateEditorContent(s.content);
         initSingleSectionEditor(i, holderEl, html);
     });
+    // Safety: force fallback for any editor still stuck after 2s
+    setTimeout(() => sections.forEach((s, i) => {
+        if (s.type === 'testimonial' || s.type === 'case-study') return;
+        const h = document.getElementById(`sec-editor-${i}`);
+        if (!h || !h.classList.contains('editor-loading')) return;
+        h.classList.remove('editor-loading'); h.classList.add('editor-loaded');
+        if (!h.querySelector('[contenteditable]') && !h.querySelector('.sec-fallback-ta'))
+            showFallbackEditor(h, migrateEditorContent(s.content), i);
+    }), 2000);
 }
 
 function initSingleSectionEditor(i, holderEl, html) {
@@ -76,7 +85,6 @@ function showFallbackEditor(holderEl, html, idx) {
         destroy: () => { holderEl.innerHTML = ''; }
     };
 }
-
 
 function secBlockHtml(s, i) {
     return `<div class="sec-b open" draggable="false" data-idx="${i}">
@@ -203,7 +211,6 @@ function saveSectionToLib(btn) {
     safeLsSet('pk_seclib', lib);
     toast('Saved to library');
 }
-
 const DEFAULT_SECTIONS = [
     { title: 'Executive Summary', category: 'intro', content: 'We are pleased to present this proposal outlining our approach, timeline, and investment for the project described herein.' },
     { title: 'Project Overview', category: 'intro', content: 'This section provides a high-level overview of the project objectives, scope, and expected outcomes.' },
@@ -214,7 +221,6 @@ const DEFAULT_SECTIONS = [
     { title: 'About Us', category: 'intro', content: 'We are a team of experienced professionals dedicated to delivering high-quality solutions that drive business results.' },
     { title: 'Next Steps', category: 'general', content: '1. Review and accept this proposal\n2. Sign the attached agreement\n3. Submit initial deposit\n4. Schedule kickoff meeting' }
 ];
-
 function openLibrary() {
     const lib = safeGetStorage('pk_seclib', []);
     const defaultLib = [...DEFAULT_SECTIONS, ...(typeof STRUCTURED_SECTION_DEFAULTS !== 'undefined' ? STRUCTURED_SECTION_DEFAULTS : [])];
@@ -251,14 +257,12 @@ function openLibrary() {
     filterLibrary();
     lucide.createIcons();
 }
-
 function setLibCat(el) {
     document.querySelectorAll('.lib-cat').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
     window._libFilter.category = el.dataset.cat;
     filterLibrary();
 }
-
 function setLibTab(tab, el) {
     document.querySelectorAll('.lib-tabs .filter-tab').forEach(t => t.classList.remove('on'));
     if (el) el.classList.add('on');
@@ -270,7 +274,6 @@ function setLibTab(tab, el) {
         if (tab === 'packs' && typeof renderPacksTab === 'function') renderPacksTab();
     }
 }
-
 function filterLibrary() {
     const search = (document.getElementById('libSearch')?.value || '').toLowerCase();
     const cat = window._libFilter.category;
