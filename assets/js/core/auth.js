@@ -12,6 +12,14 @@ async function initAuth() {
         return;
     }
 
+    // Safety timeout — never leave the user on a blank screen
+    const safetyTimer = setTimeout(() => {
+        if (!document.getElementById('obContent')?.innerHTML?.trim()) {
+            console.warn('[Auth] Safety timeout — showing auth screen');
+            renderAuthScreen();
+        }
+    }, 5000);
+
     // Detect OAuth callback (hash contains access_token from Google redirect)
     const hash = window.location.hash;
     const isOAuthCallback = hash && hash.includes('access_token=');
@@ -77,9 +85,11 @@ async function initAuth() {
 
         if (session && !authBooted) {
             authBooted = true;
+            clearTimeout(safetyTimer);
             await safePullAndBoot();
         } else if (event === 'INITIAL_SESSION' && !session && !authBooted && !isOAuthCallback) {
             authBooted = true;
+            clearTimeout(safetyTimer);
             renderAuthScreen();
         }
     });
@@ -98,12 +108,13 @@ async function initAuth() {
     // Give onAuthStateChange a moment to fire (it's async)
     await new Promise(r => setTimeout(r, 300));
 
-    if (authBooted) return; // Already handled by onAuthStateChange
+    if (authBooted) { clearTimeout(safetyTimer); return; }
 
     // Fallback: if we have a session from getSession, boot manually
     if (sbSession) {
         console.warn('[Auth] Fallback: booting with session from getSession');
         authBooted = true;
+        clearTimeout(safetyTimer);
         cleanHash();
         await safePullAndBoot();
         return;
@@ -149,6 +160,7 @@ async function initAuth() {
 
     // No session, no OAuth callback — show login
     authBooted = true;
+    clearTimeout(safetyTimer);
     renderAuthScreen();
 }
 

@@ -199,10 +199,10 @@ body {
 /* ─── Global Focus Ring ─── */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.15);
+  box-shadow: none;
 }
 .dark :focus-visible {
-  box-shadow: 0 0 0 2px rgba(212, 212, 216, 0.15);
+  box-shadow: none;
 }
 
 /* ─── Lucide Icons Base ─── */

@@ -7,7 +7,8 @@ function renderPricing(p) {
     const items = p.lineItems || [];
     let rows = '';
     items.forEach((item, i) => {
-        rows += `<tr class="li-row">
+        rows += `<tr class="li-row" draggable="false">
+      <td class="li-grip-td"><span class="li-grip" onmousedown="this.closest('.li-row').draggable=true" onmouseup="this.closest('.li-row').draggable=false"><i data-lucide="grip-vertical"></i></span></td>
       <td><div class="li-title-wrap"><input type="text" class="ld" value="${esc(item.desc)}" placeholder="Item title" oninput="dirty()"><div class="tiptap-wrap li-desc-editor" id="li-editor-${i}"></div></div></td>
       <td><input type="number" class="lq" value="${item.qty}" min="0" step="1" oninput="reRow(this);dirty()"></td>
       <td><input type="number" class="lr" value="${item.rate}" min="0" step="100" oninput="reRow(this);dirty()"></td>
@@ -28,7 +29,7 @@ function renderPricing(p) {
 
     const sectionHtml = {
         packages: '<div id="pkgSection"></div>',
-        lineItems: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Line Items</div><div class="card-d">Deliverables and costs</div></div><div class="pricing-cur-wrap"><label class="fl pricing-cur-label">Currency</label><div id="fCur" class="pricing-cur-sel"></div></div></div>${hasItems ? `<table class="li-tbl"><thead><tr><th style="width:40%">Item</th><th style="width:12%">Qty</th><th style="width:18%">Rate</th><th style="width:18%;text-align:right">Amount</th><th style="width:12%"></th></tr></thead><tbody id="liBody">${rows}</tbody></table><div class="pricing-summary-area"><div class="pricing-summary-layout"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}<div class="pricing-summary-col"><div class="summary-row sub"><span class="sr-label">Subtotal</span><span class="sr-val" id="subtotalVal">${fmtCur(subtotal, p.currency)}</span></div><div class="summary-row sub pricing-disc-row"><span class="sr-label">Discount</span><div class="pricing-disc-input"><span class="pricing-disc-sign">−</span><input type="number" id="fDiscount" value="${disc}" min="0" step="500" class="pricing-disc-field" oninput="reTotal();dirty()"></div></div><div class="summary-row sub pricing-disc-row"><span class="sr-label">${taxLbl}</span><div class="pricing-disc-input"><input type="number" id="fTaxRate" value="${taxRate}" min="0" max="100" step="0.5" class="pricing-tax-field" oninput="reTotal();dirty()"><span class="pricing-disc-sign">%</span><span class="sr-val pricing-tax-val" id="taxAmtVal">${fmtCur(taxAmt, p.currency)}</span></div></div><div class="summary-row sub" id="addOnsSummaryRow" style="display:none"></div><div class="summary-row grand"><span class="sr-label">Total</span><span class="sr-val" id="totalVal">${fmtCur(grand, p.currency)}</span></div></div></div></div>` : `<div class="empty empty-sm"><div class="empty-icon"><i data-lucide="receipt"></i></div><div class="empty-t">No line items yet</div><div class="empty-d">Add deliverables, services, or products with quantities and rates.</div><div class="sec-header-actions"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add First Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}</div></div>`}</div>`,
+        lineItems: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Line Items</div><div class="card-d">Deliverables and costs</div></div><div class="pricing-cur-wrap"><label class="fl pricing-cur-label">Currency</label><div id="fCur" class="pricing-cur-sel"></div></div></div>${hasItems ? `<table class="li-tbl"><thead><tr><th style="width:28px"></th><th style="width:40%">Item</th><th style="width:12%">Qty</th><th style="width:18%">Rate</th><th style="width:18%;text-align:right">Amount</th><th style="width:12%"></th></tr></thead><tbody id="liBody">${rows}</tbody></table><div class="pricing-summary-area"><div class="pricing-summary-layout"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}<div class="pricing-summary-col"><div class="summary-row sub"><span class="sr-label">Subtotal</span><span class="sr-val" id="subtotalVal">${fmtCur(subtotal, p.currency)}</span></div><div class="summary-row sub pricing-disc-row"><span class="sr-label">Discount</span><div class="pricing-disc-input"><span class="pricing-disc-sign">−</span><input type="number" id="fDiscount" value="${disc}" min="0" step="500" class="pricing-disc-field" oninput="reTotal();dirty()"></div></div><div class="summary-row sub pricing-disc-row"><span class="sr-label">${taxLbl}</span><div class="pricing-disc-input"><input type="number" id="fTaxRate" value="${taxRate}" min="0" max="100" step="0.5" class="pricing-tax-field" oninput="reTotal();dirty()"><span class="pricing-disc-sign">%</span><span class="sr-val pricing-tax-val" id="taxAmtVal">${fmtCur(taxAmt, p.currency)}</span></div></div><div class="summary-row sub" id="addOnsSummaryRow" style="display:none"></div><div class="summary-row grand"><span class="sr-label">Total</span><span class="sr-val" id="totalVal">${fmtCur(grand, p.currency)}</span></div></div></div></div>` : `<div class="empty empty-sm"><div class="empty-icon"><i data-lucide="receipt"></i></div><div class="empty-t">No line items yet</div><div class="empty-d">Add deliverables, services, or products with quantities and rates.</div><div class="sec-header-actions"><button class="btn-sm-outline" onclick="addLine()"><i data-lucide="plus"></i> Add First Item</button>${typeof openCsvImport === 'function' ? '<button class="btn-sm-outline" onclick="openCsvImport()"><i data-lucide="file-spreadsheet"></i> Import CSV</button>' : ''}</div></div>`}</div>`,
         addOns: '<div id="addOnsSection"></div>',
         paySchedule: '<div id="payScheduleSection"></div>',
         payments: '<div id="paymentsSection"></div>',
@@ -46,6 +47,7 @@ function renderPricing(p) {
 
     document.getElementById('edPricing').innerHTML = `<div id="pricingInsights"></div><div id="pricingSecList">${sectionsHtml}</div>`;
     initPricingDrag();
+    initLineItemDrag();
     if (typeof renderPackages === 'function') renderPackages(p);
     if (typeof renderAddOns === 'function') renderAddOns(p);
     if (typeof renderPaymentSchedule === 'function') renderPaymentSchedule(p);
@@ -77,37 +79,30 @@ function renderPricing(p) {
 }
 
 function initPricingDrag() {
-    const list = document.getElementById('pricingSecList');
-    if (!list) return;
-    let dragEl = null;
-    list.querySelectorAll('.price-sec').forEach(b => {
-        b.addEventListener('dragstart', (e) => {
-            dragEl = b; b.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', '');
-        });
-        b.addEventListener('dragend', () => {
-            b.classList.remove('dragging');
-            b.draggable = false;
-            list.querySelectorAll('.price-sec').forEach(x => { x.classList.remove('drag-over', 'drag-over-bottom'); });
-            savePricingOrder();
-        });
-        b.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            if (!dragEl || dragEl === b) return;
-            list.querySelectorAll('.price-sec').forEach(x => { x.classList.remove('drag-over', 'drag-over-bottom'); });
-            const mid = b.getBoundingClientRect().top + b.getBoundingClientRect().height / 2;
-            b.classList.add(e.clientY < mid ? 'drag-over' : 'drag-over-bottom');
-        });
-        b.addEventListener('dragleave', () => { b.classList.remove('drag-over', 'drag-over-bottom'); });
-        b.addEventListener('drop', (e) => {
-            e.preventDefault();
-            list.querySelectorAll('.price-sec').forEach(x => { x.classList.remove('drag-over', 'drag-over-bottom'); });
-            if (!dragEl || dragEl === b) return;
-            const mid = b.getBoundingClientRect().top + b.getBoundingClientRect().height / 2;
-            if (e.clientY < mid) list.insertBefore(dragEl, b);
-            else list.insertBefore(dragEl, b.nextSibling);
-        });
+    const l = document.getElementById('pricingSecList');
+    if (!l) return;
+    let d = null;
+    const clr = () => l.querySelectorAll('.price-sec').forEach(x => x.classList.remove('drag-over', 'drag-over-bottom'));
+    l.querySelectorAll('.price-sec').forEach(b => {
+        b.ondragstart = (e) => { d = b; b.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', ''); };
+        b.ondragend = () => { b.classList.remove('dragging'); b.draggable = false; clr(); savePricingOrder(); };
+        b.ondragover = (e) => { e.preventDefault(); if (!d || d === b) return; clr(); b.classList.add(e.clientY < b.getBoundingClientRect().top + b.getBoundingClientRect().height / 2 ? 'drag-over' : 'drag-over-bottom'); };
+        b.ondragleave = () => b.classList.remove('drag-over', 'drag-over-bottom');
+        b.ondrop = (e) => { e.preventDefault(); clr(); if (!d || d === b) return; const m = b.getBoundingClientRect().top + b.getBoundingClientRect().height / 2; if (e.clientY < m) l.insertBefore(d, b); else l.insertBefore(d, b.nextSibling); };
+    });
+}
+
+function initLineItemDrag() {
+    const b = document.getElementById('liBody');
+    if (!b) return;
+    let d = null;
+    const clr = () => b.querySelectorAll('.li-row').forEach(x => x.classList.remove('drag-over', 'drag-over-bottom'));
+    b.querySelectorAll('.li-row').forEach(r => {
+        r.ondragstart = (e) => { d = r; r.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', ''); };
+        r.ondragend = () => { r.classList.remove('dragging'); r.draggable = false; clr(); dirty(); };
+        r.ondragover = (e) => { e.preventDefault(); if (!d || d === r) return; clr(); r.classList.add(e.clientY < r.getBoundingClientRect().top + r.getBoundingClientRect().height / 2 ? 'drag-over' : 'drag-over-bottom'); };
+        r.ondragleave = () => r.classList.remove('drag-over', 'drag-over-bottom');
+        r.ondrop = (e) => { e.preventDefault(); clr(); if (!d || d === r) return; const m = r.getBoundingClientRect().top + r.getBoundingClientRect().height / 2; if (e.clientY < m) b.insertBefore(d, r); else b.insertBefore(d, r.nextSibling); };
     });
 }
 
@@ -233,8 +228,10 @@ function addLine() {
     tr.className = 'li-row';
     const c = cselGetValue(document.getElementById('fCur')) || defaultCurrency();
     const uniqueId = 'li-' + Date.now() + Math.random().toString(36).slice(2, 5);
-    tr.innerHTML = `<td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="tiptap-wrap li-desc-editor" id="${uniqueId}"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, c)}</td><td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>`;
+    tr.setAttribute('draggable', 'false');
+    tr.innerHTML = `<td class="li-grip-td"><span class="li-grip" onmousedown="this.closest('.li-row').draggable=true" onmouseup="this.closest('.li-row').draggable=false"><i data-lucide="grip-vertical"></i></span></td><td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="tiptap-wrap li-desc-editor" id="${uniqueId}"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, c)}</td><td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>`;
     body.appendChild(tr);
+    initLineItemDrag();
     lucide.createIcons();
     const el = document.getElementById(uniqueId);
     if (el) initSingleLiEditor(el, null);

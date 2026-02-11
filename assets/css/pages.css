@@ -831,16 +831,16 @@
 .ld-sub:focus,
 .lq:focus,
 .lr:focus {
-  border-color: var(--ring) !important;
+  border-color: var(--border) !important;
   background: var(--bg2) !important;
-  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.06) !important;
+  box-shadow: none !important;
 }
 
 .dark .ld:focus,
 .dark .ld-sub:focus,
 .dark .lq:focus,
 .dark .lr:focus {
-  box-shadow: 0 0 0 2px rgba(212, 212, 216, 0.15) !important;
+  box-shadow: none !important;
 }
 
 .ld {
@@ -933,6 +933,26 @@
   flex: 1;
   min-width: 0;
 }
+
+/* Line item grip */
+.li-grip-td {
+  width: 28px !important;
+  padding: 0 2px !important;
+  vertical-align: middle;
+}
+.li-grip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text4);
+  cursor: grab;
+  transition: color var(--t);
+}
+.li-grip svg { width: 14px; height: 14px; }
+.li-grip:hover { color: var(--text); }
+.li-row.dragging { opacity: 0.5; background: var(--muted); }
+.li-row.drag-over { border-top: 3px solid var(--blue) !important; }
+.li-row.drag-over-bottom { border-bottom: 3px solid var(--blue) !important; }
 
 /* Pricing insights */
 .pi-banner {
@@ -2745,8 +2765,8 @@
 }
 
 .tiptap-wrap:focus-within {
-  border-color: var(--ring);
-  box-shadow: 0 0 0 2px rgba(24, 24, 27, .06);
+  border-color: var(--border);
+  box-shadow: none;
 }
 
 /* Core editor element */
@@ -2905,7 +2925,7 @@
 }
 
 .dark .tiptap-wrap:focus-within {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, .06);
+  box-shadow: none;
 }
 
 .dark .tiptap-wrap .tiptap mark {

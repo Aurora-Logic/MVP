@@ -43,13 +43,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.6';
+const APP_VERSION = '2.7';
 const APP_BUILD = '20260211';
 const WHATS_NEW_ITEMS = [
-    { icon: 'hard-drive-download', title: 'Offline-Ready Dependencies', desc: 'All vendor libraries (Lucide, Supabase, Tiptap, QR) now load locally — no CDN dependency.' },
-    { icon: 'shield-check', title: 'Security Hardening', desc: 'Added CSP headers, SSRF protection, AI rate limiting, and sensitive data stripping from cloud sync.' },
-    { icon: 'pen-line', title: 'Faster Rich Text Editor', desc: 'Tiptap now loads as a single synchronous bundle — no more white-box flicker on slow connections.' },
-    { icon: 'cloud', title: 'Safer Cloud Sync', desc: 'API keys and signatures are now excluded from cloud sync — they stay on your device only.' }
+    { icon: 'grip-vertical', title: 'Drag Reorder Line Items', desc: 'Drag line items in pricing table to reorder — same seamless grip handle as sections.' },
+    { icon: 'pen-line', title: 'Cleaner Focus States', desc: 'Removed distracting outlines from inputs and editors for a smoother writing experience.' },
+    { icon: 'shield', title: 'Auth Safety Net', desc: 'Added fallback timeout so the app never gets stuck on a blank screen during sign-in.' },
+    { icon: 'refresh-cw', title: 'Auto SW Update', desc: 'Service worker now auto-updates on each load — no more stale cached files.' }
 ];
 
 function checkWhatsNew() {

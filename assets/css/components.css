@@ -260,15 +260,15 @@ input:focus,
 select:focus,
 textarea:focus {
   outline: none !important;
-  border-color: var(--ring) !important;
+  border-color: var(--border) !important;
   background: var(--bg2) !important;
-  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.06) !important;
+  box-shadow: none !important;
 }
 
 .dark input:focus,
 .dark select:focus,
 .dark textarea:focus {
-  box-shadow: 0 0 0 2px rgba(212, 212, 216, 0.15) !important;
+  box-shadow: none !important;
 }
 
 input::placeholder,

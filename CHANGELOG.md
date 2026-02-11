@@ -4,6 +4,28 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.7 (build 20260211) — 2026-02-11
+
+### Features
+- Drag-to-reorder line items in pricing table with grip handles (same UX as section reorder)
+- Removed focus ring outlines from all inputs, textareas, and tiptap editors for cleaner writing UX
+
+### Fixes
+- Added 5-second safety timeout in auth flow to prevent blank screen on slow connections
+- Service worker now forces update check on every page load (no more stale caches)
+- Bumped SW cache to v5
+
+### Files Changed
+- `assets/js/editor/pricing.js` — line item drag reorder with grip handle
+- `assets/css/components.css` — removed focus ring from inputs
+- `assets/css/pages.css` — removed focus ring from tiptap-wrap and line items, added grip CSS
+- `assets/css/variables.css` — removed global focus-visible ring
+- `assets/js/core/auth.js` — 5-second safety timeout
+- `index.html` — SW registration with forced update
+- `sw.js` — cache v4 → v5
+
+---
+
 ## v2.6 (build 20260211) — 2026-02-11
 
 ### Features
