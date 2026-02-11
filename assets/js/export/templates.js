@@ -2,6 +2,7 @@
 // PDF TEMPLATES
 // ════════════════════════════════════════
 
+/* exported buildCoverHtml, buildModernTpl, buildClassicTpl, buildMinimalTpl, buildTabularTpl */
 function buildPricingHtml(rows, c, t, bc, style) {
     if (!rows.length) return '';
     const thStyle = style === 'classic' ? 'background:' + bc + ';color:#fff;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:700' : 'text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;padding:7px 0;border-bottom:1px solid #e4e4e7;color:#a1a1aa';

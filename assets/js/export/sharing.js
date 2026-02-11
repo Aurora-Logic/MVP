@@ -2,6 +2,7 @@
 // SHARING — Client Portal & Share Links
 // ════════════════════════════════════════
 
+/* exported shareProposal, copyShareLink, recordProposalView, respondToProposal */
 function generateShareToken() {
     const arr = new Uint8Array(16);
     crypto.getRandomValues(arr);
@@ -19,7 +20,7 @@ function shareProposal() {
         persist();
     }
 
-    const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
+    const baseUrl = window.location.href.replace(/\/[^/]*$/, '/');
     const shareUrl = baseUrl + 'client.html?p=' + p.shareToken;
 
     const wrap = document.createElement('div');

@@ -1,7 +1,30 @@
+# Dependencies
+node_modules/
+dist/
 
-# Embedded git repos
-.claude/skills/anthropic-skills/
+# Environment & secrets
+.env
+.env.*
 
-# Snyk Security Extension - AI Rules (auto-generated)
-.agent/rules/snyk_rules.md
-.vercel
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Testing
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Vercel CLI
+.vercel/
+
+# Claude Code (local tooling config, not part of the app)
+.claude/
+.agent/
+
+# Logs
+*.log

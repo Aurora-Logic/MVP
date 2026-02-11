@@ -2,7 +2,8 @@
 // AUTH — Login, Signup, Session Management
 // ════════════════════════════════════════
 
-let authMode = 'login'; // login | signup | reset
+/* exported initAuth, onSignedIn, doLogin, doSignup, doGoogleLogin, doPasswordReset, skipAuth, doLogout, authMode */
+let authMode = 'login'; // login | signup | reset -- eslint: reassigned via onclick handlers
 
 async function initAuth() {
     initSupabase();
@@ -64,7 +65,7 @@ async function initAuth() {
 
     // Register auth state listener
     sb().auth.onAuthStateChange(async (event, session) => {
-        console.log('[Auth] onAuthStateChange:', event, !!session);
+        console.warn('[Auth] onAuthStateChange:', event, !!session);
         sbSession = session;
         cleanHash();
 
@@ -85,9 +86,9 @@ async function initAuth() {
 
     // getSession() triggers SDK's detectSessionInUrl to process hash tokens
     try {
-        console.log('[Auth] Calling getSession...');
+        console.warn('[Auth] Calling getSession...');
         const { data, error } = await sb().auth.getSession();
-        console.log('[Auth] getSession result:', !!data?.session, error?.message || 'ok');
+        console.warn('[Auth] getSession result:', !!data?.session, error?.message || 'ok');
         if (data?.session) sbSession = data.session;
     } catch (e) {
         console.warn('[Auth] getSession failed:', e);
@@ -101,7 +102,7 @@ async function initAuth() {
 
     // Fallback: if we have a session from getSession, boot manually
     if (sbSession) {
-        console.log('[Auth] Fallback: booting with session from getSession');
+        console.warn('[Auth] Fallback: booting with session from getSession');
         authBooted = true;
         cleanHash();
         await safePullAndBoot();
@@ -110,14 +111,14 @@ async function initAuth() {
 
     // For OAuth callbacks: the SDK may need more time to process
     if (isOAuthCallback) {
-        console.log('[Auth] OAuth callback — waiting for SDK to process token...');
+        console.warn('[Auth] OAuth callback — waiting for SDK to process token...');
         // Try manually setting the session from the hash as last resort
         try {
             const params = new URLSearchParams(hash.substring(1));
             const accessToken = params.get('access_token');
             const refreshToken = params.get('refresh_token');
             if (accessToken && refreshToken) {
-                console.log('[Auth] Manual setSession attempt...');
+                console.warn('[Auth] Manual setSession attempt...');
                 const { data, error } = await sb().auth.setSession({
                     access_token: accessToken,
                     refresh_token: refreshToken
@@ -369,7 +370,7 @@ async function doGoogleLogin() {
     try {
         // Use current origin (works on localhost, Vercel, custom domains)
         const redirectUrl = window.location.origin + window.location.pathname;
-        console.log('[Auth] Google OAuth redirectTo:', redirectUrl);
+        console.warn('[Auth] Google OAuth redirectTo:', redirectUrl);
         const { error } = await sb().auth.signInWithOAuth({
             provider: 'google',
             options: { redirectTo: redirectUrl }

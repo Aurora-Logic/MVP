@@ -3,6 +3,8 @@
 // ════════════════════════════════════════
 
 // ─── Tiptap Factory ───
+/* exported createEditor, migrateEditorContent, loadEditor, refreshStatsBar, edTab */
+/** @param {HTMLElement|string} holder @param {{content?: string, placeholder?: string, headingLevels?: number[], tables?: boolean, taskList?: boolean, onChange?: Function}} [opts] @returns {Object|null} Tiptap editor instance */
 function createEditor(holder, opts = {}) {
     if (!window.TiptapEditor) { console.warn('Tiptap not loaded yet'); return null; }
     const el = typeof holder === 'string' ? document.getElementById(holder) : holder;
@@ -43,6 +45,7 @@ function createEditor(holder, opts = {}) {
 }
 
 // ─── Editor.js → HTML Migration ───
+/** @param {string|Object|null} data @returns {string} HTML string */
 function migrateEditorContent(data) {
     if (!data) return '';
     if (typeof data === 'string') return data;

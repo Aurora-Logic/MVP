@@ -11,8 +11,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get('p');
 
 // Load proposal data from localStorage (shared with main app)
-let DB = JSON.parse(localStorage.getItem('pk_db') || '[]');
-let CONFIG = JSON.parse(localStorage.getItem('pk_config') || 'null');
+const DB = JSON.parse(localStorage.getItem('pk_db') || '[]');
+const CONFIG = JSON.parse(localStorage.getItem('pk_config') || 'null');
 let proposal = null;
 
 function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
@@ -146,7 +146,7 @@ function renderProposal() {
         : '';
 
     // Build sections HTML
-    let sectionsHtml = (p.sections || []).map((s, i) => `
+    const sectionsHtml = (p.sections || []).map((s, i) => `
         <div class="section-card" id="sec-${i}">
             <div class="section-title">
                 <i data-lucide="${getSectionIcon(s.type)}"></i>

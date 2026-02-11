@@ -2,6 +2,8 @@
 // VARIABLES — Placeholder replacement
 // ════════════════════════════════════════
 
+/* exported replaceVariables, showInsertVariableDropdown */
+/** @param {string} text @param {Proposal} p @returns {string} text with {{variables}} replaced */
 function replaceVariables(text, p) {
     if (!text || typeof text !== 'string') return text;
     const t = calcTotals(p);

@@ -2,6 +2,7 @@
 // FOCUS / DISTRACTION-FREE MODE
 // ════════════════════════════════════════
 
+/* exported toggleFocusMode */
 function toggleFocusMode() {
     const app = document.getElementById('appShell');
     if (!app) return;

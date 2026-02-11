@@ -2,6 +2,7 @@
 // KEYBOARD SHORTCUTS PANEL (Phase 1.3)
 // ════════════════════════════════════════
 
+/* exported openShortcutsPanel */
 function openShortcutsPanel() {
     // Remove existing
     document.getElementById('shortcutsModal')?.remove();

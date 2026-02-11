@@ -2,11 +2,11 @@
 // ADD-ONS — Optional extras (Phase 2.2)
 // ════════════════════════════════════════
 
+/* exported addAddOn, removeAddOn, toggleAddOn, calcAddOnsTotal, collectAddOnsData, buildAddOnsPdfHtml */
 function renderAddOns(p) {
     const el = document.getElementById('addOnsSection');
     if (!el) return;
     const addOns = p.addOns || [];
-    const c = p.currency || defaultCurrency();
 
     let rows = '';
     addOns.forEach((ao, i) => {

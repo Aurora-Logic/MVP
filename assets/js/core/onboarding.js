@@ -2,6 +2,7 @@
 // ONBOARDING — 4-Step Creative Flow
 // ════════════════════════════════════════
 
+/* exported obNext, obPrev, finishOb, handleLogo */
 const OB_COUNTRIES = [
     { value: 'IN', label: '\ud83c\uddee\ud83c\uddf3 India' }, { value: 'US', label: '\ud83c\uddfa\ud83c\uddf8 United States' }, { value: 'GB', label: '\ud83c\uddec\ud83c\udde7 United Kingdom' },
     { value: 'CA', label: '\ud83c\udde8\ud83c\udde6 Canada' }, { value: 'AU', label: '\ud83c\udde6\ud83c\uddfa Australia' }, { value: 'DE', label: '\ud83c\udde9\ud83c\uddea Germany' },
@@ -263,7 +264,7 @@ function handleLogo(input) {
     reader.onload = (e) => {
         const url = sanitizeDataUrl(e.target.result);
         if (!url) { input.value = ''; return; }
-        document.querySelectorAll('.brand-logo-box').forEach(box => { box.innerHTML = '<img src="' + esc(url) + '">'; });
+        document.querySelectorAll('.brand-logo-box').forEach(box => { box.innerHTML = '<img src="' + esc(url) + '" alt="Company logo">'; });
         if (!CONFIG) CONFIG = {};
         CONFIG.logo = url;
     };

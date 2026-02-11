@@ -2,6 +2,7 @@
 // ANALYTICS BREAKDOWNS (Phase 5.5)
 // ════════════════════════════════════════
 
+/* exported breakdownTab, openAnalyticsBreakdowns, setBreakdownTab, exportAnalyticsReport */
 let breakdownTab = 'value';
 
 function openAnalyticsBreakdowns() {

@@ -2,6 +2,7 @@
 // PAYMENTS — Payment Recording & Tracking
 // ════════════════════════════════════════
 
+/* exported addPayment, removePayment, updatePaymentSummary, paymentStatusBadge, buildPaymentsReceiptHtml, quickRecordPayment, saveQuickPayment, showPaymentPickerMenu */
 const PAYMENT_METHODS = ['Bank', 'UPI', 'Cash', 'Cheque', 'Card', 'Other'];
 
 function paymentTotals(p) {

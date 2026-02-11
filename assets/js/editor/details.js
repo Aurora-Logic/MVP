@@ -2,6 +2,7 @@
 // DETAILS TAB
 // ════════════════════════════════════════
 
+/* exported updateExpiryWarning, toggleStatusMenu, setStatus, handleCoverPhoto, changeCoverPhoto, removeCoverPhoto */
 function renderDetails(p) {
     let expiryHtml = '';
     if (p.validUntil && (p.status === 'draft' || p.status === 'sent')) {
@@ -21,12 +22,12 @@ function renderDetails(p) {
       <div class="card-head">
         <div><div class="card-t">Proposal Info</div><div class="card-d">Basic details</div></div>
         <div class="status-dd">
-          <span class="badge badge-${p.status}" onclick="toggleStatusMenu(event)" id="statusBadge"><span class="badge-dot"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)} <i data-lucide="chevron-down" style="width:12px;height:12px;margin-left:2px"></i></span>
-          <div class="status-menu" id="statusMenu">
-            <div class="status-opt" onclick="setStatus('draft')"><span class="so-dot" style="background:var(--text4)"></span> Draft</div>
-            <div class="status-opt" onclick="setStatus('sent')"><span class="so-dot" style="background:var(--blue)"></span> Sent</div>
-            <div class="status-opt" onclick="setStatus('accepted')"><span class="so-dot" style="background:var(--green)"></span> Accepted</div>
-            <div class="status-opt" onclick="setStatus('declined')"><span class="so-dot" style="background:var(--red)"></span> Declined</div>
+          <span class="badge badge-${p.status}" onclick="toggleStatusMenu(event)" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" id="statusBadge" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleStatusMenu(event)}"><span class="badge-dot"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)} <i data-lucide="chevron-down" style="width:12px;height:12px;margin-left:2px"></i></span>
+          <div class="status-menu" id="statusMenu" role="listbox" aria-label="Proposal status">
+            <div class="status-opt" role="option" tabindex="0" onclick="setStatus('draft')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><span class="so-dot" style="background:var(--text4)"></span> Draft</div>
+            <div class="status-opt" role="option" tabindex="0" onclick="setStatus('sent')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><span class="so-dot" style="background:var(--blue)"></span> Sent</div>
+            <div class="status-opt" role="option" tabindex="0" onclick="setStatus('accepted')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><span class="so-dot" style="background:var(--green)"></span> Accepted</div>
+            <div class="status-opt" role="option" tabindex="0" onclick="setStatus('declined')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><span class="so-dot" style="background:var(--red)"></span> Declined</div>
           </div>
         </div>
       </div>

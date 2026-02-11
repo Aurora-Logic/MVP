@@ -2,6 +2,7 @@
 // EXPORT
 // ════════════════════════════════════════
 
+/* exported doExport, toggleBulkCheck, toggleSelectAll, bulkExport */
 function doExport(mode) {
     showLoading('Saving changes...');
     dirty();
@@ -33,7 +34,7 @@ function doExport(mode) {
 }
 
 // Bulk Export (Phase 3.5)
-let bulkSelected = new Set();
+const bulkSelected = new Set();
 
 function toggleBulkCheck(id, checkbox) {
     if (checkbox.checked) bulkSelected.add(id);

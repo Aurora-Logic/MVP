@@ -2,6 +2,7 @@
 // PREVIEW & EXPORT HELPERS
 // ════════════════════════════════════════
 
+/* exported openPreview, closePreview, setDocTpl */
 function openPreview() {
     dirty();
     const doc = document.getElementById('prevDoc');
@@ -74,7 +75,7 @@ function buildPreview(mode) {
         return { desc: `<div style="font-weight:600">${esc(i.desc)}</div>${detail}`, qty: i.qty, rate: fmtCur(i.rate || 0, c), amt: fmtCur(a, c) };
     });
     const secs = (p.sections || []).filter(s => s.title || s.content);
-    const logoHtml = CONFIG?.logo ? `<img class="pd-logo" src="${esc(CONFIG.logo)}" style="max-height:36px;margin-bottom:16px">` : '';
+    const logoHtml = CONFIG?.logo ? `<img class="pd-logo" src="${esc(CONFIG.logo)}" alt="${esc(CONFIG?.company || 'Company')} logo" style="max-height:36px;margin-bottom:16px">` : '';
 
     let html = '';
     // Draft watermark (Phase 1.5)

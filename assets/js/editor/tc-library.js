@@ -2,6 +2,7 @@
 // T&C LIBRARY — Terms & Conditions presets
 // ════════════════════════════════════════
 
+/* exported openTCLib, filterTCLib, insertTC */
 const TC_DEFAULTS = [
     { title: 'Standard Payment (50/50)', text: '50% advance before project kickoff.\nRemaining 50% upon completion and before final delivery.\nPayment due within 7 business days of invoice.', category: 'payment' },
     { title: 'Milestone-based (30/30/40)', text: '30% advance to begin work.\n30% upon design approval.\n40% upon final delivery.\nAll payments due within 15 days of invoice.', category: 'payment' },
@@ -36,7 +37,7 @@ function openTCLib() {
         if (!filtered.length) return '<div class="breakdown-empty">No items in this category</div>';
         return filtered.map((t) => {
             const idx = all.indexOf(t);
-            return `<div class="tc-chip" onclick="insertTC(${idx})"><div class="tc-chip-t">${esc(t.title)}</div><div class="tc-chip-d">${esc(t.text.substring(0, 70))}...</div></div>`;
+            return `<div class="tc-chip" role="button" tabindex="0" onclick="insertTC(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><div class="tc-chip-t">${esc(t.title)}</div><div class="tc-chip-d">${esc(t.text.substring(0, 70))}...</div></div>`;
         }).join('');
     };
 
@@ -72,7 +73,7 @@ function filterTCLib(cat) {
     } else {
         grid.innerHTML = filtered.map((t) => {
             const idx = all.indexOf(t);
-            return `<div class="tc-chip" onclick="insertTC(${idx})"><div class="tc-chip-t">${esc(t.title)}</div><div class="tc-chip-d">${esc(t.text.substring(0, 70))}...</div></div>`;
+            return `<div class="tc-chip" role="button" tabindex="0" onclick="insertTC(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><div class="tc-chip-t">${esc(t.title)}</div><div class="tc-chip-d">${esc(t.text.substring(0, 70))}...</div></div>`;
         }).join('');
     }
     document.querySelectorAll('.tc-tab').forEach(b => b.classList.remove('active'));
@@ -81,13 +82,12 @@ function filterTCLib(cat) {
 
 function insertTC(i) {
     const tc = window._tcData[i];
-    if (paymentTermsEditor && paymentTermsEditor.blocks) {
-        const blockCount = paymentTermsEditor.blocks.getBlocksCount();
-        if (blockCount > 0) paymentTermsEditor.blocks.insert('paragraph', { text: '' });
-        tc.text.split('\n').filter(line => line.trim()).forEach(line => {
-            paymentTermsEditor.blocks.insert('paragraph', { text: line });
-        });
+    if (paymentTermsEditor && typeof paymentTermsEditor.commands?.insertContent === 'function') {
+        const html = tc.text.split('\n').filter(line => line.trim()).map(line => `<p>${esc(line)}</p>`).join('');
+        paymentTermsEditor.commands.insertContent(html);
         dirty();
+    } else {
+        toast('Payment terms editor not ready', 'warning');
     }
     document.getElementById('tcModal')?.remove();
     toast(tc.title + ' added');

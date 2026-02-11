@@ -2,6 +2,7 @@
 // SYNC — Cloud sync layer (Supabase)
 // ════════════════════════════════════════
 
+/* exported syncAfterPersist, syncAfterSaveConfig, syncAfterSaveClients, pullFromCloud */
 let syncTimer = null;
 const SYNC_DEBOUNCE = 2000;
 

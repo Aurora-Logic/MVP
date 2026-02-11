@@ -28,11 +28,11 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <!-- Lucide Icons (pinned) -->
-    <script src="https://unpkg.com/lucide@0.460.0"></script>
-    <!-- Tailwind CSS v4 Browser CDN (pinned) -->
+    <script src="https://unpkg.com/lucide@0.460.0" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous"></script>
+    <!-- Tailwind CSS v4 Browser CDN (pinned, SRI not practical for dynamic compilation) -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.0.0"></script>
     <!-- Supabase JS Client (pinned) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
     <!-- Inline theme detection (prevent FOUC) -->
     <script>
         (function () {
@@ -64,6 +64,7 @@
     </div>
 
     <!-- ═══ APP ═══ -->
+    <a href="#bodyScroll" class="skip-link">Skip to main content</a>
     <div class="app" id="appShell" style="display:none">
         <!-- Mobile sidebar overlay -->
         <div class="side-overlay" id="sideOverlay" onclick="closeMobileSidebar()"></div>
@@ -131,7 +132,7 @@
                 </div>
                 <div class="topbar-right" id="topRight"></div>
             </div>
-            <div class="body-scroll" id="bodyScroll"></div>
+            <main class="body-scroll" id="bodyScroll" role="main"></main>
         </div>
     </div>
 
@@ -209,7 +210,7 @@
     </div>
 
     <!-- QR Code generator (UPI payments) -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js" integrity="sha384-lQXOAyZwHXE55JFyrOMB7nY2Wv+m5ZWNtJcHrd1rceRQXAYNLak8ukN5TjBTcIwz" crossorigin="anonymous"></script>
 
     <!-- Core: Supabase + Auth + Sync (before store) -->
     <script src="assets/js/core/supabase.js"></script>

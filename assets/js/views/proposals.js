@@ -2,6 +2,7 @@
 // PROPOSALS VIEW — List, Filter, Pagination
 // ════════════════════════════════════════
 
+/* exported doQuickExport, quickPreview, showStatusMenu, setProposalStatus, setFilter, filterList, goPage, toggleSortProposals */
 function renderPropList(list) {
   const wrap = document.getElementById('propListWrap');
   if (!list.length) {
@@ -25,7 +26,7 @@ function renderPropList(list) {
   const aviColors = { draft: 'var(--text3)', sent: 'var(--blue)', accepted: 'var(--green)', declined: 'var(--red)', expired: 'var(--amber)', archived: 'var(--text4)' };
   const isArchived = currentFilter === 'archived';
 
-  let rows = list.map(p => {
+  const rows = list.map(p => {
     const val = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
     const initials = (p.client?.name || p.title || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     const isNew = (Date.now() - (p.createdAt || 0)) < 86400000;

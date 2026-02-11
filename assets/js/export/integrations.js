@@ -2,6 +2,7 @@
 // INTEGRATIONS — Export Formats & Webhook
 // ════════════════════════════════════════
 
+/* exported exportMarkdown, exportCsv, exportStandaloneHtml, sendWebhook, showExportMenu */
 function exportMarkdown() {
     const p = cur(); if (!p) return;
     const c = p.currency || defaultCurrency();

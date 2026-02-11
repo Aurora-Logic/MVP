@@ -3,6 +3,7 @@
 // ════════════════════════════════════════
 
 // Global error boundary
+/* exported APP_BUILD */
 window.onerror = function(msg, src, line, col, err) {
     const info = `${msg} at ${src}:${line}:${col}`;
     console.error('[ProposalKit Error]', info, err);

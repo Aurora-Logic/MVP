@@ -2,6 +2,7 @@
 // COMPLETENESS SCORE — Weighted (Phase 5.4)
 // ════════════════════════════════════════
 
+/* exported buildCompletenessHtml, buildScoreBadge, showCompletenessDetail, navigateToTab */
 function calcCompleteness(p) {
     if (!p) return { score: 0, total: 100, missing: [], checks: [] };
     const checks = [];

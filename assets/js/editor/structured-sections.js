@@ -2,6 +2,7 @@
 // STRUCTURED SECTIONS — Testimonial & Case Study
 // ════════════════════════════════════════
 
+/* exported STRUCTURED_SECTION_DEFAULTS, structuredSecBlockHtml, setRating, collectStructuredSection, buildStructuredSectionPdf */
 const STRUCTURED_SECTION_DEFAULTS = [
     { title: 'Client Testimonial', type: 'testimonial', category: 'general', testimonial: { quote: 'Working with this team transformed our business. Their attention to detail and strategic approach exceeded our expectations.', author: 'Jane Smith', company: 'Acme Corp', rating: 5 } },
     { title: 'Case Study', type: 'case-study', category: 'general', caseStudy: { challenge: 'The client needed to modernize their legacy system while maintaining business continuity.', solution: 'We implemented a phased migration approach with parallel systems running during transition.', result: '40% reduction in operational costs and 3x improvement in system performance.' } }

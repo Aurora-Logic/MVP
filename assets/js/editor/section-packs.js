@@ -2,6 +2,7 @@
 // SECTION TEMPLATE PACKS (Phase 5.6)
 // ════════════════════════════════════════
 
+/* exported renderPacksTab, previewPack, insertPack */
 const SECTION_PACKS = [
     {
         id: 'saas', name: 'SaaS Pack', icon: 'cloud', color: 'var(--blue)',

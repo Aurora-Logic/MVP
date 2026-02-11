@@ -2,6 +2,7 @@
 // CLIENT DATABASE
 // ════════════════════════════════════════
 
+/* exported saveClient, editClient, delClient, showClientPicker, pickClient, showClientInsight, createProposalForClient */
 function renderClients() {
     CUR = null;
     document.getElementById('topTitle').textContent = 'Clients';
@@ -25,11 +26,11 @@ function renderClients() {
         lucide.createIcons(); return;
     }
 
-    let cards = CLIENTS.map((c, i) => {
+    const cards = CLIENTS.map((c, i) => {
         const ini = (c.name || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
         const propCount = DB.filter(p => p.client?.name === c.name || p.client?.email === c.email).length;
         const totalVal = DB.filter(p => p.client?.name === c.name || p.client?.email === c.email).reduce((s, p) => s + (p.lineItems || []).reduce((a, it) => a + (it.qty || 0) * (it.rate || 0), 0), 0);
-        return `<div class="client-card" onclick="showClientInsight(${i})">
+        return `<div class="client-card" role="button" tabindex="0" onclick="showClientInsight(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
       <div class="cc-head">
         <div class="cc-avi" style="background:var(--blue-bg);color:var(--blue)">${ini}</div>
         <div><div class="cc-name">${esc(c.name)}</div><div class="cc-email">${esc(c.email)}</div></div>
@@ -108,7 +109,7 @@ function showClientPicker() {
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap'; wrap.id = 'cpModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-    let items = CLIENTS.map((c, i) => `<div class="cp-item" onclick="pickClient(${i})"><span class="cp-item-name">${esc(c.name)}</span><span class="cp-item-email">${esc(c.email)}</span></div>`).join('');
+    const items = CLIENTS.map((c, i) => `<div class="cp-item" role="button" tabindex="0" onclick="pickClient(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><span class="cp-item-name">${esc(c.name)}</span><span class="cp-item-email">${esc(c.email)}</span></div>`).join('');
     wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-t">Select Client</div><div class="modal-d">Pick a saved client to auto-fill</div><div style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">${items}</div><div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('cpModal').remove()">Cancel</button></div></div>`;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));

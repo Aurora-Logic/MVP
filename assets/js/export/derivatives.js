@@ -2,6 +2,7 @@
 // DERIVATIVES — SOW, Contract, Receipt
 // ════════════════════════════════════════
 
+/* exported generateDerivative, openDerivativesMenu, buildSowHtml, buildContractHtml, buildReceiptHtml */
 function generateDerivative(type) {
     const p = cur();
     if (!p) { toast('Open a proposal first'); return; }

@@ -2,10 +2,23 @@
 // STORE — Data Layer (no dependencies)
 // ════════════════════════════════════════
 
-let DB, CONFIG, CLIENTS;
+/* exported saveTimer, ctxTarget, currentFilter, currentSort, lastSaveTime, saveIndicatorTimer, docTemplate, sectionEditors, paymentTermsEditor, focusMode, viewMode, undoStack, redoStack, MAX_UNDO, saveConfig, saveClients, uid, activeDB, safeGetStorage, escAttr, safeLsSet, sanitizeHtml, sanitizeDataUrl, isValidId, validateTaxId, fmtCur, fmtNum, fmtDate, timeAgo, rgbToHex, defaultCurrency, proposalValue, capitalize, nextPropNumber, taxLabel, COLORS, COLOR_NAMES, logoutApp */
+/** @typedef {{ desc: string, detail?: string, qty: number, rate: number }} LineItem */
+/** @typedef {{ title: string, content?: string, type?: string, testimonial?: Object, caseStudy?: Object }} Section */
+/** @typedef {{ id: string, title: string, number: string, status: string, date: string, validUntil: string, currency: string, sender: {company: string, email: string, address: string}, client: {name: string, contact: string, email: string, phone: string}, lineItems: LineItem[], sections: Section[], discount: number, taxRate: number, coverPage?: boolean, shareToken?: string, version?: number, versionHistory?: Object[], createdAt: number, updatedAt: number, archived?: boolean, clientResponse?: Object, paymentTerms?: string, addOns?: Object[], paymentSchedule?: Object[], packages?: Object[], packagesEnabled?: boolean, lastEditedBy?: string }} Proposal */
+/** @typedef {{ name?: string, company?: string, email?: string, phone?: string, address?: string, country?: string, color?: string, logo?: string, bank?: Object, gstin?: string, pan?: string, udyam?: string, lut?: string, ein?: string, vatNumber?: string, abn?: string, aiApiKey?: string, aiModel?: string, signature?: string, activeUserId?: string, team?: Object[], webhookUrl?: string, font?: string, whiteLabel?: boolean }} AppConfig */
+/** @typedef {{ id: string, name: string, contact?: string, email?: string, phone?: string, company?: string, address?: string, notes?: string }} Client */
+
+/** @type {Proposal[]} */
+let DB;
+/** @type {AppConfig|null} */
+let CONFIG;
+/** @type {Client[]} */
+let CLIENTS;
 try { DB = JSON.parse(localStorage.getItem('pk_db') || '[]'); } catch (e) { DB = []; console.error('pk_db corrupted, reset to empty:', e); }
 try { CONFIG = JSON.parse(localStorage.getItem('pk_config') || 'null'); } catch (e) { CONFIG = null; console.error('pk_config corrupted, reset:', e); }
 try { CLIENTS = JSON.parse(localStorage.getItem('pk_clients') || '[]'); } catch (e) { CLIENTS = []; console.error('pk_clients corrupted, reset:', e); }
+/* eslint-disable prefer-const -- These are reassigned in other files */
 let CUR = null;
 let saveTimer = null;
 let ctxTarget = null;
@@ -22,8 +35,10 @@ let viewMode = localStorage.getItem('pk_viewMode') || 'list';
 // Undo/Redo state stack
 let undoStack = [];
 let redoStack = [];
+/* eslint-enable prefer-const */
 const MAX_UNDO = 20;
 
+/** @returns {boolean} true if saved successfully */
 function persist() {
     try {
         localStorage.setItem('pk_db', JSON.stringify(DB));
@@ -60,6 +75,7 @@ function saveClients() {
     catch (e) { toast('Error saving clients', 'error'); console.error('localStorage error:', e); }
 }
 
+/** @returns {Proposal|undefined} */
 function cur() { return DB.find(p => p.id === CUR); }
 function uid() { return 'p' + Date.now() + Math.random().toString(36).slice(2, 7); }
 function activeDB() { return DB.filter(p => !p.archived); }
@@ -117,6 +133,7 @@ window.addEventListener('storage', (e) => {
     }
 });
 
+/** @param {string} s @returns {string} HTML-escaped string */
 function esc(s) {
     return (s || '')
         .replace(/&/g, '&amp;')
@@ -136,6 +153,7 @@ function safeLsSet(key, val) {
 }
 
 // Sanitize HTML — allow safe inline formatting tags from EditorJS, strip everything else
+/** @param {string} html @returns {string} sanitized HTML */
 function sanitizeHtml(html) {
     if (!html || typeof html !== 'string') return '';
     const div = document.createElement('div');
@@ -151,7 +169,7 @@ function sanitizeHtml(html) {
             }
             if (name === 'href' || name === 'src' || name === 'action') {
                 const val = (attr.value || '').trim().toLowerCase();
-                if (val.startsWith('javascript:') || val.startsWith('data:text') || val.startsWith('vbscript:')) {
+                if (val.startsWith('javascript:') || val.startsWith('data:text') || val.startsWith('data:image/svg') || val.startsWith('vbscript:')) {
                     el.removeAttribute(attr.name);
                 }
             }
@@ -190,6 +208,7 @@ function validateTaxId(type, value) {
     return v ? v.re.test(value.trim()) : true;
 }
 
+/** @param {number} n @param {string} [c] currency symbol @returns {string} formatted currency */
 function fmtCur(n, c) {
     const currency = c || '₹';
     const displayCurrency = currency === '¥CN' ? '¥' : currency;
@@ -204,6 +223,7 @@ function fmtNum(n, c) {
     return val.toLocaleString(locale);
 }
 
+/** @param {string|number} d date string or timestamp @returns {string} */
 function fmtDate(d) {
     if (!d) return '—';
     const dt = new Date(d);

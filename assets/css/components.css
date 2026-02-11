@@ -3,6 +3,27 @@
    shadcn/ui patterns in vanilla CSS
    ═══════════════════════════════════════════════ */
 
+/* ════════ SKIP LINK (Accessibility) ════════ */
+.skip-link {
+    position: fixed;
+    top: -100%;
+    left: 16px;
+    z-index: 10000;
+    padding: 8px 16px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.2s ease-out;
+}
+.skip-link:focus {
+    top: 16px;
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
 /* ════════ BUTTONS ════════ */
 
 .btn,

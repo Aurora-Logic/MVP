@@ -2,6 +2,7 @@
 // PAYMENT SCHEDULE — Milestones (Phase 2.3)
 // ════════════════════════════════════════
 
+/* exported addMilestone, removeMilestone, toggleScheduleMode, updateScheduleBar, buildSchedulePdfHtml */
 function renderPaymentSchedule(p) {
     const el = document.getElementById('payScheduleSection');
     if (!el) return;

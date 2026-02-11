@@ -2,6 +2,7 @@
 // SECTIONS TAB
 // ════════════════════════════════════════
 
+/* exported addSec, showAddSectionMenu, togSec, updSecName, delSec, saveSectionToLib, openLibrary, setLibCat, setLibTab, insertFromLib */
 function renderSections(p) {
     const el = document.getElementById('edSections');
     const secs = p.sections || [];
@@ -48,13 +49,11 @@ function initSectionEditors(sections) {
         // Migrate content: blocks → HTML, plain text → HTML
         const html = migrateEditorContent(s.content);
 
-        if (typeof createEditor !== 'function' || !window.tiptapReady) {
+        if (!window.tiptapReady) {
             // Tiptap not loaded yet — wait for it
-            const onReady = () => {
-                window.removeEventListener('tiptap-ready', onReady);
+            window.addEventListener('tiptap-ready', () => {
                 initSingleSectionEditor(i, holderEl, html);
-            };
-            window.addEventListener('tiptap-ready', onReady);
+            }, { once: true });
             return;
         }
 
@@ -64,11 +63,13 @@ function initSectionEditors(sections) {
 
 function initSingleSectionEditor(i, holderEl, html) {
     try {
-        sectionEditors[i] = createEditor(holderEl, {
+        const editor = createEditor(holderEl, {
             content: html,
             placeholder: 'Write section content...',
             onChange: () => dirty()
         });
+        if (!editor) { console.warn('Section editor ' + i + ' returned null — Tiptap not ready'); return; }
+        sectionEditors[i] = editor;
         if (holderEl) { holderEl.classList.remove('editor-loading'); holderEl.classList.add('editor-loaded'); }
     } catch (e) { console.error('Tiptap init error', e); }
 }
@@ -76,7 +77,7 @@ function initSingleSectionEditor(i, holderEl, html) {
 
 function secBlockHtml(s, i) {
     return `<div class="sec-b open" draggable="true" data-idx="${i}">
-    <div class="sec-hd" onclick="togSec(this)">
+    <div class="sec-hd" onclick="togSec(this)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togSec(this)}">
       <span class="sec-grip" onmousedown="event.stopPropagation()"><i data-lucide="grip-vertical"></i></span>
       <span class="sec-nm">${esc(s.title) || 'New Section'}</span>
       <span class="sec-chv"><i data-lucide="chevron-down"></i></span>
@@ -111,9 +112,9 @@ function showAddSectionMenu(btn) {
     const menu = document.createElement('div');
     menu.className = 'sec-type-menu';
     menu.innerHTML = `
-        <div class="sec-type-opt" onclick="this.parentElement.remove();addSec()"><i data-lucide="text"></i> Text Section</div>
-        <div class="sec-type-opt" onclick="this.parentElement.remove();addSec('testimonial')"><i data-lucide="quote"></i> Testimonial</div>
-        <div class="sec-type-opt" onclick="this.parentElement.remove();addSec('case-study')"><i data-lucide="lightbulb"></i> Case Study</div>`;
+        <div class="sec-type-opt" role="button" tabindex="0" onclick="this.parentElement.remove();addSec()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><i data-lucide="text"></i> Text Section</div>
+        <div class="sec-type-opt" role="button" tabindex="0" onclick="this.parentElement.remove();addSec('testimonial')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><i data-lucide="quote"></i> Testimonial</div>
+        <div class="sec-type-opt" role="button" tabindex="0" onclick="this.parentElement.remove();addSec('case-study')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><i data-lucide="lightbulb"></i> Case Study</div>`;
     btn.parentElement.style.position = 'relative';
     btn.parentElement.appendChild(menu);
     lucide.createIcons();
@@ -193,7 +194,7 @@ function saveSectionToLib(btn) {
     if (sectionEditors[idx] && typeof sectionEditors[idx].getHTML === 'function') {
         try { content = sectionEditors[idx].getHTML(); } catch (e) { }
     }
-    let lib = safeGetStorage('pk_seclib', []);
+    const lib = safeGetStorage('pk_seclib', []);
     lib.push({ title, content, savedAt: Date.now() });
     safeLsSet('pk_seclib', lib);
     toast('Saved to library');
@@ -229,12 +230,12 @@ function openLibrary() {
         <div id="libSectionsView">
             <div class="lib-search"><input type="text" id="libSearch" placeholder="Search sections..." oninput="filterLibrary()"></div>
             <div class="lib-cats">
-                <span class="lib-cat active" data-cat="all" onclick="setLibCat(this)">All</span>
-                <span class="lib-cat" data-cat="intro" onclick="setLibCat(this)">Intro</span>
-                <span class="lib-cat" data-cat="scope" onclick="setLibCat(this)">Scope</span>
-                <span class="lib-cat" data-cat="terms" onclick="setLibCat(this)">Terms</span>
-                <span class="lib-cat" data-cat="pricing" onclick="setLibCat(this)">Pricing</span>
-                <span class="lib-cat" data-cat="general" onclick="setLibCat(this)">General</span>
+                <span class="lib-cat active" data-cat="all" role="tab" tabindex="0" onclick="setLibCat(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">All</span>
+                <span class="lib-cat" data-cat="intro" role="tab" tabindex="0" onclick="setLibCat(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Intro</span>
+                <span class="lib-cat" data-cat="scope" role="tab" tabindex="0" onclick="setLibCat(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Scope</span>
+                <span class="lib-cat" data-cat="terms" role="tab" tabindex="0" onclick="setLibCat(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Terms</span>
+                <span class="lib-cat" data-cat="pricing" role="tab" tabindex="0" onclick="setLibCat(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Pricing</span>
+                <span class="lib-cat" data-cat="general" role="tab" tabindex="0" onclick="setLibCat(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">General</span>
             </div>
             <div id="libList" class="lib-list-scroll"></div>
         </div>
@@ -276,7 +277,7 @@ function filterLibrary() {
     const cc = { intro: 'cat-intro', scope: 'cat-scope', terms: 'cat-terms', pricing: 'cat-pricing', general: 'cat-general' };
     list.innerHTML = filtered.map(s => {
         const idx = window._libData.indexOf(s);
-        return `<div class="lib-item" onclick="insertFromLib(${idx})"><i data-lucide="file-text"></i><span class="lib-item-t">${esc(s.title)}</span><span class="lib-item-cat ${cc[s.category] || 'cat-general'}">${s.category}</span><span class="lib-item-d">${s.source === 'default' ? 'Default' : 'Saved'}</span></div>`;
+        return `<div class="lib-item" role="button" tabindex="0" onclick="insertFromLib(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><i data-lucide="file-text"></i><span class="lib-item-t">${esc(s.title)}</span><span class="lib-item-cat ${cc[s.category] || 'cat-general'}">${s.category}</span><span class="lib-item-d">${s.source === 'default' ? 'Default' : 'Saved'}</span></div>`;
     }).join('');
     lucide.createIcons();
 }

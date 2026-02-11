@@ -2,6 +2,8 @@
 // MODALS & TOASTS
 // ════════════════════════════════════════
 
+/* exported openNewModal, pickNewModalColor, closeNewModal, toast, showLoading, hideLoading, confirmDialog */
+/** @param {HTMLElement} modal — trap Tab focus within this element */
 function trapFocus(modal) {
     const sel = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
     const els = modal.querySelectorAll(sel);
@@ -127,6 +129,7 @@ function closeNewModal(e) {
     nm.classList.remove('show');
 }
 
+/** @param {string} msg @param {'success'|'error'|'warning'|'info'} [type] */
 function toast(msg, type = 'success') {
     const box = document.getElementById('toastBox');
     const t = document.createElement('div');
@@ -164,29 +167,32 @@ function hideLoading() {
 }
 
 // Custom confirm dialog (replaces native confirm())
+/** @param {string} message @param {Function} onConfirm @param {{title?: string, confirmText?: string, destructive?: boolean}} [opts] */
 function confirmDialog(message, onConfirm, opts = {}) {
     const title = opts.title || 'Confirm';
     const confirmText = opts.confirmText || 'Delete';
     const destructive = opts.destructive !== false;
+    const previousFocus = document.activeElement;
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap';
     wrap.id = 'confirmModal';
     wrap.setAttribute('role', 'alertdialog');
     wrap.setAttribute('aria-modal', 'true');
     wrap.setAttribute('aria-label', title);
-    wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
+    const closeModal = () => { releaseFocus(wrap); wrap.remove(); if (previousFocus && typeof previousFocus.focus === 'function') previousFocus.focus(); };
+    wrap.onclick = (e) => { if (e.target === wrap) closeModal(); };
     wrap.innerHTML = `
         <div class="modal modal-sm" onclick="event.stopPropagation()">
             <div class="modal-t" style="margin-bottom:4px">${esc(title)}</div>
             <div class="modal-d" style="margin-bottom:0">${esc(message)}</div>
             <div class="modal-foot">
-                <button class="btn-sm-outline" onclick="document.getElementById('confirmModal').remove()">Cancel</button>
+                <button class="btn-sm-outline" id="confirmCancelBtn">Cancel</button>
                 <button class="${destructive ? 'btn-sm-destructive' : 'btn-sm'}" id="confirmBtn">${esc(confirmText)}</button>
             </div>
         </div>`;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
-    const confirmBtn = document.getElementById('confirmBtn');
-    confirmBtn.onclick = () => { releaseFocus(wrap); wrap.remove(); onConfirm(); };
+    document.getElementById('confirmCancelBtn').onclick = closeModal;
+    document.getElementById('confirmBtn').onclick = () => { closeModal(); onConfirm(); };
     trapFocus(wrap);
 }

@@ -2,6 +2,7 @@
 // AUTOSAVE + SAVE INDICATOR
 // ════════════════════════════════════════
 
+/* exported dirty, undo, redo */
 function showSaveIndicator(state) {
     const el = document.getElementById('saveIndicator');
     if (!el) return;
@@ -41,6 +42,7 @@ function pushUndo() {
 }
 
 let _viewerWarned = false;
+/** Debounced autosave — collects all editor data and persists to localStorage */
 function dirty() {
     if (typeof canEdit === 'function' && !canEdit()) { if (!_viewerWarned) { toast('Viewers cannot edit proposals', 'warning'); _viewerWarned = true; setTimeout(() => { _viewerWarned = false; }, 5000); } return; }
     clearTimeout(saveTimer);

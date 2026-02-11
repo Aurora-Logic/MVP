@@ -2,6 +2,7 @@
 // KANBAN BOARD VIEW
 // ════════════════════════════════════════
 
+/* exported setViewMode */
 function setViewMode(mode) {
     viewMode = mode;
     safeLsSet('pk_viewMode', mode);

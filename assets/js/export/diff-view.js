@@ -2,6 +2,7 @@
 // DIFF VIEW — Version Comparison
 // ════════════════════════════════════════
 
+/* exported openDiffView */
 function openDiffView() {
     const p = cur(); if (!p) return;
     if (!p.versionHistory || !p.versionHistory.length) {

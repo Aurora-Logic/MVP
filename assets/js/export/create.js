@@ -2,6 +2,7 @@
 // CREATE / DUPLICATE / DELETE + SIDEBAR + CONTEXT MENU + SHARING
 // ════════════════════════════════════════
 
+/* exported doDupWithClient, fromTpl, fromSavedTpl, saveAsTemplate, doSaveAsTemplate, deleteSavedTpl, bumpVersion, toggleCover, ctxAction */
 function createProp(tpl) {
     const id = uid();
     const existingNumbers = DB.map(p => {
@@ -128,7 +129,7 @@ function doSaveAsTemplate() {
         paymentTerms: p.paymentTerms || '',
         savedAt: Date.now()
     };
-    let saved = safeGetStorage('pk_templates', []);
+    const saved = safeGetStorage('pk_templates', []);
     saved.push(tpl);
     safeLsSet('pk_templates', saved);
     document.getElementById('saveTplModal')?.remove();
@@ -138,7 +139,7 @@ function doSaveAsTemplate() {
 function deleteSavedTpl(idx, e) {
     e.stopPropagation();
     confirmDialog('Delete this template?', () => {
-        let saved = safeGetStorage('pk_templates', []);
+        const saved = safeGetStorage('pk_templates', []);
         saved.splice(idx, 1);
         safeLsSet('pk_templates', saved);
         openNewModal();

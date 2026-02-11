@@ -3,6 +3,7 @@
 // ════════════════════════════════════════
 
 // Moved from pricing.js — Smart Pricing Insights (Phase 2.5)
+/* exported buildPricingInsights, openCsvImport, handleCsvFile, updateCsvMap, confirmCsvImport */
 function buildPricingInsights(p) {
     const el = document.getElementById('pricingInsights');
     if (!el) return;

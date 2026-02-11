@@ -2,6 +2,7 @@
 // EMAIL
 // ════════════════════════════════════════
 
+/* exported emailProposal, sendWithTemplate */
 function emailProposal(id) {
     const p = DB.find(x => x.id === id);
     if (!p) return;

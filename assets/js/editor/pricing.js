@@ -2,6 +2,7 @@
 // PRICING TAB
 // ════════════════════════════════════════
 
+/* exported deleteLineItem, addLine, reRow */
 function renderPricing(p) {
     const items = p.lineItems || [];
     let rows = '';
@@ -39,7 +40,7 @@ function renderPricing(p) {
     const validOrder = order.filter(k => sectionHtml[k]);
     defaultOrder.forEach(k => { if (!validOrder.includes(k)) validOrder.push(k); });
 
-    let sectionsHtml = validOrder.map(key =>
+    const sectionsHtml = validOrder.map(key =>
         `<div class="price-sec" draggable="true" data-sec="${key}"><span class="price-sec-grip" onmousedown="event.stopPropagation()"><i data-lucide="grip-vertical"></i></span><div class="price-sec-body">${sectionHtml[key]}</div></div>`
     ).join('');
 
@@ -130,18 +131,20 @@ function initPaymentTermsEditor(p) {
 
     const doInit = () => {
         try {
-            paymentTermsEditor = createEditor(ptHolder, {
+            const editor = createEditor(ptHolder, {
                 content: html,
                 placeholder: 'Add payment terms...',
                 tables: false,
                 onChange: () => dirty()
             });
+            if (!editor) { console.warn('Payment terms editor returned null — Tiptap not ready'); return; }
+            paymentTermsEditor = editor;
             ptHolder.classList.remove('editor-loading');
             ptHolder.classList.add('editor-loaded');
         } catch (e) { console.error('Payment terms editor init error', e); }
     };
 
-    if (typeof createEditor === 'function' && window.tiptapReady) doInit();
+    if (window.tiptapReady) doInit();
     else window.addEventListener('tiptap-ready', doInit, { once: true });
 }
 
@@ -156,7 +159,7 @@ function initSingleLiEditor(el, initialData) {
 
     const doInit = () => {
         try {
-            el._editor = createEditor(el, {
+            const editor = createEditor(el, {
                 content: html,
                 placeholder: 'Description...',
                 headingLevels: [3, 4],
@@ -164,12 +167,14 @@ function initSingleLiEditor(el, initialData) {
                 taskList: false,
                 onChange: () => dirty()
             });
+            if (!editor) { console.warn('LI editor returned null — Tiptap not ready'); return; }
+            el._editor = editor;
             el.classList.remove('editor-loading');
             el.classList.add('editor-loaded');
         } catch (e) { console.error('LI editor init error', e); }
     };
 
-    if (typeof createEditor === 'function' && window.tiptapReady) doInit();
+    if (window.tiptapReady) doInit();
     else window.addEventListener('tiptap-ready', doInit, { once: true });
 }
 

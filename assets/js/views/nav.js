@@ -2,6 +2,7 @@
 // NAVIGATION + MOBILE + KEYBOARD
 // ════════════════════════════════════════
 
+/* exported goNav, toggleMobileSidebar, toggleSidebar, initSidebarState, initKeyboardShortcuts */
 function destroyAllEditors() {
     // Destroy section editors
     if (typeof sectionEditors === 'object' && sectionEditors) {
@@ -103,6 +104,9 @@ function initKeyboardShortcuts() {
                 const modal = document.getElementById(modalId);
                 if (modal && modal.classList.contains('show')) { modal.classList.remove('show'); return; }
             }
+            // What's New modal — must save seen state before removing
+            const wnModal = document.getElementById('whatsNewModal');
+            if (wnModal) { if (typeof dismissWhatsNew === 'function') dismissWhatsNew(); else wnModal.remove(); return; }
             // Dynamic modals (remove from DOM)
             const dynamicModals = ['shortcutsModal', 'completenessModal', 'clientModal', 'cpModal', 'libModal', 'tcModal', 'tplModal', 'emailTplModal', 'shareModal', 'dupClientModal', 'confirmModal', 'csvModal'];
             for (const modalId of dynamicModals) {

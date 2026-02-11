@@ -2,6 +2,7 @@
 // WIN RATE ANALYTICS (Phase 3.1 + 5.5)
 // ════════════════════════════════════════
 
+/* exported buildAnalyticsWidget, setAnalyticsFilter */
 let analyticsFilter = 'all';
 
 function getFilteredProposals(timeFilter) {

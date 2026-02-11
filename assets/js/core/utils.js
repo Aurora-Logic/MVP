@@ -2,6 +2,7 @@
 // UTILS — DatePicker + helpers
 // ════════════════════════════════════════
 
+/* exported autoResizeTextarea, initDatePickers */
 class DatePicker {
     constructor(input) {
         this.input = input;

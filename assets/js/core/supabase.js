@@ -2,6 +2,7 @@
 // SUPABASE — Client initialization
 // ════════════════════════════════════════
 
+/* exported initSupabase, getValidToken, generateCsrfToken, validateCsrfToken, getUserPlan, setSyncStatus */
 const SUPABASE_URL = 'https://fhttdaouzyfvfegvrpil.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZodHRkYW91enlmdmZlZ3ZycGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3MzQ1NzIsImV4cCI6MjA4NjMxMDU3Mn0.wUrvbM2Jaeuta90XJZCSgyeL7DqE3T3upwWe9wRaZLA';
 

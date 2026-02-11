@@ -2,6 +2,7 @@
 // TABLE OF CONTENTS — Floating outline panel
 // ════════════════════════════════════════
 
+/* exported tocGoSection */
 function renderTOC() {
     const p = cur(); if (!p) { hideTOC(); return; }
     let existing = document.getElementById('tocPanel');
@@ -23,7 +24,7 @@ function renderTOC() {
 
     let html = '<div class="toc-head">Outline</div>';
     tabs.forEach(t => {
-        html += `<div class="toc-item ${t.tab === activeTab ? 'on' : ''}" onclick="tocGoTab('${t.tab}')"><i data-lucide="${t.icon}"></i> ${t.label}</div>`;
+        html += `<div class="toc-item ${t.tab === activeTab ? 'on' : ''}" role="button" tabindex="0" onclick="tocGoTab('${t.tab}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><i data-lucide="${t.icon}"></i> ${t.label}</div>`;
     });
 
     // Section titles
@@ -32,7 +33,7 @@ function renderTOC() {
         html += '<div class="toc-divider"></div>';
         secs.forEach((s, i) => {
             const title = s.title || 'Untitled';
-            html += `<div class="toc-item toc-sub" onclick="tocGoSection(${i})"><i data-lucide="text"></i> ${esc(title)}</div>`;
+            html += `<div class="toc-item toc-sub" role="button" tabindex="0" onclick="tocGoSection(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><i data-lucide="text"></i> ${esc(title)}</div>`;
         });
     }
 

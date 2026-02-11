@@ -2,6 +2,7 @@
 // SETTINGS
 // ════════════════════════════════════════
 
+/* exported addEmailTemplate, editEmailTemplate, deleteEmailTemplate, saveEmailTemplate, exportData, importData, applyWhiteLabel */
 function getCountryTaxHtml() {
     const c = CONFIG?.country;
     if (c === 'IN') return `
@@ -96,7 +97,7 @@ function renderSettings() {
           <div class="fg">
             <label class="fl">Logo</label>
             <div class="brand-logo-box" onclick="document.getElementById('setLogoInput').click()" id="setLogoBox">
-              ${CONFIG?.logo ? '<img src="' + esc(CONFIG.logo) + '">' : '<i data-lucide="image-plus"></i>'}
+              ${CONFIG?.logo ? '<img src="' + esc(CONFIG.logo) + '" alt="Company logo">' : '<i data-lucide="image-plus"></i>'}
             </div>
             <input type="file" id="setLogoInput" accept="image/*" style="display:none" onchange="handleLogo(this);saveSettings()">
             <div class="fh">PNG, JPG, or SVG</div>
@@ -231,7 +232,7 @@ function saveEmailTemplate(existingId) {
     const subject = document.getElementById('tplSubject')?.value.trim();
     const body = document.getElementById('tplBody')?.value.trim();
     if (!name || !subject || !body) { toast('Please fill all fields'); return; }
-    let saved = safeGetStorage('pk_email_tpl', []);
+    const saved = safeGetStorage('pk_email_tpl', []);
     const id = existingId || 'tpl_' + Date.now();
     if (existingId) {
         const idx = saved.findIndex(t => t.id === existingId);

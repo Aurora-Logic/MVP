@@ -2,6 +2,7 @@
 // AI WRITING ASSISTANT — Anthropic Claude
 // ════════════════════════════════════════
 
+/* exported showAiPanel, runAi, runAiCustom, acceptAiResult, renderAiSettingsCard */
 let _aiLoading = false;
 
 const AI_PROMPTS = {

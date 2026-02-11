@@ -4,6 +4,7 @@
 
 // csel(el, options) — converts a container into a custom select
 // options: { value, placeholder, searchable, small, items: [{ value, label, icon?, desc?, group? }], onChange }
+/* exported csel, cselToggle, cselFilter, cselGetValue */
 function csel(el, opts) {
     if (!el) return;
     const items = opts.items || [];

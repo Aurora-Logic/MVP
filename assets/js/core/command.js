@@ -2,6 +2,7 @@
 // COMMAND PALETTE — ⌘K
 // ════════════════════════════════════════
 
+/* exported openCommandPalette, cmdRun */
 function openCommandPalette() {
     // Remove existing
     const existing = document.getElementById('cmdDialog');

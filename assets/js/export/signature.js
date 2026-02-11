@@ -2,6 +2,7 @@
 // SIGNATURE PAD — Draw & save signatures
 // ════════════════════════════════════════
 
+/* exported clearSigCanvas, saveSignature, editSignature, clearSignature */
 function initSignaturePad() {
     const display = document.getElementById('sigDisplay');
     if (!display) return;

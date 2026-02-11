@@ -2,6 +2,7 @@
 // PRICING PACKAGES — 3-Tier (Phase 2.1)
 // ════════════════════════════════════════
 
+/* exported togglePackages, setRecommended, addPackageFeature, removePackageFeature, setFeatureTier, collectPackagesData, buildPackagesPdfHtml */
 function renderPackages(p) {
     const el = document.getElementById('pkgSection');
     if (!el) return;
@@ -62,7 +63,6 @@ function renderPackages(p) {
             </div>
         </div>
         <div class="pkg-grid">${cards}</div>
-        ${true ? `
         <div class="pkg-features" style="margin-top:14px">
             <table class="pkg-feat-tbl">
                 <thead><tr>
@@ -73,7 +73,7 @@ function renderPackages(p) {
                 <tbody>${featureRows}</tbody>
             </table>
             ${!features.length ? '<div class="ps-empty" style="padding:12px;text-align:center;font-size:12px;color:var(--text4)">Click "Feature" to add comparison rows</div>' : ''}
-        </div>` : ''}
+        </div>
     </div>`;
     lucide.createIcons();
 }

@@ -2,6 +2,7 @@
 // TEAM — Local User Profiles & Roles
 // ════════════════════════════════════════
 
+/* exported initTeam, switchUser, removeTeamMember, canEdit, showUserSwitcher, renderTeamSettings, showAddMemberModal, doAddMember */
 const TEAM_COLORS = ['#007AFF', '#34C759', '#FF9500', '#AF52DE', '#FF3B30', '#5856D6', '#30B0C7', '#FF2D55'];
 const VALID_ROLES = ['admin', 'editor', 'viewer'];
 

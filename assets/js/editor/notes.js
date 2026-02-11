@@ -2,6 +2,7 @@
 // NOTES TAB
 // ════════════════════════════════════════
 
+/* exported addNote, deleteNote */
 function renderNotes(p) {
     const notes = p.notes || [];
     let html = `<div class="card card-p">

@@ -2,6 +2,7 @@
 // DASHBOARD
 // ════════════════════════════════════════
 
+/* exported dismissExpiry, toggleSort, sortProposals */
 function buildDuesBanner(active) {
     if (typeof paymentTotals !== 'function') return '';
     const accepted = (active || activeDB()).filter(p => p.status === 'accepted');
@@ -71,7 +72,7 @@ function buildResumeCard() {
   const ts = recent.updatedAt || recent.createdAt;
   const ago = ts ? timeAgo(ts) : '';
   const rid = escAttr(recent.id);
-  return `<div class="resume-card" onclick="loadEditor('${rid}')">
+  return `<div class="resume-card" role="button" tabindex="0" onclick="loadEditor('${rid}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
     <div class="resume-icon"><i data-lucide="pen-line"></i></div>
     <div class="resume-body">
       <div class="resume-label">Continue where you left off</div>
