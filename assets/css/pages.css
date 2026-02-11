@@ -2732,10 +2732,10 @@
 }
 
 
-/* ════════ EDITOR JS ════════ */
+/* ════════ TIPTAP EDITOR ════════ */
 
-/* Base container — provides border, background, focus ring */
-.editorjs-container {
+/* Base container */
+.tiptap-wrap {
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--r);
@@ -2744,117 +2744,153 @@
   transition: all var(--t);
 }
 
-.editorjs-container:focus-within {
+.tiptap-wrap:focus-within {
   border-color: var(--ring);
   box-shadow: 0 0 0 2px rgba(24, 24, 27, .06);
 }
 
-/* Internal layout — full width, no bottom padding bloat */
-.editorjs-container .codex-editor__redactor {
-  padding-bottom: 0 !important;
+/* Core editor element */
+.tiptap-wrap .tiptap {
+  outline: none;
 }
 
-.editorjs-container .ce-block__content {
-  max-width: 100%;
-  margin: 0;
-}
-
-.editorjs-container .ce-toolbar__content {
-  max-width: 100%;
-}
-
-/* Typography — match reference font sizes */
-.editorjs-container .ce-paragraph {
+/* Typography */
+.tiptap-wrap .tiptap p {
   font-size: 13px;
   line-height: 1.6;
   color: var(--text);
+  margin: 0 0 4px;
 }
 
-.editorjs-container .ce-header {
+.tiptap-wrap .tiptap h2 {
+  font-size: 16px;
   font-weight: 600;
   color: var(--text);
+  margin: 12px 0 6px;
 }
 
-.editorjs-container h2.ce-header {
-  font-size: 16px;
-}
-
-.editorjs-container h3.ce-header {
+.tiptap-wrap .tiptap h3 {
   font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 10px 0 4px;
 }
 
-/* Block types */
-.editorjs-container .cdx-list {
+.tiptap-wrap .tiptap h4 {
   font-size: 13px;
-  padding-left: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 8px 0 4px;
 }
 
-.editorjs-container .cdx-quote {
+/* Lists */
+.tiptap-wrap .tiptap ul,
+.tiptap-wrap .tiptap ol {
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 4px 0;
+}
+
+.tiptap-wrap .tiptap li {
+  margin-bottom: 2px;
+}
+
+/* Task list (checklist) */
+.tiptap-wrap .tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.tiptap-wrap .tiptap ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tiptap-wrap .tiptap ul[data-type="taskList"] li label {
+  margin-top: 2px;
+}
+
+/* Blockquote */
+.tiptap-wrap .tiptap blockquote {
   border-left: 3px solid var(--blue);
   padding-left: 12px;
   font-style: italic;
   color: var(--text2);
+  margin: 8px 0;
 }
 
-.editorjs-container .ce-delimiter {
-  line-height: 1.6;
+/* Code */
+.tiptap-wrap .tiptap code {
+  background: var(--muted);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 12px;
 }
 
-.editorjs-container .cdx-marker {
+.tiptap-wrap .tiptap pre {
+  background: var(--muted);
+  padding: 12px;
+  border-radius: var(--r);
+  margin: 8px 0;
+  overflow-x: auto;
+}
+
+.tiptap-wrap .tiptap pre code {
+  background: none;
+  padding: 0;
+  font-size: 12px;
+}
+
+/* Mark / Highlight */
+.tiptap-wrap .tiptap mark {
   background: rgba(245, 235, 111, 0.5);
   padding: 2px 0;
 }
 
-/* Toolbar buttons */
-.editorjs-container .ce-toolbar__plus,
-.editorjs-container .ce-toolbar__settings-btn {
-  color: var(--text3);
+/* Horizontal rule */
+.tiptap-wrap .tiptap hr {
+  border: none;
+  border-top: 2px solid var(--border);
+  margin: 16px 0;
+}
+
+/* Table */
+.tiptap-wrap .tiptap table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.tiptap-wrap .tiptap th,
+.tiptap-wrap .tiptap td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  font-size: 12px;
+  text-align: left;
+}
+
+.tiptap-wrap .tiptap th {
   background: var(--muted);
-  border-radius: 6px;
+  font-weight: 600;
 }
 
-.editorjs-container .ce-toolbar__plus:hover,
-.editorjs-container .ce-toolbar__settings-btn:hover {
-  background: var(--hover);
+/* Link */
+.tiptap-wrap .tiptap a {
+  color: var(--blue);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
-/* Toolbar actions wrapper */
-.ce-toolbar__actions {
-  z-index: 4;
-}
-
-/* Inline toolbar */
-.editorjs-container .ce-inline-toolbar {
-  border-radius: var(--r);
-  border: 1px solid var(--border);
-  box-shadow: var(--sh2);
-}
-
-.ce-inline-toolbar {
-  z-index: 1000;
-}
-
-.ce-inline-tool--active {
-  color: var(--primary);
-}
-
-/* Popover (toolbox) */
-.editorjs-container .ce-popover {
-  border-radius: var(--r);
-  border: 1px solid var(--border);
-  box-shadow: var(--sh2);
-}
-
-.ce-popover {
-  z-index: 1000;
-}
-
-.ce-settings {
-  z-index: 1000;
-}
-
-.ce-conversion-toolbar {
-  z-index: 1000;
+/* Placeholder */
+.tiptap-wrap .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--text4);
+  pointer-events: none;
+  float: left;
+  height: 0;
 }
 
 /* Fix: Ensure menus don't get clipped by section accordion */
@@ -2864,38 +2900,15 @@
 }
 
 /* Dark mode */
-.dark .editorjs-container {
+.dark .tiptap-wrap {
   background: var(--card);
 }
 
-.dark .editorjs-container:focus-within {
+.dark .tiptap-wrap:focus-within {
   box-shadow: 0 0 0 2px rgba(255, 255, 255, .06);
 }
 
-.dark .ce-block--selected .ce-block__content {
-  background: var(--muted);
-}
-
-.dark .ce-inline-toolbar,
-.dark .ce-conversion-toolbar,
-.dark .ce-settings,
-.dark .ce-popover {
-  background: var(--card);
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
-.dark .ce-inline-tool:hover,
-.dark .ce-conversion-tool:hover,
-.dark .ce-popover-item:hover {
-  background: var(--muted);
-}
-
-.dark .ce-inline-tool--active {
-  color: var(--blue);
-}
-
-.dark .editorjs-container .cdx-marker {
+.dark .tiptap-wrap .tiptap mark {
   background: rgba(245, 235, 111, 0.3);
 }
 
@@ -2907,17 +2920,7 @@
   background: var(--card) !important;
 }
 
-.li-desc-editor .codex-editor__redactor {
-  padding-bottom: 0 !important;
-  min-height: 24px;
-}
-
-.li-desc-editor .ce-block__content {
-  max-width: 100%;
-  margin: 0;
-}
-
-.li-desc-editor .ce-paragraph {
+.li-desc-editor .tiptap p {
   line-height: 1.4;
   font-size: 12px;
   color: var(--text2);

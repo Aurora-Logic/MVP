@@ -85,8 +85,8 @@ function showInsertVariableDropdown(editorInstance, btnEl) {
     dropdown.querySelectorAll('.var-item').forEach(item => {
         item.onclick = () => {
             const key = item.dataset.key;
-            if (editorInstance && editorInstance.blocks) {
-                editorInstance.blocks.insert('paragraph', { text: key });
+            if (editorInstance && editorInstance.commands) {
+                editorInstance.commands.insertContent(key);
                 dirty();
             }
             dropdown.remove();

@@ -42,13 +42,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.4';
-const APP_BUILD = '20260210';
+const APP_VERSION = '2.5';
+const APP_BUILD = '20260211';
 const WHATS_NEW_ITEMS = [
-    { icon: 'cloud', title: 'Cloud Sync', desc: 'Your proposals, clients, and settings now sync across all your devices automatically.' },
-    { icon: 'log-in', title: 'User Accounts', desc: 'Sign in with Google or email to access your data from anywhere.' },
+    { icon: 'pen-line', title: 'New Rich Text Editor', desc: 'Replaced Editor.js with Tiptap — enjoy a seamless Notion-like writing experience with better formatting.' },
+    { icon: 'log-in', title: 'Improved Google Sign-In', desc: 'OAuth flow now has automatic retry and timeout handling for reliable login.' },
+    { icon: 'cloud', title: 'Cloud Sync', desc: 'Your proposals, clients, and settings sync across all your devices automatically.' },
     { icon: 'share-2', title: 'Cloud Sharing', desc: 'Shared proposal links now work across devices — no same-browser requirement.' },
-    { icon: 'shield-check', title: 'Secure & Private', desc: 'Row-level security ensures only you can access your data.' },
     { icon: 'wifi-off', title: 'Offline Mode', desc: 'Continue working offline — data syncs automatically when you reconnect.' }
 ];
 

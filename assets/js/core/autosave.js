@@ -76,11 +76,10 @@ function dirty() {
         const curEl = document.getElementById('fCur');
         p.currency = curEl ? (cselGetValue(curEl) || p.currency) : p.currency;
 
-        // Payment Terms - save from EditorJS
-        if (typeof paymentTermsEditor !== 'undefined' && paymentTermsEditor && typeof paymentTermsEditor.save === 'function') {
+        // Payment Terms - save from Tiptap
+        if (typeof paymentTermsEditor !== 'undefined' && paymentTermsEditor && typeof paymentTermsEditor.getHTML === 'function') {
             try {
-                const data = await paymentTermsEditor.save();
-                p.paymentTerms = data;
+                p.paymentTerms = paymentTermsEditor.getHTML();
             } catch (err) { console.warn('Error saving payment terms', err); }
         }
 
@@ -89,7 +88,7 @@ function dirty() {
         p.discount = Math.max(0, parseFloat(get('fDiscount')) || 0);
         p.taxRate = Math.min(100, Math.max(0, parseFloat(get('fTaxRate')) || 0));
 
-        // Sections - save from EditorJS or structured forms
+        // Sections - save from Tiptap or structured forms
         const secEls = document.querySelectorAll('.sec-b');
         if (secEls.length) {
             const newSections = [];
@@ -107,16 +106,15 @@ function dirty() {
                 const title = b.querySelector('.sec-ti')?.value || '';
                 let content = null;
 
-                // Try getting from EditorJS — use the editor keyed to this DOM element's holder
-                const editorHolder = b.querySelector('.editorjs-container');
+                // Try getting from Tiptap — use the editor keyed to this DOM element's holder
+                const editorHolder = b.querySelector('.tiptap-wrap');
                 const editorIdx = editorHolder ? parseInt(editorHolder.id?.replace('sec-editor-', '')) : i;
                 const editorKey = !isNaN(editorIdx) ? editorIdx : i;
-                if (typeof sectionEditors !== 'undefined' && sectionEditors[editorKey] && typeof sectionEditors[editorKey].save === 'function') {
+                if (typeof sectionEditors !== 'undefined' && sectionEditors[editorKey] && typeof sectionEditors[editorKey].getHTML === 'function') {
                     try {
-                        content = await sectionEditors[editorKey].save();
+                        content = sectionEditors[editorKey].getHTML();
                     } catch (err) {
                         console.warn('Error saving section ' + i, err);
-                        // Keep existing content on save failure (fallback below)
                     }
                 }
 
@@ -125,15 +123,14 @@ function dirty() {
                 if (!content && p.sections && p.sections[!isNaN(origIdx) ? origIdx : i]) {
                     content = p.sections[!isNaN(origIdx) ? origIdx : i].content;
                 }
-                // Or if it was initialized as empty object
-                if (!content) content = { blocks: [] };
+                if (!content) content = '';
 
                 newSections.push({ title, content });
             }
             p.sections = newSections;
         }
 
-        // Line Items - save from inputs and EditorJS
+        // Line Items - save from inputs and Tiptap
         const liEls = document.querySelectorAll('.li-row');
         if (liEls.length || document.getElementById('liBody')) {
             const newLineItems = [];
@@ -142,14 +139,13 @@ function dirty() {
                 const qty = parseFloat(row.querySelector('.lq')?.value) || 0;
                 const rate = parseFloat(row.querySelector('.lr')?.value) || 0;
 
-                let detail = null;
+                let detail = '';
                 const editorEl = row.querySelector('.li-desc-editor');
-                if (editorEl && editorEl._editor && typeof editorEl._editor.save === 'function') {
+                if (editorEl && editorEl._editor && typeof editorEl._editor.getHTML === 'function') {
                     try {
-                        detail = await editorEl._editor.save();
+                        detail = editorEl._editor.getHTML();
                     } catch (e) { console.warn('LI editor save failed', e); }
                 }
-                if (!detail) detail = { blocks: [] };
 
                 newLineItems.push({ desc, detail, qty, rate });
             }

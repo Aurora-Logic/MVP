@@ -7,7 +7,7 @@ function renderPricing(p) {
     let rows = '';
     items.forEach((item, i) => {
         rows += `<tr class="li-row">
-      <td><div class="li-title-wrap"><input type="text" class="ld" value="${esc(item.desc)}" placeholder="Item title" oninput="dirty()"><div class="editorjs-container li-desc-editor" id="li-editor-${i}"></div></div></td>
+      <td><div class="li-title-wrap"><input type="text" class="ld" value="${esc(item.desc)}" placeholder="Item title" oninput="dirty()"><div class="tiptap-wrap li-desc-editor" id="li-editor-${i}"></div></div></td>
       <td><input type="number" class="lq" value="${item.qty}" min="0" step="1" oninput="reRow(this);dirty()"></td>
       <td><input type="number" class="lr" value="${item.rate}" min="0" step="100" oninput="reRow(this);dirty()"></td>
       <td class="li-amt">${fmtCur((item.qty || 0) * (item.rate || 0), p.currency)}</td>
@@ -31,7 +31,7 @@ function renderPricing(p) {
         addOns: '<div id="addOnsSection"></div>',
         paySchedule: '<div id="payScheduleSection"></div>',
         payments: '<div id="paymentsSection"></div>',
-        payTerms: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Payment Terms</div><div class="card-d">Conditions and legal terms</div></div><div class="pricing-tc-actions"><button class="btn-sm-icon-ghost" onclick="showInsertVariableDropdown(paymentTermsEditor,this)" data-tooltip="Insert Variable" data-side="bottom" data-align="center"><i data-lucide="braces"></i></button><button class="btn-sm-outline" onclick="openTCLib()"><i data-lucide="bookmark"></i> T&C Library</button></div></div><div class="fg fg-flush"><div id="paymentTermsEditor" class="editorjs-container"></div></div></div>`
+        payTerms: `<div class="card card-p"><div class="card-head"><div><div class="card-t">Payment Terms</div><div class="card-d">Conditions and legal terms</div></div><div class="pricing-tc-actions"><button class="btn-sm-icon-ghost" onclick="showInsertVariableDropdown(paymentTermsEditor,this)" data-tooltip="Insert Variable" data-side="bottom" data-align="center"><i data-lucide="braces"></i></button><button class="btn-sm-outline" onclick="openTCLib()"><i data-lucide="bookmark"></i> T&C Library</button></div></div><div class="fg fg-flush"><div id="paymentTermsEditor" class="tiptap-wrap"></div></div></div>`
     };
 
     const defaultOrder = ['packages', 'lineItems', 'addOns', 'paySchedule', 'payments', 'payTerms'];
@@ -117,7 +117,7 @@ function savePricingOrder() {
 }
 
 function initPaymentTermsEditor(p) {
-    if (paymentTermsEditor && typeof paymentTermsEditor.destroy === 'function') {
+    if (paymentTermsEditor) {
         try { paymentTermsEditor.destroy(); } catch (e) { }
     }
     paymentTermsEditor = null;
@@ -126,83 +126,56 @@ function initPaymentTermsEditor(p) {
     if (!ptHolder) return;
     ptHolder.classList.add('editor-loading');
 
-    let data;
-    if (p.paymentTerms) {
-        if (typeof p.paymentTerms === 'string') {
-            if (p.paymentTerms.trim()) {
-                data = { blocks: p.paymentTerms.split('\n\n').map(t => ({ type: 'paragraph', data: { text: t } })) };
-            } else {
-                data = { blocks: [] };
-            }
-        } else {
-            data = p.paymentTerms;
-        }
-    } else {
-        data = { blocks: [] };
-    }
+    const html = typeof migrateEditorContent === 'function' ? migrateEditorContent(p.paymentTerms) : (p.paymentTerms || '');
 
-    // Resolve CDN globals with fallbacks
-    const EditorHeader = window.Header || window.EditorjsHeader;
-    const EditorList = window.List || window.EditorjsList || window.NestedList;
+    const doInit = () => {
+        try {
+            paymentTermsEditor = createEditor(ptHolder, {
+                content: html,
+                placeholder: 'Add payment terms...',
+                tables: false,
+                onChange: () => dirty()
+            });
+            ptHolder.classList.remove('editor-loading');
+            ptHolder.classList.add('editor-loaded');
+        } catch (e) { console.error('Payment terms editor init error', e); }
+    };
 
-    try {
-        paymentTermsEditor = new EditorJS({
-            holder: 'paymentTermsEditor',
-            data: data,
-            tools: {
-                header: { class: EditorHeader, inlineToolbar: true, config: { placeholder: 'Heading', levels: [2, 3, 4], defaultLevel: 3 } },
-                list: { class: EditorList, inlineToolbar: true },
-                quote: { class: window.Quote || window.EditorQuote || class {}, inlineToolbar: true },
-                marker: window.Marker || window.EditorMarker || class {},
-                delimiter: window.Delimiter || window.EditorDelimiter || class {}
-            },
-            placeholder: 'Add payment terms... (use / for blocks)',
-            minHeight: 60,
-            onReady: () => { ptHolder.classList.remove('editor-loading'); ptHolder.classList.add('editor-loaded'); },
-            onChange: () => dirty()
-        });
-    } catch (e) { console.error('Payment terms editor init error', e); }
+    if (typeof createEditor === 'function' && window.tiptapReady) doInit();
+    else window.addEventListener('tiptap-ready', doInit, { once: true });
 }
 
 function initSingleLiEditor(el, initialData) {
-    if (el._editor && typeof el._editor.destroy === 'function') {
+    if (el._editor) {
         try { el._editor.destroy(); } catch (e) { }
     }
     el._editor = null;
     el.classList.add('editor-loading');
 
-    let data;
-    if (typeof initialData === 'string') {
-        if (initialData.trim()) {
-            data = { blocks: initialData.split('\n').map(t => ({ type: 'paragraph', data: { text: t } })) };
-        } else { data = { blocks: [] }; }
-    } else { data = initialData || { blocks: [] }; }
+    const html = typeof migrateEditorContent === 'function' ? migrateEditorContent(initialData) : '';
 
-    try {
-        const EditorHeader = window.Header || window.EditorjsHeader;
-        const EditorList = window.List || window.EditorjsList || window.NestedList;
+    const doInit = () => {
+        try {
+            el._editor = createEditor(el, {
+                content: html,
+                placeholder: 'Description...',
+                headingLevels: [3, 4],
+                tables: false,
+                taskList: false,
+                onChange: () => dirty()
+            });
+            el.classList.remove('editor-loading');
+            el.classList.add('editor-loaded');
+        } catch (e) { console.error('LI editor init error', e); }
+    };
 
-        el._editor = new EditorJS({
-            holder: el,
-            data: data,
-            tools: {
-                header: { class: EditorHeader, inlineToolbar: true, config: { placeholder: 'Heading', levels: [3, 4], defaultLevel: 3 } },
-                list: { class: EditorList, inlineToolbar: true },
-                quote: { class: window.Quote || window.EditorQuote || class {}, inlineToolbar: true },
-                marker: window.Marker || window.EditorMarker || class {},
-                delimiter: window.Delimiter || window.EditorDelimiter || class {}
-            },
-            placeholder: 'Description...',
-            minHeight: 0,
-            onReady: () => { el.classList.remove('editor-loading'); el.classList.add('editor-loaded'); },
-            onChange: () => dirty()
-        });
-    } catch (e) { console.error('LI editor init error', e); }
+    if (typeof createEditor === 'function' && window.tiptapReady) doInit();
+    else window.addEventListener('tiptap-ready', doInit, { once: true });
 }
 
 function destroyLiEditor(row) {
     const editorEl = row.querySelector('.li-desc-editor');
-    if (editorEl?._editor && typeof editorEl._editor.destroy === 'function') {
+    if (editorEl?._editor) {
         try { editorEl._editor.destroy(); } catch (e) { }
         editorEl._editor = null;
     }
@@ -240,7 +213,7 @@ function addLine() {
     tr.className = 'li-row';
     const c = cselGetValue(document.getElementById('fCur')) || defaultCurrency();
     const uniqueId = 'li-' + Date.now() + Math.random().toString(36).slice(2, 5);
-    tr.innerHTML = `<td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="editorjs-container li-desc-editor" id="${uniqueId}"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, c)}</td><td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>`;
+    tr.innerHTML = `<td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="tiptap-wrap li-desc-editor" id="${uniqueId}"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, c)}</td><td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>`;
     body.appendChild(tr);
     lucide.createIcons();
     const el = document.getElementById(uniqueId);

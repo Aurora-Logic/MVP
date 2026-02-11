@@ -228,19 +228,38 @@
     <script src="assets/js/core/completeness.js"></script>
     <script src="assets/js/core/onboarding.js"></script>
     <script src="assets/js/core/team.js"></script>
-    <!-- CDN: Editor.js + plugins -->
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.29.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.7"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@2.7.2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/marker@1.4.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@1.4.2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@2.2.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@1.5.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@2.8.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@1.4.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/underline@1.1.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@2.5.3"></script>
+    <!-- CDN: Tiptap Editor (ESM modules → exposed as globals) -->
+    <script type="module">
+        import { Editor } from 'https://esm.sh/@tiptap/core@2'
+        import StarterKit from 'https://esm.sh/@tiptap/starter-kit@2'
+        import Underline from 'https://esm.sh/@tiptap/extension-underline@2'
+        import Highlight from 'https://esm.sh/@tiptap/extension-highlight@2'
+        import Table from 'https://esm.sh/@tiptap/extension-table@2'
+        import TableRow from 'https://esm.sh/@tiptap/extension-table-row@2'
+        import TableCell from 'https://esm.sh/@tiptap/extension-table-cell@2'
+        import TableHeader from 'https://esm.sh/@tiptap/extension-table-header@2'
+        import TaskList from 'https://esm.sh/@tiptap/extension-task-list@2'
+        import TaskItem from 'https://esm.sh/@tiptap/extension-task-item@2'
+        import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder@2'
+        import Link from 'https://esm.sh/@tiptap/extension-link@2'
+        import BubbleMenu from 'https://esm.sh/@tiptap/extension-bubble-menu@2'
+
+        window.TiptapEditor = Editor
+        window.TiptapStarterKit = StarterKit
+        window.TiptapUnderline = Underline
+        window.TiptapHighlight = Highlight
+        window.TiptapTable = Table
+        window.TiptapTableRow = TableRow
+        window.TiptapTableCell = TableCell
+        window.TiptapTableHeader = TableHeader
+        window.TiptapTaskList = TaskList
+        window.TiptapTaskItem = TaskItem
+        window.TiptapPlaceholder = Placeholder
+        window.TiptapLink = Link
+        window.TiptapBubbleMenu = BubbleMenu
+        window.tiptapReady = true
+        window.dispatchEvent(new Event('tiptap-ready'))
+    </script>
     <!-- Editor: Editor tabs & components -->
     <script src="assets/js/editor/focus-mode.js"></script>
     <!-- Views: Main page views -->

@@ -28,7 +28,6 @@ async function initAuth() {
     }
 
     if (isOAuthCallback) {
-        // Show loading while Supabase SDK processes the OAuth token from the hash
         const el = document.getElementById('obContent');
         if (el) {
             document.getElementById('appShell').style.display = 'none';
@@ -37,44 +36,131 @@ async function initAuth() {
         }
     }
 
-    // Set up auth state listener FIRST (before getSession triggers detectSessionInUrl)
+    // Use a promise-based approach to handle the session resolution
     let authBooted = false;
-    sb().auth.onAuthStateChange(async (event, session) => {
-        sbSession = session;
-        // Clean hash after SDK processes it
+
+    async function safePullAndBoot() {
+        try {
+            await pullAndBoot();
+        } catch (e) {
+            console.error('pullAndBoot failed:', e);
+            // Still try to boot even if cloud sync fails
+            if (CONFIG) {
+                document.getElementById('onboard').classList.add('hide');
+                document.getElementById('appShell').style.display = 'flex';
+                bootApp();
+                if (typeof toast === 'function') toast('Cloud sync failed — working offline', 'error');
+            } else {
+                renderOnboarding();
+            }
+        }
+    }
+
+    function cleanHash() {
         if (window.location.hash.includes('access_token=') && window.history.replaceState) {
             window.history.replaceState(null, '', window.location.pathname + window.location.search);
         }
-        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && !authBooted) {
-            authBooted = true;
-            await pullAndBoot();
-        } else if (event === 'INITIAL_SESSION' && !session && !authBooted) {
-            authBooted = true;
-            renderAuthScreen();
-        } else if (event === 'SIGNED_OUT') {
+    }
+
+    // Register auth state listener
+    sb().auth.onAuthStateChange(async (event, session) => {
+        console.log('[Auth] onAuthStateChange:', event, !!session);
+        sbSession = session;
+        cleanHash();
+
+        if (event === 'SIGNED_OUT') {
             sbSession = null;
+            if (authBooted) renderAuthScreen();
+            return;
+        }
+
+        if (session && !authBooted) {
+            authBooted = true;
+            await safePullAndBoot();
+        } else if (event === 'INITIAL_SESSION' && !session && !authBooted && !isOAuthCallback) {
+            authBooted = true;
             renderAuthScreen();
         }
     });
 
-    // getSession() triggers Supabase SDK to detect hash tokens (detectSessionInUrl: true)
-    // and fire onAuthStateChange with INITIAL_SESSION
+    // getSession() triggers SDK's detectSessionInUrl to process hash tokens
     try {
-        const { data } = await sb().auth.getSession();
-        sbSession = data?.session || null;
-    } catch (e) { sbSession = null; }
+        console.log('[Auth] Calling getSession...');
+        const { data, error } = await sb().auth.getSession();
+        console.log('[Auth] getSession result:', !!data?.session, error?.message || 'ok');
+        if (data?.session) sbSession = data.session;
+    } catch (e) {
+        console.warn('[Auth] getSession failed:', e);
+        sbSession = null;
+    }
 
-    // Fallback: if onAuthStateChange hasn't fired yet (rare), boot manually
-    if (!authBooted) {
-        if (sbSession) {
-            authBooted = true;
-            await pullAndBoot();
-        } else if (!isOAuthCallback) {
-            // No session and not waiting for OAuth — show login
-            authBooted = true;
-            renderAuthScreen();
+    // Give onAuthStateChange a moment to fire (it's async)
+    await new Promise(r => setTimeout(r, 300));
+
+    if (authBooted) return; // Already handled by onAuthStateChange
+
+    // Fallback: if we have a session from getSession, boot manually
+    if (sbSession) {
+        console.log('[Auth] Fallback: booting with session from getSession');
+        authBooted = true;
+        cleanHash();
+        await safePullAndBoot();
+        return;
+    }
+
+    // For OAuth callbacks: the SDK may need more time to process
+    if (isOAuthCallback) {
+        console.log('[Auth] OAuth callback — waiting for SDK to process token...');
+        // Try manually setting the session from the hash as last resort
+        try {
+            const params = new URLSearchParams(hash.substring(1));
+            const accessToken = params.get('access_token');
+            const refreshToken = params.get('refresh_token');
+            if (accessToken && refreshToken) {
+                console.log('[Auth] Manual setSession attempt...');
+                const { data, error } = await sb().auth.setSession({
+                    access_token: accessToken,
+                    refresh_token: refreshToken
+                });
+                if (!error && data?.session) {
+                    sbSession = data.session;
+                    authBooted = true;
+                    cleanHash();
+                    await safePullAndBoot();
+                    return;
+                }
+                console.warn('[Auth] Manual setSession failed:', error?.message);
+            }
+        } catch (e) {
+            console.warn('[Auth] Manual token exchange failed:', e);
         }
-        // If OAuth callback with no session yet, onAuthStateChange will handle it
+
+        // Final timeout: show error with retry
+        await new Promise(r => setTimeout(r, 4000));
+        if (!authBooted) {
+            cleanHash();
+            authBooted = true;
+            showOAuthRetryScreen();
+        }
+        return;
+    }
+
+    // No session, no OAuth callback — show login
+    authBooted = true;
+    renderAuthScreen();
+}
+
+function showOAuthRetryScreen() {
+    const el = document.getElementById('obContent');
+    if (el) {
+        el.innerHTML = `<div class="auth-form" style="text-align:center">
+            <div style="font-size:36px;margin-bottom:12px">&#9888;&#65039;</div>
+            <div class="auth-title">Sign-in timed out</div>
+            <div class="auth-desc" style="margin-bottom:20px">We couldn't complete the sign-in. This can happen if the link expired or there was a network issue.</div>
+            <button class="btn" style="margin-bottom:12px" onclick="doGoogleLogin()">Try again with Google</button>
+            <div><button class="btn-outline" onclick="authMode='login';renderAuthScreen()">Back to Sign In</button></div>
+        </div>`;
+        lucide.createIcons();
     }
 }
 
@@ -283,6 +369,7 @@ async function doGoogleLogin() {
     try {
         // Use current origin (works on localhost, Vercel, custom domains)
         const redirectUrl = window.location.origin + window.location.pathname;
+        console.log('[Auth] Google OAuth redirectTo:', redirectUrl);
         const { error } = await sb().auth.signInWithOAuth({
             provider: 'google',
             options: { redirectTo: redirectUrl }
@@ -300,7 +387,7 @@ async function doPasswordReset() {
     setAuthLoading(true);
     try {
         const { error } = await sb().auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + '/index.html'
+            redirectTo: window.location.origin + window.location.pathname
         });
         if (error) { showAuthError(error.message); setAuthLoading(false); return; }
         showAuthError('');

@@ -28,56 +28,49 @@ function renderSections(p) {
     lucide.createIcons();
 }
 
-function initSectionEditors(sections) {
-    // Destroy existing
+function destroyAllEditors() {
     Object.values(sectionEditors).forEach(e => {
         if (e && typeof e.destroy === 'function') try { e.destroy(); } catch (err) { }
     });
     sectionEditors = {};
+}
 
-    // Resolve CDN globals with fallbacks (matches reference pattern)
-    const EditorHeader = window.Header || window.EditorjsHeader;
-    const EditorList = window.List || window.EditorjsList || window.NestedList;
-    const EditorQuote = window.Quote;
-    const EditorMarker = window.Marker;
-    const EditorDelimiter = window.Delimiter;
+function initSectionEditors(sections) {
+    destroyAllEditors();
 
     sections.forEach((s, i) => {
         if (s.type === 'testimonial' || s.type === 'case-study') return;
 
-        let data;
-        // Convert plain text to blocks if needed
-        if (typeof s.content === 'string') {
-            if (s.content.trim()) {
-                data = { blocks: s.content.split('\n\n').map(t => ({ type: 'paragraph', data: { text: t } })) };
-            } else {
-                data = { blocks: [] };
-            }
-        } else {
-            data = s.content || { blocks: [] };
+        const holderEl = document.getElementById(`sec-editor-${i}`);
+        if (!holderEl) return;
+        holderEl.classList.add('editor-loading');
+
+        // Migrate content: blocks → HTML, plain text → HTML
+        const html = migrateEditorContent(s.content);
+
+        if (typeof createEditor !== 'function' || !window.tiptapReady) {
+            // Tiptap not loaded yet — wait for it
+            const onReady = () => {
+                window.removeEventListener('tiptap-ready', onReady);
+                initSingleSectionEditor(i, holderEl, html);
+            };
+            window.addEventListener('tiptap-ready', onReady);
+            return;
         }
 
-        const holderEl = document.getElementById(`sec-editor-${i}`);
-        if (holderEl) holderEl.classList.add('editor-loading');
-
-        try {
-            sectionEditors[i] = new EditorJS({
-                holder: `sec-editor-${i}`,
-                data: data,
-                tools: {
-                    header: { class: EditorHeader, inlineToolbar: true, config: { placeholder: 'Heading', levels: [2, 3, 4], defaultLevel: 2 } },
-                    list: { class: EditorList, inlineToolbar: true },
-                    quote: { class: EditorQuote, inlineToolbar: true },
-                    marker: EditorMarker,
-                    delimiter: EditorDelimiter
-                },
-                placeholder: 'Write section content... (use / for blocks)',
-                minHeight: 60,
-                onReady: () => { if (holderEl) { holderEl.classList.remove('editor-loading'); holderEl.classList.add('editor-loaded'); } },
-                onChange: () => dirty()
-            });
-        } catch (e) { console.error('EditorJS init error', e); }
+        initSingleSectionEditor(i, holderEl, html);
     });
+}
+
+function initSingleSectionEditor(i, holderEl, html) {
+    try {
+        sectionEditors[i] = createEditor(holderEl, {
+            content: html,
+            placeholder: 'Write section content...',
+            onChange: () => dirty()
+        });
+        if (holderEl) { holderEl.classList.remove('editor-loading'); holderEl.classList.add('editor-loaded'); }
+    } catch (e) { console.error('Tiptap init error', e); }
 }
 
 
@@ -97,7 +90,7 @@ function secBlockHtml(s, i) {
     <div class="sec-bd">
       <div class="fg"><label class="fl">Title</label><input type="text" class="sec-ti" value="${esc(s.title)}" placeholder="e.g. Executive Summary" oninput="updSecName(this);dirty()"></div>
       <div class="fg fg-flush"><label class="fl">Content</label>
-        <div class="editorjs-container" id="sec-editor-${i}"></div>
+        <div class="tiptap-wrap" id="sec-editor-${i}"></div>
       </div>
     </div>
   </div>`;
@@ -108,7 +101,7 @@ function addSec(type) {
     const p = cur(); if (!p) return;
     if (type === 'testimonial') p.sections.push({ type: 'testimonial', title: 'Client Testimonial', testimonial: { quote: '', author: '', company: '', rating: 5 } });
     else if (type === 'case-study') p.sections.push({ type: 'case-study', title: 'Case Study', caseStudy: { challenge: '', solution: '', result: '' } });
-    else p.sections.push({ title: '', content: { blocks: [] } }); // Start with empty object for block editor
+    else p.sections.push({ title: '', content: '' });
     persist(); renderSections(p); refreshStatsBar(); lucide.createIcons();
 }
 
@@ -137,8 +130,8 @@ function delSec(btn) {
     const p = cur();
     if (!p) return;
 
-    // Destroy editor
-    if (sectionEditors[idx] && typeof sectionEditors[idx].destroy === 'function') {
+    // Destroy Tiptap editor
+    if (sectionEditors[idx]) {
         try { sectionEditors[idx].destroy(); } catch (e) { }
         delete sectionEditors[idx];
     }
@@ -191,14 +184,14 @@ function initDrag() {
     });
 }
 
-async function saveSectionToLib(btn) {
+function saveSectionToLib(btn) {
     const block = btn.closest('.sec-b');
     const idx = parseInt(block.dataset.idx);
     const title = block.querySelector('.sec-ti').value;
     if (!title) { toast('Add a title first'); return; }
-    let content = { blocks: [] };
-    if (sectionEditors[idx] && typeof sectionEditors[idx].save === 'function') {
-        try { content = await sectionEditors[idx].save(); } catch (e) { console.warn('Save to lib: editor save failed', e); }
+    let content = '';
+    if (sectionEditors[idx] && typeof sectionEditors[idx].getHTML === 'function') {
+        try { content = sectionEditors[idx].getHTML(); } catch (e) { }
     }
     let lib = safeGetStorage('pk_seclib', []);
     lib.push({ title, content, savedAt: Date.now() });

@@ -80,15 +80,11 @@ function showAiPanel(sectionIdx) {
     document.getElementById('aiCustomPrompt')?.focus();
 }
 
-async function getEditorContent(sectionIdx) {
+function getEditorContent(sectionIdx) {
     const editor = sectionEditors[sectionIdx];
     if (!editor) return '';
     try {
-        const data = await editor.save();
-        return (data.blocks || []).map(b => {
-            if (b.type === 'list') return (b.data?.items || []).map(item => typeof item === 'object' ? (item.content || '') : item).join('\n');
-            return b.data?.text || b.data?.code || '';
-        }).filter(Boolean).join('\n\n');
+        return typeof editor.getText === 'function' ? editor.getText() : '';
     } catch (e) { return ''; }
 }
 
@@ -146,10 +142,9 @@ function acceptAiResult(sectionIdx) {
     const editor = sectionEditors[sectionIdx];
     if (!editor) return;
     if (typeof pushUndo === 'function') pushUndo();
-    editor.blocks.clear();
-    text.split('\n\n').forEach(para => {
-        if (para.trim()) editor.blocks.insert('paragraph', { text: para.trim() });
-    });
+    // Convert plain text paragraphs to HTML
+    const html = text.split('\n\n').filter(p => p.trim()).map(p => `<p>${esc(p.trim())}</p>`).join('');
+    editor.commands.setContent(html);
     dirty();
     document.getElementById('aiPanel')?.remove();
     toast('AI suggestion applied');

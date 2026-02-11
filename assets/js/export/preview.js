@@ -35,61 +35,27 @@ function calcTotals(p) {
     return { subtotal, disc, afterDisc, taxRate, taxAmt, addOnsTotal, grand };
 }
 
-// Convert Editor.js JSON data to HTML string (with optional variable replacement)
+// Convert editor content to HTML string for PDF (with optional variable replacement)
 function editorJsToHtml(content, p = null) {
     if (!content) return '';
 
-    // Handle legacy plain text
+    // Tiptap: content is already HTML string — pass through
     if (typeof content === 'string') {
+        // Check if it looks like HTML (has tags) or is plain text
+        if (content.includes('<') && content.includes('>')) {
+            return p ? replaceVariables(content, p) : content;
+        }
+        // Plain text legacy
         const escaped = esc(content).replace(/\n/g, '<br>');
         return p ? replaceVariables(escaped, p) : escaped;
     }
 
-    // Handle Editor.js JSON format
-    if (!content.blocks || !Array.isArray(content.blocks)) return '';
+    // Legacy: Editor.js JSON format — convert blocks to HTML
+    if (content.blocks && Array.isArray(content.blocks)) {
+        return typeof convertLegacyBlocks === 'function' ? convertLegacyBlocks(content) : '';
+    }
 
-    let html = content.blocks.map(block => {
-        let text = sanitizeHtml(block.data?.text || '');
-        if (p) text = replaceVariables(text, p);
-
-        switch (block.type) {
-            case 'header':
-                const level = block.data?.level || 2;
-                return `<div style="font-weight:600;font-size:${level === 2 ? '15px' : '14px'};margin:12px 0 6px">${text}</div>`;
-            case 'paragraph':
-                return `<div style="margin-bottom:6px">${text}</div>`;
-            case 'list':
-                let items = (block.data?.items || []).map(item => sanitizeHtml(typeof item === 'object' ? (item.content || item.text || '') : item));
-                if (p) items = items.map(item => replaceVariables(item, p));
-                const style = block.data?.style === 'ordered' ? 'ol' : 'ul';
-                const listItems = items.map(item => `<li>${item}</li>`).join('');
-                return style === 'ol'
-                    ? `<ol style="margin:6px 0;padding-left:20px">${listItems}</ol>`
-                    : `<ul style="margin:6px 0;padding-left:20px">${listItems}</ul>`;
-            case 'checklist':
-                const checkItems = (block.data?.items || []).map(ci => {
-                    const checked = ci.checked ? '\u2611' : '\u2610';
-                    return `<div style="margin:2px 0">${checked} ${sanitizeHtml(ci.text || '')}</div>`;
-                }).join('');
-                return `<div style="margin:6px 0">${checkItems}</div>`;
-            case 'table':
-                const rows = (block.data?.content || []).map(row => {
-                    const cells = row.map(cell => `<td style="border:1px solid #e4e4e7;padding:6px 10px;font-size:12px">${sanitizeHtml(cell)}</td>`).join('');
-                    return `<tr>${cells}</tr>`;
-                }).join('');
-                return `<table style="border-collapse:collapse;width:100%;margin:8px 0">${rows}</table>`;
-            case 'code':
-                return `<pre style="background:#f4f4f5;border-radius:6px;padding:10px 14px;font-size:12px;font-family:monospace;overflow-x:auto;margin:8px 0">${esc(block.data?.code || '')}</pre>`;
-            case 'quote':
-                return `<blockquote style="border-left:3px solid #888;padding-left:12px;margin:8px 0;font-style:italic;color:#666">${text}</blockquote>`;
-            case 'delimiter':
-                return '<hr style="border:none;border-top:1px solid #e4e4e7;margin:12px 0">';
-            default:
-                return text ? `<div>${text}</div>` : '';
-        }
-    }).join('');
-
-    return html;
+    return '';
 }
 
 function buildPreview(mode) {

@@ -4,6 +4,36 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.5 (build 20260211) — 2026-02-11
+
+### feat
+- Replace Editor.js with Tiptap — Notion-like rich text editor with seamless typing, better formatting (bold, italic, lists, tables, code blocks, task lists)
+- Backward-compatible data migration: old Editor.js block format auto-converts to HTML on open
+- Tiptap loaded via ESM modules from esm.sh CDN with async ready event
+
+### fix
+- Google OAuth: robust retry with 5-second timeout, manual setSession fallback, and retry screen if SDK fails to process hash token
+- OAuth error screen with clear messaging and "Try again" button
+
+### refactor
+- All editor saves now synchronous (getHTML) instead of async (save + blocks JSON)
+- Variable insertion uses Tiptap insertContent API
+- AI assistant uses getText/setContent instead of blocks API
+- PDF export passthrough for HTML content with legacy block converter fallback
+
+### Files Changed
+- `index.html` — Removed 12 Editor.js CDN tags, added Tiptap ESM module imports
+- `assets/js/editor/editor.js` — Added createEditor() factory, migrateEditorContent(), convertLegacyBlocks()
+- `assets/js/editor/sections.js` — Switched to Tiptap createEditor(), tiptap-ready event handling
+- `assets/js/editor/pricing.js` — Rewrote payment terms + line item editors for Tiptap
+- `assets/js/core/autosave.js` — Changed async .save() to sync .getHTML() for all editors
+- `assets/js/export/preview.js` — editorJsToHtml() now passes HTML through, legacy fallback
+- `assets/js/editor/ai-assistant.js` — getText/setContent instead of blocks API
+- `assets/js/core/variables.js` — insertContent instead of blocks.insert
+- `assets/js/core/auth.js` — Robust OAuth with timeout, retry screen, safePullAndBoot
+- `assets/css/pages.css` — Replaced ~190 lines Editor.js CSS with Tiptap styles
+- `assets/js/boot.js` — Version bump to 2.5
+
 ## v2.4 (build 20260210) — 2026-02-10
 
 ### Features

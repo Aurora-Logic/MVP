@@ -1,6 +1,101 @@
 // ════════════════════════════════════════
-// EDITOR — Main editor view
+// EDITOR — Main editor view + Tiptap helpers
 // ════════════════════════════════════════
+
+// ─── Tiptap Factory ───
+function createEditor(holder, opts = {}) {
+    if (!window.TiptapEditor) { console.warn('Tiptap not loaded yet'); return null; }
+    const el = typeof holder === 'string' ? document.getElementById(holder) : holder;
+    if (!el) return null;
+
+    const extensions = [
+        window.TiptapStarterKit.configure({
+            heading: { levels: opts.headingLevels || [2, 3, 4] }
+        }),
+        window.TiptapPlaceholder.configure({
+            placeholder: opts.placeholder || 'Start writing...'
+        }),
+        window.TiptapLink.configure({ openOnClick: false }),
+    ];
+    if (window.TiptapUnderline) extensions.push(window.TiptapUnderline);
+    if (window.TiptapHighlight) extensions.push(window.TiptapHighlight);
+    if (opts.tables !== false && window.TiptapTable) {
+        extensions.push(window.TiptapTable.configure({ resizable: true }));
+        extensions.push(window.TiptapTableRow);
+        extensions.push(window.TiptapTableCell);
+        extensions.push(window.TiptapTableHeader);
+    }
+    if (opts.taskList !== false && window.TiptapTaskList) {
+        extensions.push(window.TiptapTaskList);
+        extensions.push(window.TiptapTaskItem.configure({ nested: true }));
+    }
+
+    const editor = new window.TiptapEditor({
+        element: el,
+        extensions,
+        content: opts.content || '',
+        editorProps: {
+            attributes: { class: 'tiptap' }
+        },
+        onUpdate: opts.onChange ? ({ editor: ed }) => opts.onChange(ed) : undefined,
+    });
+    return editor;
+}
+
+// ─── Editor.js → HTML Migration ───
+function migrateEditorContent(data) {
+    if (!data) return '';
+    if (typeof data === 'string') return data;
+    if (data.blocks && Array.isArray(data.blocks)) return convertLegacyBlocks(data);
+    return '';
+}
+
+function convertLegacyBlocks(data) {
+    if (!data?.blocks?.length) return '';
+    return data.blocks.map(b => {
+        const d = b.data || {};
+        switch (b.type) {
+            case 'paragraph': return `<p>${d.text || ''}</p>`;
+            case 'header': {
+                const lvl = d.level || 2;
+                return `<h${lvl}>${d.text || ''}</h${lvl}>`;
+            }
+            case 'list': {
+                const tag = d.style === 'ordered' ? 'ol' : 'ul';
+                const items = (d.items || []).map(item => {
+                    const txt = typeof item === 'object' ? (item.content || '') : item;
+                    return `<li>${txt}</li>`;
+                }).join('');
+                return `<${tag}>${items}</${tag}>`;
+            }
+            case 'checklist': {
+                const items = (d.items || []).map(item => {
+                    const checked = item.checked ? ' data-checked="true"' : '';
+                    return `<li${checked}><label><input type="checkbox"${item.checked ? ' checked' : ''}>${item.text || ''}</label></li>`;
+                }).join('');
+                return `<ul data-type="taskList">${items}</ul>`;
+            }
+            case 'quote': return `<blockquote><p>${d.text || ''}</p>${d.caption ? `<cite>${d.caption}</cite>` : ''}</blockquote>`;
+            case 'code': return `<pre><code>${esc(d.code || '')}</code></pre>`;
+            case 'delimiter': return '<hr>';
+            case 'table': {
+                if (!d.content?.length) return '';
+                let h = '<table><tbody>';
+                d.content.forEach((row, ri) => {
+                    h += '<tr>';
+                    (row || []).forEach(cell => {
+                        const tag = ri === 0 && d.withHeadings ? 'th' : 'td';
+                        h += `<${tag}>${cell || ''}</${tag}>`;
+                    });
+                    h += '</tr>';
+                });
+                h += '</tbody></table>';
+                return h;
+            }
+            default: return d.text ? `<p>${d.text}</p>` : '';
+        }
+    }).join('');
+}
 
 function loadEditor(id) {
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
