@@ -38,47 +38,50 @@ function destroyAllEditors() {
 
 function initSectionEditors(sections) {
     destroyAllEditors();
-
     sections.forEach((s, i) => {
         if (s.type === 'testimonial' || s.type === 'case-study') return;
-
         const holderEl = document.getElementById(`sec-editor-${i}`);
         if (!holderEl) return;
         holderEl.classList.add('editor-loading');
-
-        // Migrate content: blocks → HTML, plain text → HTML
         const html = migrateEditorContent(s.content);
-
-        if (!window.tiptapReady) {
-            // Tiptap not loaded yet — wait for it
-            window.addEventListener('tiptap-ready', () => {
-                initSingleSectionEditor(i, holderEl, html);
-            }, { once: true });
-            return;
-        }
-
         initSingleSectionEditor(i, holderEl, html);
     });
 }
 
 function initSingleSectionEditor(i, holderEl, html) {
     try {
-        const editor = createEditor(holderEl, {
-            content: html,
-            placeholder: 'Write section content...',
-            onChange: () => dirty()
-        });
-        if (!editor) { console.warn('Section editor ' + i + ' returned null — Tiptap not ready'); return; }
+        const editor = createEditor(holderEl, { content: html, placeholder: 'Write section content...', onChange: () => dirty() });
+        if (!editor) { showFallbackEditor(holderEl, html, i); return; }
         sectionEditors[i] = editor;
-        if (holderEl) { holderEl.classList.remove('editor-loading'); holderEl.classList.add('editor-loaded'); }
-    } catch (e) { console.error('Tiptap init error', e); }
+        holderEl.classList.remove('editor-loading'); holderEl.classList.add('editor-loaded');
+        // Verify Tiptap rendered a contenteditable
+        setTimeout(() => {
+            if (!holderEl.querySelector('[contenteditable]')) {
+                try { editor.destroy(); } catch (_e) { /* ignore */ }
+                delete sectionEditors[i];
+                showFallbackEditor(holderEl, html, i);
+            }
+        }, 150);
+    } catch (e) { console.error('Tiptap init error', e); showFallbackEditor(holderEl, html, i); }
+}
+
+function showFallbackEditor(holderEl, html, idx) {
+    if (!holderEl || holderEl.querySelector('.sec-fallback-ta')) return;
+    const tmp = document.createElement('div'); tmp.innerHTML = html || '';
+    const plain = tmp.textContent || tmp.innerText || '';
+    holderEl.innerHTML = `<textarea class="sec-fallback-ta" rows="6" placeholder="Write section content..." oninput="dirty()">${esc(plain)}</textarea>`;
+    holderEl.classList.remove('editor-loading'); holderEl.classList.add('editor-loaded');
+    sectionEditors[idx] = {
+        getHTML: () => { const ta = holderEl.querySelector('.sec-fallback-ta'); return ta ? '<p>' + esc(ta.value).replace(/\n/g, '</p><p>') + '</p>' : ''; },
+        destroy: () => { holderEl.innerHTML = ''; }
+    };
 }
 
 
 function secBlockHtml(s, i) {
-    return `<div class="sec-b open" draggable="true" data-idx="${i}">
+    return `<div class="sec-b open" draggable="false" data-idx="${i}">
     <div class="sec-hd" onclick="togSec(this)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togSec(this)}">
-      <span class="sec-grip" onmousedown="event.stopPropagation()"><i data-lucide="grip-vertical"></i></span>
+      <span class="sec-grip" onmousedown="this.closest('.sec-b').draggable=true" onmouseup="this.closest('.sec-b').draggable=false"><i data-lucide="grip-vertical"></i></span>
       <span class="sec-nm">${esc(s.title) || 'New Section'}</span>
       <span class="sec-chv"><i data-lucide="chevron-down"></i></span>
       <div class="sec-acts" onclick="event.stopPropagation()">
@@ -156,6 +159,7 @@ function initDrag() {
         });
         b.addEventListener('dragend', () => {
             b.classList.remove('dragging');
+            b.draggable = false;
             list.querySelectorAll('.sec-b').forEach(x => { x.classList.remove('drag-over', 'drag-over-bottom'); });
             const p = cur(); if (!p) return;
             const secEls = list.querySelectorAll('.sec-b');

@@ -3,6 +3,7 @@ import globals from 'globals';
 import prettierConfig from 'eslint-config-prettier';
 
 export default [
+    { ignores: ['assets/js/vendor/**'] },
     js.configs.recommended,
     prettierConfig,
     {
@@ -19,7 +20,7 @@ export default [
                 QRCode: 'readonly',
                 qrcode: 'readonly',
 
-                // ── Tiptap (exposed on window via ESM module in index.html) ──
+                // ── Tiptap (exposed on window via tiptap.bundle.js) ──
                 TiptapEditor: 'readonly',
                 TiptapStarterKit: 'readonly',
                 TiptapPlaceholder: 'readonly',

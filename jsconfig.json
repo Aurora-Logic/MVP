@@ -12,5 +12,5 @@
     "baseUrl": "."
   },
   "include": ["assets/js/**/*.js", "assets/js/globals.d.ts"],
-  "exclude": ["node_modules", "dist", "test-results"]
+  "exclude": ["node_modules", "dist", "test-results", "assets/js/vendor"]
 }

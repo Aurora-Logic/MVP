@@ -117,6 +117,7 @@ async function initAuth() {
             const params = new URLSearchParams(hash.substring(1));
             const accessToken = params.get('access_token');
             const refreshToken = params.get('refresh_token');
+            console.warn('[Auth] Token lengths:', accessToken?.length, refreshToken?.length);
             if (accessToken && refreshToken) {
                 console.warn('[Auth] Manual setSession attempt...');
                 const { data, error } = await sb().auth.setSession({
@@ -130,14 +131,14 @@ async function initAuth() {
                     await safePullAndBoot();
                     return;
                 }
-                console.warn('[Auth] Manual setSession failed:', error?.message);
+                console.warn('[Auth] Manual setSession failed:', error?.message, error?.status);
             }
         } catch (e) {
             console.warn('[Auth] Manual token exchange failed:', e);
         }
 
         // Final timeout: show error with retry
-        await new Promise(r => setTimeout(r, 4000));
+        await new Promise(r => setTimeout(r, 3000));
         if (!authBooted) {
             cleanHash();
             authBooted = true;
@@ -160,6 +161,9 @@ function showOAuthRetryScreen() {
             <div class="auth-desc" style="margin-bottom:20px">We couldn't complete the sign-in. This can happen if the link expired or there was a network issue.</div>
             <button class="btn" style="margin-bottom:12px" onclick="doGoogleLogin()">Try again with Google</button>
             <div><button class="btn-outline" onclick="authMode='login';renderAuthScreen()">Back to Sign In</button></div>
+            <div style="margin-top:16px"><button class="btn-outline auth-offline-btn" onclick="skipAuth()">
+                <i data-lucide="wifi-off" style="width:16px;height:16px"></i> Continue offline
+            </button></div>
         </div>`;
         lucide.createIcons();
     }

@@ -19,9 +19,9 @@ function testimonialFormHtml(s, i) {
     const stars = [1, 2, 3, 4, 5].map(n =>
         `<button type="button" class="star-btn ${n <= (t.rating || 5) ? 'on' : ''}" onclick="setRating(${i}, ${n})" data-tooltip="${n} star${n > 1 ? 's' : ''}" data-side="bottom" data-align="center"><i data-lucide="star"></i></button>`
     ).join('');
-    return `<div class="sec-b open" draggable="true" data-idx="${i}" data-type="testimonial">
+    return `<div class="sec-b open" draggable="false" data-idx="${i}" data-type="testimonial">
     <div class="sec-hd" onclick="togSec(this)">
-      <span class="sec-grip" onmousedown="event.stopPropagation()"><i data-lucide="grip-vertical"></i></span>
+      <span class="sec-grip" onmousedown="this.closest('.sec-b').draggable=true" onmouseup="this.closest('.sec-b').draggable=false"><i data-lucide="grip-vertical"></i></span>
       <span class="badge-sec-type testi"><i data-lucide="quote"></i> Testimonial</span>
       <span class="sec-nm">${esc(s.title) || 'Client Testimonial'}</span>
       <span class="sec-chv"><i data-lucide="chevron-down"></i></span>
@@ -44,9 +44,9 @@ function testimonialFormHtml(s, i) {
 
 function caseStudyFormHtml(s, i) {
     const cs = s.caseStudy || { challenge: '', solution: '', result: '' };
-    return `<div class="sec-b open" draggable="true" data-idx="${i}" data-type="case-study">
+    return `<div class="sec-b open" draggable="false" data-idx="${i}" data-type="case-study">
     <div class="sec-hd" onclick="togSec(this)">
-      <span class="sec-grip" onmousedown="event.stopPropagation()"><i data-lucide="grip-vertical"></i></span>
+      <span class="sec-grip" onmousedown="this.closest('.sec-b').draggable=true" onmouseup="this.closest('.sec-b').draggable=false"><i data-lucide="grip-vertical"></i></span>
       <span class="badge-sec-type cs"><i data-lucide="lightbulb"></i> Case Study</span>
       <span class="sec-nm">${esc(s.title) || 'Case Study'}</span>
       <span class="sec-chv"><i data-lucide="chevron-down"></i></span>

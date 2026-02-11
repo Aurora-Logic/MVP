@@ -43,14 +43,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.5';
+const APP_VERSION = '2.6';
 const APP_BUILD = '20260211';
 const WHATS_NEW_ITEMS = [
-    { icon: 'pen-line', title: 'New Rich Text Editor', desc: 'Replaced Editor.js with Tiptap — enjoy a seamless Notion-like writing experience with better formatting.' },
-    { icon: 'log-in', title: 'Improved Google Sign-In', desc: 'OAuth flow now has automatic retry and timeout handling for reliable login.' },
-    { icon: 'cloud', title: 'Cloud Sync', desc: 'Your proposals, clients, and settings sync across all your devices automatically.' },
-    { icon: 'share-2', title: 'Cloud Sharing', desc: 'Shared proposal links now work across devices — no same-browser requirement.' },
-    { icon: 'wifi-off', title: 'Offline Mode', desc: 'Continue working offline — data syncs automatically when you reconnect.' }
+    { icon: 'hard-drive-download', title: 'Offline-Ready Dependencies', desc: 'All vendor libraries (Lucide, Supabase, Tiptap, QR) now load locally — no CDN dependency.' },
+    { icon: 'shield-check', title: 'Security Hardening', desc: 'Added CSP headers, SSRF protection, AI rate limiting, and sensitive data stripping from cloud sync.' },
+    { icon: 'pen-line', title: 'Faster Rich Text Editor', desc: 'Tiptap now loads as a single synchronous bundle — no more white-box flicker on slow connections.' },
+    { icon: 'cloud', title: 'Safer Cloud Sync', desc: 'API keys and signatures are now excluded from cloud sync — they stay on your device only.' }
 ];
 
 function checkWhatsNew() {

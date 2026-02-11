@@ -41,7 +41,7 @@ function renderPricing(p) {
     defaultOrder.forEach(k => { if (!validOrder.includes(k)) validOrder.push(k); });
 
     const sectionsHtml = validOrder.map(key =>
-        `<div class="price-sec" draggable="true" data-sec="${key}"><span class="price-sec-grip" onmousedown="event.stopPropagation()"><i data-lucide="grip-vertical"></i></span><div class="price-sec-body">${sectionHtml[key]}</div></div>`
+        `<div class="price-sec" draggable="false" data-sec="${key}"><span class="price-sec-grip" onmousedown="this.closest('.price-sec').draggable=true" onmouseup="this.closest('.price-sec').draggable=false"><i data-lucide="grip-vertical"></i></span><div class="price-sec-body">${sectionHtml[key]}</div></div>`
     ).join('');
 
     document.getElementById('edPricing').innerHTML = `<div id="pricingInsights"></div><div id="pricingSecList">${sectionsHtml}</div>`;
@@ -88,6 +88,7 @@ function initPricingDrag() {
         });
         b.addEventListener('dragend', () => {
             b.classList.remove('dragging');
+            b.draggable = false;
             list.querySelectorAll('.price-sec').forEach(x => { x.classList.remove('drag-over', 'drag-over-bottom'); });
             savePricingOrder();
         });
@@ -129,23 +130,42 @@ function initPaymentTermsEditor(p) {
 
     const html = typeof migrateEditorContent === 'function' ? migrateEditorContent(p.paymentTerms) : (p.paymentTerms || '');
 
-    const doInit = () => {
-        try {
-            const editor = createEditor(ptHolder, {
-                content: html,
-                placeholder: 'Add payment terms...',
-                tables: false,
-                onChange: () => dirty()
-            });
-            if (!editor) { console.warn('Payment terms editor returned null — Tiptap not ready'); return; }
-            paymentTermsEditor = editor;
-            ptHolder.classList.remove('editor-loading');
-            ptHolder.classList.add('editor-loaded');
-        } catch (e) { console.error('Payment terms editor init error', e); }
-    };
+    try {
+        const editor = createEditor(ptHolder, {
+            content: html,
+            placeholder: 'Add payment terms...',
+            tables: false,
+            onChange: () => dirty()
+        });
+        if (!editor) {
+            showPtFallback(ptHolder, html);
+            return;
+        }
+        paymentTermsEditor = editor;
+        ptHolder.classList.remove('editor-loading');
+        ptHolder.classList.add('editor-loaded');
+        // Verify render
+        setTimeout(() => {
+            if (!ptHolder.querySelector('[contenteditable]')) {
+                try { editor.destroy(); } catch (_e) { /* ignore */ }
+                showPtFallback(ptHolder, html);
+            }
+        }, 150);
+    } catch (e) {
+        console.error('Payment terms editor init error', e);
+        showPtFallback(ptHolder, html);
+    }
+}
 
-    if (window.tiptapReady) doInit();
-    else window.addEventListener('tiptap-ready', doInit, { once: true });
+function showPtFallback(holder, html) {
+    if (!holder || holder.querySelector('.sec-fallback-ta')) return;
+    const tmp = document.createElement('div'); tmp.innerHTML = html || '';
+    holder.innerHTML = `<textarea class="sec-fallback-ta" rows="4" placeholder="Add payment terms..." oninput="dirty()">${esc(tmp.textContent || '')}</textarea>`;
+    holder.classList.remove('editor-loading'); holder.classList.add('editor-loaded');
+    paymentTermsEditor = {
+        getHTML: () => { const ta = holder.querySelector('.sec-fallback-ta'); return ta ? '<p>' + esc(ta.value).replace(/\n/g, '</p><p>') + '</p>' : ''; },
+        destroy: () => { holder.innerHTML = ''; }
+    };
 }
 
 function initSingleLiEditor(el, initialData) {
@@ -157,25 +177,20 @@ function initSingleLiEditor(el, initialData) {
 
     const html = typeof migrateEditorContent === 'function' ? migrateEditorContent(initialData) : '';
 
-    const doInit = () => {
-        try {
-            const editor = createEditor(el, {
-                content: html,
-                placeholder: 'Description...',
-                headingLevels: [3, 4],
-                tables: false,
-                taskList: false,
-                onChange: () => dirty()
-            });
-            if (!editor) { console.warn('LI editor returned null — Tiptap not ready'); return; }
-            el._editor = editor;
-            el.classList.remove('editor-loading');
-            el.classList.add('editor-loaded');
-        } catch (e) { console.error('LI editor init error', e); }
-    };
-
-    if (window.tiptapReady) doInit();
-    else window.addEventListener('tiptap-ready', doInit, { once: true });
+    try {
+        const editor = createEditor(el, {
+            content: html,
+            placeholder: 'Description...',
+            headingLevels: [3, 4],
+            tables: false,
+            taskList: false,
+            onChange: () => dirty()
+        });
+        if (!editor) { console.warn('LI editor returned null'); return; }
+        el._editor = editor;
+        el.classList.remove('editor-loading');
+        el.classList.add('editor-loaded');
+    } catch (e) { console.error('LI editor init error', e); }
 }
 
 function destroyLiEditor(row) {

@@ -4,6 +4,8 @@
 
 /* exported showAiPanel, runAi, runAiCustom, acceptAiResult, renderAiSettingsCard */
 let _aiLoading = false;
+let _aiLastRequest = 0;
+const AI_RATE_LIMIT_MS = 3000;
 
 const AI_PROMPTS = {
     improve: 'Improve the following proposal section text. Make it more professional, clear, and persuasive while keeping the same meaning. Return only the improved text, no explanations or preamble.',
@@ -15,6 +17,12 @@ const AI_PROMPTS = {
 async function aiRequest(prompt, content) {
     const key = CONFIG?.aiApiKey;
     if (!key) { toast('Add your API key in Settings → AI Assistant', 'warning'); return null; }
+    const now = Date.now();
+    if (now - _aiLastRequest < AI_RATE_LIMIT_MS) {
+        toast('Please wait a moment before making another AI request', 'warning');
+        return null;
+    }
+    _aiLastRequest = now;
     try {
         const res = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',

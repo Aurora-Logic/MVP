@@ -2912,6 +2912,24 @@
   background: rgba(245, 235, 111, 0.3);
 }
 
+/* Fallback textarea when Tiptap fails to load */
+.sec-fallback-ta {
+  width: 100% !important;
+  min-height: 120px;
+  padding: 12px 16px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r) !important;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: inherit;
+  background: var(--white) !important;
+  color: var(--text) !important;
+}
+.dark .sec-fallback-ta {
+  background: var(--card) !important;
+}
+
 /* Line item description editor — compact variant */
 .li-desc-editor {
   min-height: 30px !important;

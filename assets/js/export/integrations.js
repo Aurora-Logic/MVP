@@ -103,6 +103,7 @@ function exportStandaloneHtml() {
     if (!html) return;
     const font = CONFIG?.font || 'Inter';
     const full = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(p.title)}</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data: blob:;">
 <link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>:root{--mono:'JetBrains Mono',ui-monospace,monospace}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'${font}',system-ui,sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}}</style>
 </head><body>${html}</body></html>`;
@@ -114,6 +115,7 @@ function sendWebhook() {
     const url = CONFIG?.webhookUrl;
     if (!url) { toast('Set webhook URL in Settings first', 'warning'); return; }
     if (!url.startsWith('https://') && !url.startsWith('http://')) { toast('Webhook URL must start with http:// or https://', 'warning'); return; }
+    try { const u = new URL(url); if (/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.0\.0\.0)/.test(u.hostname)) { toast('Webhook URL cannot target private networks', 'warning'); return; } } catch (_e) { toast('Invalid webhook URL', 'warning'); return; }
     const t = calcTotals(p);
     const payload = {
         event: 'proposal.export',

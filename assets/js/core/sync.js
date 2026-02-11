@@ -74,9 +74,13 @@ async function pushConfig() {
     try {
         const user = await getUser();
         if (!user) return;
+        // Strip sensitive keys — never sync API keys or signature data to cloud
+        const safeConfig = { ...CONFIG };
+        delete safeConfig.aiApiKey;
+        delete safeConfig.signature;
         await sb().from('configs').upsert({
             user_id: user.id,
-            data: CONFIG,
+            data: safeConfig,
             updated_at: new Date().toISOString()
         }, { onConflict: 'user_id' });
     } catch (e) { console.error('Config push failed:', e); }
@@ -84,10 +88,11 @@ async function pushConfig() {
 
 async function pushClients() {
     if (!syncEnabled()) return;
+    setSyncStatus('syncing');
     try {
         const user = await getUser();
         if (!user) return;
-        // Replace all clients for this user
+        // Replace all clients for this user (atomic: delete then insert)
         await sb().from('clients').delete().eq('user_id', user.id);
         if (CLIENTS.length) {
             const rows = CLIENTS.map(c => ({
@@ -95,9 +100,10 @@ async function pushClients() {
                 data: c,
                 updated_at: new Date().toISOString()
             }));
-            await sb().from('clients').insert(rows);
+            const { error } = await sb().from('clients').insert(rows);
+            if (error) throw error;
         }
-    } catch (e) { console.error('Clients push failed:', e); }
+    } catch (e) { console.error('Clients push failed:', e); setSyncStatus('error'); }
 }
 
 async function pushLibraries() {
@@ -130,65 +136,70 @@ async function pushLibraries() {
 async function pullFromCloud() {
     if (!sb() || !isLoggedIn()) return;
     setSyncStatus('syncing');
+    let hadError = false;
     try {
         const user = await getUser();
         if (!user) { setSyncStatus('error'); return; }
 
         // Pull proposals
-        const { data: cloudProposals } = await sb().from('proposals')
-            .select('id, data, updated_at').eq('user_id', user.id);
-        if (cloudProposals && cloudProposals.length) {
-            const merged = mergeProposals(DB, cloudProposals.map(r => r.data));
-            DB = merged;
-            localStorage.setItem('pk_db', JSON.stringify(DB));
-        } else if (!cloudProposals || !cloudProposals.length) {
-            // Cloud empty, local has data — push up
-            if (DB.length) await pushProposals();
-        }
+        try {
+            const { data: cloudProposals, error } = await sb().from('proposals')
+                .select('id, data, updated_at').eq('user_id', user.id);
+            if (error) throw error;
+            if (cloudProposals && cloudProposals.length) {
+                const merged = mergeProposals(DB, cloudProposals.map(r => r.data));
+                DB = merged;
+                localStorage.setItem('pk_db', JSON.stringify(DB));
+            } else if (DB.length) {
+                await pushProposals();
+            }
+        } catch (e) { console.warn('Pull proposals failed:', e); hadError = true; }
 
         // Pull config
-        const { data: cloudConfig } = await sb().from('configs')
-            .select('data').eq('user_id', user.id).single();
-        if (cloudConfig?.data) {
-            if (CONFIG) {
-                // Merge: cloud fields win, but keep local fields that cloud doesn't have
-                CONFIG = { ...CONFIG, ...cloudConfig.data };
-            } else {
-                CONFIG = cloudConfig.data;
+        try {
+            const { data: cloudConfig, error } = await sb().from('configs')
+                .select('data').eq('user_id', user.id).maybeSingle();
+            if (error) throw error;
+            if (cloudConfig?.data) {
+                CONFIG = CONFIG ? { ...CONFIG, ...cloudConfig.data } : cloudConfig.data;
+                localStorage.setItem('pk_config', JSON.stringify(CONFIG));
+            } else if (CONFIG) {
+                await pushConfig();
             }
-            localStorage.setItem('pk_config', JSON.stringify(CONFIG));
-        } else if (CONFIG) {
-            // Cloud empty, push local config up
-            await pushConfig();
-        }
+        } catch (e) { console.warn('Pull config failed:', e); hadError = true; }
 
         // Pull clients
-        const { data: cloudClients } = await sb().from('clients')
-            .select('data').eq('user_id', user.id);
-        if (cloudClients && cloudClients.length) {
-            const remoteClients = cloudClients.map(r => r.data);
-            CLIENTS = mergeClients(CLIENTS, remoteClients);
-            localStorage.setItem('pk_clients', JSON.stringify(CLIENTS));
-        } else if (CLIENTS.length) {
-            await pushClients();
-        }
+        try {
+            const { data: cloudClients, error } = await sb().from('clients')
+                .select('data').eq('user_id', user.id);
+            if (error) throw error;
+            if (cloudClients && cloudClients.length) {
+                CLIENTS = mergeClients(CLIENTS, cloudClients.map(r => r.data));
+                localStorage.setItem('pk_clients', JSON.stringify(CLIENTS));
+            } else if (CLIENTS.length) {
+                await pushClients();
+            }
+        } catch (e) { console.warn('Pull clients failed:', e); hadError = true; }
 
         // Pull libraries
-        const { data: cloudLibs } = await sb().from('libraries')
-            .select('type, data').eq('user_id', user.id);
-        if (cloudLibs && cloudLibs.length) {
-            const libMap = { sections: 'pk_seclib', tc: 'pk_tclib', email_templates: 'pk_email_tpl', proposal_templates: 'pk_templates' };
-            cloudLibs.forEach(lib => {
-                const key = libMap[lib.type];
-                if (key && Array.isArray(lib.data)) {
-                    localStorage.setItem(key, JSON.stringify(lib.data));
-                }
-            });
-        } else {
-            await pushLibraries();
-        }
+        try {
+            const { data: cloudLibs, error } = await sb().from('libraries')
+                .select('type, data').eq('user_id', user.id);
+            if (error) throw error;
+            if (cloudLibs && cloudLibs.length) {
+                const libMap = { sections: 'pk_seclib', tc: 'pk_tclib', email_templates: 'pk_email_tpl', proposal_templates: 'pk_templates' };
+                cloudLibs.forEach(lib => {
+                    const key = libMap[lib.type];
+                    if (key && Array.isArray(lib.data)) {
+                        localStorage.setItem(key, JSON.stringify(lib.data));
+                    }
+                });
+            } else {
+                await pushLibraries();
+            }
+        } catch (e) { console.warn('Pull libraries failed:', e); hadError = true; }
 
-        setSyncStatus('synced');
+        setSyncStatus(hadError ? 'error' : 'synced');
     } catch (e) {
         console.error('Pull from cloud failed:', e);
         setSyncStatus('error');

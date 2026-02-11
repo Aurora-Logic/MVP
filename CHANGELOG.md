@@ -4,6 +4,44 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.6 (build 20260211) — 2026-02-11
+
+### Features
+- Vendor-locked all CDN dependencies locally (Lucide, Supabase, QR code) — app works fully offline
+- Tiptap editor bundled as single synchronous IIFE via esbuild — eliminates ESM CDN race conditions
+
+### Security Fixes
+- Strip `aiApiKey` and `signature` from cloud sync payload (sync.js)
+- Add 3-second rate limiting on AI assistant requests (ai-assistant.js)
+- Add Content-Security-Policy meta tag to client.html
+- Add CSP meta tag to standalone HTML exports (integrations.js)
+- Add SSRF protection — webhook URLs blocked for private/localhost IPs (integrations.js)
+
+### Chore
+- Remove dead tiptap-ready fallback code from sections.js and pricing.js
+- Update service worker cache to v3 with all vendor files
+- Add vendor directory to eslint ignores, prettierignore, jsconfig exclude
+
+### Files Changed
+- `assets/js/vendor/lucide-0.460.0.js` — vendored Lucide Icons v0.460.0
+- `assets/js/vendor/supabase-2.49.1.js` — vendored Supabase JS v2.49.1
+- `assets/js/vendor/qrcode-1.4.4.min.js` — vendored QR code generator
+- `assets/js/vendor/tiptap.bundle.js` — esbuild IIFE bundle of 13 Tiptap packages
+- `assets/js/vendor/tiptap-entry.mjs` — esbuild entry point
+- `assets/js/core/sync.js` — strip sensitive keys before cloud push
+- `assets/js/editor/ai-assistant.js` — rate limiting on AI requests
+- `assets/js/editor/sections.js` — remove tiptap-ready fallback
+- `assets/js/editor/pricing.js` — remove tiptap-ready fallback
+- `assets/js/export/integrations.js` — CSP on HTML export, SSRF webhook validation
+- `index.html` — replace CDN scripts with local vendor, tighten CSP
+- `client.html` — replace CDN scripts with local vendor, add CSP
+- `sw.js` — bump cache v3, add vendor files to STATIC_ASSETS
+- `eslint.config.js` — ignore vendor directory
+- `.prettierignore` — ignore vendor directory
+- `jsconfig.json` — exclude vendor from type checking
+- `package.json` — add Tiptap devDependencies + build script
+- `assets/js/boot.js` — version bump to 2.6
+
 ## v2.5 (build 20260211) — 2026-02-11
 
 ### feat
