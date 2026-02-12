@@ -39,8 +39,8 @@
     --r: 8px;
     --r2: 10px;
     --r3: 12px;
-    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
-    --letter-spacing: -0.02em;
+    --font: 'SF Pro Display', 'SF Pro', 'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --letter-spacing: -0.011em;
     --mono: 'JetBrains Mono', monospace;
     --t: 150ms ease-out;
     --sh: 0 1px 2px rgba(0, 0, 0, .05);

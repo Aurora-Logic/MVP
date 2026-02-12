@@ -16,10 +16,13 @@ function generateDerivative(type) {
     const html = prevDoc ? prevDoc.innerHTML : '';
     if (prevDoc) prevDoc.innerHTML = savedHtml;
     if (!html) { win.close(); return; }
-    const font = CONFIG?.font || 'Inter';
+    const font = CONFIG?.font || 'System';
+    const isSystem = !font || font === 'System' || font === 'Inter';
+    const fontLink = isSystem ? '' : `<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700;800&display=swap" rel="stylesheet">`;
+    const fontFamily = isSystem ? "'SF Pro Display','Helvetica Neue',Helvetica,-apple-system,system-ui,sans-serif" : `'${font}',system-ui,sans-serif`;
     win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${labels[type] || type}</title>
-<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'${font}',system-ui,sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}table{page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}img{page-break-inside:avoid;break-inside:avoid}}</style>
+${fontLink}<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:${fontFamily};padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}table{page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}img{page-break-inside:avoid;break-inside:avoid}}</style>
 </head><body>${html}</body></html>`);
     win.document.close();
     setTimeout(() => win.print(), 600);

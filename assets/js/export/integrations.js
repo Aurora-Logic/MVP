@@ -101,11 +101,14 @@ function exportStandaloneHtml() {
     buildPreview('proposal');
     const html = document.getElementById('prevDoc')?.innerHTML;
     if (!html) return;
-    const font = CONFIG?.font || 'Inter';
+    const font = CONFIG?.font || 'System';
+    const isSystem = !font || font === 'System' || font === 'Inter';
+    const fontLink = isSystem ? '' : `<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700;800&display=swap" rel="stylesheet">`;
+    const fontFamily = isSystem ? "'SF Pro Display','Helvetica Neue',Helvetica,-apple-system,system-ui,sans-serif" : `'${font}',system-ui,sans-serif`;
     const full = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(p.title)}</title>
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data: blob:;">
-<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>:root{--mono:'JetBrains Mono',ui-monospace,monospace}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'${font}',system-ui,sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}}</style>
+${fontLink}<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>:root{--mono:'JetBrains Mono',ui-monospace,monospace}*{box-sizing:border-box;margin:0;padding:0}body{font-family:${fontFamily};padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}}</style>
 </head><body>${html}</body></html>`;
     downloadBlob(full, slugify(p.title || 'proposal') + '.html', 'text/html');
 }

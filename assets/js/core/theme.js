@@ -56,7 +56,7 @@ function getCurrentTheme() {
 
 // ─── Apply font family (Google Fonts) ───
 const FONT_URLS = {
-    'Inter': '', // already loaded
+    'System': '', // SF Pro / Helvetica Neue / Helvetica (system fonts)
     'Roboto': 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap',
     'Lato': 'https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap',
     'Playfair Display': 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap',
@@ -65,7 +65,7 @@ const FONT_URLS = {
 };
 
 function applyFont(fontName) {
-    if (!fontName || fontName === 'Inter' || fontName === 'System') {
+    if (!fontName || fontName === 'System' || fontName === 'Inter') {
         document.documentElement.style.setProperty('--font', "'SF Pro Display', 'SF Pro', 'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, system-ui, sans-serif");
         return;
     }
@@ -88,18 +88,5 @@ function applyFont(fontName) {
     } catch (e) { /* ignore */ }
 })();
 
-// ─── Listen for system theme changes ───
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-  const storedTheme = localStorage.getItem('pk_theme');
-  // Only auto-switch if user hasn't set explicit preference
-  if (!storedTheme) {
-    const theme = e.matches ? 'dark' : 'light';
-    document.documentElement.classList.toggle('dark', e.matches);
-    updateMetaTheme(theme);
-
-    // Re-initialize Lucide icons
-    if (typeof lucide !== 'undefined') {
-      lucide.createIcons();
-    }
-  }
-});
+// System theme auto-detection removed — app defaults to light mode only.
+// Users can toggle dark mode manually from Settings if desired.

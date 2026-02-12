@@ -157,9 +157,9 @@ function renderSettings() {
         items: OB_COUNTRIES, onChange: (val) => { CONFIG.country = val; document.getElementById('setTaxFields').innerHTML = getCountryTaxHtml(); saveSettings(); }
     });
     csel(document.getElementById('setFont'), {
-        value: CONFIG?.font || 'Inter',
+        value: CONFIG?.font || 'System',
         items: [
-            { value: 'Inter', label: 'Inter', desc: 'Modern' }, { value: 'Roboto', label: 'Roboto', desc: 'Standard' },
+            { value: 'System', label: 'System (SF Pro)', desc: 'Default' }, { value: 'Roboto', label: 'Roboto', desc: 'Standard' },
             { value: 'Lato', label: 'Lato', desc: 'Friendly' }, { value: 'Playfair Display', label: 'Playfair Display', desc: 'Elegant' },
             { value: 'Merriweather', label: 'Merriweather', desc: 'Classic' }, { value: 'Courier Prime', label: 'Courier Prime', desc: 'Typewriter' }
         ],
@@ -182,7 +182,7 @@ function saveSettings() {
     CONFIG.country = cselGetValue(document.getElementById('setCountry')) || CONFIG.country;
     CONFIG.address = v('setAddr', CONFIG.address);
     CONFIG.website = v('setWebsite', CONFIG.website);
-    CONFIG.font = cselGetValue(document.getElementById('setFont')) || CONFIG.font || 'Inter';
+    CONFIG.font = cselGetValue(document.getElementById('setFont')) || CONFIG.font || 'System';
     const wlEl = document.getElementById('setWhiteLabel');
     if (wlEl) CONFIG.whiteLabel = wlEl.checked;
     CONFIG.aiApiKey = v('setAiKey', CONFIG.aiApiKey);

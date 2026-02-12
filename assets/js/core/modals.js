@@ -25,7 +25,7 @@ function releaseFocus(modal) {
 function openNewModal() {
     const modal = document.getElementById('newModalInner');
     const curCat = window._newModalCat || 'general';
-    const font = CONFIG?.font || 'Inter';
+    const font = CONFIG?.font || 'System';
     const color = CONFIG?.color || COLORS[0];
 
     // Template descriptions for cards
@@ -72,7 +72,7 @@ function openNewModal() {
 
     // Font items
     const fonts = [
-        { value: 'Inter', label: 'Inter', desc: 'Modern' },
+        { value: 'System', label: 'System (SF Pro)', desc: 'Default' },
         { value: 'Roboto', label: 'Roboto', desc: 'Standard' },
         { value: 'Lato', label: 'Lato', desc: 'Friendly' },
         { value: 'Playfair Display', label: 'Playfair Display', desc: 'Elegant' },
