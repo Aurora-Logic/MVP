@@ -14,12 +14,12 @@ function openAnalyticsBreakdowns() {
     wrap.innerHTML = `<div class="modal breakdown-modal-body" onclick="event.stopPropagation()">
         <div class="modal-t"><i data-lucide="bar-chart-3" class="modal-t-icon"></i> Win Rate Breakdowns</div>
         <div class="modal-d">Analyze your win rates across different dimensions</div>
-        <div class="breakdown-tabs">
+        <div class="breakdown-tabs"><div class="filter-tabs">
             <button class="filter-tab on" onclick="setBreakdownTab('value',this)">By Value</button>
             <button class="filter-tab" onclick="setBreakdownTab('client',this)">By Client</button>
             <button class="filter-tab" onclick="setBreakdownTab('month',this)">By Month</button>
             <button class="filter-tab" onclick="setBreakdownTab('template',this)">By Template</button>
-        </div>
+        </div></div>
         <div id="breakdownContent">${getBreakdownContent('value')}</div>
         <div class="modal-foot">
             <button class="btn-sm-outline" onclick="document.getElementById('analyticsBreakdownsModal').remove()">Close</button>

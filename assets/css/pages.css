@@ -3661,13 +3661,17 @@
 .an-hbar-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 0;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.an-hbar-row + .an-hbar-row {
+  border-top: 1px solid var(--border);
 }
 
 .an-hbar-label {
-  width: 90px;
-  font-size: 12px;
+  width: 110px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text);
   overflow: hidden;
@@ -3678,23 +3682,23 @@
 
 .an-hbar-track {
   flex: 1;
-  height: 8px;
+  height: 10px;
   background: var(--muted);
-  border-radius: 4px;
+  border-radius: var(--r-pill);
   overflow: hidden;
 }
 
 .an-hbar-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: var(--r-pill);
   transition: width var(--t2);
   min-width: 2px;
 }
 
 .an-hbar-val {
-  width: 80px;
+  width: 90px;
   text-align: right;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text);
   flex-shrink: 0;
@@ -3703,6 +3707,7 @@
 .an-hbar-ratio {
   color: var(--text4);
   font-weight: 400;
+  font-size: 12px;
 }
 
 /* Analytics legend dots (color classes) */

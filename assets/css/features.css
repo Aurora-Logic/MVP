@@ -794,20 +794,30 @@
 /* ════════ BREAKDOWN MODAL ════════ */
 
 .breakdown-modal-body {
-  width: 600px;
+  max-width: 560px;
   max-height: 85vh;
   overflow-y: auto;
 }
 
 .breakdown-tabs {
-  margin: 14px 0 16px;
+  margin: 16px 0 20px;
 }
 
 .breakdown-empty {
-  padding: 20px;
+  padding: 32px 20px;
   text-align: center;
   color: var(--text4);
   font-size: 13px;
+}
+
+.breakdown-modal-body .modal-foot {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.breakdown-modal-body .modal-d {
+  margin-bottom: 0;
 }
 
 /* ════════ CSV IMPORT MODAL ════════ */
@@ -858,8 +868,9 @@
 .modal-t-icon {
   width: 18px;
   height: 18px;
-  vertical-align: -3px;
+  vertical-align: -2px;
   margin-right: 6px;
+  color: var(--text3);
 }
 
 /* ════════ LIBRARY TABS BAR ════════ */
