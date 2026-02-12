@@ -58,7 +58,7 @@ function updateBulkUI() {
 }
 
 function toggleSelectAll() {
-    const checks = document.querySelectorAll('.bulk-check');
+    const checks = document.querySelectorAll('.bulk-check-input');
     const allChecked = [...checks].every(c => c.checked);
     checks.forEach(c => {
         c.checked = !allChecked;
@@ -71,7 +71,7 @@ function toggleSelectAll() {
 
 function clearBulkSelection() {
     bulkSelected.clear();
-    document.querySelectorAll('.bulk-check').forEach(c => c.checked = false);
+    document.querySelectorAll('.bulk-check-input').forEach(c => c.checked = false);
     updateBulkUI();
 }
 

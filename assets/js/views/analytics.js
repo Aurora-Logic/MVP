@@ -3,13 +3,13 @@
 // ════════════════════════════════════════
 
 /* exported buildAnalyticsWidget, setAnalyticsFilter */
-let analyticsFilter = 'all';
+let analyticsFilter = '90d';
 
 function getFilteredProposals(timeFilter) {
     const active = activeDB();
     if (timeFilter === 'all') return active;
     const now = Date.now();
-    const ranges = { month: 30, '3mo': 90, year: 365 };
+    const ranges = { '7d': 7, '30d': 30, '90d': 90, month: 30, '3mo': 90, year: 365 };
     const days = ranges[timeFilter] || 365;
     const cutoff = now - days * 86400000;
     return active.filter(p => (p.createdAt || 0) >= cutoff);
@@ -36,43 +36,152 @@ function computeAnalytics(proposals) {
     return { winRate, pipeline, avgValue, avgDays, forecast, outstanding, total: proposals.length, accepted: accepted.length, decided: decided.length };
 }
 
-function buildBarChart(proposals) {
+let _areaChartData = null;
+
+function buildAreaChart(proposals) {
     const months = [];
     const now = new Date();
-    for (let i = 5; i >= 0; i--) {
+    const ranges = { '7d': 1, '30d': 2, '90d': 6 };
+    const count = ranges[analyticsFilter] || 6;
+    for (let i = count - 1; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        months.push({ year: d.getFullYear(), month: d.getMonth(), label: d.toLocaleString('en', { month: 'short' }) });
+        months.push({ year: d.getFullYear(), month: d.getMonth(),
+            label: d.toLocaleString('en', { month: 'short' }) });
     }
-    const buckets = months.map(m => {
+    _areaChartData = months.map(m => {
         const inMonth = proposals.filter(p => {
             const d = new Date(p.createdAt || 0);
             return d.getFullYear() === m.year && d.getMonth() === m.month;
         });
-        return { label: m.label, accepted: inMonth.filter(p => p.status === 'accepted').length, declined: inMonth.filter(p => p.status === 'declined').length, pending: inMonth.filter(p => p.status === 'draft' || p.status === 'sent').length, expired: inMonth.filter(p => p.status === 'expired').length };
+        const val = (list) => list.reduce((a, p) =>
+            a + (p.lineItems || []).reduce((s, i) =>
+                s + (i.qty || 0) * (i.rate || 0), 0), 0);
+        return { label: m.label,
+            won: val(inMonth.filter(p => p.status === 'accepted')),
+            active: val(inMonth.filter(p =>
+                p.status === 'draft' || p.status === 'sent')),
+            lost: val(inMonth.filter(p => p.status === 'declined')),
+            outstanding: val(inMonth.filter(p => p.status === 'expired'))
+        };
     });
-    const maxVal = Math.max(...buckets.map(b => b.accepted + b.declined + b.pending + b.expired), 1);
-
-    return `<div class="an-chart">
-        ${buckets.map(b => {
-        const total = b.accepted + b.declined + b.pending + b.expired;
-        const h = total > 0 ? Math.max(Math.round(total / maxVal * 100), 8) : 0;
-        return `<div class="an-bar-col">
-                <div class="an-bar-stack" style="height:${h}%">
-                    ${b.accepted ? `<div class="an-bar-seg won" style="flex:${b.accepted}" data-tooltip="${b.accepted} won" data-side="top" data-align="center"></div>` : ''}
-                    ${b.pending ? `<div class="an-bar-seg pending" style="flex:${b.pending}"></div>` : ''}
-                    ${b.declined ? `<div class="an-bar-seg lost" style="flex:${b.declined}"></div>` : ''}
-                    ${b.expired ? `<div class="an-bar-seg expired" style="flex:${b.expired}"></div>` : ''}
-                </div>
-                <div class="an-bar-label">${b.label}</div>
-            </div>`;
-    }).join('')}
+    return `<div class="an-area-wrap">
+        <canvas id="anAreaCanvas" class="an-area-canvas" height="200"></canvas>
     </div>
     <div class="an-legend">
+        <span class="an-legend-item"><span class="an-dot an-dot-primary"></span>Revenue</span>
+        <span class="an-legend-item"><span class="an-dot an-dot-blue"></span>Active</span>
         <span class="an-legend-item"><span class="an-dot an-dot-green"></span>Won</span>
-        <span class="an-legend-item"><span class="an-dot an-dot-blue"></span>Pending</span>
-        <span class="an-legend-item"><span class="an-dot an-dot-red"></span>Lost</span>
-        <span class="an-legend-item"><span class="an-dot an-dot-amber"></span>Expired</span>
+        <span class="an-legend-item"><span class="an-dot an-dot-red"></span>Outstanding</span>
     </div>`;
+}
+
+function drawAreaChart() {
+    const cv = document.getElementById('anAreaCanvas');
+    if (!cv || !_areaChartData) return;
+    const data = _areaChartData;
+    const dpr = window.devicePixelRatio || 1;
+    const W = cv.offsetWidth, H = 200;
+    if (W < 10) return;
+    cv.width = W * dpr;
+    cv.height = H * dpr;
+    const ctx = cv.getContext('2d');
+    ctx.scale(dpr, dpr);
+    const pl = 48, pr = 16, pt = 16, pb = 32;
+    const cw = W - pl - pr, ch = H - pt - pb;
+    const n = data.length;
+    if (n < 1) return;
+    const isDark = document.documentElement.classList.contains('dark');
+    const cs = getComputedStyle(document.documentElement);
+    const colors = {
+        revenue: cs.getPropertyValue('--primary').trim() || '#800020',
+        active: cs.getPropertyValue('--blue').trim() || '#007AFF',
+        won: cs.getPropertyValue('--green').trim() || '#34C759',
+        outstanding: cs.getPropertyValue('--red').trim() || '#FF3B30'
+    };
+    const totals = data.map(d =>
+        d.won + d.active + d.lost + d.outstanding);
+    const maxV = Math.max(...totals, 1);
+    const gridColor = isDark
+        ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+    const textColor = cs.getPropertyValue('--muted-foreground').trim()
+        || '#71717a';
+    const font = '500 11px -apple-system,system-ui,sans-serif';
+    ctx.font = font;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i <= 4; i++) {
+        const y = pt + ch - (i / 4) * ch;
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pl, y);
+        ctx.lineTo(W - pr, y); ctx.stroke();
+        ctx.fillStyle = textColor;
+        const v = Math.round(maxV * (i / 4));
+        ctx.fillText(v >= 1000
+            ? (v / 1000).toFixed(v >= 10000 ? 0 : 1) + 'k' : v,
+            pl - 8, y);
+    }
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    data.forEach((d, i) => {
+        ctx.fillStyle = textColor;
+        const x = n === 1 ? pl + cw / 2 : pl + (i / (n - 1)) * cw;
+        ctx.fillText(d.label, x, H - pb + 10);
+    });
+    function hexToRgb(h) {
+        h = h.replace('#', '');
+        if (h.length === 3)
+            h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+        return 'rgb(' + parseInt(h.slice(0, 2), 16) + ',' +
+            parseInt(h.slice(2, 4), 16) + ',' +
+            parseInt(h.slice(4, 6), 16) + ')';
+    }
+    function drawArea(vals, color, alpha) {
+        const pts = vals.map((v, i) => ({
+            x: n === 1 ? pl + cw / 2 : pl + (i / (n - 1)) * cw,
+            y: pt + ch - (v / maxV) * ch
+        }));
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+            const cpx = (pts[i - 1].x + pts[i].x) / 2;
+            ctx.bezierCurveTo(cpx, pts[i - 1].y,
+                cpx, pts[i].y, pts[i].x, pts[i].y);
+        }
+        const grad = ctx.createLinearGradient(0, pt, 0, pt + ch);
+        const rgbC = color.startsWith('#') ? hexToRgb(color) : color;
+        const base = rgbC.startsWith('rgb') ? rgbC : 'rgb(128,0,32)';
+        grad.addColorStop(0,
+            base.replace(')', ',' + alpha + ')').replace('rgb', 'rgba'));
+        grad.addColorStop(1,
+            base.replace(')', ',0.01)').replace('rgb', 'rgba'));
+        ctx.lineTo(pts[pts.length - 1].x, pt + ch);
+        ctx.lineTo(pts[0].x, pt + ch);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+            const cpx = (pts[i - 1].x + pts[i].x) / 2;
+            ctx.bezierCurveTo(cpx, pts[i - 1].y,
+                cpx, pts[i].y, pts[i].x, pts[i].y);
+        }
+        ctx.strokeStyle = base; ctx.lineWidth = 2; ctx.stroke();
+        pts.forEach(p => {
+            ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = base; ctx.fill();
+        });
+    }
+    const series = [
+        { vals: totals, color: colors.revenue, alpha: 0.15 },
+        { vals: data.map(d => d.active), color: colors.active,
+            alpha: 0.10 },
+        { vals: data.map(d => d.won), color: colors.won, alpha: 0.10 },
+        { vals: data.map(d => d.outstanding),
+            color: colors.outstanding, alpha: 0.08 }
+    ];
+    series.reverse().forEach(s => drawArea(s.vals, s.color, s.alpha));
 }
 
 function buildDonutChart(proposals) {
@@ -112,59 +221,49 @@ function buildAnalyticsWidget() {
     const proposals = getFilteredProposals(analyticsFilter);
     const stats = computeAnalytics(proposals);
     const c = proposals[0]?.currency || defaultCurrency();
-    const filters = ['month', '3mo', 'year', 'all'];
-    const labels = { month: '30d', '3mo': '3mo', year: '1yr', all: 'All' };
+    const filters = ['90d', '30d', '7d'];
+    const labels = { '90d': 'Last 3 months', '30d': 'Last 30 days',
+        '7d': 'Last 7 days' };
+    const descs = { '90d': 'Jan - Jun ' + new Date().getFullYear(),
+        '30d': 'Last 30 days', '7d': 'Last 7 days' };
     const hasBreakdowns = typeof openAnalyticsBreakdowns === 'function';
 
     return `<div class="an-widget">
         <div class="an-header">
-            <div><div class="an-title">Analytics</div><div class="an-subtitle">${stats.total} proposal${stats.total !== 1 ? 's' : ''} in period</div></div>
+            <div>
+                <div class="an-title">Revenue Overview</div>
+                <div class="an-subtitle">${descs[analyticsFilter] || descs['90d']}</div>
+            </div>
             <div class="an-header-actions">
-                <div class="an-filters">
-                    ${filters.map(f => `<button class="an-filter${analyticsFilter === f ? ' on' : ''}" onclick="setAnalyticsFilter('${f}')">${labels[f]}</button>`).join('')}
+                <div class="an-toggle-group">
+                    ${filters.map(f => `<button class="an-toggle${analyticsFilter === f ? ' on' : ''}" onclick="setAnalyticsFilter('${f}')">${labels[f]}</button>`).join('')}
                 </div>
                 ${hasBreakdowns ? '<button class="btn-sm-outline" onclick="openAnalyticsBreakdowns()"><i data-lucide="bar-chart-3"></i> Breakdowns</button>' : ''}
             </div>
         </div>
-        <div class="an-body">
-            <div class="an-main">
-                <div class="an-metrics ${typeof paymentTotals === 'function' ? 'an-metrics-6' : 'an-metrics-5'}">
-                    <div class="an-metric">
-                        <div class="an-metric-val ${stats.winRate >= 50 ? 'good' : stats.winRate > 0 ? 'mid' : ''}">${stats.winRate}%</div>
-                        <div class="an-metric-label">Win Rate</div>
-                        <div class="an-metric-sub">${stats.accepted}/${stats.decided} decided</div>
-                    </div>
-                    <div class="an-metric">
-                        <div class="an-metric-val">${fmtCur(stats.pipeline, c)}</div>
-                        <div class="an-metric-label">Pipeline</div>
-                        <div class="an-metric-sub">Open proposals</div>
-                    </div>
-                    <div class="an-metric">
-                        <div class="an-metric-val">${fmtCur(stats.forecast, c)}</div>
-                        <div class="an-metric-label">Forecast</div>
-                        <div class="an-metric-sub">Expected revenue</div>
-                    </div>
-                    <div class="an-metric">
-                        <div class="an-metric-val">${fmtCur(stats.avgValue, c)}</div>
-                        <div class="an-metric-label">Avg Value</div>
-                        <div class="an-metric-sub">Per proposal</div>
-                    </div>
-                    <div class="an-metric">
-                        <div class="an-metric-val">${stats.avgDays > 0 ? stats.avgDays + 'd' : '—'}</div>
-                        <div class="an-metric-label">Avg Close</div>
-                        <div class="an-metric-sub">Days to accept</div>
-                    </div>
-                    ${typeof paymentTotals === 'function' ? `<div class="an-metric">
-                        <div class="an-metric-val ${stats.outstanding > 0 ? 'mid' : 'good'}">${fmtCur(stats.outstanding, c)}</div>
-                        <div class="an-metric-label">Outstanding</div>
-                        <div class="an-metric-sub">Unpaid balance</div>
-                    </div>` : ''}
-                </div>
-                ${proposals.length >= 2 ? buildBarChart(proposals) : ''}
+        <div class="an-chart-content">
+            ${proposals.length >= 1 ? buildAreaChart(proposals) : '<div class="an-chart-empty">Not enough data to display chart</div>'}
+        </div>
+        <div class="an-stats-grid">
+            <div class="an-stat-card sc-green">
+                <div class="an-stat-label">Win Rate</div>
+                <div class="an-stat-val">${stats.winRate}%</div>
+                <div class="an-stat-sub">${stats.accepted}/${stats.decided} decided</div>
             </div>
-            <div class="an-side">
-                <div class="an-side-title">Status Breakdown</div>
-                ${buildDonutChart(proposals)}
+            <div class="an-stat-card sc-blue">
+                <div class="an-stat-label">Pipeline</div>
+                <div class="an-stat-val">${fmtCur(stats.pipeline, c)}</div>
+                <div class="an-stat-sub">Active proposals</div>
+            </div>
+            <div class="an-stat-card sc-primary">
+                <div class="an-stat-label">Avg Value</div>
+                <div class="an-stat-val">${fmtCur(stats.avgValue, c)}</div>
+                <div class="an-stat-sub">Per proposal</div>
+            </div>
+            <div class="an-stat-card sc-red">
+                <div class="an-stat-label">Avg Close</div>
+                <div class="an-stat-val">${stats.avgDays > 0 ? stats.avgDays + ' days' : '\u2014'}</div>
+                <div class="an-stat-sub">Time to close</div>
             </div>
         </div>
     </div>`;

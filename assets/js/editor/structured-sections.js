@@ -106,7 +106,7 @@ function buildTestimonialPdfHtml(s, bc) {
       <div style="margin-top:12px;display:flex;align-items:center;gap:8px">
         <div style="width:32px;height:32px;border-radius:50%;background:${bc};color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">${(t.author || 'A').charAt(0).toUpperCase()}</div>
         <div>
-          <div style="font-size:13px;font-weight:600;color:#18181b">${esc(t.author)}</div>
+          <div style="font-size:13px;font-weight:600;color:#800020">${esc(t.author)}</div>
           ${t.company ? `<div style="font-size:11px;color:#71717a">${esc(t.company)}</div>` : ''}
         </div>
         <div style="margin-left:auto;color:${bc};font-size:14px;letter-spacing:2px">${stars}</div>

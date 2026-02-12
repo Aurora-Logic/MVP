@@ -245,6 +245,7 @@ export default [
                 toggleMobileSidebar: 'readonly',
                 closeMobileSidebar: 'readonly',
                 toggleSidebar: 'readonly',
+                toggleUserMenu: 'readonly',
                 initSidebarState: 'readonly',
                 initKeyboardShortcuts: 'readonly',
 
@@ -258,7 +259,7 @@ export default [
                 sortProposals: 'readonly',
 
                 // ── views/proposals.js ──
-                renderPropList: 'readonly',
+                renderPropTable: 'readonly',
                 doQuickExport: 'readonly',
                 quickPreview: 'readonly',
                 showStatusMenu: 'readonly',
@@ -270,6 +271,8 @@ export default [
                 renderProposals: 'readonly',
                 goPage: 'readonly',
                 toggleSortProposals: 'readonly',
+                showSortMenu: 'readonly',
+                buildPagination: 'readonly',
 
                 // ── views/clients.js ──
                 renderClients: 'readonly',
@@ -305,9 +308,11 @@ export default [
 
                 // ── views/analytics.js ──
                 analyticsFilter: 'writable',
+                _areaChartData: 'writable',
                 getFilteredProposals: 'readonly',
                 computeAnalytics: 'readonly',
-                buildBarChart: 'readonly',
+                buildAreaChart: 'readonly',
+                drawAreaChart: 'readonly',
                 buildDonutChart: 'readonly',
                 buildAnalyticsWidget: 'readonly',
                 setAnalyticsFilter: 'readonly',

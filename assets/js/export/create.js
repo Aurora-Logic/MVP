@@ -211,8 +211,27 @@ function refreshSide() {
     document.getElementById('propCnt').textContent = active.length;
     const cntEl = document.getElementById('clientCnt');
     if (cntEl) cntEl.textContent = CLIENTS.length;
-    const brand = document.querySelector('.side-brand');
+    // Update team name
+    const brand = document.getElementById('sideBrand');
     if (brand) brand.textContent = typeof appName === 'function' ? appName() : 'ProposalKit';
+    // Update logo
+    const logo = document.getElementById('sideLogo');
+    if (logo) {
+        const an = typeof appName === 'function' ? appName() : 'ProposalKit';
+        if (CONFIG.logo) {
+            logo.innerHTML = `<img src="${CONFIG.logo}" alt="">`;
+        } else {
+            logo.textContent = an.charAt(0).toUpperCase();
+        }
+    }
+    // Update footer user info
+    const userName = document.getElementById('sideUserName');
+    const userEmail = document.getElementById('sideUserEmail');
+    const userAvatar = document.getElementById('sideUserAvatar');
+    if (userName) userName.textContent = CONFIG.name || 'User';
+    if (userEmail) userEmail.textContent = CONFIG.email || 'Settings';
+    if (userAvatar) userAvatar.textContent = (CONFIG.name || 'U').charAt(0).toUpperCase();
+    // Rebuild recent list
     const list = document.getElementById('recentList');
     list.innerHTML = '';
     active.slice(0, 6).forEach(p => {

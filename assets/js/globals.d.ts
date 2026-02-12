@@ -102,6 +102,7 @@ declare function goNav(view: string): void;
 declare function toggleMobileSidebar(): void;
 declare function closeMobileSidebar(): void;
 declare function toggleSidebar(): void;
+declare function toggleUserMenu(): void;
 declare function initSidebarState(): void;
 declare function initKeyboardShortcuts(): void;
 
@@ -298,6 +299,7 @@ declare function setFilter(filter: string): void;
 declare function filterList(): void;
 declare function goPage(page: number): void;
 declare function toggleSortProposals(): void;
+declare function showSortMenu(event: Event): void;
 declare function saveClient(idx: number): void;
 declare function editClient(idx: number): void;
 declare function delClient(idx: number): void;

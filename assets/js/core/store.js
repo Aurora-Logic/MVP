@@ -30,7 +30,7 @@ let docTemplate = 'modern';
 let sectionEditors = {};
 let paymentTermsEditor = null;
 let focusMode = false;
-let viewMode = localStorage.getItem('pk_viewMode') || 'list';
+let viewMode = localStorage.getItem('pk_viewMode') || 'table';
 
 // Undo/Redo state stack
 let undoStack = [];
@@ -277,8 +277,8 @@ function taxLabel() {
     return 'Tax';
 }
 
-const COLORS = ['#18181b', '#2563eb', '#7c3aed', '#dc2626', '#d97706', '#16a34a', '#0891b2', '#be185d'];
-const COLOR_NAMES = { '#18181b': '#09090b', '#2563eb': '#1e40af', '#7c3aed': '#5b21b6', '#dc2626': '#991b1b', '#d97706': '#92400e', '#16a34a': '#166534', '#0891b2': '#155e75', '#be185d': '#9d174d' };
+const COLORS = ['#800020', '#2563eb', '#7c3aed', '#dc2626', '#d97706', '#16a34a', '#0891b2', '#be185d'];
+const COLOR_NAMES = { '#800020': '#5c0017', '#2563eb': '#1e40af', '#7c3aed': '#5b21b6', '#dc2626': '#991b1b', '#d97706': '#92400e', '#16a34a': '#166534', '#0891b2': '#155e75', '#be185d': '#9d174d' };
 
 function logoutApp() {
     const isCloud = typeof isLoggedIn === 'function' && isLoggedIn();

@@ -93,24 +93,24 @@ function buildContractHtml(p, c, bc, t, rows, secs, logo) {
     let clause = 1;
     secs.forEach(s => {
         h += `<div style="margin-bottom:24px">
-            <div style="font-size:13px;font-weight:700;color:#18181b;margin-bottom:6px">${clause}. ${esc(s.title).toUpperCase()}</div>
+            <div style="font-size:13px;font-weight:700;color:#800020;margin-bottom:6px">${clause}. ${esc(s.title).toUpperCase()}</div>
             <div style="color:#3f3f46;font-size:13px;line-height:1.7;padding-left:16px">${editorJsToHtml(s.content, p)}</div>
         </div>`;
         clause++;
     });
     if (rows.length) {
-        h += `<div style="font-size:13px;font-weight:700;color:#18181b;margin:24px 0 8px">${clause}. COMPENSATION</div>`;
+        h += `<div style="font-size:13px;font-weight:700;color:#800020;margin:24px 0 8px">${clause}. COMPENSATION</div>`;
         h += `<div style="padding-left:16px">`;
         h += buildPricingHtml(rows, c, t, bc, 'modern');
         h += `</div>`;
         clause++;
     }
     if (p.paymentTerms) {
-        h += `<div style="font-size:13px;font-weight:700;color:#18181b;margin:24px 0 8px">${clause}. PAYMENT TERMS</div>`;
+        h += `<div style="font-size:13px;font-weight:700;color:#800020;margin:24px 0 8px">${clause}. PAYMENT TERMS</div>`;
         h += `<div style="color:#3f3f46;font-size:13px;line-height:1.7;padding-left:16px">${editorJsToHtml(p.paymentTerms, p)}</div>`;
         clause++;
     }
-    h += `<div style="font-size:13px;font-weight:700;color:#18181b;margin:24px 0 8px">${clause}. TERM</div>`;
+    h += `<div style="font-size:13px;font-weight:700;color:#800020;margin:24px 0 8px">${clause}. TERM</div>`;
     h += `<div style="color:#3f3f46;font-size:13px;line-height:1.7;padding-left:16px">This Agreement shall commence on ${fmtDate(p.date)} and remain in effect until ${fmtDate(p.validUntil)}, unless terminated earlier by either Party with 30 days written notice.</div>`;
     h += buildBankFooterHtml(bc);
     h += buildSignatureBlock(p, bc);

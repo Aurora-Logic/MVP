@@ -23,7 +23,7 @@
     <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
     <!-- Analytics (Plausible — no cookies, GDPR compliant) -->
     <script defer data-domain="proposalkit.vercel.app" src="https://plausible.io/js/script.js"></script>
-    <!-- Inter Font (replacing DM Sans) + JetBrains Mono -->
+    <!-- Inter fallback + JetBrains Mono (SF Pro Display loads as system font) -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
@@ -55,9 +55,27 @@
 
 <body>
 
-    <!-- ═══ ONBOARDING ═══ -->
+    <!-- ═══ AUTH + ONBOARDING ═══ -->
     <div class="onboard" id="onboard">
-        <div class="ob-card ob-card-wide">
+        <!-- Auth: shadcn two-column split -->
+        <div class="auth-split" id="authSplit" style="display:none">
+            <div class="auth-left">
+                <div class="auth-left-top">
+                    <div class="auth-brand-icon">P</div>
+                    <span class="auth-brand-name">ProposalKit</span>
+                </div>
+                <div class="auth-left-bottom">
+                    <blockquote class="auth-quote">&ldquo;ProposalKit has completely transformed how I send proposals. What used to take hours now takes minutes.&rdquo;</blockquote>
+                    <div class="auth-quote-author">Sofia Davis</div>
+                </div>
+            </div>
+            <div class="auth-right">
+                <div class="auth-right-top" id="authRightTop"></div>
+                <div id="authContent"></div>
+            </div>
+        </div>
+        <!-- Onboarding: card style -->
+        <div class="ob-card ob-card-wide" id="obCard">
             <div class="ob-icon">P</div>
             <div id="obContent"></div>
         </div>
@@ -69,35 +87,51 @@
         <!-- Mobile sidebar overlay -->
         <div class="side-overlay" id="sideOverlay" onclick="closeMobileSidebar()"></div>
 
-        <!-- Sidebar -->
+        <!-- Sidebar — shadcn/ui sidebar-07 -->
         <aside class="side" id="sidebar" role="navigation" aria-label="Main navigation">
-            <button class="side-collapse-btn" onclick="toggleSidebar()" title="Collapse sidebar">
-                <i data-lucide="chevron-left"></i>
-            </button>
-            <div class="side-top">
-                <div class="side-logo" id="sideLogo">P</div>
-                <div class="side-top-info">
-                    <span class="side-brand">ProposalKit</span>
-                </div>
-                <button class="side-new-btn" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom">
-                    <i data-lucide="plus"></i>
+            <div class="side-rail" onclick="toggleSidebar()"></div>
+            <!-- SidebarHeader -->
+            <div class="side-header">
+                <button class="side-team-btn" onclick="toggleSidebar()">
+                    <div class="side-team-logo" id="sideLogo">P</div>
+                    <span class="side-team-name" id="sideBrand">ProposalKit</span>
                 </button>
             </div>
+            <!-- SidebarContent -->
             <div class="side-body">
-                <div class="side-nav">
-                    <button class="side-btn on" data-nav="dashboard" onclick="goNav('dashboard')"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></button>
-                    <button class="side-btn" data-nav="editor" onclick="goNav('editor')"><i data-lucide="file-text"></i><span>Proposals</span><span class="cnt" id="propCnt">0</span></button>
-                    <button class="side-btn" data-nav="clients" onclick="goNav('clients')"><i data-lucide="users"></i><span>Clients</span><span class="cnt" id="clientCnt">0</span></button>
+                <!-- NavMain group -->
+                <div class="side-group">
+                    <div class="side-new-wrap">
+                        <button class="side-new-full" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom">
+                            <i data-lucide="circle-plus"></i><span>Quick Create</span>
+                        </button>
+                    </div>
+                    <div class="side-nav">
+                        <button class="side-btn on" data-nav="dashboard" onclick="goNav('dashboard')"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></button>
+                        <button class="side-btn" data-nav="editor" onclick="goNav('editor')"><i data-lucide="file-text"></i><span>Proposals</span><span class="cnt" id="propCnt">0</span></button>
+                        <button class="side-btn" data-nav="clients" onclick="goNav('clients')"><i data-lucide="users"></i><span>Clients</span><span class="cnt" id="clientCnt">0</span></button>
+                    </div>
                 </div>
-                <div class="side-divider"></div>
-                <div class="side-label">Recent</div>
-                <div id="recentList"></div>
+                <!-- NavDocuments group -->
+                <div class="side-group">
+                    <div class="side-group-label">Recent</div>
+                    <div id="recentList"></div>
+                </div>
+                <!-- NavSecondary group (mt-auto) -->
+                <div class="side-group side-group-secondary">
+                    <button class="side-btn" data-nav="settings" onclick="goNav('settings')"><i data-lucide="settings"></i><span>Settings</span></button>
+                </div>
             </div>
+            <!-- SidebarFooter -->
             <div class="side-foot">
-                <button class="side-foot-btn" onclick="typeof showUserSwitcher==='function'&&showUserSwitcher()" id="sideUserBtn" style="display:none"><i data-lucide="user"></i><span id="sideUserName"></span></button>
-                <button class="side-foot-btn" data-nav="settings" onclick="goNav('settings')"><i data-lucide="settings"></i><span>Settings</span></button>
-                <button class="side-foot-btn" onclick="toggleTheme()" id="sideThemeBtn"><i data-lucide="sun" class="theme-icon-light"></i><i data-lucide="moon" class="theme-icon-dark"></i><span>Theme</span></button>
-                <button class="side-foot-btn" onclick="logoutApp()" id="sideLogoutBtn"><i data-lucide="log-out"></i><span>Logout</span></button>
+                <button class="side-user-btn" onclick="toggleUserMenu()" id="sideUserBtn">
+                    <div class="side-user-avatar" id="sideUserAvatar">U</div>
+                    <div class="side-user-info">
+                        <span class="side-user-name" id="sideUserName">User</span>
+                        <span class="side-user-email" id="sideUserEmail">Settings</span>
+                    </div>
+                    <i data-lucide="ellipsis-vertical" class="side-user-chevron"></i>
+                </button>
             </div>
         </aside>
 
@@ -108,7 +142,11 @@
                     aria-label="Toggle menu">
                     <i data-lucide="menu"></i>
                 </button>
-                <span class="topbar-title" id="topTitle">Dashboard</span>
+                <div class="topbar-breadcrumb">
+                    <span class="breadcrumb-item breadcrumb-root" id="breadcrumbRoot" onclick="goNav('dashboard')">ProposalKit</span>
+                    <i data-lucide="chevron-right" class="breadcrumb-sep"></i>
+                    <span class="breadcrumb-item breadcrumb-current" id="topTitle">Dashboard</span>
+                </div>
                 <span class="sync-indicator" id="syncIndicator" style="display:none"></span>
                 <span class="save-indicator" id="saveIndicator" style="display:none" aria-live="polite" role="status">
                     <i data-lucide="loader-2" class="save-icon saving"></i>

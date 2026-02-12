@@ -123,7 +123,10 @@ function loadEditor(id) {
     document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
     document.querySelector('[data-nav="editor"]')?.classList.add('on');
 
-    document.getElementById('topTitle').innerHTML = `<span class="breadcrumb-link" onclick="renderProposals();document.querySelectorAll('[data-nav]').forEach(b=>b.classList.remove('on'));document.querySelector('[data-nav=&quot;editor&quot;]')?.classList.add('on')">Proposals</span><span class="breadcrumb-sep">/</span>${esc(p.title || 'Untitled')}`;
+    // Update breadcrumb: root → "Proposals" (clickable), current → proposal title
+    const bRoot = document.getElementById('breadcrumbRoot');
+    if (bRoot) { bRoot.textContent = 'Proposals'; bRoot.onclick = () => { renderProposals(); document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on')); document.querySelector('[data-nav="editor"]')?.classList.add('on'); }; }
+    document.getElementById('topTitle').textContent = p.title || 'Untitled';
     document.title = (p.title || 'Untitled') + ' \u2014 ' + (typeof appName === 'function' ? appName() : 'ProposalKit');
 
     // Calc stats for bar

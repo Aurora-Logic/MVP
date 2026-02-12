@@ -37,29 +37,23 @@ function buildMetricCards(active, c) {
         return `<span class="trend-badge ${cls}"><i data-lucide="${icon}" style="width:12px;height:12px"></i> ${pct > 0 ? '+' : ''}${pct}%</span>`;
     };
 
-    const curIcon = { INR: 'indian-rupee', USD: 'dollar-sign', EUR: 'euro', GBP: 'pound-sterling', JPY: 'japanese-yen' };
-    const cIcon = curIcon[c] || 'banknote';
-
+    const trendIcon = (pct) => pct >= 0 ? 'trending-up' : 'trending-down';
     return `<div class="dash-metric-grid">
-      <div class="metric-card metric-card-clickable" onclick="goNav('proposals')">
-        <div class="metric-card-header"><span class="metric-card-label">Total Pipeline</span><div class="metric-card-icon mci-revenue"><i data-lucide="${cIcon}"></i></div></div>
-        <div class="metric-card-value">${fmtCur(totalValue, c)}</div>
-        <div class="metric-card-footer">${trend(valTrend)} from last 30 days</div>
+      <div class="metric-card mc-revenue metric-card-clickable" onclick="goNav('editor')">
+        <div class="metric-card-header"><span class="metric-card-label">Total Revenue</span><div class="metric-card-value">${fmtCur(totalValue, c)}</div><div class="metric-card-action">${trend(valTrend)}</div></div>
+        <div class="metric-card-footer"><div class="metric-card-footer-trend">${valTrend >= 0 ? '+' : ''}${valTrend}% from last month <i data-lucide="${trendIcon(valTrend)}"></i></div><div class="metric-card-footer-desc">Revenue across all proposals</div></div>
       </div>
-      <div class="metric-card metric-card-clickable" onclick="setFilter('sent');goNav('proposals')">
-        <div class="metric-card-header"><span class="metric-card-label">Active Proposals</span><div class="metric-card-icon mci-active"><i data-lucide="send"></i></div></div>
-        <div class="metric-card-value">${sent}</div>
-        <div class="metric-card-footer">${sent} awaiting response</div>
+      <div class="metric-card mc-active metric-card-clickable" onclick="setFilter('sent');goNav('editor')">
+        <div class="metric-card-header"><span class="metric-card-label">Active Proposals</span><div class="metric-card-value">${sent}</div><div class="metric-card-action">${trend(0)}</div></div>
+        <div class="metric-card-footer"><div class="metric-card-footer-trend">${sent} awaiting response</div><div class="metric-card-footer-desc">Proposals pending client action</div></div>
       </div>
-      <div class="metric-card metric-card-clickable" onclick="setFilter('accepted');goNav('proposals')">
-        <div class="metric-card-header"><span class="metric-card-label">Won Deals</span><div class="metric-card-icon mci-won"><i data-lucide="check-circle"></i></div></div>
-        <div class="metric-card-value">${accepted}</div>
-        <div class="metric-card-footer">${trend(wonTrend)} ${winRate}% win rate</div>
+      <div class="metric-card mc-won metric-card-clickable" onclick="setFilter('accepted');goNav('editor')">
+        <div class="metric-card-header"><span class="metric-card-label">Won Deals</span><div class="metric-card-value">${accepted}</div><div class="metric-card-action">${trend(wonTrend)}</div></div>
+        <div class="metric-card-footer"><div class="metric-card-footer-trend">${winRate}% win rate <i data-lucide="${trendIcon(wonTrend)}"></i></div><div class="metric-card-footer-desc">Conversion rate this period</div></div>
       </div>
-      <div class="metric-card${duesTotal > 0 ? ' metric-card-clickable' : ''}"${duesTotal > 0 ? ` onclick="setFilter('dues');goNav('proposals')"` : ''}>
-        <div class="metric-card-header"><span class="metric-card-label">Outstanding</span><div class="metric-card-icon mci-dues"><i data-lucide="wallet"></i></div></div>
-        <div class="metric-card-value">${fmtCur(duesTotal, c)}</div>
-        <div class="metric-card-footer">${duesTotal > 0 ? 'Unpaid balance' : 'All payments settled'}</div>
+      <div class="metric-card mc-outstanding${duesTotal > 0 ? ' metric-card-clickable' : ''}"${duesTotal > 0 ? ` onclick="setFilter('dues');goNav('editor')"` : ''}>
+        <div class="metric-card-header"><span class="metric-card-label">Outstanding</span><div class="metric-card-value">${fmtCur(duesTotal, c)}</div><div class="metric-card-action">${duesTotal > 0 ? trend(-Math.round(duesTotal / (totalValue || 1) * 100)) : trend(0)}</div></div>
+        <div class="metric-card-footer"><div class="metric-card-footer-trend">${duesTotal > 0 ? 'Unpaid balance' : 'All payments settled'}</div><div class="metric-card-footer-desc">${duesTotal > 0 ? 'Requires follow-up' : 'No outstanding dues'}</div></div>
       </div>
     </div>`;
 }
@@ -105,28 +99,34 @@ function buildExpiryBanner() {
 function buildResumeBar() {
   const recent = activeDB()
     .filter(p => p.status === 'draft' || p.status === 'sent')
-    .sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))[0];
+    .sort((a, b) => (b.updatedAt || b.createdAt || 0) -
+      (a.updatedAt || a.createdAt || 0))[0];
   if (!recent) return '';
-  const value = (recent.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0);
+  const value = (recent.lineItems || []).reduce((s, i) =>
+    s + (i.qty || 0) * (i.rate || 0), 0);
   const ts = recent.updatedAt || recent.createdAt;
   const rid = escAttr(recent.id);
-  return `<div class="resume-bar" role="button" tabindex="0" onclick="loadEditor('${rid}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
-    <div class="resume-bar-icon"><i data-lucide="pen-line"></i></div>
-    <div class="resume-bar-body">
-      <div class="resume-bar-title">${esc(recent.title || 'Untitled')}</div>
-      <div class="resume-bar-meta">${recent.client?.name ? esc(recent.client.name) : ''}${recent.client?.name && value ? ' &middot; ' : ''}${value ? fmtCur(value, recent.currency) : ''}${ts ? ' &middot; ' + timeAgo(ts) : ''}</div>
+  const statusLabel = recent.status === 'sent' ? 'Sent' : 'Draft';
+  const statusCls = recent.status === 'sent' ? 'sent' : 'draft';
+  return `<div class="resume-card-v2" role="button" tabindex="0" onclick="loadEditor('${rid}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+    <div class="resume-card-header">
+      <span class="resume-card-label">Continue Working</span>
+      <div class="resume-card-title">${esc(recent.title || 'Untitled')}</div>
+      <div class="resume-card-action"><span class="resume-card-badge status-${statusCls}">${statusLabel}</span></div>
     </div>
-    <button class="btn-sm resume-bar-btn" onclick="event.stopPropagation();loadEditor('${rid}')"><i data-lucide="arrow-right"></i> Continue</button>
+    <div class="resume-card-footer">
+      <div class="resume-card-trend">${recent.client?.name ? esc(recent.client.name) : ''}${recent.client?.name && value ? ' &middot; ' : ''}${value ? fmtCur(value, recent.currency) : ''}</div>
+      <div class="resume-card-desc">${ts ? 'Last edited ' + timeAgo(ts) : 'Pick up where you left off'}</div>
+    </div>
   </div>`;
 }
 
 function buildAlertsSection(active) {
   const expiryHtml = buildExpiryBanner();
-  const duesHtml = typeof buildDuesBanner === 'function' ? buildDuesBanner(active) : '';
+  const duesHtml = typeof buildDuesBanner === 'function'
+    ? buildDuesBanner(active) : '';
   if (!expiryHtml && !duesHtml) return '';
-  const expiryCount = (expiryHtml.match(/expiry-banner/g) || []).length;
-  const total = expiryCount + (duesHtml ? 1 : 0);
-  return `<div class="dash-alerts"><div class="dash-alerts-header"><div class="dash-alerts-title"><i data-lucide="bell"></i> Alerts <span class="dash-alerts-count">${total}</span></div></div><div class="dash-alerts-body">${expiryHtml}${duesHtml}</div></div>`;
+  return `<div class="dash-alerts">${expiryHtml}${duesHtml}</div>`;
 }
 
 function buildSideMetrics(active) {
@@ -164,7 +164,7 @@ function renderDashboard() {
   document.getElementById('topTitle').textContent = 'Dashboard';
   const topSearch = document.getElementById('topSearch');
   if (topSearch) topSearch.style.display = '';
-  document.getElementById('topRight').innerHTML = '<button class="btn-sm" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom"><i data-lucide="plus"></i> New Proposal</button>';
+  document.getElementById('topRight').innerHTML = '';
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   let changed = false;
@@ -201,32 +201,26 @@ function renderDashboard() {
     return;
   }
 
-  const accepted = active.filter(p => p.status === 'accepted').length;
-  const sent = active.filter(p => p.status === 'sent').length;
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const firstName = (CONFIG?.name || '').split(' ')[0];
   const c = defaultCurrency();
 
   body.innerHTML = `
-    <div class="dash-header">
-      <div><div class="dash-greeting">${greeting}${firstName ? ', ' + esc(firstName) : ''}</div>
-      <div class="dash-subtitle">${sent} proposal${sent !== 1 ? 's' : ''} awaiting response${accepted ? ', ' + accepted + ' won' : ''}</div></div>
-      <div class="dash-header-right"><button class="btn-sm" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom"><i data-lucide="plus"></i> New Proposal</button></div>
-    </div>
-    ${buildMetricCards(active, c)}
-    <div class="dash-body">
-      <div class="dash-left">
+    <div class="dash-container">
+      ${buildMetricCards(active, c)}
+      <div class="dash-content">
         ${buildResumeBar()}
         ${buildAlertsSection(active)}
         ${typeof buildAnalyticsWidget === 'function' && active.length >= 3 ? buildAnalyticsWidget() : ''}
       </div>
-      <div class="dash-right">
-        ${buildSideMetrics(active)}
-        ${buildActivityFeed()}
-      </div>
     </div>`;
   lucide.createIcons();
+  if (typeof drawAreaChart === 'function') {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      drawAreaChart();
+      // Retry if canvas wasn't laid out yet
+      const cv = document.getElementById('anAreaCanvas');
+      if (cv && cv.width === 0) setTimeout(drawAreaChart, 100);
+    }));
+  }
 }
 
 function toggleSort() {

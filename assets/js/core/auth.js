@@ -2,8 +2,26 @@
 // AUTH — Login, Signup, Session Management
 // ════════════════════════════════════════
 
-/* exported initAuth, onSignedIn, doLogin, doSignup, doGoogleLogin, doPasswordReset, skipAuth, doLogout, authMode */
+/* exported initAuth, onSignedIn, doLogin, doSignup, doGoogleLogin, doGithubLogin, doPasswordReset, skipAuth, doLogout, authMode */
 let authMode = 'login'; // login | signup | reset -- eslint: reassigned via onclick handlers
+
+function showAuthSplit() {
+    const split = document.getElementById('authSplit');
+    const card = document.getElementById('obCard');
+    if (split) split.style.display = 'flex';
+    if (card) card.style.display = 'none';
+    document.getElementById('appShell').style.display = 'none';
+    document.getElementById('onboard').classList.remove('hide');
+}
+
+function hideAuthSplit() {
+    const split = document.getElementById('authSplit');
+    if (split) split.style.display = 'none';
+}
+
+function authTarget() {
+    return document.getElementById('authContent');
+}
 
 async function initAuth() {
     initSupabase();
@@ -14,7 +32,7 @@ async function initAuth() {
 
     // Safety timeout — never leave the user on a blank screen
     const safetyTimer = setTimeout(() => {
-        if (!document.getElementById('obContent')?.innerHTML?.trim()) {
+        if (!authTarget()?.innerHTML?.trim() && !document.getElementById('obContent')?.innerHTML?.trim()) {
             console.warn('[Auth] Safety timeout — showing auth screen');
             renderAuthScreen();
         }
@@ -26,21 +44,19 @@ async function initAuth() {
     const hasOAuthError = hash && (hash.includes('error=') || hash.includes('error_description='));
 
     if (hasOAuthError) {
-        const el = document.getElementById('obContent');
+        showAuthSplit();
+        const el = authTarget();
         if (el) {
-            document.getElementById('appShell').style.display = 'none';
-            document.getElementById('onboard').classList.remove('hide');
-            el.innerHTML = '<div class="auth-form" style="text-align:center"><div style="font-size:36px;margin-bottom:12px">&#9888;&#65039;</div><div class="auth-title">Sign-in failed</div><div class="auth-desc">Google authentication was cancelled or failed. Please try again.</div><button class="btn" style="margin-top:16px" onclick="authMode=\'login\';renderAuthScreen()">Back to Sign In</button></div>';
+            el.innerHTML = '<div class="auth-form" style="text-align:center"><div style="font-size:36px;margin-bottom:12px">&#9888;&#65039;</div><div class="auth-title">Sign-in failed</div><div class="auth-desc" style="margin-bottom:20px">Google authentication was cancelled or failed. Please try again.</div><button class="btn" onclick="authMode=\'login\';renderAuthScreen()">Back to Sign In</button></div>';
         }
         if (window.history.replaceState) window.history.replaceState(null, '', window.location.pathname);
         return;
     }
 
     if (isOAuthCallback) {
-        const el = document.getElementById('obContent');
+        showAuthSplit();
+        const el = authTarget();
         if (el) {
-            document.getElementById('appShell').style.display = 'none';
-            document.getElementById('onboard').classList.remove('hide');
             el.innerHTML = '<div class="auth-form" style="text-align:center"><div style="font-size:36px;margin-bottom:12px">&#128274;</div><div class="auth-title">Signing you in...</div><div class="auth-desc">Please wait while we complete authentication.</div></div>';
         }
     }
@@ -53,13 +69,14 @@ async function initAuth() {
             await pullAndBoot();
         } catch (e) {
             console.error('pullAndBoot failed:', e);
-            // Still try to boot even if cloud sync fails
             if (CONFIG) {
+                hideAuthSplit();
                 document.getElementById('onboard').classList.add('hide');
                 document.getElementById('appShell').style.display = 'flex';
                 bootApp();
                 if (typeof toast === 'function') toast('Cloud sync failed — working offline', 'error');
             } else {
+                showAuthSplit();
                 renderOnboarding();
             }
         }
@@ -123,7 +140,6 @@ async function initAuth() {
     // For OAuth callbacks: the SDK may need more time to process
     if (isOAuthCallback) {
         console.warn('[Auth] OAuth callback — waiting for SDK to process token...');
-        // Try manually setting the session from the hash as last resort
         try {
             const params = new URLSearchParams(hash.substring(1));
             const accessToken = params.get('access_token');
@@ -165,7 +181,8 @@ async function initAuth() {
 }
 
 function showOAuthRetryScreen() {
-    const el = document.getElementById('obContent');
+    showAuthSplit();
+    const el = authTarget();
     if (el) {
         el.innerHTML = `<div class="auth-form" style="text-align:center">
             <div style="font-size:36px;margin-bottom:12px">&#9888;&#65039;</div>
@@ -173,9 +190,11 @@ function showOAuthRetryScreen() {
             <div class="auth-desc" style="margin-bottom:20px">We couldn't complete the sign-in. This can happen if the link expired or there was a network issue.</div>
             <button class="btn" style="margin-bottom:12px" onclick="doGoogleLogin()">Try again with Google</button>
             <div><button class="btn-outline" onclick="authMode='login';renderAuthScreen()">Back to Sign In</button></div>
-            <div style="margin-top:16px"><button class="btn-outline auth-offline-btn" onclick="skipAuth()">
-                <i data-lucide="wifi-off" style="width:16px;height:16px"></i> Continue offline
-            </button></div>
+            <div class="auth-offline">
+                <button class="btn-outline auth-offline-btn" onclick="skipAuth()">
+                    <i data-lucide="wifi-off" style="width:16px;height:16px"></i> Continue offline
+                </button>
+            </div>
         </div>`;
         lucide.createIcons();
     }
@@ -183,10 +202,12 @@ function showOAuthRetryScreen() {
 
 function offlineBoot() {
     if (CONFIG) {
+        hideAuthSplit();
         document.getElementById('onboard').classList.add('hide');
         document.getElementById('appShell').style.display = 'flex';
         bootApp();
     } else {
+        showAuthSplit();
         renderOnboarding();
     }
 }
@@ -206,10 +227,12 @@ async function pullAndBoot() {
     try { CLIENTS = JSON.parse(localStorage.getItem('pk_clients') || '[]'); } catch (e) { CLIENTS = []; }
 
     if (CONFIG) {
+        hideAuthSplit();
         document.getElementById('onboard').classList.add('hide');
         document.getElementById('appShell').style.display = 'flex';
         bootApp();
     } else {
+        showAuthSplit();
         renderOnboarding();
     }
 }
@@ -219,11 +242,22 @@ async function pullAndBoot() {
 // ════════════════════════════════════════
 
 function renderAuthScreen() {
-    document.getElementById('appShell').style.display = 'none';
-    document.getElementById('onboard').classList.remove('hide');
+    showAuthSplit();
     document.title = 'Sign In — ProposalKit';
-    const el = document.getElementById('obContent');
+    const el = authTarget();
     if (!el) return;
+
+    // Top-right: toggle link between login/signup
+    const top = document.getElementById('authRightTop');
+    if (top) {
+        if (authMode === 'signup') {
+            top.innerHTML = '<button class="btn-ghost auth-mode-link" onclick="authMode=\'login\';renderAuthScreen()">Login</button>';
+        } else if (authMode === 'login') {
+            top.innerHTML = '<button class="btn-ghost auth-mode-link" onclick="authMode=\'signup\';renderAuthScreen()">Sign up</button>';
+        } else {
+            top.innerHTML = '<button class="btn-ghost auth-mode-link" onclick="authMode=\'login\';renderAuthScreen()">Login</button>';
+        }
+    }
 
     if (authMode === 'reset') {
         el.innerHTML = getResetHtml();
@@ -243,19 +277,24 @@ function getLoginHtml() {
         <div class="auth-form">
             <div class="auth-header">
                 <div class="auth-title">Welcome back</div>
-                <div class="auth-desc">Sign in to sync your proposals across devices</div>
+                <div class="auth-desc">Sign in to your account to continue</div>
             </div>
-            <button class="auth-google-btn" onclick="doGoogleLogin()">
-                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                Sign in with Google
-            </button>
-            <div class="auth-divider"><span>or continue with email</span></div>
-            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
-            <div class="fg"><label class="fl">Password</label><input type="password" id="authPass" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
+            <div class="fg"><label class="fl">Password</label><input type="password" id="authPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
             <div id="authError" class="auth-error"></div>
-            <button class="btn auth-submit" id="authSubmitBtn" onclick="doLogin()">Sign In</button>
+            <button class="btn auth-submit" id="authSubmitBtn" onclick="doLogin()">Sign In with Email</button>
+            <div class="auth-divider"><span>OR CONTINUE WITH</span></div>
+            <div class="auth-social-row">
+                <button class="auth-google-btn" onclick="doGoogleLogin()">
+                    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                    Google
+                </button>
+                <button class="auth-github-btn" onclick="doGithubLogin()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub
+                </button>
+            </div>
             <div class="auth-links">
-                <span>Don't have an account? <a href="#" onclick="authMode='signup';renderAuthScreen();return false">Sign up</a></span>
                 <a href="#" onclick="authMode='reset';renderAuthScreen();return false">Forgot password?</a>
             </div>
             <div class="auth-offline">
@@ -264,6 +303,7 @@ function getLoginHtml() {
                 </button>
                 <div class="auth-offline-hint">Your data stays on this device only</div>
             </div>
+            <div class="auth-terms">By clicking continue, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
         </div>`;
 }
 
@@ -271,21 +311,24 @@ function getSignupHtml() {
     return `
         <div class="auth-form">
             <div class="auth-header">
-                <div class="auth-title">Create your account</div>
-                <div class="auth-desc">Start building professional proposals for free</div>
+                <div class="auth-title">Create an account</div>
+                <div class="auth-desc">Enter your details below to get started</div>
             </div>
-            <button class="auth-google-btn" onclick="doGoogleLogin()">
-                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                Sign up with Google
-            </button>
-            <div class="auth-divider"><span>or continue with email</span></div>
             <div class="fg"><label class="fl">Full Name</label><input type="text" id="authName" placeholder="Your name" onkeydown="if(event.key==='Enter')document.getElementById('authEmail').focus()"></div>
-            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
+            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
             <div class="fg"><label class="fl">Password</label><input type="password" id="authPass" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doSignup()"></div>
             <div id="authError" class="auth-error"></div>
             <button class="btn auth-submit" id="authSubmitBtn" onclick="doSignup()">Create Account</button>
-            <div class="auth-links">
-                <span>Already have an account? <a href="#" onclick="authMode='login';renderAuthScreen();return false">Sign in</a></span>
+            <div class="auth-divider"><span>OR CONTINUE WITH</span></div>
+            <div class="auth-social-row">
+                <button class="auth-google-btn" onclick="doGoogleLogin()">
+                    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                    Google
+                </button>
+                <button class="auth-github-btn" onclick="doGithubLogin()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub
+                </button>
             </div>
             <div class="auth-offline">
                 <button class="btn-outline auth-offline-btn" onclick="skipAuth()">
@@ -293,6 +336,7 @@ function getSignupHtml() {
                 </button>
                 <div class="auth-offline-hint">Your data stays on this device only</div>
             </div>
+            <div class="auth-terms">By clicking continue, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
         </div>`;
 }
 
@@ -303,10 +347,10 @@ function getResetHtml() {
                 <div class="auth-title">Reset password</div>
                 <div class="auth-desc">Enter your email and we'll send a reset link</div>
             </div>
-            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doPasswordReset()"></div>
+            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')doPasswordReset()"></div>
             <div id="authError" class="auth-error"></div>
             <button class="btn auth-submit" id="authSubmitBtn" onclick="doPasswordReset()">Send Reset Link</button>
-            <div class="auth-links">
+            <div class="auth-links" style="justify-content:center">
                 <a href="#" onclick="authMode='login';renderAuthScreen();return false"><i data-lucide="arrow-left" style="width:14px;height:14px;vertical-align:middle"></i> Back to sign in</a>
             </div>
         </div>`;
@@ -364,7 +408,8 @@ async function doSignup() {
         if (data.user && !data.session) {
             // Email confirmation required
             showAuthError('');
-            document.getElementById('obContent').innerHTML = `
+            const el = authTarget();
+            if (el) el.innerHTML = `
                 <div class="auth-form" style="text-align:center">
                     <div style="font-size:36px;margin-bottom:12px">&#9993;</div>
                     <div class="auth-title">Check your email</div>
@@ -397,6 +442,20 @@ async function doGoogleLogin() {
     }
 }
 
+async function doGithubLogin() {
+    if (!sb()) { showAuthError('Cloud features unavailable'); return; }
+    try {
+        const redirectUrl = window.location.origin + window.location.pathname;
+        const { error } = await sb().auth.signInWithOAuth({
+            provider: 'github',
+            options: { redirectTo: redirectUrl }
+        });
+        if (error) showAuthError(error.message);
+    } catch (e) {
+        showAuthError('GitHub login failed');
+    }
+}
+
 async function doPasswordReset() {
     const email = document.getElementById('authEmail')?.value?.trim();
     if (!email) { showAuthError('Please enter your email'); return; }
@@ -408,7 +467,8 @@ async function doPasswordReset() {
         });
         if (error) { showAuthError(error.message); setAuthLoading(false); return; }
         showAuthError('');
-        document.getElementById('obContent').innerHTML = `
+        const el = authTarget();
+        if (el) el.innerHTML = `
             <div class="auth-form" style="text-align:center">
                 <div style="font-size:36px;margin-bottom:12px">&#9993;</div>
                 <div class="auth-title">Check your email</div>

@@ -32,11 +32,13 @@ function activeUser() {
 }
 
 function updateSidebarUser() {
-    const el = document.getElementById('sideUserName');
-    const btn = document.getElementById('sideUserBtn');
     const u = activeUser();
-    if (btn) btn.style.display = (CONFIG?.team?.length > 1) ? '' : 'none';
-    if (el && u) el.textContent = u.name;
+    const nameEl = document.getElementById('sideUserName');
+    const avatarEl = document.getElementById('sideUserAvatar');
+    const emailEl = document.getElementById('sideUserEmail');
+    if (nameEl) nameEl.textContent = u?.name || CONFIG.name || 'User';
+    if (avatarEl) avatarEl.textContent = (u?.name || CONFIG.name || 'U').charAt(0).toUpperCase();
+    if (emailEl) emailEl.textContent = u?.email || CONFIG.email || 'Settings';
 }
 
 function switchUser(userId) {

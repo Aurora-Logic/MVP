@@ -35,6 +35,9 @@ function goNav(view) {
     document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
     const btn = document.querySelector(`[data-nav="${view}"]`);
     if (btn) btn.classList.add('on');
+    // Reset breadcrumb root to app name
+    const root = document.getElementById('breadcrumbRoot');
+    if (root) { root.textContent = an; root.onclick = () => goNav('dashboard'); }
     // Destroy EditorJS instances when leaving editor
     if (view !== 'editor') destroyAllEditors();
     // Hide TOC on non-editor views
@@ -163,5 +166,59 @@ function initKeyboardShortcuts() {
     // Click to close context menus
     document.addEventListener('click', () => {
         hideCtx();
+        // Close user menu on outside click
+        const um = document.querySelector('.side-user-menu');
+        if (um) um.remove();
     });
+}
+
+// ── User menu dropdown (shadcn NavUser) ──
+function toggleUserMenu() {
+    const existing = document.querySelector('.side-user-menu');
+    if (existing) { existing.remove(); return; }
+    const btn = document.getElementById('sideUserBtn');
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+    const menu = document.createElement('div');
+    menu.className = 'side-user-menu';
+    const name = CONFIG.name || 'User';
+    const email = CONFIG.email || '';
+    const initial = name.charAt(0).toUpperCase();
+    // Team members
+    let teamHtml = '';
+    if (CONFIG.team && CONFIG.team.length > 1) {
+        const curId = CONFIG.activeUserId;
+        teamHtml = '<div class="side-user-menu-sep"></div>' + CONFIG.team.filter(m => m.id !== curId).slice(0, 3).map(m =>
+            `<button class="side-user-menu-item" onclick="typeof switchUser==='function'&&switchUser('${escAttr(m.id)}');document.querySelector('.side-user-menu')?.remove()"><i data-lucide="user"></i>${esc(m.name)}</button>`
+        ).join('');
+    }
+    menu.innerHTML = `
+        <div class="side-user-menu-header">
+            <div class="side-user-avatar">${initial}</div>
+            <div class="side-user-menu-header-info">
+                <span class="side-user-name">${esc(name)}</span>
+                ${email ? `<span class="side-user-email">${esc(email)}</span>` : ''}
+            </div>
+        </div>
+        <div class="side-user-menu-sep"></div>
+        <button class="side-user-menu-item" onclick="goNav('settings');document.querySelector('.side-user-menu')?.remove()"><i data-lucide="settings"></i>Settings</button>
+        <button class="side-user-menu-item" onclick="toggleTheme();document.querySelector('.side-user-menu')?.remove()"><i data-lucide="sun" class="theme-icon-light"></i><i data-lucide="moon" class="theme-icon-dark"></i>Theme</button>
+        ${teamHtml}
+        <div class="side-user-menu-sep"></div>
+        <button class="side-user-menu-item" onclick="logoutApp()"><i data-lucide="log-out"></i>Log out</button>`;
+    menu.style.position = 'fixed';
+    menu.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+    menu.style.left = rect.left + 'px';
+    document.body.appendChild(menu);
+    lucide.createIcons();
+    // Prevent immediate close from the same click
+    setTimeout(() => {
+        const close = (e) => {
+            if (!menu.contains(e.target) && e.target !== btn) {
+                menu.remove();
+                document.removeEventListener('click', close);
+            }
+        };
+        document.addEventListener('click', close);
+    }, 10);
 }

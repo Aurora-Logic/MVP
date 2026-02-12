@@ -1,8 +1,8 @@
 // ════════════════════════════════════════
-// PROPOSALS VIEW — List, Filter, Pagination
+// PROPOSALS VIEW — Notion-style Table & List
 // ════════════════════════════════════════
 
-/* exported doQuickExport, quickPreview, showStatusMenu, setProposalStatus, setFilter, filterList, goPage, toggleSortProposals */
+/* exported doQuickExport, quickPreview, showStatusMenu, setProposalStatus, setFilter, filterList, goPage, toggleSortProposals, showSortMenu */
 
 function getSmartDate(p) {
   if (p.status === 'accepted' && p.clientResponse?.respondedAt) return 'Accepted ' + timeAgo(p.clientResponse.respondedAt);
@@ -12,18 +12,29 @@ function getSmartDate(p) {
   return timeAgo(p.createdAt || Date.now());
 }
 
-function renderPropList(list) {
+const _emptyMessages = {
+  draft: { title: 'No drafts yet', desc: 'Start writing a proposal and it will appear here as a draft.' },
+  sent: { title: 'Nothing sent yet', desc: 'Once you send a proposal to a client, it will show up here.' },
+  accepted: { title: 'No wins yet', desc: 'Accepted proposals will appear here. Keep going!' },
+  declined: { title: 'No declined proposals', desc: 'Proposals declined by clients will appear here.' },
+  expired: { title: 'Nothing expired', desc: 'Proposals past their validity date will show up here.' },
+  dues: { title: 'No outstanding dues', desc: 'All accepted proposals are fully paid. Nice work!' },
+  archived: { title: 'Archive is empty', desc: 'Archived proposals will appear here when you archive them.' },
+  all: { title: 'No results found', desc: 'Try a different search term or create a new proposal.' }
+};
+
+function renderPropTable(list) {
   const wrap = document.getElementById('propListWrap');
   if (!list.length) {
     const filterIcons = { draft: 'file-text', sent: 'send', accepted: 'check-circle', declined: 'x-circle', expired: 'clock', dues: 'wallet', archived: 'archive' };
     const filterIcon = filterIcons[currentFilter] || 'search';
-    const filterLabel = currentFilter !== 'all' ? currentFilter.charAt(0).toUpperCase() + currentFilter.slice(1) : '';
+    const msg = _emptyMessages[currentFilter] || _emptyMessages.all;
     wrap.innerHTML = `<div class="empty" style="padding:60px 20px">
-        <div class="empty-icon" style="width:48px;height:48px;border-radius:50%;background:var(--muted);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="${esc(filterIcon)}" style="width:20px;height:20px;color:var(--text4)"></i></div>
-        <div class="empty-t">${currentFilter !== 'all' ? 'No ' + esc(filterLabel) + ' proposals' : 'No results found'}</div>
-        <div class="empty-d">${currentFilter !== 'all' ? 'Proposals will appear here once they have the "' + esc(filterLabel) + '" status.' : 'Try a different search term or create a new proposal.'}</div>
-        <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-            ${currentFilter !== 'all' ? '<button class="btn-sm-outline" onclick="setFilter(\'all\')"><i data-lucide="x"></i> Clear filter</button>' : ''}
+        <div class="empty-icon" style="width:48px;height:48px;border-radius:50%;background:var(--muted);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i data-lucide="${esc(filterIcon)}" style="width:20px;height:20px;color:var(--text4)"></i></div>
+        <div class="empty-t">${msg.title}</div>
+        <div class="empty-d">${msg.desc}</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+            ${currentFilter !== 'all' ? '<button class="btn-sm-outline" onclick="setFilter(\'all\')"><i data-lucide="arrow-left"></i> All proposals</button>' : ''}
             <button class="btn-sm" onclick="openNewModal()"><i data-lucide="plus"></i> New Proposal</button>
         </div>
     </div>`;
@@ -31,62 +42,64 @@ function renderPropList(list) {
     return;
   }
 
-  const aviBgs = { draft: 'var(--muted)', sent: 'var(--blue-bg)', accepted: 'var(--green-bg)', declined: 'var(--red-bg)', expired: 'var(--amber-bg)', archived: 'var(--muted)' };
-  const aviColors = { draft: 'var(--text3)', sent: 'var(--blue)', accepted: 'var(--green)', declined: 'var(--red)', expired: 'var(--amber)', archived: 'var(--text4)' };
   const isArchived = currentFilter === 'archived';
-
   const rows = list.map(p => {
     const t = typeof calcTotals === 'function' ? calcTotals(p) : { grand: (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0) };
     const val = t.grand;
-    const initials = (p.client?.name || p.title || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    const isNew = (Date.now() - (p.createdAt || 0)) < 86400000;
     const pid = escAttr(p.id);
     const smartDate = getSmartDate(p);
-    const score = typeof calcCompleteness === 'function' ? calcCompleteness(p).score : null;
-    const scoreColor = score !== null ? (score >= 71 ? 'var(--green)' : score >= 41 ? 'var(--amber)' : 'var(--red)') : '';
-    const secCount = (p.sections || []).length;
-    const liCount = (p.lineItems || []).length;
+    const st = isArchived ? 'archived' : p.status;
+    const statusLabel = st.charAt(0).toUpperCase() + st.slice(1);
 
-    return `<div class="prop-row-v2" onclick="loadEditor('${pid}')" oncontextmenu="showCtx(event,'${pid}')">
-      ${!isArchived ? `<input type="checkbox" class="bulk-check" data-id="${pid}" onclick="event.stopPropagation();toggleBulkCheck('${pid}', this)">` : ''}
-      <div class="prop-avi" style="background:${aviBgs[isArchived ? 'archived' : p.status]};color:${aviColors[isArchived ? 'archived' : p.status]}">${initials}</div>
-      <div class="prop-body">
-        <div class="prop-line1">
-          <div class="prop-title">${esc(p.title || 'Untitled')}${isNew ? ' <span class="badge-new">NEW</span>' : ''}</div>
-          <div class="prop-line1-right">
-            <span class="badge badge-${p.status} badge-click" onclick="event.stopPropagation();showStatusMenu(event,'${pid}')"><span class="badge-dot"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)} <i data-lucide="chevron-down" class="badge-chevron"></i></span>
-            <span class="prop-value mono">${fmtCur(val, p.currency)}</span>
-          </div>
-        </div>
-        <div class="prop-line2">
-          <div class="prop-meta">
-            ${p.number ? `<span class="prop-meta-num">${esc(p.number)}</span>` : ''}
-            ${p.client?.name ? `<span class="prop-meta-sep"></span><span class="prop-meta-client"><i data-lucide="building-2" style="width:11px;height:11px;display:inline-block;vertical-align:-1px;margin-right:2px;opacity:0.5"></i>${esc(p.client.name)}</span>` : ''}
-            <span class="prop-meta-sep"></span>
-            <span class="prop-meta-date">${smartDate}</span>
-            ${secCount ? `<span class="prop-meta-sep"></span><span class="prop-meta-info">${secCount} sec</span>` : ''}
-            ${liCount ? `<span class="prop-meta-sep"></span><span class="prop-meta-info">${liCount} items</span>` : ''}
-          </div>
-          <div class="prop-line2-right">
-            ${score !== null ? `<div class="score-bar" data-tooltip="Score: ${score}/100" data-side="top"><div class="score-bar-fill" style="width:${score}%;background:${scoreColor}"></div></div>` : ''}
-            ${typeof paymentStatusBadge === 'function' && p.status === 'accepted' ? paymentStatusBadge(p) : ''}
-          </div>
-        </div>
-      </div>
-      <div class="prop-actions-hover">
-        ${isArchived ? `
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();unarchiveProp('${pid}')" data-tooltip="Restore" data-side="bottom"><i data-lucide="archive-restore"></i></button>
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();delProp('${pid}')" data-tooltip="Delete" data-side="bottom"><i data-lucide="trash-2"></i></button>
-        ` : `
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();emailProposal('${pid}')" data-tooltip="Email" data-side="bottom"><i data-lucide="mail"></i></button>
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();dupProp('${pid}')" data-tooltip="Duplicate" data-side="bottom"><i data-lucide="copy"></i></button>
-        <button class="btn-sm-icon-ghost" onclick="event.stopPropagation();showCtx(event,'${pid}')" data-tooltip="More" data-side="bottom"><i data-lucide="more-horizontal"></i></button>
-        `}
+    if (viewMode === 'table') {
+      return `<tr class="nt-row" onclick="loadEditor('${pid}')" oncontextmenu="showCtx(event,'${pid}')">
+        <td class="nt-cell nt-cell-check">${!isArchived ? `<label class="bulk-check-wrap" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-input" data-id="${pid}" onchange="toggleBulkCheck('${pid}', this)"><span class="bulk-check-pill"></span></label>` : ''}</td>
+        <td class="nt-cell nt-cell-title"><span class="nt-title-text">${esc(p.title || 'Untitled')}</span></td>
+        <td class="nt-cell nt-cell-client"><span class="nt-client-text">${esc(p.client?.name || '\u2014')}</span></td>
+        <td class="nt-cell nt-cell-status"><span class="badge badge-${st} badge-click" onclick="event.stopPropagation();showStatusMenu(event,'${pid}')"><span class="badge-dot"></span> ${statusLabel}</span></td>
+        <td class="nt-cell nt-cell-value mono">${fmtCur(val, p.currency)}</td>
+        <td class="nt-cell nt-cell-date">${smartDate}</td>
+        <td class="nt-cell nt-cell-actions"><div class="prop-actions">${isArchived ? `
+          <button class="prop-act-btn" onclick="event.stopPropagation();unarchiveProp('${pid}')" data-tooltip="Restore" data-side="bottom"><i data-lucide="archive-restore"></i></button>
+          <button class="prop-act-btn" onclick="event.stopPropagation();delProp('${pid}')" data-tooltip="Delete" data-side="bottom"><i data-lucide="trash-2"></i></button>` : `
+          <button class="prop-act-btn" onclick="event.stopPropagation();emailProposal('${pid}')" data-tooltip="Email" data-side="bottom"><i data-lucide="mail"></i></button>
+          <button class="prop-act-btn" onclick="event.stopPropagation();dupProp('${pid}')" data-tooltip="Duplicate" data-side="bottom"><i data-lucide="copy"></i></button>
+          <button class="prop-act-btn" onclick="event.stopPropagation();showCtx(event,'${pid}')" data-tooltip="More" data-side="bottom"><i data-lucide="more-horizontal"></i></button>`}
+        </div></td>
+      </tr>`;
+    }
+    // List view — compact single-line
+    return `<div class="nl-row" onclick="loadEditor('${pid}')" oncontextmenu="showCtx(event,'${pid}')">
+      ${!isArchived ? `<label class="bulk-check-wrap" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-input" data-id="${pid}" onchange="toggleBulkCheck('${pid}', this)"><span class="bulk-check-pill"></span></label>` : ''}
+      <i data-lucide="file-text" class="nl-icon"></i>
+      <span class="nl-title">${esc(p.title || 'Untitled')}</span>
+      <span class="nl-meta">${esc(p.client?.name || '')}</span>
+      <span class="badge badge-${st} badge-sm"><span class="badge-dot"></span> ${statusLabel}</span>
+      <span class="nl-value mono">${fmtCur(val, p.currency)}</span>
+      <span class="nl-date">${smartDate}</span>
+      <div class="prop-actions">${isArchived ? `
+        <button class="prop-act-btn" onclick="event.stopPropagation();unarchiveProp('${pid}')" data-tooltip="Restore" data-side="bottom"><i data-lucide="archive-restore"></i></button>` : `
+        <button class="prop-act-btn" onclick="event.stopPropagation();showCtx(event,'${pid}')" data-tooltip="More" data-side="bottom"><i data-lucide="more-horizontal"></i></button>`}
       </div>
     </div>`;
   }).join('');
 
-  wrap.innerHTML = '<div class="prop-list">' + rows + '</div>';
+  if (viewMode === 'table') {
+    wrap.innerHTML = `<div class="nt-wrap"><table class="nt-table">
+      <thead><tr class="nt-head">
+        <th class="nt-th nt-th-check"></th>
+        <th class="nt-th nt-th-title">Title</th>
+        <th class="nt-th nt-th-client">Client</th>
+        <th class="nt-th nt-th-status">Status</th>
+        <th class="nt-th nt-th-value">Value</th>
+        <th class="nt-th nt-th-date">Updated</th>
+        <th class="nt-th nt-th-actions"></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } else {
+    wrap.innerHTML = `<div class="nl-wrap">${rows}</div>`;
+  }
   lucide.createIcons();
 }
 
@@ -142,6 +155,59 @@ function filterList() {
 let currentPage = 1;
 const ITEMS_PER_PAGE = 10;
 
+function buildPagination(currentPg, totalPgs) {
+  if (totalPgs <= 1) return '';
+  const pages = [];
+  const addPage = (n) => { if (!pages.includes(n)) pages.push(n); };
+  addPage(1);
+  for (let i = Math.max(2, currentPg - 1); i <= Math.min(totalPgs - 1, currentPg + 1); i++) addPage(i);
+  addPage(totalPgs);
+  pages.sort((a, b) => a - b);
+
+  let items = '';
+  items += `<button class="pg-btn pg-nav" onclick="goPage(${currentPg - 1})" ${currentPg === 1 ? 'disabled' : ''} aria-label="Previous page"><i data-lucide="chevron-left"></i><span class="pg-nav-label">Previous</span></button>`;
+
+  let last = 0;
+  for (const pg of pages) {
+    if (last && pg - last > 1) {
+      items += '<span class="pg-ellipsis" aria-hidden="true"><i data-lucide="more-horizontal"></i></span>';
+    }
+    items += `<button class="pg-btn pg-num${pg === currentPg ? ' pg-active' : ''}" onclick="goPage(${pg})" aria-label="Page ${pg}"${pg === currentPg ? ' aria-current="page"' : ''}>${pg}</button>`;
+    last = pg;
+  }
+
+  items += `<button class="pg-btn pg-nav" onclick="goPage(${currentPg + 1})" ${currentPg >= totalPgs ? 'disabled' : ''} aria-label="Next page"><span class="pg-nav-label">Next</span><i data-lucide="chevron-right"></i></button>`;
+  return `<nav class="pg-wrap" role="navigation" aria-label="Pagination">${items}</nav>`;
+}
+
+function showSortMenu(event) {
+  event.stopPropagation();
+  const existing = document.querySelector('.sort-dropdown');
+  if (existing) { existing.remove(); return; }
+  const opts = [
+    { key: 'date', label: 'Newest first', icon: 'calendar' },
+    { key: 'value', label: 'Highest value', icon: 'trending-up' },
+    { key: 'name', label: 'Name A-Z', icon: 'arrow-down-a-z' }
+  ];
+  const dd = document.createElement('div');
+  dd.className = 'sort-dropdown';
+  dd.innerHTML = opts.map(o =>
+    `<button class="sort-opt${currentSort === o.key ? ' sort-opt-active' : ''}" onclick="currentSort='${o.key}';document.querySelector('.sort-dropdown')?.remove();renderProposals()">
+      <i data-lucide="${o.icon}" style="width:14px;height:14px"></i><span>${o.label}</span>${currentSort === o.key ? '<i data-lucide="check" style="width:14px;height:14px;margin-left:auto;color:var(--primary)"></i>' : ''}
+    </button>`
+  ).join('');
+  const btn = event.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  dd.style.top = (rect.bottom + 4) + 'px';
+  dd.style.right = (window.innerWidth - rect.right) + 'px';
+  document.body.appendChild(dd);
+  lucide.createIcons();
+  const close = (e) => { if (!dd.contains(e.target) && e.target !== btn) { dd.remove(); document.removeEventListener('click', close); } };
+  setTimeout(() => document.addEventListener('click', close), 10);
+}
+
+const _filterDotColors = { draft: 'var(--text4)', sent: 'var(--blue)', accepted: 'var(--green)', declined: 'var(--red)', expired: 'var(--amber)', dues: 'var(--green)', archived: 'var(--text4)' };
+
 function renderProposals() {
   CUR = null;
   if (typeof hideTOC === 'function') hideTOC();
@@ -178,40 +244,40 @@ function renderProposals() {
   const totalPages = Math.ceil(display.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginated = display.slice(startIdx, startIdx + ITEMS_PER_PAGE);
-  const sortLabel = currentSort === 'date' ? 'Newest' : currentSort === 'value' ? 'Highest' : 'A-Z';
+  const sortIcons = { date: 'calendar', value: 'trending-up', name: 'arrow-down-a-z' };
+  const sortLabels = { date: 'Newest', value: 'Highest', name: 'A-Z' };
+
+  const filterTab = (key, label, count, icon) => {
+    const dot = key !== 'all' ? `<span class="ft-dot" style="background:${_filterDotColors[key] || 'var(--text4)'}"></span>` : '';
+    const iconHtml = icon ? `<i data-lucide="${icon}"></i>` : '';
+    return `<button class="filter-tab${currentFilter === key ? ' on' : ''}${!count ? ' dimmed' : ''}" onclick="setFilter('${key}')">${dot}${iconHtml}${label} <span class="fc">${count}</span></button>`;
+  };
 
   body.innerHTML = `
-    <div class="prop-header">
-      <div class="prop-header-left">
-        <h1 class="prop-header-title">Proposals</h1>
-        <span class="prop-header-count">${activeDB().length}</span>
-      </div>
-      <div class="prop-header-right">
-        <button class="btn-sm" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom"><i data-lucide="plus"></i> New Proposal</button>
-      </div>
-    </div>
     <div class="prop-toolbar">
-      <div class="prop-filters">
-        <button class="filter-tab${currentFilter === 'all' ? ' on' : ''}" onclick="setFilter('all')">All <span class="fc">${counts.all}</span></button>
-        <button class="filter-tab${currentFilter === 'draft' ? ' on' : ''}${!counts.draft ? ' dimmed' : ''}" onclick="setFilter('draft')">Draft <span class="fc">${counts.draft}</span></button>
-        <button class="filter-tab${currentFilter === 'sent' ? ' on' : ''}${!counts.sent ? ' dimmed' : ''}" onclick="setFilter('sent')">Sent <span class="fc">${counts.sent}</span></button>
-        <button class="filter-tab${currentFilter === 'accepted' ? ' on' : ''}${!counts.accepted ? ' dimmed' : ''}" onclick="setFilter('accepted')">Won <span class="fc">${counts.accepted}</span></button>
-        <button class="filter-tab${currentFilter === 'declined' ? ' on' : ''}${!counts.declined ? ' dimmed' : ''}" onclick="setFilter('declined')">Lost <span class="fc">${counts.declined}</span></button>
-        <button class="filter-tab${currentFilter === 'expired' ? ' on' : ''}${!counts.expired ? ' dimmed' : ''}" onclick="setFilter('expired')">Expired <span class="fc">${counts.expired}</span></button>
-        ${typeof paymentTotals === 'function' ? `<button class="filter-tab${currentFilter === 'dues' ? ' on' : ''}${!counts.dues ? ' dimmed' : ''}" onclick="setFilter('dues')"><i data-lucide="wallet"></i> Dues <span class="fc">${counts.dues}</span></button>` : ''}
-        <button class="filter-tab${currentFilter === 'archived' ? ' on' : ''}${!counts.archived ? ' dimmed' : ''}" onclick="setFilter('archived')"><i data-lucide="archive"></i> Archived <span class="fc">${counts.archived}</span></button>
+      <div class="prop-filters" role="tablist" aria-label="Filter proposals">
+        ${filterTab('all', 'All', counts.all)}
+        ${filterTab('draft', 'Draft', counts.draft)}
+        ${filterTab('sent', 'Sent', counts.sent)}
+        ${filterTab('accepted', 'Won', counts.accepted)}
+        ${filterTab('declined', 'Lost', counts.declined)}
+        ${filterTab('expired', 'Expired', counts.expired)}
+        ${typeof paymentTotals === 'function' ? filterTab('dues', 'Dues', counts.dues, 'wallet') : ''}
+        ${filterTab('archived', 'Archived', counts.archived, 'archive')}
       </div>
       <div class="prop-toolbar-right">
-        <button class="sort-btn" onclick="toggleSortProposals()" id="sortBtnP"><i data-lucide="arrow-up-down"></i> ${sortLabel}</button>
+        <button class="sort-btn" onclick="showSortMenu(event)" id="sortBtnP" aria-haspopup="true"><i data-lucide="${sortIcons[currentSort]}"></i> ${sortLabels[currentSort]} <i data-lucide="chevron-down" style="width:12px;height:12px;opacity:0.5"></i></button>
         ${typeof quickRecordPayment === 'function' && counts.dues > 0 ? `<button class="sort-btn" onclick="showPaymentPickerMenu(event)" style="color:var(--green)"><i data-lucide="indian-rupee"></i> Record</button>` : ''}
-        <div class="view-toggle">
-          <button class="vt-btn${viewMode === 'list' ? ' on' : ''}" onclick="setViewMode('list')" data-tooltip="List view" data-side="bottom"><i data-lucide="list"></i></button>
-          <button class="vt-btn${viewMode === 'kanban' ? ' on' : ''}" onclick="setViewMode('kanban')" data-tooltip="Board view" data-side="bottom"><i data-lucide="kanban"></i></button>
+        <div class="view-toggle" role="group" aria-label="View mode">
+          <button class="vt-btn${viewMode === 'table' ? ' on' : ''}" onclick="setViewMode('table')" data-tooltip="Table view" data-side="bottom" aria-pressed="${viewMode === 'table'}"><i data-lucide="table-2"></i></button>
+          <button class="vt-btn${viewMode === 'list' ? ' on' : ''}" onclick="setViewMode('list')" data-tooltip="List view" data-side="bottom" aria-pressed="${viewMode === 'list'}"><i data-lucide="list"></i></button>
+          <button class="vt-btn${viewMode === 'kanban' ? ' on' : ''}" onclick="setViewMode('kanban')" data-tooltip="Board view" data-side="bottom" aria-pressed="${viewMode === 'kanban'}"><i data-lucide="kanban"></i></button>
         </div>
+        <button class="btn-sm" onclick="openNewModal()" data-tooltip="⌘N" data-side="bottom"><i data-lucide="plus"></i> New</button>
       </div>
     </div>
     <div id="propListWrap"></div>
-    ${totalPages > 1 ? `<div class="pagination"><button class="btn-sm-outline" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i data-lucide="chevron-left"></i> Prev</button><span class="pg-info">Page ${currentPage} of ${totalPages}</span><button class="btn-sm-outline" onclick="goPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>Next <i data-lucide="chevron-right"></i></button></div>` : ''}
+    ${buildPagination(currentPage, totalPages)}
     <div class="bulk-bar" id="bulkBar" style="display:none"></div>`;
 
   if (typeof bulkSelected !== 'undefined') bulkSelected.clear();
@@ -220,11 +286,8 @@ function renderProposals() {
   } else {
     const wrap = document.getElementById('propListWrap');
     if (wrap) {
-      wrap.innerHTML = Array(Math.min(paginated.length || 3, 5)).fill(0).map(() =>
-        `<div class="skeleton-row"><div class="skeleton" style="width:32px;height:32px;border-radius:50%"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="skeleton skeleton-text w-3-4"></div><div class="skeleton skeleton-text w-1-2"></div></div><div class="skeleton skeleton-badge"></div></div>`
-      ).join('');
-      requestAnimationFrame(() => { renderPropList(paginated); });
-    } else { renderPropList(paginated); }
+      requestAnimationFrame(() => { renderPropTable(paginated); });
+    } else { renderPropTable(paginated); }
   }
   lucide.createIcons();
 }

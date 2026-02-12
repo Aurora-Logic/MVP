@@ -15,13 +15,20 @@ const OB_COUNTRIES = [
 let obStep = 1;
 
 function renderOnboarding() {
-    const el = document.getElementById('obContent');
+    const el = document.getElementById('authContent') || document.getElementById('obContent');
     if (!el) return;
+    // Update left panel for onboarding context
+    const quote = document.querySelector('.auth-quote');
+    const author = document.querySelector('.auth-quote-author');
+    if (quote) quote.innerHTML = '\u201CThe setup takes less than a minute. Just the essentials to get your proposals looking professional.\u201D';
+    if (author) author.textContent = 'ProposalKit Team';
+    // Hide auth top-right toggle (Login/Sign up link)
+    const topRight = document.getElementById('authRightTop');
+    if (topRight) topRight.style.display = 'none';
     const steps = ['About You', 'Location & Tax', 'Payment', 'Branding'];
     document.title = steps[obStep - 1] + ' — Setup — ProposalKit';
-    const progress = `<div class="ob-progress"><div class="ob-progress-bar" style="width:${(obStep / 4) * 100}%"></div></div>
-        <div class="ob-steps">${steps.map((s, i) => `<span class="ob-step-label${i + 1 === obStep ? ' on' : i + 1 < obStep ? ' done' : ''}">${s}</span>`).join('')}</div>`;
-    el.innerHTML = progress + getObStepHtml(obStep);
+    const dots = `<div class="ob-dots">${steps.map((_, i) => `<span class="ob-dot${i + 1 === obStep ? ' on' : i + 1 < obStep ? ' done' : ''}"></span>`).join('')}</div>`;
+    el.innerHTML = '<div class="auth-form ob-form-wrap">' + getObStepHtml(obStep) + dots + '</div>';
     if (obStep === 2) {
         csel(document.getElementById('obCountry'), {
             value: CONFIG?.country || '', placeholder: 'Select country', searchable: true,
@@ -35,69 +42,68 @@ function renderOnboarding() {
 
 function getObStepHtml(step) {
     if (step === 1) return `
-        <div class="ob-step-header"><i data-lucide="user" class="ob-step-icon"></i><div><div class="ob-title">Tell us about you</div><div class="ob-desc">We'll use this on every proposal you create — no need to type it again.</div></div></div>
-        <div class="ob-form">
-            <div class="fg"><label class="fl">Company / Studio Name</label><input type="text" id="obCompany" placeholder="e.g. Pixel Studio" value="${esc(CONFIG?.company || '')}"></div>
-            <div class="fr">
-                <div class="fg"><label class="fl">Your Name</label><input type="text" id="obName" placeholder="Your full name" value="${esc(CONFIG?.name || '')}"></div>
-                <div class="fg"><label class="fl">Email</label><input type="email" id="obEmail" placeholder="hello@studio.com" value="${esc(CONFIG?.email || '')}"></div>
-            </div>
-            <div class="fr">
-                <div class="fg"><label class="fl">Phone</label><input type="tel" id="obPhone" placeholder="+91 98765 43210" value="${esc(CONFIG?.phone || '')}"></div>
-                <div class="fg"><label class="fl">Website</label><input type="url" id="obWebsite" placeholder="https://yourstudio.com" value="${esc(CONFIG?.website || '')}"></div>
-            </div>
-            <div class="ob-btn-row"><button class="btn-outline" onclick="obStep=2;renderOnboarding()">Skip for now</button><button class="btn ob-btn-fill" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button></div>
-        </div>`;
+        <div class="auth-header">
+            <div class="auth-title">Tell us about you</div>
+            <div class="auth-desc">This info appears on every proposal you create.</div>
+        </div>
+        <div class="fg"><label class="fl">Company / Studio Name</label><input type="text" id="obCompany" placeholder="e.g. Pixel Studio" value="${esc(CONFIG?.company || '')}"></div>
+        <div class="fg"><label class="fl">Your Name</label><input type="text" id="obName" placeholder="Your full name" value="${esc(CONFIG?.name || '')}"></div>
+        <div class="fg"><label class="fl">Email</label><input type="email" id="obEmail" placeholder="hello@studio.com" value="${esc(CONFIG?.email || '')}"></div>
+        <div class="fr">
+            <div class="fg"><label class="fl">Phone</label><input type="tel" id="obPhone" placeholder="+91 98765 43210" value="${esc(CONFIG?.phone || '')}"></div>
+            <div class="fg"><label class="fl">Website</label><input type="url" id="obWebsite" placeholder="https://yourstudio.com" value="${esc(CONFIG?.website || '')}"></div>
+        </div>
+        <button class="btn auth-submit" onclick="obNext()">Continue</button>
+        <div class="ob-skip"><a href="#" onclick="obStep=2;renderOnboarding();return false">Skip for now</a></div>`;
     if (step === 2) return `
-        <div class="ob-step-header"><i data-lucide="map-pin" class="ob-step-icon"></i><div><div class="ob-title">Where you operate</div><div class="ob-desc">Country-specific fields help generate compliant invoices and proposals.</div></div></div>
-        <div class="ob-form">
-            <div class="fr">
-                <div class="fg"><label class="fl">Country</label><div id="obCountry"></div></div>
-                <div class="fg"><label class="fl">Address</label><input type="text" id="obAddr" placeholder="Street, City, State, PIN" value="${esc(CONFIG?.address || '')}"></div>
-            </div>
-            <div id="obCountryFields"></div>
-            <div class="ob-btn-row">
-                <button class="btn-ghost" onclick="obPrev()"><i data-lucide="arrow-left"></i> Back</button>
-                <button class="btn-outline" onclick="obStep=3;renderOnboarding()">Skip for now</button>
-                <button class="btn ob-btn-fill" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button>
-            </div>
+        <div class="auth-header">
+            <div class="auth-title">Where you operate</div>
+            <div class="auth-desc">Country-specific fields for compliant proposals.</div>
+        </div>
+        <div class="fg"><label class="fl">Country</label><div id="obCountry"></div></div>
+        <div class="fg"><label class="fl">Address</label><input type="text" id="obAddr" placeholder="Street, City, State, PIN" value="${esc(CONFIG?.address || '')}"></div>
+        <div id="obCountryFields"></div>
+        <button class="btn auth-submit" onclick="obNext()">Continue</button>
+        <div class="ob-nav-row">
+            <a href="#" onclick="obPrev();return false">&larr; Back</a>
+            <a href="#" onclick="obStep=3;renderOnboarding();return false">Skip</a>
         </div>`;
     if (step === 3) return `
-        <div class="ob-step-header"><i data-lucide="landmark" class="ob-step-icon"></i><div><div class="ob-title">Payment details</div><div class="ob-desc">Add your bank details so clients know where to pay. You can always update this later.</div></div></div>
-        <div class="ob-form">
-            <div class="ob-bank-card">
-                <div class="fr">
-                    <div class="fg"><label class="fl">Bank Name</label><input type="text" id="obBankName" placeholder="e.g. HDFC Bank" value="${esc(CONFIG?.bank?.name || '')}"></div>
-                    <div class="fg"><label class="fl">Account Holder</label><input type="text" id="obBankHolder" placeholder="Account holder name" value="${esc(CONFIG?.bank?.holder || '')}"></div>
-                </div>
-                <div class="fg"><label class="fl">Account Number</label><input type="text" id="obBankAccount" placeholder="e.g. 1234567890" value="${esc(CONFIG?.bank?.account || '')}"></div>
-                <div class="fr">
-                    <div class="fg"><label class="fl">IFSC / Sort Code</label><input type="text" id="obBankIfsc" placeholder="e.g. HDFC0001234" value="${esc(CONFIG?.bank?.ifsc || '')}"></div>
-                    <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="obBankSwift" placeholder="e.g. HDFCINBB" value="${esc(CONFIG?.bank?.swift || '')}"></div>
-                </div>
-                ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="obBankUpi" placeholder="e.g. business@upi" value="${esc(CONFIG?.bank?.upi || '')}"><div class="fh">Shown as QR code on PDFs</div></div>` : ''}
-            </div>
-            <div class="ob-btn-row">
-                <button class="btn-ghost" onclick="obPrev()"><i data-lucide="arrow-left"></i> Back</button>
-                <button class="btn-outline" onclick="obNext()">Skip</button>
-                <button class="btn ob-btn-fill" onclick="obNext()">Continue <i data-lucide="arrow-right"></i></button>
-            </div>
+        <div class="auth-header">
+            <div class="auth-title">Payment details</div>
+            <div class="auth-desc">Bank info for your invoices. Update anytime in settings.</div>
+        </div>
+        <div class="fr">
+            <div class="fg"><label class="fl">Bank Name</label><input type="text" id="obBankName" placeholder="e.g. HDFC Bank" value="${esc(CONFIG?.bank?.name || '')}"></div>
+            <div class="fg"><label class="fl">Account Holder</label><input type="text" id="obBankHolder" placeholder="Account holder name" value="${esc(CONFIG?.bank?.holder || '')}"></div>
+        </div>
+        <div class="fg"><label class="fl">Account Number</label><input type="text" id="obBankAccount" placeholder="e.g. 1234567890" value="${esc(CONFIG?.bank?.account || '')}"></div>
+        <div class="fr">
+            <div class="fg"><label class="fl">IFSC / Sort Code</label><input type="text" id="obBankIfsc" placeholder="e.g. HDFC0001234" value="${esc(CONFIG?.bank?.ifsc || '')}"></div>
+            <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="obBankSwift" placeholder="e.g. HDFCINBB" value="${esc(CONFIG?.bank?.swift || '')}"></div>
+        </div>
+        ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="obBankUpi" placeholder="e.g. business@upi" value="${esc(CONFIG?.bank?.upi || '')}"><div class="fh">Shown as QR code on PDFs</div></div>` : ''}
+        <button class="btn auth-submit" onclick="obNext()">Continue</button>
+        <div class="ob-nav-row">
+            <a href="#" onclick="obPrev();return false">&larr; Back</a>
+            <a href="#" onclick="obNext();return false">Skip</a>
         </div>`;
     if (step === 4) return `
-        <div class="ob-step-header"><i data-lucide="palette" class="ob-step-icon"></i><div><div class="ob-title">Brand it yours</div><div class="ob-desc">Upload your logo and pick a color — they'll appear on every proposal.</div></div></div>
-        <div class="ob-form">
-            <div class="fg">
-                <label class="fl">Logo</label>
-                <div class="brand-logo-box" onclick="document.getElementById('logoInput').click()" id="obLogoBox"><i data-lucide="image-plus"></i></div>
-                <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="handleLogo(this)">
-                <div class="fh">Click to upload (PNG, JPG, SVG, WebP — max 2MB)</div>
-            </div>
-            <div class="fg"><label class="fl">Brand Color</label><div id="obColors"></div></div>
-            <div class="ob-btn-row">
-                <button class="btn-ghost" onclick="obPrev()"><i data-lucide="arrow-left"></i> Back</button>
-                <button class="btn-outline" onclick="finishOb()">Skip</button>
-                <button class="btn ob-btn-fill" onclick="finishOb()">Start Creating <i data-lucide="rocket"></i></button>
-            </div>
+        <div class="auth-header">
+            <div class="auth-title">Brand it yours</div>
+            <div class="auth-desc">Logo and color for your proposals.</div>
+        </div>
+        <div class="fg">
+            <label class="fl">Logo</label>
+            <div class="brand-logo-box" onclick="document.getElementById('logoInput').click()" id="obLogoBox"><i data-lucide="image-plus"></i></div>
+            <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="handleLogo(this)">
+            <div class="fh">PNG, JPG, SVG, WebP — max 2MB</div>
+        </div>
+        <div class="fg"><label class="fl">Brand Color</label><div id="obColors"></div></div>
+        <button class="btn auth-submit" onclick="finishOb()">Start Creating</button>
+        <div class="ob-nav-row">
+            <a href="#" onclick="obPrev();return false">&larr; Back</a>
+            <a href="#" onclick="finishOb();return false">Skip</a>
         </div>`;
     return '';
 }
@@ -193,16 +199,16 @@ function finishOb() {
     // Brand color
     const sel = document.querySelector('#obColors .color-swatch.on');
     if (sel) {
-        CONFIG.color = rgbToHex(sel.style.background) || sel.style.background || '#18181b';
+        CONFIG.color = rgbToHex(sel.style.background) || sel.style.background || '#800020';
     } else {
         const hexInp = document.querySelector('#obColors .color-hex-input');
         if (hexInp && /^#[0-9a-fA-F]{6}$/.test(hexInp.value.trim())) CONFIG.color = hexInp.value.trim();
-        else CONFIG.color = CONFIG.color || '#18181b';
+        else CONFIG.color = CONFIG.color || '#800020';
     }
     saveConfig();
     if (typeof pushToCloud === 'function') pushToCloud();
     // Celebration animation before transitioning
-    const obEl = document.getElementById('obContent');
+    const obEl = document.getElementById('authContent') || document.getElementById('obContent');
     if (obEl) {
         obEl.innerHTML = `<div style="text-align:center;padding:60px 20px;animation:fadeIn .4s ease-out">
             <div style="font-size:48px;margin-bottom:16px">&#127881;</div>
@@ -238,7 +244,7 @@ function renderColorSwatches(containerId, selected) {
     el.appendChild(row);
     const hexWrap = document.createElement('div');
     hexWrap.className = 'color-hex-wrap';
-    hexWrap.innerHTML = `<span class="color-hex-preview" style="background:${selected || '#18181b'}"></span><input type="text" class="color-hex-input" value="${selected || '#18181b'}" placeholder="#000000" maxlength="7" spellcheck="false">`;
+    hexWrap.innerHTML = `<span class="color-hex-preview" style="background:${selected || '#800020'}"></span><input type="text" class="color-hex-input" value="${selected || '#800020'}" placeholder="#000000" maxlength="7" spellcheck="false">`;
     el.appendChild(hexWrap);
     const hexInput = hexWrap.querySelector('.color-hex-input');
     const hexPreview = hexWrap.querySelector('.color-hex-preview');

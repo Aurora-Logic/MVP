@@ -62,7 +62,7 @@ function editorJsToHtml(content, p = null) {
 function buildPreview(mode) {
     const p = cur(); if (!p) return;
     const c = p.currency || defaultCurrency();
-    const bc = CONFIG?.color || '#18181b';
+    const bc = CONFIG?.color || '#800020';
     const t = calcTotals(p);
     const isInvoice = mode === 'invoice';
     const docTitle = isInvoice ? 'INVOICE' : esc(p.title);

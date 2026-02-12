@@ -313,7 +313,7 @@ function importData() {
 }
 
 function applyWhiteLabel() {
-    const brand = document.querySelector('.side-brand');
+    const brand = document.getElementById('sideBrand');
     if (brand) brand.textContent = CONFIG?.whiteLabel ? (CONFIG?.company || 'ProposalKit') : 'ProposalKit';
     refreshSide();
 }
