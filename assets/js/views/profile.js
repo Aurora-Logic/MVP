@@ -74,7 +74,8 @@ function renderProfile() {
             ${buildProfRow('Account Holder', CONFIG?.bank?.holder)}
             ${buildProfRow('Account', CONFIG?.bank?.account ? maskAccount(CONFIG.bank.account) : '')}
             ${buildProfRow('IFSC / Sort Code', CONFIG?.bank?.ifsc)}
-            ${CONFIG?.country === 'IN' && CONFIG?.bank?.upi ? buildProfRow('UPI', CONFIG.bank.upi) : ''}
+            ${buildProfRow('SWIFT / BIC', CONFIG?.bank?.swift)}
+            ${CONFIG?.country === 'IN' ? buildProfRow('UPI ID', CONFIG?.bank?.upi) : ''}
           </div>
         </div>
 

@@ -81,7 +81,7 @@
 }
 .lib-cat {
   padding: 4px 10px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
   font-family: var(--font);
   color: var(--text3);
@@ -119,13 +119,13 @@
 .lib-item:hover { background: var(--muted); }
 .lib-item svg { width: 14px; height: 14px; color: var(--text4); flex-shrink: 0; }
 .lib-item-t {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text);
   flex: 1;
 }
 .lib-item-cat {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   padding: 2px 7px;
   border-radius: var(--r-pill);
@@ -139,14 +139,14 @@
 .cat-custom { background: var(--muted); color: var(--purple); }
 
 .lib-item-d {
-  font-size: 10px;
+  font-size: 14px;
   color: var(--text4);
   white-space: nowrap;
 }
 .lib-empty {
   padding: 20px;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text4);
 }
 
@@ -163,7 +163,7 @@
   align-items: center;
   gap: 5px;
   padding: 5px 10px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   font-family: var(--font);
   color: var(--text3);
@@ -180,7 +180,7 @@
 }
 .tc-tab svg { width: 14px; height: 14px; }
 .tc-count {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   opacity: 0.7;
 }
@@ -202,13 +202,13 @@
   background: var(--muted);
 }
 .tc-chip-t {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 3px;
 }
 .tc-chip-d {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text3);
   line-height: 1.4;
 }
@@ -240,7 +240,7 @@
   margin-bottom: 4px;
 }
 .empty-d {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text3);
   max-width: 320px;
   line-height: 1.5;
@@ -264,7 +264,7 @@
   font-size: 14px;
 }
 .empty-sm .empty-d {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 /* First run (dashboard) */
@@ -322,12 +322,12 @@
 }
 .fr-feat-icon svg { width: 18px; height: 18px; color: var(--text3); }
 .fr-feat-t {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
 .fr-feat-d {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text4);
   margin-top: 2px;
 }
@@ -340,7 +340,7 @@
   gap: 12px;
   padding: 10px 16px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 0;
 }
 .expiry-banner svg { width: 16px; height: 16px; flex-shrink: 0; }
@@ -359,7 +359,7 @@
   gap: 8px;
   padding: 10px 14px;
   border-radius: var(--r2);
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 14px;
 }
 .expiry-warn svg { width: 16px; height: 16px; flex-shrink: 0; }
@@ -377,7 +377,7 @@
 /* ════════ STRUCTURED SECTIONS ════════ */
 
 .badge-sec-type {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: var(--r-pill);
@@ -429,7 +429,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text);
   border-radius: var(--r);
@@ -545,7 +545,7 @@
   padding: 6px 0;
 }
 .sc-label {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text);
 }
 .sc-keys {
@@ -574,12 +574,12 @@
 
 .csv-paste {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px;
   resize: vertical;
   min-height: 80px;
 }
 .csv-map-select {
-  font-size: 12px !important;
+  font-size: 14px !important;
   padding: 4px 8px !important;
 }
 
@@ -589,7 +589,7 @@
   background: var(--muted);
   border-radius: var(--r2);
   padding: 16px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   color: var(--text);
   max-height: 300px;
@@ -640,14 +640,14 @@
 }
 
 .pack-desc {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text3);
   margin-top: 4px;
   line-height: 1.4;
 }
 
 .pack-count {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text4);
   text-transform: uppercase;
@@ -675,20 +675,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .pack-preview-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
 
 .pack-preview-excerpt {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text4);
   margin-top: 2px;
   line-height: 1.4;
@@ -729,7 +729,7 @@
 }
 
 .comp-group-label {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   color: var(--text4);
@@ -741,7 +741,7 @@
   align-items: center;
   gap: 8px;
   padding: 4px 0;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .comp-check-icon {
@@ -754,7 +754,7 @@
 }
 
 .comp-check-pts {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -762,7 +762,7 @@
   padding: 10px;
   background: var(--muted);
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text3);
 }
 
@@ -774,7 +774,7 @@
   padding: 10px;
   background: var(--green-bg);
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--green);
   font-weight: 500;
 }
@@ -785,7 +785,7 @@
 
 /* Score badge inline */
 .score-badge {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 9999px;
@@ -807,7 +807,7 @@
   padding: 32px 20px;
   text-align: center;
   color: var(--text4);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .breakdown-modal-body .modal-foot {
@@ -834,11 +834,11 @@
 }
 
 .csv-map-label {
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .csv-preview-header {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 6px;
@@ -908,7 +908,7 @@
   gap: 8px;
   width: 100%;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   font-family: var(--font);
   color: var(--text);
@@ -942,7 +942,7 @@
 .ai-icon { width: 16px; height: 16px; color: var(--purple); }
 .ai-title {
   flex: 1;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
@@ -957,7 +957,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   font-family: var(--font);
   color: var(--text);
@@ -988,7 +988,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text3);
 }
 .ai-loading svg { width: 16px; height: 16px; color: var(--purple); }
@@ -997,7 +997,7 @@
   padding: 14px;
 }
 .ai-result-content {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text);
   line-height: 1.6;
   max-height: 200px;
@@ -1035,7 +1035,7 @@
   margin-bottom: 16px;
 }
 .diff-changes-t {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 6px;
@@ -1044,7 +1044,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text3);
   padding: 3px 0;
 }
@@ -1053,7 +1053,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--green);
   padding: 8px 0;
 }
@@ -1072,7 +1072,7 @@
   background: var(--muted);
   border-radius: var(--r);
   padding: 14px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.6;
   color: var(--text);
   overflow-y: auto;
@@ -1088,7 +1088,7 @@
   font-weight: 600;
 }
 .diff-meta {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text4);
   margin-bottom: 12px;
 }
@@ -1098,13 +1098,13 @@
   border-bottom: 1px solid var(--border);
 }
 .diff-sec-t {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 4px;
 }
 .diff-sec-c {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text3);
 }
 .diff-pricing {
@@ -1118,7 +1118,7 @@
   font-family: var(--mono);
 }
 .diff-li {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text3);
   padding: 2px 0;
 }
@@ -1135,21 +1135,21 @@
 .team-row:last-child { border-bottom: none; }
 .team-info { flex: 1; min-width: 0; }
 .team-name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
 .team-you {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--text4);
 }
 .team-email {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text4);
 }
 .team-role-badge {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: var(--r-pill);
@@ -1197,7 +1197,7 @@
 .user-sw-item.on { background: var(--muted); }
 .user-sw-info { flex: 1; min-width: 0; }
 .user-sw-name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text);
   display: flex;
@@ -1205,7 +1205,7 @@
   gap: 4px;
 }
 .user-sw-role {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text4);
   text-transform: capitalize;
 }

@@ -182,11 +182,11 @@ function buildStatusChart(active) {
   const total = active.length;
   if (total === 0) return '';
   const items = [
-    { key: 'draft', label: 'Draft', color: 'var(--muted-foreground)' },
-    { key: 'sent', label: 'Sent', color: 'var(--blue)' },
-    { key: 'accepted', label: 'Accepted', color: 'var(--green)' },
-    { key: 'declined', label: 'Declined', color: 'var(--red)' },
-    { key: 'expired', label: 'Expired', color: 'var(--amber)' }
+    { key: 'draft', label: 'Draft', color: '#B8607A' },
+    { key: 'sent', label: 'Sent', color: '#9B3A5A' },
+    { key: 'accepted', label: 'Accepted', color: '#6D1A36' },
+    { key: 'declined', label: 'Declined', color: '#4A0D24' },
+    { key: 'expired', label: 'Expired', color: '#D4899E' }
   ].filter(i => counts[i.key] > 0);
   const bar = items.map(i =>
     `<div class="sbc-seg" style="flex:${counts[i.key]};background:${i.color}" data-tooltip="${i.label}: ${counts[i.key]}"></div>`
@@ -194,8 +194,8 @@ function buildStatusChart(active) {
   const legend = items.map(i =>
     `<div class="sbc-legend-item"><span class="sbc-dot" style="background:${i.color}"></span>${i.label} <strong>${counts[i.key]}</strong></div>`
   ).join('');
-  return `<div class="an-widget">
-    <div class="an-header"><div><div class="an-title">Proposal Status</div><div class="an-subtitle">${total} total proposals</div></div></div>
+  return `<div class="sbc-glass-card">
+    <div class="sbc-glass-header"><div class="sbc-glass-title">Proposal Status</div><div class="sbc-glass-sub">${total} total</div></div>
     <div class="sbc-bar">${bar}</div>
     <div class="sbc-legend">${legend}</div>
   </div>`;

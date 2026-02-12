@@ -278,7 +278,7 @@
 
   /* Pricing table */
   .li-tbl {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .li-tbl th {
@@ -397,7 +397,7 @@
   .an-toggle {
     flex: 1;
     padding: 6px 8px;
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .an-stats-row {
@@ -445,7 +445,7 @@
   }
 
   .ob-desc {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   /* Modal full width */
@@ -457,15 +457,15 @@
 
   /* Proposals — small mobile */
   .nt-th-check, .nt-cell-check { display: none; }
-  .nt-cell { padding: 6px 8px; font-size: 12px; }
-  .nt-th { padding: 5px 8px; font-size: 11px; }
-  .nl-row { padding: 6px 10px; font-size: 12px; gap: 8px; }
+  .nt-cell { padding: 6px 8px; font-size: 14px; }
+  .nt-th { padding: 5px 8px; font-size: 14px; }
+  .nl-row { padding: 6px 10px; font-size: 14px; gap: 8px; }
   .nl-icon { width: 14px; height: 14px; }
-  .filter-tab { padding: 4px 8px; font-size: 11px; }
+  .filter-tab { padding: 4px 8px; font-size: 14px; }
   .ft-dot { width: 5px; height: 5px; }
-  .fc { font-size: 9px; }
-  .sort-btn { padding: 5px 8px; font-size: 11px; }
-  .pg-num { min-width: 30px; height: 30px; font-size: 12px; }
+  .fc { font-size: 14px; }
+  .sort-btn { padding: 5px 8px; font-size: 14px; }
+  .pg-num { min-width: 30px; height: 30px; font-size: 14px; }
   .pg-nav { height: 30px; }
   .pg-ellipsis { width: 24px; height: 30px; }
 
@@ -477,7 +477,7 @@
   /* Topbar */
   .breadcrumb-root { display: none; }
   .breadcrumb-sep { display: none; }
-  .breadcrumb-current { max-width: 120px; font-size: 13px; }
+  .breadcrumb-current { max-width: 120px; font-size: 14px; }
 
   /* Preview */
   .prev-doc {
