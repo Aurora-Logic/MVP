@@ -4,6 +4,24 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.9 (build 20260212) — 2026-02-12
+
+### Features
+- Dashboard redesigned with shadcn/ui dashboard-01 gradient metric cards (Total Pipeline, Active Proposals, Won Deals, Outstanding)
+- 30-day trend badges compare recent vs prior period with up/down/neutral indicators
+- Currency-aware icon on pipeline card (INR, USD, EUR, GBP, JPY)
+- Clickable metric cards navigate directly to filtered proposal views
+- Responsive grid: 4 cols → 2 cols (1100px) → 1 col (480px)
+- Dark mode gradient adjustment (3% vs 5% primary opacity)
+
+### Files Changed
+- `assets/js/views/dashboard.js` — Added `buildMetricCards()` function, replaced stats strip
+- `assets/css/pages.css` — Added ~100 lines: `.dash-metric-grid`, `.metric-card`, `.trend-badge` styles
+- `assets/css/responsive.css` — Added metric grid breakpoints at 1100px, 768px, 480px
+- `assets/js/boot.js` — Version bump 2.8 → 2.9, updated What's New
+
+---
+
 ## v2.8 (build 20260211) — 2026-02-11
 
 ### feat

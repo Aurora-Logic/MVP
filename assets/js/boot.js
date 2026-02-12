@@ -43,14 +43,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.8';
-const APP_BUILD = '20260211';
+const APP_VERSION = '2.9';
+const APP_BUILD = '20260212';
 const WHATS_NEW_ITEMS = [
-    { icon: 'layout-dashboard', title: 'Apple-Level UX Redesign', desc: 'Dashboard, Proposals, Settings, and Sidebar completely redesigned with Apple HIG-quality visuals.' },
-    { icon: 'type', title: 'Notion-Style Rich Editor', desc: 'Select text for a floating toolbar, type / for slash commands — headings, lists, tables, and more.' },
-    { icon: 'panel-left', title: 'Refined Sidebar', desc: 'Translucent hover states, card-on-select nav buttons, and proposal values in recent items.' },
-    { icon: 'calendar', title: 'Custom Calendar Selects', desc: 'Date picker month/year dropdowns now match the app design — no more native selects.' },
-    { icon: 'scroll-text', title: 'Settings Scroll Spy', desc: 'Settings now has a sticky nav sidebar that highlights your current section as you scroll.' }
+    { icon: 'layout-grid', title: 'shadcn Metric Cards', desc: 'Dashboard now features 4 gradient metric cards — Total Pipeline, Active Proposals, Won Deals, and Outstanding.' },
+    { icon: 'trending-up', title: '30-Day Trend Badges', desc: 'Each metric card shows a trend badge comparing the last 30 days vs the prior period.' },
+    { icon: 'banknote', title: 'Currency-Aware Icons', desc: 'Pipeline card icon adapts to your currency — Rupee, Dollar, Euro, Pound, or Yen.' },
+    { icon: 'mouse-pointer-click', title: 'Clickable Metric Cards', desc: 'Click any metric card to jump straight to filtered proposals.' }
 ];
 
 function checkWhatsNew() {

@@ -14,7 +14,8 @@
     display: none;
   }
 
-  .dash-grid {
+  .dash-grid,
+  .dash-metric-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -137,6 +138,9 @@
   .dash-header { flex-direction: column; align-items: flex-start; gap: 8px; }
   .dash-stats-strip { overflow-x: auto; padding: 10px 14px; }
   .dss-item { padding: 4px 14px; }
+  .dash-metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .metric-card { padding: 16px; }
+  .metric-card-value { font-size: 22px; }
 
   /* Proposals v2 */
   .prop-header { flex-wrap: wrap; gap: 8px; }
@@ -311,13 +315,15 @@
   }
 
   /* Dashboard stat cards */
-  .dash-grid {
+  .dash-grid,
+  .dash-metric-grid {
     grid-template-columns: 1fr;
   }
 
   /* Dashboard v2 */
   .dss-val { font-size: 18px; }
   .dss-item { padding: 4px 10px; }
+  .metric-card-value { font-size: 20px; }
 
   /* Analytics widget small mobile */
   .an-metrics {

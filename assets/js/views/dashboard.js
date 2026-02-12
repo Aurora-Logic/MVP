@@ -3,6 +3,67 @@
 // ════════════════════════════════════════
 
 /* exported dismissExpiry, toggleSort, sortProposals */
+
+function buildMetricCards(active, c) {
+    const totalValue = active.reduce((a, p) =>
+        a + (p.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0), 0);
+    const sent = active.filter(p => p.status === 'sent').length;
+    const accepted = active.filter(p => p.status === 'accepted').length;
+    const decided = active.filter(p => p.status === 'accepted' || p.status === 'declined').length;
+    const winRate = decided > 0 ? Math.round(accepted / decided * 100) : 0;
+    const duesTotal = typeof paymentTotals === 'function'
+        ? active.filter(p => p.status === 'accepted')
+            .reduce((s, p) => s + paymentTotals(p).balanceDue, 0) : 0;
+
+    // Trend: compare last 30 days vs prior 30 days
+    const now = Date.now(), d30 = 30 * 86400000;
+    const recent = active.filter(p => (p.createdAt || 0) >= now - d30);
+    const prior = active.filter(p => {
+        const t = p.createdAt || 0;
+        return t >= now - 2 * d30 && t < now - d30;
+    });
+    const sumVal = (list) => list.reduce((a, p) =>
+        a + (p.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0), 0);
+    const recentVal = sumVal(recent), priorVal = sumVal(prior);
+    const valTrend = priorVal > 0 ? Math.round((recentVal - priorVal) / priorVal * 100) : (recentVal > 0 ? 100 : 0);
+    const recentWon = recent.filter(p => p.status === 'accepted').length;
+    const priorWon = prior.filter(p => p.status === 'accepted').length;
+    const wonTrend = priorWon > 0 ? Math.round((recentWon - priorWon) / priorWon * 100) : (recentWon > 0 ? 100 : 0);
+
+    const trend = (pct) => {
+        if (pct === 0) return '<span class="trend-badge trend-neutral"><i data-lucide="minus" style="width:12px;height:12px"></i> 0%</span>';
+        const cls = pct > 0 ? 'trend-up' : 'trend-down';
+        const icon = pct > 0 ? 'trending-up' : 'trending-down';
+        return `<span class="trend-badge ${cls}"><i data-lucide="${icon}" style="width:12px;height:12px"></i> ${pct > 0 ? '+' : ''}${pct}%</span>`;
+    };
+
+    const curIcon = { INR: 'indian-rupee', USD: 'dollar-sign', EUR: 'euro', GBP: 'pound-sterling', JPY: 'japanese-yen' };
+    const cIcon = curIcon[c] || 'banknote';
+
+    return `<div class="dash-metric-grid">
+      <div class="metric-card metric-card-clickable" onclick="goNav('proposals')">
+        <div class="metric-card-header"><span class="metric-card-label">Total Pipeline</span><div class="metric-card-icon mci-revenue"><i data-lucide="${cIcon}"></i></div></div>
+        <div class="metric-card-value">${fmtCur(totalValue, c)}</div>
+        <div class="metric-card-footer">${trend(valTrend)} from last 30 days</div>
+      </div>
+      <div class="metric-card metric-card-clickable" onclick="setFilter('sent');goNav('proposals')">
+        <div class="metric-card-header"><span class="metric-card-label">Active Proposals</span><div class="metric-card-icon mci-active"><i data-lucide="send"></i></div></div>
+        <div class="metric-card-value">${sent}</div>
+        <div class="metric-card-footer">${sent} awaiting response</div>
+      </div>
+      <div class="metric-card metric-card-clickable" onclick="setFilter('accepted');goNav('proposals')">
+        <div class="metric-card-header"><span class="metric-card-label">Won Deals</span><div class="metric-card-icon mci-won"><i data-lucide="check-circle"></i></div></div>
+        <div class="metric-card-value">${accepted}</div>
+        <div class="metric-card-footer">${trend(wonTrend)} ${winRate}% win rate</div>
+      </div>
+      <div class="metric-card${duesTotal > 0 ? ' metric-card-clickable' : ''}"${duesTotal > 0 ? ` onclick="setFilter('dues');goNav('proposals')"` : ''}>
+        <div class="metric-card-header"><span class="metric-card-label">Outstanding</span><div class="metric-card-icon mci-dues"><i data-lucide="wallet"></i></div></div>
+        <div class="metric-card-value">${fmtCur(duesTotal, c)}</div>
+        <div class="metric-card-footer">${duesTotal > 0 ? 'Unpaid balance' : 'All payments settled'}</div>
+      </div>
+    </div>`;
+}
+
 function buildDuesBanner(active) {
     if (typeof paymentTotals !== 'function') return '';
     const accepted = (active || activeDB()).filter(p => p.status === 'accepted');
@@ -142,8 +203,6 @@ function renderDashboard() {
 
   const accepted = active.filter(p => p.status === 'accepted').length;
   const sent = active.filter(p => p.status === 'sent').length;
-  const totalValue = active.reduce((a, p) => a + (p.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0), 0);
-  const duesTotal = typeof paymentTotals === 'function' ? active.filter(p => p.status === 'accepted').reduce((s, p) => s + paymentTotals(p).balanceDue, 0) : 0;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const firstName = (CONFIG?.name || '').split(' ')[0];
@@ -155,16 +214,7 @@ function renderDashboard() {
       <div class="dash-subtitle">${sent} proposal${sent !== 1 ? 's' : ''} awaiting response${accepted ? ', ' + accepted + ' won' : ''}</div></div>
       <div class="dash-header-right"><button class="btn-sm" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom"><i data-lucide="plus"></i> New Proposal</button></div>
     </div>
-    <div class="dash-stats-strip">
-      <div class="dss-item dss-clickable" onclick="goNav('editor')"><div class="dss-val">${total}</div><div class="dss-label">Total</div></div>
-      <div class="dss-sep"></div>
-      <div class="dss-item dss-clickable" onclick="setFilter('sent');goNav('editor')"><div class="dss-val" style="color:var(--blue)">${sent}</div><div class="dss-label">Awaiting</div></div>
-      <div class="dss-sep"></div>
-      <div class="dss-item dss-clickable" onclick="setFilter('accepted');goNav('editor')"><div class="dss-val" style="color:var(--green)">${accepted}</div><div class="dss-label">Won</div></div>
-      <div class="dss-sep"></div>
-      <div class="dss-item"><div class="dss-val">${fmtCur(totalValue, c)}</div><div class="dss-label">Pipeline</div></div>
-      ${duesTotal > 0 ? `<div class="dss-sep"></div><div class="dss-item dss-clickable" onclick="setFilter('dues');goNav('editor')"><div class="dss-val" style="color:var(--red)">${fmtCur(duesTotal, c)}</div><div class="dss-label">Outstanding</div></div>` : ''}
-    </div>
+    ${buildMetricCards(active, c)}
     <div class="dash-body">
       <div class="dash-left">
         ${buildResumeBar()}
