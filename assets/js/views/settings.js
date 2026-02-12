@@ -73,7 +73,7 @@ function settingsNavHtml() {
         ['signature', 'pen-tool', 'Signature'],
         ['data', 'database', 'Data']
     ];
-    const ver = `${typeof appName === 'function' ? appName() : 'ProposalKit'} v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : '?'}`;
+    const ver = `${typeof appName === 'function' ? appName() : 'ProposalKit'} v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : '?'} (build ${typeof APP_BUILD !== 'undefined' ? APP_BUILD : '?'})`;
     return `<nav class="settings-nav">${items.map(([id, icon, label], i) =>
         `<button class="settings-nav-item${i === 0 ? ' on' : ''}" data-sec="sec-${id}" onclick="scrollToSection('sec-${id}')"><i data-lucide="${icon}"></i> ${label}</button>`
     ).join('')}<div class="settings-nav-version">${ver}</div></nav>`;
