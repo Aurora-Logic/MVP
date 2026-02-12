@@ -215,10 +215,12 @@ function refreshSide() {
     if (brand) brand.textContent = typeof appName === 'function' ? appName() : 'ProposalKit';
     const list = document.getElementById('recentList');
     list.innerHTML = '';
-    active.slice(0, 8).forEach(p => {
+    active.slice(0, 6).forEach(p => {
         const d = document.createElement('div');
         d.className = 'ri' + (p.id === CUR ? ' on' : '');
-        d.innerHTML = `<span class="ri-dot ${p.status}"></span><span class="ri-text">${esc(p.title || 'Untitled')}</span>`;
+        const t = typeof calcTotals === 'function' ? calcTotals(p) : { grand: 0 };
+        const val = t.grand > 0 ? fmtCur(t.grand, p.currency) : '';
+        d.innerHTML = `<span class="ri-dot ${p.status}"></span><span class="ri-text">${esc(p.title || 'Untitled')}</span>${val ? `<span class="ri-meta">${val}</span>` : ''}`;
         d.onclick = () => loadEditor(p.id);
         d.oncontextmenu = (e) => showCtx(e, p.id);
         list.appendChild(d);

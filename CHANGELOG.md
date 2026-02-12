@@ -4,6 +4,43 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.8 (build 20260211) — 2026-02-11
+
+### feat
+- Apple HIG-level redesign of Dashboard (stats strip, two-col layout, activity feed, side metrics)
+- Apple HIG-level redesign of Proposals page (page header, card-wrapped list, data-rich rows with section/item counts)
+- Apple HIG-level redesign of Settings (nav sidebar with scroll spy, single-column layout, danger zone divider)
+- Apple HIG-level redesign of Sidebar (translucent hover, card-on-select nav, proposal values in recent items)
+- Notion-style Tiptap editor: bubble menu on text selection (bold/italic/underline/strike/code/highlight/link)
+- Notion-style Tiptap editor: slash command menu (/ for headings, lists, tasks, quotes, code, tables, dividers)
+- Email template functions extracted to settings-templates.js for file size management
+
+### style
+- Custom-styled date picker month/year selects (removed native appearance, added SVG chevron, dark mode)
+- Proposal rows show section count, line item count, client icon, mono proposal number
+- Sidebar uses `var(--bg2)` background, `rgba()` translucent hovers, subtle card shadows for active state
+- Sidebar footer icons use `opacity: 0.6` with `1` on hover
+- Mobile sidebar overlay uses `backdrop-filter: blur(2px)`
+
+### Files Changed
+- `assets/css/layout.css` — Complete sidebar CSS rewrite with Apple HIG patterns
+- `assets/css/pages.css` — Dashboard v2, Proposals v2, Settings v2, Tiptap bubble/slash menu CSS
+- `assets/css/components.css` — Custom date picker select styling
+- `assets/css/responsive.css` — Updated breakpoints for new layouts
+- `assets/js/views/dashboard.js` — Rewritten with stats strip, two-col grid, side metrics, activity feed
+- `assets/js/views/proposals.js` — Page header, data-rich rows, calcTotals integration
+- `assets/js/views/settings.js` — Nav sidebar, scroll spy, single-column layout
+- `assets/js/views/settings-templates.js` — New file (email template functions extracted)
+- `assets/js/editor/editor.js` — createEditor() auto-attaches bubble + slash menus
+- `assets/js/editor/tiptap-menus.js` — New file (Notion-style bubble menu + slash commands)
+- `assets/js/editor/sections.js` — destroyAllEditors() cleans up Tiptap menus
+- `assets/js/export/create.js` — refreshSide() shows 6 recent items with values
+- `assets/js/globals.d.ts` — Type declarations for new functions
+- `index.html` — Added tiptap-menus.js + settings-templates.js script tags, sidebar HTML refined
+- `sw.js` — Added tiptap-menus.js to service worker cache
+
+---
+
 ## v2.7 (build 20260211) — 2026-02-11
 
 ### Features

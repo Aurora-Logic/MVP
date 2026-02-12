@@ -7,6 +7,7 @@ const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/assets/js/vendor/tiptap.bundle.js',
+  '/assets/js/editor/tiptap-menus.js',
   '/assets/js/vendor/lucide-0.460.0.js',
   '/assets/js/vendor/supabase-2.49.1.js',
   '/assets/js/vendor/qrcode-1.4.4.min.js',

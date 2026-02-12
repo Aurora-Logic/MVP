@@ -20,79 +20,80 @@ function buildDuesBanner(active) {
 
 function buildExpiryBanner() {
   const dismissed = safeGetStorage('pk_dismissed', []);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
+  const today = new Date(); today.setHours(0, 0, 0, 0);
   const expiring = DB.filter(p => {
-    if (p.archived) return false;
-    if (p.status === 'accepted' || p.status === 'declined') return false;
-    if (dismissed.includes(p.id)) return false;
-    if (!p.validUntil) return false;
-    const exp = new Date(p.validUntil);
-    exp.setHours(0, 0, 0, 0);
-    const diff = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
-    return diff <= 7;
+    if (p.archived || p.status === 'accepted' || p.status === 'declined') return false;
+    if (dismissed.includes(p.id) || !p.validUntil) return false;
+    const exp = new Date(p.validUntil); exp.setHours(0, 0, 0, 0);
+    return Math.ceil((exp - today) / 86400000) <= 7;
   }).map(p => {
-    const exp = new Date(p.validUntil);
-    exp.setHours(0, 0, 0, 0);
-    const diff = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
-    return { ...p, daysLeft: diff };
+    const exp = new Date(p.validUntil); exp.setHours(0, 0, 0, 0);
+    return { ...p, daysLeft: Math.ceil((exp - today) / 86400000) };
   }).sort((a, b) => a.daysLeft - b.daysLeft);
-
-  if (expiring.length === 0) return '';
-
+  if (!expiring.length) return '';
   return expiring.slice(0, 3).map(p => {
     let type, icon, text;
-    if (p.daysLeft < 0) {
-      type = 'expired'; icon = 'alert-circle'; text = `Expired ${Math.abs(p.daysLeft)} day${Math.abs(p.daysLeft) !== 1 ? 's' : ''} ago`;
-    } else if (p.daysLeft === 0) {
-      type = 'urgent'; icon = 'alert-triangle'; text = 'Expires today';
-    } else if (p.daysLeft <= 3) {
-      type = 'warning'; icon = 'clock'; text = `Expires in ${p.daysLeft} day${p.daysLeft !== 1 ? 's' : ''}`;
-    } else {
-      type = 'info'; icon = 'info'; text = `Expires in ${p.daysLeft} days`;
-    }
-    return `<div class="expiry-banner ${type}">
-            <i data-lucide="${icon}"></i>
-            <div class="expiry-text">
-                <strong>${esc(p.title)}</strong> for ${esc(p.client?.name || 'Unknown')} — ${text}
-            </div>
-            <button class="btn-sm-ghost" onclick="emailProposal('${escAttr(p.id)}')" data-tooltip="Follow up" data-side="bottom" data-align="center"><i data-lucide="mail"></i></button>
-            <button class="btn-sm-ghost" onclick="dismissExpiry('${escAttr(p.id)}')" data-tooltip="Dismiss" data-side="bottom" data-align="center"><i data-lucide="x"></i></button>
-        </div>`;
+    if (p.daysLeft < 0) { type = 'expired'; icon = 'alert-circle'; text = `Expired ${Math.abs(p.daysLeft)} day${Math.abs(p.daysLeft) !== 1 ? 's' : ''} ago`; }
+    else if (p.daysLeft === 0) { type = 'urgent'; icon = 'alert-triangle'; text = 'Expires today'; }
+    else if (p.daysLeft <= 3) { type = 'warning'; icon = 'clock'; text = `Expires in ${p.daysLeft} day${p.daysLeft !== 1 ? 's' : ''}`; }
+    else { type = 'info'; icon = 'info'; text = `Expires in ${p.daysLeft} days`; }
+    return `<div class="expiry-banner ${type}"><i data-lucide="${icon}"></i><div class="expiry-text"><strong>${esc(p.title)}</strong> for ${esc(p.client?.name || 'Unknown')} — ${text}</div><button class="btn-sm-ghost" onclick="emailProposal('${escAttr(p.id)}')" data-tooltip="Follow up" data-side="bottom"><i data-lucide="mail"></i></button><button class="btn-sm-ghost" onclick="dismissExpiry('${escAttr(p.id)}')" data-tooltip="Dismiss" data-side="bottom"><i data-lucide="x"></i></button></div>`;
   }).join('');
 }
 
-function buildResumeCard() {
+function buildResumeBar() {
   const recent = activeDB()
     .filter(p => p.status === 'draft' || p.status === 'sent')
     .sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))[0];
   if (!recent) return '';
   const value = (recent.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0);
   const ts = recent.updatedAt || recent.createdAt;
-  const ago = ts ? timeAgo(ts) : '';
   const rid = escAttr(recent.id);
-  return `<div class="resume-card" role="button" tabindex="0" onclick="loadEditor('${rid}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
-    <div class="resume-icon"><i data-lucide="pen-line"></i></div>
-    <div class="resume-body">
-      <div class="resume-label">Continue where you left off</div>
-      <div class="resume-title">${esc(recent.title || 'Untitled')}</div>
-      <div class="resume-meta">
-        ${recent.client?.name ? '<span>' + esc(recent.client.name) + '</span>' : ''}
-        ${value ? '<span>' + fmtCur(value, recent.currency) + '</span>' : ''}
-        ${ago ? '<span>' + ago + '</span>' : ''}
-      </div>
+  return `<div class="resume-bar" role="button" tabindex="0" onclick="loadEditor('${rid}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+    <div class="resume-bar-icon"><i data-lucide="pen-line"></i></div>
+    <div class="resume-bar-body">
+      <div class="resume-bar-title">${esc(recent.title || 'Untitled')}</div>
+      <div class="resume-bar-meta">${recent.client?.name ? esc(recent.client.name) : ''}${recent.client?.name && value ? ' &middot; ' : ''}${value ? fmtCur(value, recent.currency) : ''}${ts ? ' &middot; ' + timeAgo(ts) : ''}</div>
     </div>
-    <button class="btn-sm-outline resume-btn" onclick="event.stopPropagation();loadEditor('${rid}')"><i data-lucide="arrow-right"></i> Continue</button>
+    <button class="btn-sm resume-bar-btn" onclick="event.stopPropagation();loadEditor('${rid}')"><i data-lucide="arrow-right"></i> Continue</button>
   </div>`;
+}
+
+function buildAlertsSection(active) {
+  const expiryHtml = buildExpiryBanner();
+  const duesHtml = typeof buildDuesBanner === 'function' ? buildDuesBanner(active) : '';
+  if (!expiryHtml && !duesHtml) return '';
+  const expiryCount = (expiryHtml.match(/expiry-banner/g) || []).length;
+  const total = expiryCount + (duesHtml ? 1 : 0);
+  return `<div class="dash-alerts"><div class="dash-alerts-header"><div class="dash-alerts-title"><i data-lucide="bell"></i> Alerts <span class="dash-alerts-count">${total}</span></div></div><div class="dash-alerts-body">${expiryHtml}${duesHtml}</div></div>`;
+}
+
+function buildSideMetrics(active) {
+  if (active.length < 2 || typeof computeAnalytics !== 'function') return '';
+  const stats = computeAnalytics(active);
+  const c = active[0]?.currency || defaultCurrency();
+  return `<div class="dash-side-metrics">
+    <div class="dsm-item"><div class="dsm-val ${stats.winRate >= 50 ? 'dsm-good' : stats.winRate > 0 ? 'dsm-mid' : ''}">${stats.winRate}%</div><div class="dsm-label">Win Rate</div><div class="dsm-sub">${stats.accepted}/${stats.decided} decided</div></div>
+    <div class="dsm-item"><div class="dsm-val">${fmtCur(stats.avgValue, c)}</div><div class="dsm-label">Avg Value</div></div>
+    <div class="dsm-item"><div class="dsm-val">${fmtCur(stats.forecast, c)}</div><div class="dsm-label">Forecast</div></div>
+    <div class="dsm-item"><div class="dsm-val">${stats.avgDays > 0 ? stats.avgDays + 'd' : '\u2014'}</div><div class="dsm-label">Avg Close</div></div>
+  </div>`;
+}
+
+function buildActivityFeed() {
+  const recents = activeDB()
+    .filter(p => p.updatedAt || p.createdAt)
+    .sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))
+    .slice(0, 5);
+  if (!recents.length) return '';
+  const si = { draft: 'file-text', sent: 'send', accepted: 'check-circle', declined: 'x-circle', expired: 'clock' };
+  const sc = { draft: 'var(--text3)', sent: 'var(--blue)', accepted: 'var(--green)', declined: 'var(--red)', expired: 'var(--amber)' };
+  return `<div class="dash-activity"><div class="dash-activity-title">Recent Activity</div>${recents.map(p => `<div class="act-item" onclick="loadEditor('${escAttr(p.id)}')"><i data-lucide="${si[p.status] || 'file-text'}" style="color:${sc[p.status] || 'var(--text3)'}"></i><div class="act-body"><div class="act-name">${esc(p.title || 'Untitled')}</div><div class="act-time">${timeAgo(p.updatedAt || p.createdAt)}</div></div></div>`).join('')}</div>`;
 }
 
 function dismissExpiry(id) {
   const dismissed = safeGetStorage('pk_dismissed', []);
-  if (!dismissed.includes(id)) {
-    dismissed.push(id);
-    safeLsSet('pk_dismissed', dismissed);
-  }
+  if (!dismissed.includes(id)) { dismissed.push(id); safeLsSet('pk_dismissed', dismissed); }
   renderDashboard();
 }
 
@@ -104,7 +105,6 @@ function renderDashboard() {
   if (topSearch) topSearch.style.display = '';
   document.getElementById('topRight').innerHTML = '<button class="btn-sm" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom"><i data-lucide="plus"></i> New Proposal</button>';
 
-  // Auto-expire proposals past their validUntil date (skip archived)
   const today = new Date(); today.setHours(0, 0, 0, 0);
   let changed = false;
   DB.forEach(p => {
@@ -143,52 +143,39 @@ function renderDashboard() {
   const accepted = active.filter(p => p.status === 'accepted').length;
   const sent = active.filter(p => p.status === 'sent').length;
   const totalValue = active.reduce((a, p) => a + (p.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0), 0);
-
+  const duesTotal = typeof paymentTotals === 'function' ? active.filter(p => p.status === 'accepted').reduce((s, p) => s + paymentTotals(p).balanceDue, 0) : 0;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const firstName = (CONFIG?.name || '').split(' ')[0];
+  const c = defaultCurrency();
 
   body.innerHTML = `
-    <div class="dash-welcome">
-      <div class="dash-welcome-t">${greeting}${firstName ? ', ' + esc(firstName) : ''}</div>
-      <div class="dash-welcome-d">You have ${sent} proposal${sent !== 1 ? 's' : ''} awaiting response${accepted ? ' and ' + accepted + ' accepted' : ''}</div>
+    <div class="dash-header">
+      <div><div class="dash-greeting">${greeting}${firstName ? ', ' + esc(firstName) : ''}</div>
+      <div class="dash-subtitle">${sent} proposal${sent !== 1 ? 's' : ''} awaiting response${accepted ? ', ' + accepted + ' won' : ''}</div></div>
+      <div class="dash-header-right"><button class="btn-sm" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom"><i data-lucide="plus"></i> New Proposal</button></div>
     </div>
-
-    ${buildResumeCard()}
-    ${buildExpiryBanner()}
-    ${typeof buildDuesBanner === 'function' ? buildDuesBanner(active) : ''}
-
-    <div class="dash-grid">
-      <div class="stat-card" onclick="goNav('editor')">
-        <div class="stat-top"><div class="stat-icon si-total"><i data-lucide="file-text"></i></div></div>
-        <div class="stat-val">${total}</div>
-        <div class="stat-label">Total Proposals</div>
-      </div>
-      <div class="stat-card" onclick="setFilter('sent');goNav('editor')">
-        <div class="stat-top"><div class="stat-icon si-sent"><i data-lucide="send"></i></div></div>
-        <div class="stat-val">${sent}</div>
-        <div class="stat-label">Awaiting Response</div>
-      </div>
-      <div class="stat-card" onclick="setFilter('accepted');goNav('editor')">
-        <div class="stat-top"><div class="stat-icon si-accepted"><i data-lucide="check-circle"></i></div></div>
-        <div class="stat-val">${accepted}</div>
-        <div class="stat-label">Won</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top"><div class="stat-icon si-value"><i data-lucide="banknote"></i></div></div>
-        <div class="stat-val">${fmtCur(totalValue, defaultCurrency())}</div>
-        <div class="stat-label">Total Pipeline Value</div>
-      </div>
-      ${typeof paymentTotals === 'function' ? `<div class="stat-card" onclick="setFilter('dues');goNav('editor')">
-        <div class="stat-top"><div class="stat-icon si-dues"><i data-lucide="wallet"></i></div></div>
-        <div class="stat-val">${fmtCur(active.filter(p => p.status === 'accepted').reduce((s, p) => s + paymentTotals(p).balanceDue, 0), defaultCurrency())}</div>
-        <div class="stat-label">Outstanding Dues</div>
-      </div>` : ''}
+    <div class="dash-stats-strip">
+      <div class="dss-item dss-clickable" onclick="goNav('editor')"><div class="dss-val">${total}</div><div class="dss-label">Total</div></div>
+      <div class="dss-sep"></div>
+      <div class="dss-item dss-clickable" onclick="setFilter('sent');goNav('editor')"><div class="dss-val" style="color:var(--blue)">${sent}</div><div class="dss-label">Awaiting</div></div>
+      <div class="dss-sep"></div>
+      <div class="dss-item dss-clickable" onclick="setFilter('accepted');goNav('editor')"><div class="dss-val" style="color:var(--green)">${accepted}</div><div class="dss-label">Won</div></div>
+      <div class="dss-sep"></div>
+      <div class="dss-item"><div class="dss-val">${fmtCur(totalValue, c)}</div><div class="dss-label">Pipeline</div></div>
+      ${duesTotal > 0 ? `<div class="dss-sep"></div><div class="dss-item dss-clickable" onclick="setFilter('dues');goNav('editor')"><div class="dss-val" style="color:var(--red)">${fmtCur(duesTotal, c)}</div><div class="dss-label">Outstanding</div></div>` : ''}
     </div>
-
-    ${typeof buildAnalyticsWidget === 'function' && active.length >= 3 ? buildAnalyticsWidget() : ''}
-  `;
-
+    <div class="dash-body">
+      <div class="dash-left">
+        ${buildResumeBar()}
+        ${buildAlertsSection(active)}
+        ${typeof buildAnalyticsWidget === 'function' && active.length >= 3 ? buildAnalyticsWidget() : ''}
+      </div>
+      <div class="dash-right">
+        ${buildSideMetrics(active)}
+        ${buildActivityFeed()}
+      </div>
+    </div>`;
   lucide.createIcons();
 }
 

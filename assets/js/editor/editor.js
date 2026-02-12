@@ -41,6 +41,14 @@ function createEditor(holder, opts = {}) {
         },
         onUpdate: opts.onChange ? ({ editor: ed }) => opts.onChange(ed) : undefined,
     });
+
+    // Attach Notion-style menus (bubble menu on selection + slash commands)
+    if (opts.menus !== false) {
+        const wrap = el.closest('.tiptap-wrap') || el;
+        if (typeof attachBubbleMenu === 'function') attachBubbleMenu(editor, wrap);
+        if (typeof attachSlashMenu === 'function') attachSlashMenu(editor, wrap);
+    }
+
     return editor;
 }
 

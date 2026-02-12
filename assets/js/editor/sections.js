@@ -31,6 +31,7 @@ function renderSections(p) {
 
 function destroyAllEditors() {
     Object.values(sectionEditors).forEach(e => {
+        if (typeof destroyTiptapMenus === 'function') try { destroyTiptapMenus(e); } catch (_) { }
         if (e && typeof e.destroy === 'function') try { e.destroy(); } catch (err) { }
     });
     sectionEditors = {};

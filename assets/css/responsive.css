@@ -39,6 +39,16 @@
     gap: 12px;
   }
 
+  /* Dashboard v2 */
+  .dash-body { grid-template-columns: 1fr; }
+  .dash-right { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+  .dash-side-metrics { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+  .dsm-item { flex: 1; min-width: 80px; }
+
+  /* Proposals v2 */
+  .prop-line1-right { gap: 6px; }
+  .prop-line2-right { display: none; }
+
   .preview {
     width: 100%;
   }
@@ -69,8 +79,8 @@
     bottom: 0;
     z-index: 99;
     transform: translateX(-100%);
-    transition: transform var(--t2);
-    width: 18rem;
+    transition: transform 200ms ease-out;
+    width: 16rem;
   }
 
   .side.mobile-open {
@@ -122,6 +132,26 @@
     width: 100%;
     overflow-x: auto;
   }
+
+  /* Dashboard v2 */
+  .dash-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .dash-stats-strip { overflow-x: auto; padding: 10px 14px; }
+  .dss-item { padding: 4px 14px; }
+
+  /* Proposals v2 */
+  .prop-header { flex-wrap: wrap; gap: 8px; }
+  .prop-toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .prop-toolbar-right { width: 100%; overflow-x: auto; }
+  .prop-filters { max-width: 100%; overflow-x: auto; }
+  .prop-row-v2 { padding: 12px 14px; gap: 10px; }
+  .prop-line1 { flex-wrap: wrap; gap: 6px; }
+  .prop-line1-right { display: flex; }
+  .prop-line2-right { display: flex; }
+
+  /* Settings v2 */
+  .settings-nav { display: none; }
+  .settings-content { padding-left: 0; max-width: 100%; }
+  .settings-layout { max-width: 600px; }
 
   /* Filter tabs horizontal scroll */
   .filter-tabs {
@@ -284,6 +314,10 @@
   .dash-grid {
     grid-template-columns: 1fr;
   }
+
+  /* Dashboard v2 */
+  .dss-val { font-size: 18px; }
+  .dss-item { padding: 4px 10px; }
 
   /* Analytics widget small mobile */
   .an-metrics {

@@ -108,6 +108,9 @@ declare function initKeyboardShortcuts(): void;
 // ── Editor ──
 declare function createEditor(holder: any, opts?: any): any;
 declare function migrateEditorContent(data: any): string;
+declare function attachBubbleMenu(editor: any, wrapEl: HTMLElement): void;
+declare function attachSlashMenu(editor: any, wrapEl: HTMLElement): void;
+declare function destroyTiptapMenus(editor: any): void;
 declare function loadEditor(propId: string): void;
 declare function refreshStatsBar(): void;
 declare function edTab(el: any, tab: string): void;

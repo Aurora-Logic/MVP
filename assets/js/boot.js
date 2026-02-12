@@ -43,13 +43,14 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.7';
+const APP_VERSION = '2.8';
 const APP_BUILD = '20260211';
 const WHATS_NEW_ITEMS = [
-    { icon: 'grip-vertical', title: 'Drag Reorder Line Items', desc: 'Drag line items in pricing table to reorder — same seamless grip handle as sections.' },
-    { icon: 'pen-line', title: 'Cleaner Focus States', desc: 'Removed distracting outlines from inputs and editors for a smoother writing experience.' },
-    { icon: 'shield', title: 'Auth Safety Net', desc: 'Added fallback timeout so the app never gets stuck on a blank screen during sign-in.' },
-    { icon: 'refresh-cw', title: 'Auto SW Update', desc: 'Service worker now auto-updates on each load — no more stale cached files.' }
+    { icon: 'layout-dashboard', title: 'Apple-Level UX Redesign', desc: 'Dashboard, Proposals, Settings, and Sidebar completely redesigned with Apple HIG-quality visuals.' },
+    { icon: 'type', title: 'Notion-Style Rich Editor', desc: 'Select text for a floating toolbar, type / for slash commands — headings, lists, tables, and more.' },
+    { icon: 'panel-left', title: 'Refined Sidebar', desc: 'Translucent hover states, card-on-select nav buttons, and proposal values in recent items.' },
+    { icon: 'calendar', title: 'Custom Calendar Selects', desc: 'Date picker month/year dropdowns now match the app design — no more native selects.' },
+    { icon: 'scroll-text', title: 'Settings Scroll Spy', desc: 'Settings now has a sticky nav sidebar that highlights your current section as you scroll.' }
 ];
 
 function checkWhatsNew() {

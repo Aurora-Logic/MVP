@@ -2,7 +2,7 @@
 // SETTINGS
 // ════════════════════════════════════════
 
-/* exported addEmailTemplate, editEmailTemplate, deleteEmailTemplate, saveEmailTemplate, exportData, importData, applyWhiteLabel */
+/* exported exportData, importData, applyWhiteLabel, scrollToSection */
 function getCountryTaxHtml() {
     const c = CONFIG?.country;
     if (c === 'IN') return `
@@ -42,107 +42,119 @@ function buildAccountCard() {
     </div>`;
 }
 
+function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function initSettingsScrollSpy() {
+    const scroller = document.getElementById('bodyScroll');
+    if (!scroller) return;
+    const sections = scroller.querySelectorAll('.settings-section[id]');
+    const navItems = document.querySelectorAll('.settings-nav-item');
+    if (!sections.length || !navItems.length) return;
+    scroller.addEventListener('scroll', () => {
+        let activeId = '';
+        sections.forEach(s => { if (s.getBoundingClientRect().top <= 100) activeId = s.id; });
+        navItems.forEach(n => n.classList.toggle('on', n.dataset.sec === activeId));
+    }, { passive: true });
+}
+
+function settingsNavHtml() {
+    const loggedIn = typeof isLoggedIn === 'function' && isLoggedIn();
+    const items = [
+        ...(loggedIn ? [['account', 'user-circle', 'Account']] : []),
+        ['profile', 'building-2', 'Profile'],
+        ['payments', 'landmark', 'Payments'],
+        ['email', 'mail', 'Email'],
+        ...(typeof renderTeamSettings === 'function' ? [['team', 'users', 'Team']] : []),
+        ...(typeof renderAiSettingsCard === 'function' ? [['ai', 'sparkles', 'AI Assistant']] : []),
+        ['branding', 'palette', 'Branding'],
+        ['signature', 'pen-tool', 'Signature'],
+        ['data', 'database', 'Data']
+    ];
+    const ver = `${typeof appName === 'function' ? appName() : 'ProposalKit'} v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : '?'}`;
+    return `<nav class="settings-nav">${items.map(([id, icon, label], i) =>
+        `<button class="settings-nav-item${i === 0 ? ' on' : ''}" data-sec="sec-${id}" onclick="scrollToSection('sec-${id}')"><i data-lucide="${icon}"></i> ${label}</button>`
+    ).join('')}<div class="settings-nav-version">${ver}</div></nav>`;
+}
+
 function renderSettings() {
     CUR = null;
     document.getElementById('topTitle').textContent = 'Settings';
     document.getElementById('topRight').innerHTML = '';
     const b = CONFIG?.bank || {};
     const body = document.getElementById('bodyScroll');
-    const acctHtml = typeof isLoggedIn === 'function' && isLoggedIn() ? buildAccountCard() : '';
-    body.innerHTML = `
-    <div class="settings-grid">
-      <div class="settings-col">
-        ${acctHtml}
-        <div class="card card-p" style="margin-bottom:14px">
-          <div class="card-head"><div><div class="card-t">Organization Details</div><div class="card-d">Auto-filled into every new proposal</div></div></div>
-          <div class="fg"><label class="fl">Company Name</label><input type="text" id="setCo" value="${esc(CONFIG?.company)}" oninput="saveSettings()"></div>
-          <div class="fr">
-            <div class="fg"><label class="fl">Your Name</label><input type="text" id="setName" value="${esc(CONFIG?.name)}" oninput="saveSettings()"></div>
-            <div class="fg"><label class="fl">Email</label><input type="email" id="setEmail" value="${esc(CONFIG?.email)}" oninput="saveSettings()"></div>
-          </div>
-          <div class="fr">
-            <div class="fg"><label class="fl">Phone</label><input type="tel" id="setPhone" value="${esc(CONFIG?.phone)}" oninput="saveSettings()"></div>
-            <div class="fg"><label class="fl">Country</label><div id="setCountry"></div></div>
-          </div>
-          <div class="fg"><label class="fl">Address</label><input type="text" id="setAddr" value="${esc(CONFIG?.address)}" oninput="saveSettings()"></div>
-          <div class="fg"><label class="fl">Website</label><input type="url" id="setWebsite" value="${esc(CONFIG?.website)}" oninput="saveSettings()"></div>
-          <div id="setTaxFields">${getCountryTaxHtml()}</div>
-        </div>
-        <div class="card card-p" style="margin-bottom:14px">
-          <div class="card-head"><div><div class="card-t">Bank / Payment Details</div><div class="card-d">Shown on proposals for client payments</div></div></div>
-          <div class="fr">
-            <div class="fg"><label class="fl">Bank Name</label><input type="text" id="setBankName" value="${esc(b.name)}" oninput="saveSettings()"></div>
-            <div class="fg"><label class="fl">Account Holder</label><input type="text" id="setBankHolder" value="${esc(b.holder)}" oninput="saveSettings()"></div>
-          </div>
-          <div class="fg"><label class="fl">Account Number</label><input type="text" id="setBankAccount" value="${esc(b.account)}" oninput="saveSettings()"></div>
-          <div class="fr">
-            <div class="fg"><label class="fl">IFSC / Sort Code</label><input type="text" id="setBankIfsc" value="${esc(b.ifsc)}" oninput="saveSettings()"></div>
-            <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="setBankSwift" value="${esc(b.swift)}" oninput="saveSettings()"></div>
-          </div>
-          ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="setBankUpi" value="${esc(b.upi || '')}" placeholder="e.g. business@upi" oninput="saveSettings()"><div class="fh">Shown as QR code on PDFs (India only)</div></div>` : ''}
-        </div>
-        <div class="card card-p" style="margin-bottom:14px">
-          <div class="card-head">
-            <div><div class="card-t">Email Templates</div><div class="card-d">Quick emails for sending proposals</div></div>
-            <button class="btn-sm-outline" onclick="addEmailTemplate()"><i data-lucide="plus"></i> Add</button>
-          </div>
-          <div id="emailTplList"></div>
+    const loggedIn = typeof isLoggedIn === 'function' && isLoggedIn();
+
+    body.innerHTML = `<div class="settings-layout">${settingsNavHtml()}
+    <div class="settings-content">
+      ${loggedIn ? `<div class="settings-section" id="sec-account">${buildAccountCard()}</div>` : ''}
+      <div class="settings-section" id="sec-profile">
+        <div class="settings-section-head"><div class="settings-section-t">Profile</div><div class="settings-section-d">Auto-filled into every new proposal</div></div>
+        <div class="fg"><label class="fl">Company Name</label><input type="text" id="setCo" value="${esc(CONFIG?.company)}" oninput="saveSettings()"></div>
+        <div class="fr"><div class="fg"><label class="fl">Your Name</label><input type="text" id="setName" value="${esc(CONFIG?.name)}" oninput="saveSettings()"></div>
+          <div class="fg"><label class="fl">Email</label><input type="email" id="setEmail" value="${esc(CONFIG?.email)}" oninput="saveSettings()"></div></div>
+        <div class="fr"><div class="fg"><label class="fl">Phone</label><input type="tel" id="setPhone" value="${esc(CONFIG?.phone)}" oninput="saveSettings()"></div>
+          <div class="fg"><label class="fl">Country</label><div id="setCountry"></div></div></div>
+        <div class="fg"><label class="fl">Address</label><input type="text" id="setAddr" value="${esc(CONFIG?.address)}" oninput="saveSettings()"></div>
+        <div class="fg"><label class="fl">Website</label><input type="url" id="setWebsite" value="${esc(CONFIG?.website)}" oninput="saveSettings()"></div>
+        <div id="setTaxFields">${getCountryTaxHtml()}</div>
+      </div>
+      <div class="settings-section" id="sec-payments">
+        <div class="settings-section-head"><div class="settings-section-t">Payments</div><div class="settings-section-d">Bank details shown on proposals</div></div>
+        <div class="fr"><div class="fg"><label class="fl">Bank Name</label><input type="text" id="setBankName" value="${esc(b.name)}" oninput="saveSettings()"></div>
+          <div class="fg"><label class="fl">Account Holder</label><input type="text" id="setBankHolder" value="${esc(b.holder)}" oninput="saveSettings()"></div></div>
+        <div class="fg"><label class="fl">Account Number</label><input type="text" id="setBankAccount" value="${esc(b.account)}" oninput="saveSettings()"></div>
+        <div class="fr"><div class="fg"><label class="fl">IFSC / Sort Code</label><input type="text" id="setBankIfsc" value="${esc(b.ifsc)}" oninput="saveSettings()"></div>
+          <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="setBankSwift" value="${esc(b.swift)}" oninput="saveSettings()"></div></div>
+        ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="setBankUpi" value="${esc(b.upi || '')}" placeholder="e.g. business@upi" oninput="saveSettings()"><div class="fh">Shown as QR code on PDFs (India only)</div></div>` : ''}
+      </div>
+      <div class="settings-section" id="sec-email">
+        <div class="settings-section-head"><div class="settings-section-t">Email Templates</div><div class="settings-section-d">Quick emails for sending proposals</div></div>
+        <button class="btn-sm-outline" onclick="addEmailTemplate()" style="margin-bottom:12px"><i data-lucide="plus"></i> Add Template</button>
+        <div id="emailTplList"></div>
+      </div>
+      ${typeof renderTeamSettings === 'function' ? `<div class="settings-section" id="sec-team">${renderTeamSettings()}</div>` : ''}
+      ${typeof renderAiSettingsCard === 'function' ? `<div class="settings-section" id="sec-ai">${renderAiSettingsCard()}</div>` : ''}
+      <div class="settings-section" id="sec-branding">
+        <div class="settings-section-head"><div class="settings-section-t">Branding</div><div class="settings-section-d">Logo and colors for your proposals</div></div>
+        <div class="fg"><label class="fl">Logo</label>
+          <div class="brand-logo-box" onclick="document.getElementById('setLogoInput').click()" id="setLogoBox">${CONFIG?.logo ? '<img src="' + esc(CONFIG.logo) + '" alt="Company logo">' : '<i data-lucide="image-plus"></i>'}</div>
+          <input type="file" id="setLogoInput" accept="image/*" style="display:none" onchange="handleLogo(this);saveSettings()"><div class="fh">PNG, JPG, or SVG</div></div>
+        <div class="fg"><div class="color-row" id="setColors"></div></div>
+        <div class="fg"><label class="fl">Font Family</label><div id="setFont"></div></div>
+        <div class="fg" style="margin-top:8px;padding-top:12px;border-top:1px solid var(--border)">
+          <label class="fl">White Label</label>
+          <label class="toggle-row"><input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()"><span class="toggle-label">Remove ProposalKit branding</span></label>
+          <div class="fh">Replaces ProposalKit name with your company name in sidebar, page titles, client portal, and exports</div>
         </div>
       </div>
-      <div class="settings-col">
-        ${typeof renderTeamSettings === 'function' ? renderTeamSettings() : ''}
-        ${typeof renderAiSettingsCard === 'function' ? renderAiSettingsCard() : ''}
-        <div class="card card-p" style="margin-bottom:14px">
-          <div class="card-head"><div><div class="card-t">Branding</div><div class="card-d">Logo and colors for your proposals</div></div></div>
-          <div class="fg">
-            <label class="fl">Logo</label>
-            <div class="brand-logo-box" onclick="document.getElementById('setLogoInput').click()" id="setLogoBox">
-              ${CONFIG?.logo ? '<img src="' + esc(CONFIG.logo) + '" alt="Company logo">' : '<i data-lucide="image-plus"></i>'}
-            </div>
-            <input type="file" id="setLogoInput" accept="image/*" style="display:none" onchange="handleLogo(this);saveSettings()">
-            <div class="fh">PNG, JPG, or SVG</div>
-          </div>
-          <div class="fg"><div class="color-row" id="setColors"></div></div>
-          <div class="fg"><label class="fl">Font Family</label><div id="setFont"></div></div>
-          <div class="fg" style="margin-top:8px;padding-top:12px;border-top:1px solid var(--border)">
-            <label class="fl">White Label</label>
-            <label class="toggle-row">
-              <input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()">
-              <span class="toggle-label">Remove ProposalKit branding</span>
-            </label>
-            <div class="fh">Replaces ProposalKit name with your company name in sidebar, page titles, client portal, and exports</div>
-          </div>
-        </div>
-        <div class="card card-p" style="margin-bottom:14px">
-          <div class="card-head"><div><div class="card-t">Your Signature</div><div class="card-d">Draw your signature to include in proposals</div></div></div>
-          <div class="sig-wrap" id="sigWrap"><div id="sigDisplay"></div></div>
-        </div>
-        <div class="card card-p">
-          <div class="card-head"><div><div class="card-t">Data Management</div><div class="card-d">Export, import, or clear your local data</div></div></div>
-          <div class="fg"><label class="fl">Webhook URL</label>
-            <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
-            <div class="fh">POST proposal data to this URL on export</div>
-          </div>
-          <div class="sec-header-actions">
-            <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export All Data</button>
-            <button class="btn-sm-outline" onclick="importData()"><i data-lucide="upload"></i> Import Data</button>
-            <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear All Data</button>
-          </div>
-        </div>
-        <div style="text-align:center;padding:16px 0 4px;font-size:11px;color:var(--text4)">
-          ${typeof appName === 'function' ? appName() : 'ProposalKit'} v${typeof APP_VERSION !== 'undefined' ? APP_VERSION : '?'}${typeof APP_BUILD !== 'undefined' ? ' (build ' + APP_BUILD + ')' : ''}
+      <div class="settings-section" id="sec-signature">
+        <div class="settings-section-head"><div class="settings-section-t">Signature</div><div class="settings-section-d">Draw your signature to include in proposals</div></div>
+        <div class="sig-wrap" id="sigWrap"><div id="sigDisplay"></div></div>
+      </div>
+      <div class="settings-danger-divider"><span class="settings-danger-label">Danger Zone</span></div>
+      <div class="settings-section" id="sec-data">
+        <div class="settings-section-head"><div class="settings-section-t">Data Management</div><div class="settings-section-d">Export, import, or clear your local data</div></div>
+        <div class="fg"><label class="fl">Webhook URL</label>
+          <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
+          <div class="fh">POST proposal data to this URL on export</div></div>
+        <div class="sec-header-actions">
+          <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export</button>
+          <button class="btn-sm-outline" onclick="importData()"><i data-lucide="upload"></i> Import</button>
+          <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear All</button>
         </div>
       </div>
-    </div>`;
+    </div></div>`;
     renderColorSwatches('setColors', CONFIG?.color);
     document.querySelectorAll('#setColors .color-swatch').forEach(s => {
         const orig = s.onclick;
         s.onclick = () => { orig(); saveSettings(); };
     });
-    const countryItems = OB_COUNTRIES;
     csel(document.getElementById('setCountry'), {
         value: CONFIG?.country || '', placeholder: 'Select country', searchable: true,
-        items: countryItems, onChange: (val) => { CONFIG.country = val; document.getElementById('setTaxFields').innerHTML = getCountryTaxHtml(); saveSettings(); }
+        items: OB_COUNTRIES, onChange: (val) => { CONFIG.country = val; document.getElementById('setTaxFields').innerHTML = getCountryTaxHtml(); saveSettings(); }
     });
     csel(document.getElementById('setFont'), {
         value: CONFIG?.font || 'Inter',
@@ -155,97 +167,11 @@ function renderSettings() {
     });
     initSignaturePad();
     renderEmailTemplates();
+    initSettingsScrollSpy();
     lucide.createIcons();
 }
 
-// Email Templates
-const DEFAULT_TEMPLATES = [
-    { id: 'intro', name: 'Introduction', subject: 'Proposal: {{proposal.title}}', body: 'Hi {{client.name}},\n\nPlease find attached our proposal for {{proposal.title}}.\n\nWe look forward to discussing this with you.\n\nBest regards,\n{{sender.name}}' },
-    { id: 'followup', name: 'Follow-up', subject: 'Following up: {{proposal.title}}', body: 'Hi {{client.name}},\n\nI wanted to follow up on the proposal I sent for {{proposal.title}}.\n\nDo you have any questions I can help answer?\n\nBest,\n{{sender.name}}' },
-    { id: 'thanks', name: 'Thank You', subject: 'Thank you for accepting our proposal', body: 'Hi {{client.name}},\n\nThank you for accepting our proposal for {{proposal.title}}!\n\nWe are excited to get started and will be in touch shortly with next steps.\n\nBest regards,\n{{sender.name}}' }
-];
-
-function getEmailTemplates() {
-    const saved = safeGetStorage('pk_email_tpl', []);
-    return [...DEFAULT_TEMPLATES.map(t => ({ ...t, isDefault: true })), ...saved];
-}
-
-function renderEmailTemplates() {
-    const list = document.getElementById('emailTplList');
-    if (!list) return;
-    const templates = getEmailTemplates();
-    if (!templates.length) { list.innerHTML = '<div class="tpl-empty">No email templates. Add one to get started.</div>'; return; }
-    list.innerHTML = templates.map(t => `
-        <div class="tpl-item">
-            <div>
-                <div class="tpl-name">${esc(t.name)} ${t.isDefault ? '<span class="tpl-badge">(Default)</span>' : ''}</div>
-                <div class="tpl-subject">Subject: ${esc(t.subject)}</div>
-            </div>
-            <div class="tpl-actions">
-                <button class="btn-sm-icon-ghost" onclick="editEmailTemplate('${escAttr(t.id)}')" data-tooltip="Edit" data-side="bottom" data-align="center"><i data-lucide="edit-3"></i></button>
-                ${!t.isDefault ? `<button class="btn-sm-icon-ghost" onclick="deleteEmailTemplate('${escAttr(t.id)}')" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="trash-2"></i></button>` : ''}
-            </div>
-        </div>`).join('');
-    lucide.createIcons();
-}
-
-function addEmailTemplate() { showTemplateModal(); }
-
-function editEmailTemplate(id) {
-    const tpl = getEmailTemplates().find(t => t.id === id);
-    if (tpl) showTemplateModal(tpl);
-}
-
-function deleteEmailTemplate(id) {
-    confirmDialog('Delete this template?', () => {
-        let saved = safeGetStorage('pk_email_tpl', []);
-        saved = saved.filter(t => t.id !== id);
-        safeLsSet('pk_email_tpl', saved);
-        renderEmailTemplates();
-        toast('Template deleted');
-    }, { title: 'Delete Template', confirmText: 'Delete' });
-}
-
-function showTemplateModal(tpl = null) {
-    const isEdit = !!tpl;
-    const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap'; wrap.id = 'tplModal';
-    wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-    wrap.innerHTML = `
-        <div class="modal" onclick="event.stopPropagation()">
-            <div class="modal-t">${isEdit ? 'Edit' : 'New'} Email Template</div>
-            <div class="modal-d">Use {{client.name}}, {{proposal.title}}, {{sender.name}} as variables</div>
-            <div class="fg" style="margin-top:12px"><label class="fl">Name</label><input type="text" id="tplName" value="${esc(tpl?.name || '')}"></div>
-            <div class="fg"><label class="fl">Subject</label><input type="text" id="tplSubject" value="${esc(tpl?.subject || '')}"></div>
-            <div class="fg"><label class="fl">Body</label><textarea id="tplBody" style="min-height:120px">${esc(tpl?.body || '')}</textarea></div>
-            <div class="modal-foot">
-                <button class="btn-sm-outline" onclick="document.getElementById('tplModal').remove()">Cancel</button>
-                <button class="btn-sm" onclick="saveEmailTemplate(${tpl && !tpl.isDefault ? `'${escAttr(tpl.id)}'` : 'null'})">${isEdit && !tpl?.isDefault ? 'Save' : 'Save as New'}</button>
-            </div>
-        </div>`;
-    document.body.appendChild(wrap);
-    requestAnimationFrame(() => wrap.classList.add('show'));
-}
-
-function saveEmailTemplate(existingId) {
-    const name = document.getElementById('tplName')?.value.trim();
-    const subject = document.getElementById('tplSubject')?.value.trim();
-    const body = document.getElementById('tplBody')?.value.trim();
-    if (!name || !subject || !body) { toast('Please fill all fields'); return; }
-    const saved = safeGetStorage('pk_email_tpl', []);
-    const id = existingId || 'tpl_' + Date.now();
-    if (existingId) {
-        const idx = saved.findIndex(t => t.id === existingId);
-        if (idx >= 0) saved[idx] = { id, name, subject, body };
-        else saved.push({ id, name, subject, body });
-    } else {
-        saved.push({ id, name, subject, body });
-    }
-    safeLsSet('pk_email_tpl', saved);
-    document.getElementById('tplModal')?.remove();
-    renderEmailTemplates();
-    toast('Template saved');
-}
+// Email template functions in settings-templates.js
 
 function saveSettings() {
     const v = (id, fb) => { const el = document.getElementById(id); return el ? el.value : fb; };
