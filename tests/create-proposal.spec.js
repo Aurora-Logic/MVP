@@ -5,7 +5,7 @@ test.describe('Create Proposal', () => {
     test('can open new proposal modal', async ({ page }) => {
         await seedAndBoot(page);
 
-        const newBtn = page.locator('.side-new-btn');
+        const newBtn = page.locator('.side-new-full');
         await expect(newBtn).toBeVisible();
         await newBtn.click();
         await page.waitForTimeout(500);
