@@ -270,188 +270,122 @@
 /* First run (dashboard) */
 /* Animations */
 @keyframes frFadeUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes frFloat {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(0, -8px); }
+@keyframes frPillFade {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@keyframes frOrb {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.15); opacity: 0.8; }
-}
+/* ════════ EMPTY STATE — Clean Centered ════════ */
 
 .first-run {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  padding: 20px 0;
-  animation: frFadeUp 0.4s ease-out;
-}
-
-/* Hero — burgundy gradient card with floating orbs */
-.fr-hero {
-  position: relative;
-  background: linear-gradient(135deg, #800020 0%, #4A0D24 60%, #2D0816 100%);
-  border-radius: 20px;
-  padding: 56px 40px;
-  overflow: hidden;
-  text-align: center;
-}
-
-.fr-orb {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  animation: frOrb 4s ease-in-out infinite;
-}
-
-.fr-orb-1 {
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(253, 164, 175, 0.15) 0%, transparent 70%);
-  top: -60px;
-  right: -40px;
-  animation-delay: 0s;
-}
-
-.fr-orb-2 {
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, rgba(184, 96, 122, 0.2) 0%, transparent 70%);
-  bottom: -30px;
-  left: -20px;
-  animation-delay: 1.5s;
-}
-
-.fr-orb-3 {
-  width: 100px;
-  height: 100px;
-  background: radial-gradient(circle, rgba(212, 137, 158, 0.15) 0%, transparent 70%);
-  top: 30%;
-  left: 15%;
-  animation-delay: 3s;
-}
-
-.fr-hero-content {
-  position: relative;
-  z-index: 1;
-}
-
-.fr-badge {
-  display: inline-flex;
   align-items: center;
-  padding: 6px 16px;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
-  border-radius: var(--r-pill);
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(4px);
+  justify-content: center;
+  min-height: calc(100vh - 160px);
+  padding: 40px 20px;
+  animation: frFadeUp 0.5s ease-out;
+}
+
+.fr-center {
+  text-align: center;
+  max-width: 480px;
+}
+
+.fr-center dotlottie-wc {
+  display: block;
+  margin: 0 auto 8px;
 }
 
 .fr-title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  color: #fff;
-  line-height: 1.2;
-  margin-bottom: 12px;
+  color: var(--text);
+  line-height: 1.25;
+  margin-bottom: 10px;
 }
 
 .fr-desc {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.65);
-  max-width: 460px;
-  line-height: 1.6;
-  margin: 0 auto 28px;
+  font-size: 15px;
+  color: var(--text4);
+  line-height: 1.65;
+  margin-bottom: 28px;
 }
 
 .fr-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
 }
 
 .fr-btn-primary {
-  background: #fff !important;
-  color: #800020 !important;
+  background: #18181b !important;
+  color: #fff !important;
   border: none !important;
   font-weight: 600 !important;
 }
 
 .fr-btn-primary:hover {
-  background: rgba(255, 255, 255, 0.9) !important;
+  background: #27272a !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .fr-btn-outline {
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+  background: var(--card) !important;
 }
 
 .fr-btn-outline:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
-  border-color: rgba(255, 255, 255, 0.5) !important;
+  background: var(--muted) !important;
+  border-color: var(--border-h) !important;
 }
 
-/* Feature cards — staggered entrance */
-.fr-features {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+/* Feature pills — floating badges below */
+.fr-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 40px;
+  max-width: 560px;
 }
 
-.fr-feat {
-  text-align: center;
+.fr-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 24px 16px;
-  animation: frFadeUp 0.4s ease-out both;
-  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
-}
-
-.fr-feat:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--sh2);
-}
-
-.fr-feat-icon {
-  width: 48px;
-  height: 48px;
-  background: rgba(128, 0, 32, 0.06);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 12px;
-  animation: frFloat 3s ease-in-out infinite;
-}
-
-.fr-feat:nth-child(2) .fr-feat-icon { animation-delay: 0.5s; }
-.fr-feat:nth-child(3) .fr-feat-icon { animation-delay: 1s; }
-.fr-feat:nth-child(4) .fr-feat-icon { animation-delay: 1.5s; }
-
-.fr-feat-icon svg { width: 22px; height: 22px; color: #800020; }
-
-.fr-feat-t {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 4px;
-}
-
-.fr-feat-d {
+  border-radius: var(--r-pill);
   font-size: 14px;
-  color: var(--text4);
-  line-height: 1.4;
+  font-weight: 500;
+  color: var(--text3);
+  animation: frPillFade 0.4s ease-out both;
+  transition: border-color 200ms ease-out, color 200ms ease-out;
+}
+
+.fr-pill:nth-child(1) { animation-delay: 0.15s; }
+.fr-pill:nth-child(2) { animation-delay: 0.25s; }
+.fr-pill:nth-child(3) { animation-delay: 0.35s; }
+.fr-pill:nth-child(4) { animation-delay: 0.45s; }
+.fr-pill:nth-child(5) { animation-delay: 0.55s; }
+.fr-pill:nth-child(6) { animation-delay: 0.65s; }
+
+.fr-pill:hover {
+  border-color: #800020;
+  color: #800020;
+}
+
+.fr-pill svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* ════════ EXPIRY BANNERS ════════ */

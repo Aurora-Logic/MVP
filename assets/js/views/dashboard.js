@@ -232,41 +232,22 @@ function renderDashboard() {
   if (total === 0) {
     body.innerHTML = `
       <div class="first-run">
-        <div class="fr-hero">
-          <div class="fr-orb fr-orb-1"></div>
-          <div class="fr-orb fr-orb-2"></div>
-          <div class="fr-orb fr-orb-3"></div>
-          <div class="fr-hero-content">
-            <div class="fr-badge">Get Started</div>
-            <div class="fr-title">Create your first proposal</div>
-            <div class="fr-desc">Build professional proposals in minutes. Pick a template, fill in the details, and export a polished PDF your clients will love.</div>
-            <div class="fr-actions">
-              <button class="btn fr-btn-primary" onclick="openNewModal()"><i data-lucide="plus"></i> New Proposal</button>
-              <button class="btn-outline fr-btn-outline" onclick="fromTpl('web')"><i data-lucide="zap"></i> Try Web Dev Template</button>
-            </div>
+        <div class="fr-center">
+          <dotlottie-wc src="https://assets-v2.lottiefiles.com/a/7a754088-1187-11ee-96ce-1b80a1a80dd1/npZCl6daoz.lottie" autoplay loop speed="0.8" style="width:280px;height:280px;margin:0 auto"></dotlottie-wc>
+          <div class="fr-title">Create something great</div>
+          <div class="fr-desc">Build professional proposals, invoices, and contracts.<br>Pick a template, add your content, and export a polished PDF.</div>
+          <div class="fr-actions">
+            <button class="btn fr-btn-primary" onclick="openNewModal()"><i data-lucide="plus"></i> New Proposal</button>
+            <button class="btn-outline fr-btn-outline" onclick="fromTpl('web')"><i data-lucide="sparkles"></i> Start from Template</button>
           </div>
         </div>
-        <div class="fr-features">
-          <div class="fr-feat" style="animation-delay:0.1s">
-            <div class="fr-feat-icon"><i data-lucide="layout-template"></i></div>
-            <div class="fr-feat-t">13 Templates</div>
-            <div class="fr-feat-d">Modern, Classic, Minimal, and 10 more</div>
-          </div>
-          <div class="fr-feat" style="animation-delay:0.2s">
-            <div class="fr-feat-icon"><i data-lucide="palette"></i></div>
-            <div class="fr-feat-t">Your Brand</div>
-            <div class="fr-feat-d">Logo & colors on every proposal</div>
-          </div>
-          <div class="fr-feat" style="animation-delay:0.3s">
-            <div class="fr-feat-icon"><i data-lucide="download"></i></div>
-            <div class="fr-feat-t">PDF Export</div>
-            <div class="fr-feat-d">One-click polished PDF exports</div>
-          </div>
-          <div class="fr-feat" style="animation-delay:0.4s">
-            <div class="fr-feat-icon"><i data-lucide="share-2"></i></div>
-            <div class="fr-feat-t">Client Portal</div>
-            <div class="fr-feat-d">Share links & get digital acceptance</div>
-          </div>
+        <div class="fr-pills">
+          <div class="fr-pill"><i data-lucide="layout-template"></i> 13 PDF Templates</div>
+          <div class="fr-pill"><i data-lucide="palette"></i> Custom Branding</div>
+          <div class="fr-pill"><i data-lucide="download"></i> One-Click Export</div>
+          <div class="fr-pill"><i data-lucide="share-2"></i> Client Portal</div>
+          <div class="fr-pill"><i data-lucide="bar-chart-3"></i> Analytics</div>
+          <div class="fr-pill"><i data-lucide="users"></i> Client CRM</div>
         </div>
       </div>`;
     lucide.createIcons();
