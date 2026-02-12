@@ -40,7 +40,7 @@ function renderPayments(p) {
 
     el.innerHTML = `<div class="card card-p">
         <div class="card-head">
-            <div><div class="card-t">Payments Received</div><div class="card-d">Record actual payments from client</div></div>
+            <div><div class="card-t">Payments received</div><div class="card-d">Record actual payments from client</div></div>
             <div style="display:flex;gap:8px;align-items:center">
                 <span class="badge badge-${statusCls[pt.status]}"><span class="badge-dot"></span> ${statusLabels[pt.status]}</span>
                 <button class="btn-sm-outline" onclick="addPayment()"><i data-lucide="plus"></i> Record</button>
@@ -135,7 +135,7 @@ function buildPaymentsReceiptHtml(p, c, bc) {
     const payments = (p.payments || []).filter(pay => pay.amount > 0);
     if (!payments.length) return '';
     const mono = "'JetBrains Mono',monospace";
-    let h = `<div style="margin:20px 0;page-break-inside:avoid;break-inside:avoid"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:${bc};margin-bottom:8px">Payments Received</div>`;
+    let h = `<div style="margin:20px 0;page-break-inside:avoid;break-inside:avoid"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:${bc};margin-bottom:8px">Payments received</div>`;
     h += '<table style="width:100%;border-collapse:collapse"><thead><tr>';
     h += '<th style="text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;padding:7px 0;border-bottom:1px solid #e4e4e7;color:#a1a1aa">Date</th>';
     h += `<th style="text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;padding:7px 0;border-bottom:1px solid #e4e4e7;color:#a1a1aa">Amount</th>`;
@@ -162,7 +162,7 @@ function quickRecordPayment(pid) {
     wrap.className = 'modal-wrap';
     wrap.innerHTML = `<div class="modal" style="max-width:420px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-            <div class="modal-t">Record Payment</div>
+            <div class="modal-t">Record payment</div>
             <button class="btn-sm-icon-ghost" onclick="this.closest('.modal-wrap').remove()"><i data-lucide="x"></i></button>
         </div>
         <div style="margin-bottom:12px;font-size:13px;color:var(--text3)">${esc(p.title || 'Untitled')} — Balance: <strong style="color:var(--red)">${fmtCur(pt.balanceDue, c)}</strong></div>

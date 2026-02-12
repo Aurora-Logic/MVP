@@ -53,7 +53,7 @@ function openTCLib() {
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `
         <div class="modal modal-lg" onclick="event.stopPropagation()">
-            <div class="modal-t">Terms & Conditions Library</div>
+            <div class="modal-t">Terms & conditions library</div>
             <div class="modal-d">Click any term to append it to your payment terms</div>
             <div class="tc-tabs">${tabs}</div>
             <div class="tc-grid tc-grid-scroll" id="tcGrid">${renderItems('all')}</div>

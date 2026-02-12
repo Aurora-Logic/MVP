@@ -57,7 +57,7 @@ function showTemplateModal(tpl = null) {
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `
         <div class="modal" onclick="event.stopPropagation()">
-            <div class="modal-t">${isEdit ? 'Edit' : 'New'} Email Template</div>
+            <div class="modal-t">${isEdit ? 'Edit' : 'New'} email template</div>
             <div class="modal-d">Use {{client.name}}, {{proposal.title}}, {{sender.name}} as variables</div>
             <div class="fg" style="margin-top:12px"><label class="fl">Name</label><input type="text" id="tplName" value="${esc(tpl?.name || '')}"></div>
             <div class="fg"><label class="fl">Subject</label><input type="text" id="tplSubject" value="${esc(tpl?.subject || '')}"></div>

@@ -20,7 +20,7 @@ function renderDetails(p) {
     ${expiryHtml}
     <div class="card card-p" style="margin-bottom:14px">
       <div class="card-head">
-        <div><div class="card-t">Proposal Info</div><div class="card-d">Basic details</div></div>
+        <div><div class="card-t">Proposal info</div><div class="card-d">Basic details</div></div>
         <div class="status-dd">
           <span class="badge badge-${p.status}" onclick="toggleStatusMenu(event)" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" id="statusBadge" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleStatusMenu(event)}"><span class="badge-dot"></span> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)} <i data-lucide="chevron-down" style="width:12px;height:12px;margin-left:2px"></i></span>
           <div class="status-menu" id="statusMenu" role="listbox" aria-label="Proposal status">
@@ -42,7 +42,7 @@ function renderDetails(p) {
     </div>
     <div class="card card-p" style="margin-bottom:14px">
       <div class="card-head">
-        <div><div class="card-t">Cover Photo</div><div class="card-d">Optional hero image for your proposal</div></div>
+        <div><div class="card-t">Cover photo</div><div class="card-d">Optional hero image for your proposal</div></div>
       </div>
       <div class="cover-wrap" id="coverWrap">
         ${p.coverPhoto ?
@@ -62,7 +62,7 @@ function renderDetails(p) {
       </div>
     </div>
     <div class="card card-p" style="margin-bottom:14px">
-      <div class="card-head"><div><div class="card-t">From (Your Company)</div><div class="card-d">Auto-filled from settings</div></div></div>
+      <div class="card-head"><div><div class="card-t">From (your company)</div><div class="card-d">Auto-filled from settings</div></div></div>
       <div class="fr">
         <div class="fg"><label class="fl">Company</label><input type="text" id="fSCo" value="${esc(p.sender.company)}" oninput="dirty()"></div>
         <div class="fg"><label class="fl">Email</label><input type="email" id="fSEm" value="${esc(p.sender.email)}" oninput="dirty()"></div>
@@ -70,7 +70,7 @@ function renderDetails(p) {
       <div class="fg"><label class="fl">Address</label><input type="text" id="fSAd" value="${esc(p.sender.address)}" oninput="dirty()"></div>
     </div>
     <div class="card card-p">
-      <div class="card-head"><div><div class="card-t">To (Client)</div></div><button class="btn-sm-outline" onclick="showClientPicker()"><i data-lucide="users"></i> Pick Client</button></div>
+      <div class="card-head"><div><div class="card-t">To (client)</div></div><button class="btn-sm-outline" onclick="showClientPicker()"><i data-lucide="users"></i> Pick Client</button></div>
       <div class="fr">
         <div class="fg"><label class="fl">Company / Name</label><input type="text" id="fCNa" value="${esc(p.client.name)}" oninput="dirty()"></div>
         <div class="fg"><label class="fl">Contact Person</label><input type="text" id="fCCo" value="${esc(p.client.contact)}" oninput="dirty()"></div>
@@ -169,5 +169,5 @@ function removeCoverPhoto() {
         persist();
         renderDetails(p);
         toast('Cover photo removed');
-    }, { title: 'Remove Cover Photo', confirmText: 'Remove' });
+    }, { title: 'Remove Cover photo', confirmText: 'Remove' });
 }

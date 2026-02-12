@@ -12,7 +12,7 @@ function renderPackages(p) {
     if (!enabled) {
         el.innerHTML = `<div class="card card-p pkg-toggle-card" style="margin-bottom:14px">
             <div style="display:flex;align-items:center;justify-content:space-between">
-                <div><div class="card-t">Pricing Packages</div><div class="card-d">Offer tiered pricing options to your client</div></div>
+                <div><div class="card-t">Pricing packages</div><div class="card-d">Offer tiered pricing options to your client</div></div>
                 <button class="btn-sm-outline" onclick="togglePackages()"><i data-lucide="layers"></i> Enable</button>
             </div>
         </div>`;
@@ -56,7 +56,7 @@ function renderPackages(p) {
 
     el.innerHTML = `<div class="card card-p" style="margin-bottom:14px">
         <div class="card-head">
-            <div><div class="card-t">Pricing Packages</div><div class="card-d">Compare tiers side by side</div></div>
+            <div><div class="card-t">Pricing packages</div><div class="card-d">Compare tiers side by side</div></div>
             <div style="display:flex;gap:6px">
                 <button class="btn-sm-outline" onclick="addPackageFeature()"><i data-lucide="plus"></i> Feature</button>
                 <button class="btn-sm-ghost" onclick="togglePackages()" data-tooltip="Disable packages" data-side="bottom" data-align="center"><i data-lucide="x"></i></button>
@@ -159,7 +159,7 @@ function buildPackagesPdfHtml(p, c, bc) {
     if (!pkgs.length) return '';
     const currSymbol = c || defaultCurrency();
 
-    let h = `<div style="margin-top:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Pricing Packages</div>`;
+    let h = `<div style="margin-top:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Pricing packages</div>`;
     h += '<div style="display:flex;gap:12px;margin-bottom:12px">';
     pkgs.forEach(pkg => {
         h += `<div style="flex:1;border:${pkg.recommended ? '2px solid ' + bc : '1px solid #e4e4e7'};border-radius:8px;padding:16px;text-align:center;position:relative">`;

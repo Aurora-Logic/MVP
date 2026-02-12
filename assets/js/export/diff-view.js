@@ -19,8 +19,8 @@ function openDiffView() {
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     const escHandler = (e) => { if (e.key === 'Escape') { wrap.remove(); document.removeEventListener('keydown', escHandler); } };
     document.addEventListener('keydown', escHandler);
-    wrap.innerHTML = `<div class="modal modal-lg" role="dialog" aria-modal="true" aria-label="Compare Versions" onclick="event.stopPropagation()" style="max-width:900px;width:95vw">
-        <div class="modal-t">Compare Versions</div>
+    wrap.innerHTML = `<div class="modal modal-lg" role="dialog" aria-modal="true" aria-label="Compare versions" onclick="event.stopPropagation()" style="max-width:900px;width:95vw">
+        <div class="modal-t">Compare versions</div>
         <div class="modal-d">Select two versions to compare side by side</div>
         <div class="diff-selectors">
             <div class="diff-sel">

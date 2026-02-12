@@ -30,7 +30,7 @@ function openCsvImport() {
     wrap.id = 'csvModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `<div class="modal csv-modal-body" onclick="event.stopPropagation()">
-        <div class="modal-t"><i data-lucide="file-spreadsheet" class="modal-t-icon"></i> Import Line Items</div>
+        <div class="modal-t"><i data-lucide="file-spreadsheet" class="modal-t-icon"></i> Import line items</div>
         <div class="modal-d">Paste CSV data or upload a .csv file</div>
         <div class="fg">
             <label class="fl">Upload CSV File</label>

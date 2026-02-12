@@ -39,7 +39,7 @@ function renderPaymentSchedule(p) {
 
     el.innerHTML = `<div class="card card-p">
         <div class="card-head">
-            <div><div class="card-t">Payment Schedule</div><div class="card-d">Milestone-based payments</div></div>
+            <div><div class="card-t">Payment schedule</div><div class="card-d">Milestone-based payments</div></div>
             <div style="display:flex;gap:6px;align-items:center">
                 <div class="ps-mode-toggle">
                     <button class="ps-mode-btn ${mode === 'percentage' ? 'on' : ''}" onclick="toggleScheduleMode('percentage')">%</button>
@@ -176,7 +176,7 @@ function buildSchedulePdfHtml(p, c, bc) {
     const t = calcTotals(p);
     const colors = ['#007AFF', '#AF52DE', '#34C759', '#FF9500', '#FF3B30', '#5AC8FA'];
 
-    let h = `<div style="margin-top:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Payment Schedule</div>`;
+    let h = `<div style="margin-top:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Payment schedule</div>`;
     // Progress bar
     h += '<div style="display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:12px;background:#f4f4f5">';
     milestones.forEach((m, i) => {

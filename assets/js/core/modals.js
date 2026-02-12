@@ -86,7 +86,7 @@ function openNewModal() {
     ).join('');
 
     modal.innerHTML = `
-        <div class="modal-t">New Proposal</div>
+        <div class="modal-t">New proposal</div>
         <div class="modal-d">Pick a template and customize appearance</div>
         <div class="nm-tabs">${tabs}</div>
         <div class="tpl-grid">${cards}</div>

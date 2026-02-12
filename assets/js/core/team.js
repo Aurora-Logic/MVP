@@ -146,7 +146,7 @@ function showAddMemberModal() {
     wrap.className = 'modal-wrap'; wrap.id = 'addMemberModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `<div class="modal" onclick="event.stopPropagation()">
-        <div class="modal-t">Add Team Member</div>
+        <div class="modal-t">Add team member</div>
         <div class="fg" style="margin-top:12px"><label class="fl">Name</label><input type="text" id="newMemberName" placeholder="Jane Smith"></div>
         <div class="fg"><label class="fl">Email</label><input type="email" id="newMemberEmail" placeholder="jane@example.com"></div>
         <div class="fg"><label class="fl">Role</label><div id="newMemberRole"></div></div>

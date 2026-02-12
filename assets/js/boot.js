@@ -69,7 +69,7 @@ function showWhatsNew() {
     wrap.onclick = (e) => { if (e.target === wrap) dismissWhatsNew(); };
     wrap.innerHTML = `<div class="modal wn-modal" onclick="event.stopPropagation()">
         <div class="wn-emoji">&#127881;</div>
-        <div class="modal-t wn-center">What's New in ${typeof appName === 'function' ? appName() : 'ProposalKit'}</div>
+        <div class="modal-t wn-center">What's new in ${typeof appName === 'function' ? appName() : 'ProposalKit'}</div>
         <div class="modal-d wn-center">Version ${APP_VERSION}</div>
         <div class="wn-list">${items}</div>
         <div class="modal-foot wn-center"><button class="btn-sm" onclick="dismissWhatsNew()">Got it</button></div>

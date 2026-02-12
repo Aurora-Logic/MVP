@@ -40,15 +40,15 @@ function buildMetricCards(active, c) {
     const trendIcon = (pct) => pct >= 0 ? 'trending-up' : 'trending-down';
     return `<div class="dash-metric-grid">
       <div class="metric-card mc-revenue metric-card-clickable" onclick="goNav('editor')">
-        <div class="metric-card-header"><span class="metric-card-label">Total Revenue</span><div class="metric-card-value">${fmtCur(totalValue, c)}</div><div class="metric-card-action">${trend(valTrend)}</div></div>
+        <div class="metric-card-header"><span class="metric-card-label">Total revenue</span><div class="metric-card-value">${fmtCur(totalValue, c)}</div><div class="metric-card-action">${trend(valTrend)}</div></div>
         <div class="metric-card-footer"><div class="metric-card-footer-trend">${valTrend >= 0 ? '+' : ''}${valTrend}% from last month <i data-lucide="${trendIcon(valTrend)}"></i></div><div class="metric-card-footer-desc">Revenue across all proposals</div></div>
       </div>
       <div class="metric-card mc-active metric-card-clickable" onclick="setFilter('sent');goNav('editor')">
-        <div class="metric-card-header"><span class="metric-card-label">Active Proposals</span><div class="metric-card-value">${sent}</div><div class="metric-card-action">${trend(0)}</div></div>
+        <div class="metric-card-header"><span class="metric-card-label">Active proposals</span><div class="metric-card-value">${sent}</div><div class="metric-card-action">${trend(0)}</div></div>
         <div class="metric-card-footer"><div class="metric-card-footer-trend">${sent} awaiting response</div><div class="metric-card-footer-desc">Proposals pending client action</div></div>
       </div>
       <div class="metric-card mc-won metric-card-clickable" onclick="setFilter('accepted');goNav('editor')">
-        <div class="metric-card-header"><span class="metric-card-label">Won Deals</span><div class="metric-card-value">${accepted}</div><div class="metric-card-action">${trend(wonTrend)}</div></div>
+        <div class="metric-card-header"><span class="metric-card-label">Won deals</span><div class="metric-card-value">${accepted}</div><div class="metric-card-action">${trend(wonTrend)}</div></div>
         <div class="metric-card-footer"><div class="metric-card-footer-trend">${winRate}% win rate <i data-lucide="${trendIcon(wonTrend)}"></i></div><div class="metric-card-footer-desc">Conversion rate this period</div></div>
       </div>
       <div class="metric-card mc-outstanding${duesTotal > 0 ? ' metric-card-clickable' : ''}"${duesTotal > 0 ? ` onclick="setFilter('dues');goNav('editor')"` : ''}>
@@ -134,10 +134,10 @@ function buildSideMetrics(active) {
   const stats = computeAnalytics(active);
   const c = active[0]?.currency || defaultCurrency();
   return `<div class="dash-side-metrics">
-    <div class="dsm-item"><div class="dsm-val ${stats.winRate >= 50 ? 'dsm-good' : stats.winRate > 0 ? 'dsm-mid' : ''}">${stats.winRate}%</div><div class="dsm-label">Win Rate</div><div class="dsm-sub">${stats.accepted}/${stats.decided} decided</div></div>
-    <div class="dsm-item"><div class="dsm-val">${fmtCur(stats.avgValue, c)}</div><div class="dsm-label">Avg Value</div></div>
+    <div class="dsm-item"><div class="dsm-val ${stats.winRate >= 50 ? 'dsm-good' : stats.winRate > 0 ? 'dsm-mid' : ''}">${stats.winRate}%</div><div class="dsm-label">Win rate</div><div class="dsm-sub">${stats.accepted}/${stats.decided} decided</div></div>
+    <div class="dsm-item"><div class="dsm-val">${fmtCur(stats.avgValue, c)}</div><div class="dsm-label">Avg value</div></div>
     <div class="dsm-item"><div class="dsm-val">${fmtCur(stats.forecast, c)}</div><div class="dsm-label">Forecast</div></div>
-    <div class="dsm-item"><div class="dsm-val">${stats.avgDays > 0 ? stats.avgDays + 'd' : '\u2014'}</div><div class="dsm-label">Avg Close</div></div>
+    <div class="dsm-item"><div class="dsm-val">${stats.avgDays > 0 ? stats.avgDays + 'd' : '\u2014'}</div><div class="dsm-label">Avg close</div></div>
   </div>`;
 }
 
@@ -149,7 +149,7 @@ function buildActivityFeed() {
   if (!recents.length) return '';
   const si = { draft: 'file-text', sent: 'send', accepted: 'check-circle', declined: 'x-circle', expired: 'clock' };
   const sc = { draft: 'var(--text3)', sent: 'var(--blue)', accepted: 'var(--green)', declined: 'var(--red)', expired: 'var(--amber)' };
-  return `<div class="dash-activity"><div class="dash-activity-title">Recent Activity</div>${recents.map(p => `<div class="act-item" onclick="loadEditor('${escAttr(p.id)}')"><i data-lucide="${si[p.status] || 'file-text'}" style="color:${sc[p.status] || 'var(--text3)'}"></i><div class="act-body"><div class="act-name">${esc(p.title || 'Untitled')}</div><div class="act-time">${timeAgo(p.updatedAt || p.createdAt)}</div></div></div>`).join('')}</div>`;
+  return `<div class="dash-activity"><div class="dash-activity-title">Recent activity</div>${recents.map(p => `<div class="act-item" onclick="loadEditor('${escAttr(p.id)}')"><i data-lucide="${si[p.status] || 'file-text'}" style="color:${sc[p.status] || 'var(--text3)'}"></i><div class="act-body"><div class="act-name">${esc(p.title || 'Untitled')}</div><div class="act-time">${timeAgo(p.updatedAt || p.createdAt)}</div></div></div>`).join('')}</div>`;
 }
 
 function buildDuesCard(active, c) {
@@ -165,7 +165,7 @@ function buildDuesCard(active, c) {
   const count = countPartial + countUnpaid;
   return `<div class="dues-card" role="button" tabindex="0" onclick="setFilter('dues');goNav('editor')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
     <div class="resume-card-header">
-      <span class="resume-card-label">Outstanding Payments</span>
+      <span class="resume-card-label">Outstanding payments</span>
       <div class="resume-card-title dues-card-val">${fmtCur(totalDue, c)}</div>
       <div class="resume-card-action"><span class="resume-card-badge status-declined">${count} unpaid</span></div>
     </div>
@@ -195,7 +195,7 @@ function buildStatusChart(active) {
     `<div class="sbc-legend-item"><span class="sbc-dot" style="background:${i.color}"></span>${i.label} <strong>${counts[i.key]}</strong></div>`
   ).join('');
   return `<div class="sbc-glass-card">
-    <div class="sbc-glass-header"><div class="sbc-glass-title">Proposal Status</div><div class="sbc-glass-sub">${total} total</div></div>
+    <div class="sbc-glass-header"><div class="sbc-glass-title">Proposal status</div><div class="sbc-glass-sub">${total} total</div></div>
     <div class="sbc-bar">${bar}</div>
     <div class="sbc-legend">${legend}</div>
   </div>`;
@@ -237,15 +237,15 @@ function renderDashboard() {
           <div class="fr-title">Create something great</div>
           <div class="fr-desc">Build professional proposals, invoices, and contracts.<br>Pick a template, add your content, and export a polished PDF.</div>
           <div class="fr-actions">
-            <button class="btn fr-btn-primary" onclick="openNewModal()"><i data-lucide="plus"></i> New Proposal</button>
-            <button class="btn-outline fr-btn-outline" onclick="fromTpl('web')"><i data-lucide="sparkles"></i> Start from Template</button>
+            <button class="btn fr-btn-primary" onclick="openNewModal()"><i data-lucide="plus"></i> New proposal</button>
+            <button class="btn-outline fr-btn-outline" onclick="fromTpl('web')"><i data-lucide="sparkles"></i> Start from template</button>
           </div>
         </div>
         <div class="fr-pills">
-          <div class="fr-pill"><i data-lucide="layout-template"></i> 13 PDF Templates</div>
-          <div class="fr-pill"><i data-lucide="palette"></i> Custom Branding</div>
-          <div class="fr-pill"><i data-lucide="download"></i> One-Click Export</div>
-          <div class="fr-pill"><i data-lucide="share-2"></i> Client Portal</div>
+          <div class="fr-pill"><i data-lucide="layout-template"></i> 13 PDF templates</div>
+          <div class="fr-pill"><i data-lucide="palette"></i> Custom branding</div>
+          <div class="fr-pill"><i data-lucide="download"></i> One-click export</div>
+          <div class="fr-pill"><i data-lucide="share-2"></i> Client portal</div>
           <div class="fr-pill"><i data-lucide="bar-chart-3"></i> Analytics</div>
           <div class="fr-pill"><i data-lucide="users"></i> Client CRM</div>
         </div>

@@ -30,11 +30,11 @@ function shareProposal() {
 
     wrap.innerHTML = `
         <div class="modal modal-sm" onclick="event.stopPropagation()">
-            <div class="modal-t"><i data-lucide="share-2" style="width:20px;height:20px;margin-right:8px;vertical-align:-4px"></i> Share Proposal</div>
+            <div class="modal-t"><i data-lucide="share-2" style="width:20px;height:20px;margin-right:8px;vertical-align:-4px"></i> Share proposal</div>
             <div class="modal-d">Send this link to your client. They can view the proposal and accept or decline it directly.</div>
 
             <div style="margin:16px 0">
-                <label class="form-label">Client Portal Link</label>
+                <label class="form-label">Client portal link</label>
                 <div style="display:flex;gap:8px">
                     <input type="text" class="input" id="shareLink" value="${esc(shareUrl)}" readonly style="flex:1;font-size:12px">
                     <button class="btn-sm" onclick="copyShareLink()">

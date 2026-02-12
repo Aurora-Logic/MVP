@@ -177,7 +177,7 @@ function initKeyboardShortcuts() {
     });
 }
 
-// ── Send Feedback modal ──
+// ── Send feedback modal ──
 function openFeedbackModal() {
     const existing = document.getElementById('feedbackModal');
     if (existing) existing.remove();
@@ -185,7 +185,7 @@ function openFeedbackModal() {
     wrap.className = 'modal-wrap'; wrap.id = 'feedbackModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `<div class="modal" style="max-width:440px" onclick="event.stopPropagation()">
-        <div class="modal-t">Send Feedback</div>
+        <div class="modal-t">Send feedback</div>
         <div class="modal-d" style="margin-bottom:12px">Report a bug, suggest a feature, or share your thoughts.</div>
         <div style="display:flex;gap:8px;margin-bottom:16px">
             <button class="btn-sm-outline fb-type-btn on" data-type="bug" onclick="selectFbType(this)"><i data-lucide="bug"></i>Bug</button>
@@ -195,7 +195,7 @@ function openFeedbackModal() {
         <textarea id="fbText" rows="4" placeholder="Describe the issue or suggestion..." style="width:100%;resize:vertical"></textarea>
         <div class="modal-foot" style="margin-top:16px">
             <button class="btn-sm-ghost" onclick="document.getElementById('feedbackModal').remove()">Cancel</button>
-            <button class="btn-sm" onclick="submitFeedback()">Send Feedback</button>
+            <button class="btn-sm" onclick="submitFeedback()">Send feedback</button>
         </div>
     </div>`;
     document.body.appendChild(wrap);

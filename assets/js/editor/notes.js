@@ -6,7 +6,7 @@
 function renderNotes(p) {
     const notes = p.notes || [];
     let html = `<div class="card card-p">
-    <div class="card-head"><div><div class="card-t">Internal Notes</div><div class="card-d">Only visible to you — not included in PDF</div></div></div>
+    <div class="card-head"><div><div class="card-t">Internal notes</div><div class="card-d">Only visible to you — not included in PDF</div></div></div>
     <div style="display:flex;gap:8px;margin-bottom:14px">
       <input type="text" id="noteInput" placeholder="Add a note..." style="flex:1" onkeydown="if(event.key==='Enter')addNote()">
       <button class="btn-sm-outline" onclick="addNote()"><i data-lucide="plus"></i> Add</button>

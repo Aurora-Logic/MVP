@@ -111,7 +111,7 @@ function renderSettings() {
         ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="setBankUpi" value="${esc(b.upi || '')}" placeholder="e.g. business@upi" oninput="saveSettings()"><div class="fh">Shown as QR code on PDFs (India only)</div></div>` : ''}
       </div>
       <div class="settings-section" id="sec-email">
-        <div class="settings-section-head"><div class="settings-section-t">Email Templates</div><div class="settings-section-d">Quick emails for sending proposals</div></div>
+        <div class="settings-section-head"><div class="settings-section-t">Email templates</div><div class="settings-section-d">Quick emails for sending proposals</div></div>
         <button class="btn-sm-outline" onclick="addEmailTemplate()" style="margin-bottom:12px"><i data-lucide="plus"></i> Add Template</button>
         <div id="emailTplList"></div>
       </div>
@@ -136,7 +136,7 @@ function renderSettings() {
       </div>
       <div class="settings-danger-divider"><span class="settings-danger-label">Danger Zone</span></div>
       <div class="settings-section" id="sec-data">
-        <div class="settings-section-head"><div class="settings-section-t">Data Management</div><div class="settings-section-d">Export, import, or clear your local data</div></div>
+        <div class="settings-section-head"><div class="settings-section-t">Data management</div><div class="settings-section-d">Export, import, or clear your local data</div></div>
         <div class="fg"><label class="fl">Webhook URL</label>
           <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
           <div class="fh">POST proposal data to this URL on export</div></div>

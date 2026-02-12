@@ -26,7 +26,7 @@ function emailProposal(id) {
 
     wrap.innerHTML = `
         <div class="modal modal-sm" onclick="event.stopPropagation()">
-            <div class="modal-t">Send Proposal via Email</div>
+            <div class="modal-t">Send proposal via email</div>
             <div class="modal-d">Select an email template</div>
             <div style="max-height:300px;overflow-y:auto;margin-top:12px">${tplOptions}</div>
             <div class="modal-foot">

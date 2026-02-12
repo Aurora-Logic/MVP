@@ -108,7 +108,7 @@ function showCompletenessDetail() {
 
     wrap.innerHTML = `
         <div class="modal modal-sm" onclick="event.stopPropagation()">
-            <div class="modal-t">Proposal Score</div>
+            <div class="modal-t">Proposal score</div>
             <div class="modal-d">Weighted best-practice checks for stronger proposals</div>
             <div class="comp-score-row">
                 <div class="comp-score-val" style="color:${color}">${score}%</div>

@@ -23,7 +23,7 @@ function renderAddOns(p) {
 
     el.innerHTML = `<div class="card card-p">
         <div class="card-head">
-            <div><div class="card-t">Optional Add-Ons</div><div class="card-d">Extras your client can opt into</div></div>
+            <div><div class="card-t">Optional add-ons</div><div class="card-d">Extras your client can opt into</div></div>
             <button class="btn-sm-outline" onclick="addAddOn()"><i data-lucide="plus"></i> Add</button>
         </div>
         <div id="aoBody">${rows || '<div class="ao-empty">No add-ons yet. Click "Add" to create optional extras.</div>'}</div>
@@ -86,7 +86,7 @@ function buildAddOnsPdfHtml(p, c, bc) {
     const addOns = (p.addOns || []).filter(a => a.desc);
     if (!addOns.length) return '';
     const currSymbol = c || defaultCurrency();
-    let h = `<div style="margin-top:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Optional Add-Ons</div>`;
+    let h = `<div style="margin-top:20px;page-break-inside:avoid;break-inside:avoid"><div style="font-size:14px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid ${bc};color:${bc}">Optional add-ons</div>`;
     addOns.forEach(ao => {
         const icon = ao.selected ? '☑' : '☐';
         h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f4f4f5">

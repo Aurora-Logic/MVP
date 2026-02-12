@@ -233,7 +233,7 @@ function openLibrary() {
     wrap.className = 'modal-wrap'; wrap.id = 'libModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `<div class="modal modal-sec-lib" onclick="event.stopPropagation()">
-        <div class="modal-t">Section Library</div>
+        <div class="modal-t">Section library</div>
         <div class="modal-d">Click to insert into your proposal</div>
         <div class="lib-tabs lib-tabs-bar">
             <button class="filter-tab on" id="libTabSections" onclick="setLibTab('sections',this)">Sections</button>

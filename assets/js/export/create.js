@@ -55,7 +55,7 @@ function dupPropWithClient(id) {
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     let items = CLIENTS.map((c, i) => `<div class="cp-item" onclick="doDupWithClient('${escAttr(id)}', ${i})"><span class="cp-item-name">${esc(c.name)}</span><span class="cp-item-email">${esc(c.email)}</span></div>`).join('');
     items += `<div class="cp-item" onclick="doDupWithClient('${escAttr(id)}', -1)" style="color:var(--text4);font-style:italic"><span class="cp-item-name">Keep original client</span></div>`;
-    wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-t">Duplicate for Client</div><div class="modal-d">Select a client for the duplicated proposal</div><div style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">${items}</div><div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('dupClientModal').remove()">Cancel</button></div></div>`;
+    wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-t">Duplicate for client</div><div class="modal-d">Select a client for the duplicated proposal</div><div style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">${items}</div><div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('dupClientModal').remove()">Cancel</button></div></div>`;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
 }
@@ -105,7 +105,7 @@ function saveAsTemplate() {
     wrap.className = 'modal-wrap'; wrap.id = 'saveTplModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()">
-        <div class="modal-t">Save as Template</div>
+        <div class="modal-t">Save as template</div>
         <div class="modal-d">Save this proposal's structure as a reusable template</div>
         <div class="fg" style="margin-top:12px"><label class="fl">Template Name</label><input type="text" id="saveTplName" value="${esc(p.title)}" placeholder="e.g. Web Dev Starter"></div>
         <div class="modal-foot">

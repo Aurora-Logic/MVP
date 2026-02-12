@@ -48,7 +48,7 @@ function renderProfile() {
             ${email ? `<div class="prof-email">${esc(email)}</div>` : ''}
             ${memberSince ? `<div class="prof-since">Member since ${memberSince}</div>` : ''}
           </div>
-          <button class="btn-sm-outline prof-edit-btn" onclick="goNav('settings')"><i data-lucide="settings"></i> Edit Profile</button>
+          <button class="btn-sm-outline prof-edit-btn" onclick="goNav('settings')"><i data-lucide="settings"></i> Edit profile</button>
         </div>
       </div>
 
@@ -77,7 +77,7 @@ function renderProfile() {
 
       <div class="prof-grid">
         <div class="prof-card">
-          <div class="prof-card-t"><i data-lucide="building-2"></i> Business Details</div>
+          <div class="prof-card-t"><i data-lucide="building-2"></i> Business details</div>
           <div class="prof-card-body">
             ${buildProfRow('Company', company)}
             ${buildProfRow('Phone', phone)}
@@ -88,7 +88,7 @@ function renderProfile() {
         </div>
 
         <div class="prof-card">
-          <div class="prof-card-t"><i data-lucide="landmark"></i> Payment Info</div>
+          <div class="prof-card-t"><i data-lucide="landmark"></i> Payment info</div>
           <div class="prof-card-body">
             ${buildProfRow('Bank', CONFIG?.bank?.name)}
             ${buildProfRow('Account Holder', CONFIG?.bank?.holder)}
@@ -142,7 +142,7 @@ function buildTaxCard() {
     }
     if (!rows.length) return '';
     return `<div class="prof-card">
-      <div class="prof-card-t"><i data-lucide="receipt"></i> Tax & Compliance</div>
+      <div class="prof-card-t"><i data-lucide="receipt"></i> Tax & compliance</div>
       <div class="prof-card-body">${rows.join('')}</div>
     </div>`;
 }

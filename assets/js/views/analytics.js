@@ -246,7 +246,7 @@ function buildAnalyticsWidget() {
         </div>
         <div class="an-stats-grid">
             <div class="an-stat-card sc-green">
-                <div class="an-stat-label">Win Rate</div>
+                <div class="an-stat-label">Win rate</div>
                 <div class="an-stat-val">${stats.winRate}%</div>
                 <div class="an-stat-sub">${stats.accepted}/${stats.decided} decided</div>
             </div>
@@ -256,12 +256,12 @@ function buildAnalyticsWidget() {
                 <div class="an-stat-sub">Active proposals</div>
             </div>
             <div class="an-stat-card sc-primary">
-                <div class="an-stat-label">Avg Value</div>
+                <div class="an-stat-label">Avg value</div>
                 <div class="an-stat-val">${fmtCur(stats.avgValue, c)}</div>
                 <div class="an-stat-sub">Per proposal</div>
             </div>
             <div class="an-stat-card sc-red">
-                <div class="an-stat-label">Avg Close</div>
+                <div class="an-stat-label">Avg close</div>
                 <div class="an-stat-val">${stats.avgDays > 0 ? stats.avgDays + ' days' : '\u2014'}</div>
                 <div class="an-stat-sub">Time to close</div>
             </div>

@@ -247,6 +247,11 @@
   margin-bottom: 14px;
 }
 
+.empty dotlottie-wc {
+  display: block;
+  margin: 0 auto 4px;
+}
+
 /* Compact empty state (editor tabs) */
 .empty-sm {
   padding: 40px 20px;
@@ -267,19 +272,7 @@
   font-size: 14px;
 }
 
-/* First run (dashboard) */
-/* Animations */
-@keyframes frFadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes frPillFade {
-  from { opacity: 0; transform: translateY(8px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* ════════ EMPTY STATE — Clean Centered ════════ */
+/* ════════ EMPTY STATE — First Run (with Lottie) ════════ */
 
 .first-run {
   display: flex;
@@ -288,7 +281,6 @@
   justify-content: center;
   min-height: calc(100vh - 160px);
   padding: 40px 20px;
-  animation: frFadeUp 0.5s ease-out;
 }
 
 .fr-center {
@@ -367,16 +359,8 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--text3);
-  animation: frPillFade 0.4s ease-out both;
   transition: border-color 200ms ease-out, color 200ms ease-out;
 }
-
-.fr-pill:nth-child(1) { animation-delay: 0.15s; }
-.fr-pill:nth-child(2) { animation-delay: 0.25s; }
-.fr-pill:nth-child(3) { animation-delay: 0.35s; }
-.fr-pill:nth-child(4) { animation-delay: 0.45s; }
-.fr-pill:nth-child(5) { animation-delay: 0.55s; }
-.fr-pill:nth-child(6) { animation-delay: 0.65s; }
 
 .fr-pill:hover {
   border-color: #800020;

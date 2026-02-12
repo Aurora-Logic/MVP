@@ -161,7 +161,7 @@ function acceptAiResult(sectionIdx) {
 
 function renderAiSettingsCard() {
     return `<div class="card card-p" style="margin-bottom:14px">
-        <div class="card-head"><div><div class="card-t">AI Writing Assistant</div><div class="card-d">Powered by Anthropic Claude</div></div></div>
+        <div class="card-head"><div><div class="card-t">AI writing assistant</div><div class="card-d">Powered by Anthropic Claude</div></div></div>
         <div class="fg"><label class="fl">API Key</label>
             <input type="password" id="setAiKey" value="${esc(CONFIG?.aiApiKey || '')}" placeholder="sk-ant-api03-..." oninput="saveSettings()">
             <div class="fh">Get your key from <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>. Stored locally only.</div>

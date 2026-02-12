@@ -252,7 +252,7 @@ function renderProposal() {
                 <div class="action-buttons">
                     <button class="btn btn-dark" onclick="showAcceptModal()">
                         <i data-lucide="check"></i>
-                        Accept Proposal
+                        Accept proposal
                     </button>
                     <button class="btn btn-out" onclick="showDeclineModal()">
                         <i data-lucide="x"></i>
@@ -337,7 +337,7 @@ function showResponseModal(type) {
 
     modal.innerHTML = `
         <div class="modal" style="max-width:${isAccept ? '480px' : '400px'}" onclick="event.stopPropagation()">
-            <div class="modal-t">${isAccept ? 'Accept Proposal' : 'Decline Proposal'}</div>
+            <div class="modal-t">${isAccept ? 'Accept proposal' : 'Decline proposal'}</div>
             <div class="modal-d">${isAccept
                 ? 'Type your name and sign below to formally accept this proposal.'
                 : 'We\'re sorry to hear that. Please let us know why (optional).'}</div>

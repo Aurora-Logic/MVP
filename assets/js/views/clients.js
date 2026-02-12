@@ -6,21 +6,21 @@
 function renderClients() {
     CUR = null;
     document.getElementById('topTitle').textContent = 'Clients';
-    document.getElementById('topRight').innerHTML = '<button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add Client</button>';
+    document.getElementById('topRight').innerHTML = '<button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add client</button>';
     const body = document.getElementById('bodyScroll');
 
     if (!CLIENTS.length) {
         body.innerHTML = `<div class="empty" style="padding:60px 20px">
-            <div class="empty-icon" style="width:56px;height:56px;border-radius:50%;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="users" style="width:24px;height:24px;color:var(--blue)"></i></div>
+            <dotlottie-wc src="https://assets-v2.lottiefiles.com/a/421db1cc-118a-11ee-aed5-fb6b0052b9aa/1KyamM2lee.lottie" autoplay loop speed="0.8" style="width:200px;height:200px;margin:0 auto"></dotlottie-wc>
             <div class="empty-t">Build your client database</div>
             <div class="empty-d">Save client details once, reuse on every proposal. No more retyping names and emails.</div>
             <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
-                <button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add Client</button>
+                <button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add client</button>
             </div>
-            <div style="display:flex;gap:24px;justify-content:center;margin-top:32px;color:var(--text4);font-size:12px">
-                <span><i data-lucide="zap" style="width:12px;height:12px;vertical-align:-1px"></i> Auto-fill proposals</span>
-                <span><i data-lucide="bar-chart-3" style="width:12px;height:12px;vertical-align:-1px"></i> Track per-client stats</span>
-                <span><i data-lucide="repeat" style="width:12px;height:12px;vertical-align:-1px"></i> Reuse across proposals</span>
+            <div style="display:flex;gap:24px;justify-content:center;margin-top:32px;color:var(--text4);font-size:14px">
+                <span><i data-lucide="zap" style="width:14px;height:14px;vertical-align:-2px"></i> Auto-fill proposals</span>
+                <span><i data-lucide="bar-chart-3" style="width:14px;height:14px;vertical-align:-2px"></i> Track per-client stats</span>
+                <span><i data-lucide="repeat" style="width:14px;height:14px;vertical-align:-2px"></i> Reuse across proposals</span>
             </div>
         </div>`;
         lucide.createIcons(); return;
@@ -59,7 +59,7 @@ function openAddClient(idx) {
     wrap.className = 'modal-wrap'; wrap.id = 'clientModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()">
-    <div class="modal-t">${isEdit ? 'Edit' : 'Add'} Client</div>
+    <div class="modal-t">${isEdit ? 'Edit' : 'Add'} client</div>
     <div class="modal-d">Save client details for quick access</div>
     <div class="fg"><label class="fl">Company / Name</label><input type="text" id="acName" value="${esc(c.name)}"></div>
     <div class="fr">
@@ -110,7 +110,7 @@ function showClientPicker() {
     wrap.className = 'modal-wrap'; wrap.id = 'cpModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     const items = CLIENTS.map((c, i) => `<div class="cp-item" role="button" tabindex="0" onclick="pickClient(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><span class="cp-item-name">${esc(c.name)}</span><span class="cp-item-email">${esc(c.email)}</span></div>`).join('');
-    wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-t">Select Client</div><div class="modal-d">Pick a saved client to auto-fill</div><div style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">${items}</div><div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('cpModal').remove()">Cancel</button></div></div>`;
+    wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-t">Select client</div><div class="modal-d">Pick a saved client to auto-fill</div><div style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">${items}</div><div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('cpModal').remove()">Cancel</button></div></div>`;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
 }
@@ -157,7 +157,7 @@ function showClientInsight(idx) {
         <div class="ci-metric"><div class="ci-metric-val">${fmtCur(totalVal, props[0]?.currency || defaultCurrency())}</div><div class="ci-metric-label">Total Value</div></div>
         <div class="ci-metric"><div class="ci-metric-val">${avgDays > 0 ? avgDays + 'd' : '—'}</div><div class="ci-metric-label">Avg Response</div></div>
     </div>
-    <div style="font-size:14px;font-weight:700;margin-bottom:10px">Proposal History</div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:10px">Proposal history</div>
     ${buildClientHistory(props)}`;
     lucide.createIcons();
 }
