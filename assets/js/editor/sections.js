@@ -2,6 +2,7 @@
 // SECTIONS TAB
 // ════════════════════════════════════════
 
+/* global destroyTiptapMenus */
 /* exported addSec, showAddSectionMenu, togSec, updSecName, delSec, saveSectionToLib, openLibrary, setLibCat, setLibTab, insertFromLib */
 function renderSections(p) {
     const el = document.getElementById('edSections');

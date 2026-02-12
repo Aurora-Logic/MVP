@@ -2,6 +2,7 @@
 // EDITOR — Main editor view + Tiptap helpers
 // ════════════════════════════════════════
 
+/* global attachBubbleMenu, attachSlashMenu */
 // ─── Tiptap Factory ───
 /* exported createEditor, migrateEditorContent, loadEditor, refreshStatsBar, edTab */
 /** @param {HTMLElement|string} holder @param {{content?: string, placeholder?: string, headingLevels?: number[], tables?: boolean, taskList?: boolean, onChange?: Function}} [opts] @returns {Object|null} Tiptap editor instance */
