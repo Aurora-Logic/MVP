@@ -43,13 +43,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.12.0';
+const APP_VERSION = '2.13.0';
 const APP_BUILD = '20260212';
 const WHATS_NEW_ITEMS = [
-    { icon: 'type', title: 'SF Pro Typography', desc: 'System font stack with SF Pro Display, Helvetica Neue, and system-ui fallbacks.' },
-    { icon: 'search', title: 'Quick Search Button', desc: 'New search icon next to Quick Create opens the command palette instantly.' },
-    { icon: 'message-square-warning', title: 'Send Feedback', desc: 'Report bugs, suggest features, or share thoughts — right from the sidebar.' },
-    { icon: 'sun', title: 'Light Mode Default', desc: 'App now defaults to light mode. Dark mode available in settings.' }
+    { icon: 'users', title: 'Expanded Client Fields', desc: 'Full client form with customer type, salutation, company, address, state dropdown, and GST number.' },
+    { icon: 'file-text', title: 'Client Portal Redesign', desc: 'Shared proposal viewer now matches the main app with a sleek topbar and pill buttons.' },
+    { icon: 'book-open', title: 'How to Use Guide', desc: 'New sidebar shortcut opens a 5-step guide to get started with the app.' },
+    { icon: 'layout-dashboard', title: 'Settings Card Layout', desc: 'Settings sections wrapped in cards matching the dashboard design pattern.' }
 ];
 
 function checkWhatsNew() {

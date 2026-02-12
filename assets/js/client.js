@@ -82,8 +82,21 @@ async function init() {
     renderProposal();
 }
 
+function buildTopbar(title) {
+    const company = proposal?.sender?.company || CONFIG?.company || 'ProposalKit';
+    return `<header class="topbar">
+        <div class="topbar-left">
+            ${CONFIG?.logo ? `<img src="${esc(CONFIG.logo)}" class="topbar-logo">` : ''}
+            <span class="topbar-company">${esc(company)}</span>
+            ${title ? `<span class="topbar-sep">/</span><span class="topbar-title">${esc(title)}</span>` : ''}
+        </div>
+        <div class="topbar-actions"></div>
+    </header>`;
+}
+
 function showError(title, message) {
     document.getElementById('app').innerHTML = `
+        ${buildTopbar('')}
         <div class="container">
             <div class="error">
                 <i data-lucide="alert-triangle" class="error-icon"></i>
@@ -100,6 +113,7 @@ function showResponded(status) {
     const cr = proposal.clientResponse || {};
     const sigImg = cr.clientSignature?.startsWith('data:image/') ? cr.clientSignature : '';
     document.getElementById('app').innerHTML = `
+        ${buildTopbar(proposal.title || 'Proposal')}
         <div class="container">
             <div class="responded">
                 <i data-lucide="${isAccepted ? 'check-circle-2' : 'x-circle'}" class="responded-icon ${status}"></i>
@@ -200,16 +214,17 @@ function renderProposal() {
         `;
     }
 
+    const company = p.sender?.company || CONFIG?.company || '';
     document.getElementById('app').innerHTML = `
-        <header class="header">
-            <div class="header-inner">
-                <div class="logo">
-                    ${CONFIG?.logo ? `<img src="${esc(CONFIG.logo)}" class="logo-img">` : ''}
-                    <span class="logo-text">${esc(p.sender?.company || CONFIG?.company || '')}</span>
-                </div>
-                <div class="header-actions">
-                    <button class="btn btn-out btn-sm" onclick="window.print()"><i data-lucide="printer"></i> Print</button>
-                </div>
+        <header class="topbar">
+            <div class="topbar-left">
+                ${CONFIG?.logo ? `<img src="${esc(CONFIG.logo)}" class="topbar-logo">` : ''}
+                <span class="topbar-company">${esc(company)}</span>
+                <span class="topbar-sep">/</span>
+                <span class="topbar-title">${esc(p.title || 'Proposal')}</span>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn btn-out btn-sm" onclick="window.print()"><i data-lucide="printer"></i> Print</button>
             </div>
         </header>
 

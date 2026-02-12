@@ -7,7 +7,7 @@ interface Section { title: string; content?: string; type?: string; testimonial?
 interface Proposal {
     id: string; title: string; number: string; status: string; date: string; validUntil: string;
     currency: string; sender: { company: string; email: string; address: string };
-    client: { name: string; contact: string; email: string; phone: string };
+    client: { name: string; contact: string; email: string; phone: string; address?: string; gstNumber?: string };
     lineItems: LineItem[]; sections: Section[]; discount: number; taxRate: number;
     coverPage?: boolean; shareToken?: string; version?: number; versionHistory?: object[];
     createdAt: number; updatedAt: number; archived?: boolean; clientResponse?: object;
@@ -25,7 +25,11 @@ interface AppConfig {
 }
 interface Client {
     id: string; name: string; contact?: string; email?: string; phone?: string;
-    company?: string; address?: string; notes?: string;
+    company?: string; address?: string; notes?: string; customerType?: string;
+    salutation?: string; firstName?: string; lastName?: string; companyName?: string;
+    displayName?: string; workPhone?: string; mobile?: string; attention?: string;
+    country?: string; state?: string; street1?: string; street2?: string;
+    city?: string; pinCode?: string; gstNumber?: string;
 }
 
 // ── Core State (store.js) ──
@@ -103,6 +107,7 @@ declare function toggleMobileSidebar(): void;
 declare function closeMobileSidebar(): void;
 declare function toggleSidebar(): void;
 declare function toggleUserMenu(): void;
+declare function openGuide(): void;
 declare function initSidebarState(): void;
 declare function initKeyboardShortcuts(): void;
 
@@ -202,6 +207,7 @@ declare function buildNordTpl(...args: any[]): string;
 declare function buildAmericanTpl(...args: any[]): string;
 declare function buildSenderDetails(): string;
 declare function buildSenderTaxLine(): string;
+declare function buildClientDetails(client: any): string;
 declare const TPLS: Record<string, any>;
 declare const TPL_CATEGORIES: any[];
 

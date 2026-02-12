@@ -2,7 +2,7 @@
 // NAVIGATION + MOBILE + KEYBOARD
 // ════════════════════════════════════════
 
-/* exported goNav, toggleMobileSidebar, toggleSidebar, initSidebarState, initKeyboardShortcuts, openFeedbackModal, selectFbType, submitFeedback */
+/* exported goNav, toggleMobileSidebar, toggleSidebar, initSidebarState, initKeyboardShortcuts, openFeedbackModal, selectFbType, submitFeedback, openGuide */
 function destroyAllEditors() {
     // Destroy section editors
     if (typeof sectionEditors === 'object' && sectionEditors) {
@@ -116,7 +116,7 @@ function initKeyboardShortcuts() {
             const wnModal = document.getElementById('whatsNewModal');
             if (wnModal) { if (typeof dismissWhatsNew === 'function') dismissWhatsNew(); else wnModal.remove(); return; }
             // Dynamic modals (remove from DOM)
-            const dynamicModals = ['feedbackModal', 'shortcutsModal', 'completenessModal', 'clientModal', 'cpModal', 'libModal', 'tcModal', 'tplModal', 'emailTplModal', 'shareModal', 'dupClientModal', 'confirmModal', 'csvModal'];
+            const dynamicModals = ['guideModal', 'feedbackModal', 'shortcutsModal', 'completenessModal', 'clientModal', 'cpModal', 'libModal', 'tcModal', 'tplModal', 'emailTplModal', 'shareModal', 'dupClientModal', 'confirmModal', 'csvModal'];
             for (const modalId of dynamicModals) {
                 const modal = document.getElementById(modalId);
                 if (modal) { modal.remove(); return; }
@@ -175,6 +175,30 @@ function initKeyboardShortcuts() {
         const um = document.querySelector('.side-user-menu');
         if (um) um.remove();
     });
+}
+
+// ── How to use guide modal ──
+function openGuide() {
+    const existing = document.getElementById('guideModal');
+    if (existing) existing.remove();
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-wrap'; wrap.id = 'guideModal';
+    wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
+    wrap.innerHTML = `<div class="modal" style="max-width:540px" onclick="event.stopPropagation()">
+        <div class="modal-t">How to use</div>
+        <div class="modal-d" style="margin-bottom:16px">A quick guide to get you started with ${typeof appName === 'function' ? appName() : 'ProposalKit'}.</div>
+        <div style="display:flex;flex-direction:column;gap:12px;max-height:400px;overflow-y:auto;padding-right:4px">
+            <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-t">Create a proposal</div><div class="guide-step-d">Click "New proposal" or press <kbd>Cmd+N</kbd>. Choose a blank proposal or start from a template.</div></div></div>
+            <div class="guide-step"><div class="guide-num">2</div><div><div class="guide-step-t">Add your content</div><div class="guide-step-d">Fill in client details, add sections with rich text, and build your pricing table with line items.</div></div></div>
+            <div class="guide-step"><div class="guide-num">3</div><div><div class="guide-step-t">Preview and export</div><div class="guide-step-d">Press <kbd>Cmd+P</kbd> to preview. Choose from 13 PDF templates, then export as PDF or share a link.</div></div></div>
+            <div class="guide-step"><div class="guide-num">4</div><div><div class="guide-step-t">Manage clients</div><div class="guide-step-d">Save client details once in the Clients tab. Pick them when creating proposals to auto-fill fields.</div></div></div>
+            <div class="guide-step"><div class="guide-num">5</div><div><div class="guide-step-t">Track progress</div><div class="guide-step-d">Use the dashboard to monitor proposal status, revenue, and win rates at a glance.</div></div></div>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:var(--muted);border-radius:var(--r);font-size:14px;color:var(--text3)">Press <kbd>Cmd+K</kbd> to open the command palette for quick access to all actions.</div>
+        <div class="modal-foot" style="margin-top:16px"><button class="btn-sm" onclick="document.getElementById('guideModal').remove()">Got it</button></div>
+    </div>`;
+    document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
 }
 
 // ── Send feedback modal ──

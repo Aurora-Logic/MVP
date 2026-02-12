@@ -2,7 +2,7 @@
 // PDF TEMPLATES
 // ════════════════════════════════════════
 
-/* exported buildCoverHtml, buildModernTpl, buildClassicTpl, buildMinimalTpl, buildTabularTpl */
+/* exported buildClientDetails, buildCoverHtml, buildModernTpl, buildClassicTpl, buildMinimalTpl, buildTabularTpl */
 function buildPricingHtml(rows, c, t, bc, style) {
     if (!rows.length) return '';
     const thStyle = style === 'classic' ? 'background:' + bc + ';color:#fff;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:700' : 'text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;padding:7px 0;border-bottom:1px solid #e4e4e7;color:#a1a1aa';
@@ -44,6 +44,13 @@ function buildSenderTaxLine() {
     const labels = { US: 'EIN', GB: 'VAT', AU: 'ABN', CA: 'BN', DE: 'USt-IdNr', FR: 'SIREN', SG: 'UEN', AE: 'TRN', NL: 'BTW', JP: 'Corp. No', SE: 'Org.nr', CH: 'UID', NZ: 'NZBN', IE: 'VAT' };
     const label = labels[country] || 'Tax ID';
     return `<div style="font-size:10px;color:#a1a1aa;margin-top:4px">${label}: ${esc(CONFIG.taxId)}</div>`;
+}
+
+function buildClientDetails(client) {
+    const parts = [client.contact, client.email, client.phone].filter(Boolean).map(v => esc(v));
+    if (client.address) parts.push(esc(client.address));
+    if (client.gstNumber) parts.push('GST: ' + esc(client.gstNumber));
+    return parts.join('<br>');
 }
 
 function buildBankFooterHtml(bc) {
@@ -91,7 +98,7 @@ function buildModernTpl(p, c, bc, t, rows, secs, logo, title, num, isInv) {
     h += `<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px"><div><h1 style="font-size:24px;font-weight:800;color:#800020;letter-spacing:-.5px;margin:0 0 4px">${title}${ver}</h1><div style="font-size:13px;color:#71717a">${num} \u00B7 ${fmtDate(p.date)}</div></div><div style="text-align:right;padding:10px 16px;border-radius:6px;background:${bc}0D"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc}">${isInv ? 'Amount Due' : 'Estimated Total'}</div><div style="font-size:20px;font-weight:800;color:${bc};font-family:'JetBrains Mono',monospace">${fmtCur(t.grand, c)}</div></div></div>`;
     h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;padding:18px;border-radius:8px;border:1px solid #e4e4e7;background:#fafafa;page-break-inside:avoid;break-inside:avoid">`;
     h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">From</div><div style="font-size:13px;font-weight:600;color:#800020">${esc(p.sender.company || '\u2014')}</div><div style="font-size:11px;color:#71717a;margin-top:2px">${buildSenderDetails()}</div>${buildSenderTaxLine()}</div>`;
-    h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">${isInv ? 'Bill To' : 'To'}</div><div style="font-size:13px;font-weight:600;color:#800020">${esc(p.client.name || '\u2014')}</div><div style="font-size:11px;color:#71717a;margin-top:2px">${[p.client.contact, p.client.email].filter(Boolean).map(v => esc(v)).join('<br>')}</div></div>`;
+    h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">${isInv ? 'Bill To' : 'To'}</div><div style="font-size:13px;font-weight:600;color:#800020">${esc(p.client.name || '\u2014')}</div><div style="font-size:11px;color:#71717a;margin-top:2px">${buildClientDetails(p.client)}</div></div>`;
     h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">Date</div><div style="font-size:13px;color:#800020">${fmtDate(p.date)}</div></div>`;
     h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:${bc};margin-bottom:4px">${isInv ? 'Due Date' : 'Valid Until'}</div><div style="font-size:13px;color:#800020">${fmtDate(p.validUntil)}</div></div>`;
     h += '</div>';
@@ -107,7 +114,7 @@ function buildClassicTpl(p, c, bc, t, rows, secs, logo, title, num, isInv) {
     let h = `<div style="background:${bc};color:#fff;padding:20px 24px;margin:-20px -20px 24px;display:flex;justify-content:space-between;align-items:center">${logo ? logo.replace(/style="([^"]*)"/, 'style="max-height:36px;filter:brightness(0) invert(1)"') : ''}<div style="font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px">${title}${ver}</div><div style="text-align:right;font-size:12px;opacity:.85"><div>${num}</div><div>${fmtDate(p.date)}</div></div></div>`;
     h += `<div style="display:flex;gap:32px;margin-bottom:28px;page-break-inside:avoid;break-inside:avoid">`;
     h += `<div style="flex:1;padding:14px;border:1px solid #e4e4e7;border-radius:4px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:${bc};letter-spacing:.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #f4f4f5">From</div><div style="font-size:13px;font-weight:600">${esc(p.sender.company)}</div><div style="font-size:12px;color:#71717a;margin-top:2px">${buildSenderDetails()}</div>${buildSenderTaxLine()}</div>`;
-    h += `<div style="flex:1;padding:14px;border:1px solid #e4e4e7;border-radius:4px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:${bc};letter-spacing:.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #f4f4f5">${isInv ? 'Bill To' : 'To'}</div><div style="font-size:13px;font-weight:600">${esc(p.client.name)}</div><div style="font-size:12px;color:#71717a;margin-top:2px">${esc(p.client.contact)}</div><div style="font-size:12px;color:#71717a">${esc(p.client.email)}</div></div>`;
+    h += `<div style="flex:1;padding:14px;border:1px solid #e4e4e7;border-radius:4px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:${bc};letter-spacing:.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #f4f4f5">${isInv ? 'Bill To' : 'To'}</div><div style="font-size:13px;font-weight:600">${esc(p.client.name)}</div><div style="font-size:12px;color:#71717a;margin-top:2px">${buildClientDetails(p.client)}</div></div>`;
     h += `<div style="padding:14px;border:1px solid #e4e4e7;border-radius:4px;min-width:120px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:${bc};letter-spacing:.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #f4f4f5">${isInv ? 'Due Date' : 'Valid Until'}</div><div style="font-size:13px;font-weight:600">${fmtDate(p.validUntil)}</div><div style="font-size:18px;font-weight:800;color:${bc};margin-top:8px;font-family:'JetBrains Mono',monospace">${fmtCur(t.grand, c)}</div></div>`;
     h += '</div>';
     if (!isInv) secs.forEach(s => { if (s.type && typeof buildStructuredSectionPdf === 'function') { h += buildStructuredSectionPdf(s, bc); } else { h += `<div style="margin-bottom:24px"><div style="font-size:13px;font-weight:700;text-transform:uppercase;color:${bc};letter-spacing:.5px;margin-bottom:8px">${esc(s.title)}</div><div style="color:#52525b;border-left:3px solid ${bc};padding-left:14px;line-height:1.7">${editorJsToHtml(s.content, p)}</div></div>`; } });
@@ -124,7 +131,7 @@ function buildMinimalTpl(p, c, bc, t, rows, secs, logo, title, num, isInv) {
     h += `<div style="display:flex;gap:24px;font-size:12px;color:#a1a1aa"><span>${num}${ver}</span><span>${fmtDate(p.date)}</span><span>${isInv ? 'Due' : 'Valid'}: ${fmtDate(p.validUntil)}</span></div></div>`;
     h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:36px;page-break-inside:avoid;break-inside:avoid">`;
     h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#a1a1aa;font-weight:700;margin-bottom:6px">From</div><div style="font-size:14px;font-weight:600;color:#800020">${esc(p.sender.company)}</div><div style="font-size:12px;color:#71717a;margin-top:2px">${buildSenderDetails()}</div>${buildSenderTaxLine()}</div>`;
-    h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#a1a1aa;font-weight:700;margin-bottom:6px">${isInv ? 'Bill To' : 'To'}</div><div style="font-size:14px;font-weight:600;color:#800020">${esc(p.client.name)}</div><div style="font-size:12px;color:#71717a;margin-top:2px">${esc(p.client.contact)}</div><div style="font-size:12px;color:#71717a">${esc(p.client.email)}</div></div>`;
+    h += `<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#a1a1aa;font-weight:700;margin-bottom:6px">${isInv ? 'Bill To' : 'To'}</div><div style="font-size:14px;font-weight:600;color:#800020">${esc(p.client.name)}</div><div style="font-size:12px;color:#71717a;margin-top:2px">${buildClientDetails(p.client)}</div></div>`;
     h += '</div>';
     if (!isInv) secs.forEach(s => { if (s.type && typeof buildStructuredSectionPdf === 'function') { h += buildStructuredSectionPdf(s, bc); } else { h += `<div style="margin-bottom:24px"><div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#800020;margin-bottom:8px">${esc(s.title)}</div><div style="color:#52525b;font-size:13px;line-height:1.8">${editorJsToHtml(s.content, p)}</div></div>`; } });
     if (rows.length) { h += `<div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#800020;margin:24px 0 10px">${isInv ? 'Items' : 'Pricing'}</div>`; h += buildPricingHtml(rows, c, t, bc, 'minimal'); }
@@ -142,8 +149,8 @@ function buildTabularTpl(p, c, bc, t, rows, secs, logo, title, num, isInv) {
     h += `<div style="font-size:22px;font-weight:800;color:#09090b;letter-spacing:-.5px">${title}</div>`;
     h += `<div style="font-size:12px;color:#a1a1aa;margin:4px 0 24px">${num}${p.version > 1 ? ' · v' + p.version : ''} · ${fmtDate(p.date)}</div>`;
     h += `<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:20px;margin-bottom:28px;padding:16px 0;border-top:1px solid #e4e4e7;border-bottom:1px solid #e4e4e7;page-break-inside:avoid;break-inside:avoid">`;
-    h += `<div><div style="${lbl}">${isInv ? 'Bill To' : 'Client'}</div><div style="font-size:13px;font-weight:600;margin-top:4px">${esc(p.client.name)}</div><div style="font-size:11px;color:#71717a">${esc(p.client.email)}</div></div>`;
-    h += `<div><div style="${lbl}">Contact</div><div style="font-size:13px;margin-top:4px">${esc(p.client.contact)}</div><div style="font-size:11px;color:#71717a">${esc(p.client.phone)}</div></div>`;
+    h += `<div><div style="${lbl}">${isInv ? 'Bill To' : 'Client'}</div><div style="font-size:13px;font-weight:600;margin-top:4px">${esc(p.client.name)}</div><div style="font-size:11px;color:#71717a">${esc(p.client.email)}${p.client.address ? '<br>' + esc(p.client.address) : ''}</div></div>`;
+    h += `<div><div style="${lbl}">Contact</div><div style="font-size:13px;margin-top:4px">${esc(p.client.contact)}</div><div style="font-size:11px;color:#71717a">${esc(p.client.phone)}${p.client.gstNumber ? '<br>GST: ' + esc(p.client.gstNumber) : ''}</div></div>`;
     h += `<div><div style="${lbl}">Date</div><div style="font-size:13px;margin-top:4px">${fmtDate(p.date)}</div></div>`;
     h += `<div><div style="${lbl}">${isInv ? 'Due' : 'Valid Until'}</div><div style="font-size:13px;margin-top:4px">${fmtDate(p.validUntil)}</div></div></div>`;
     if (!isInv) secs.forEach(s => { if (s.type && typeof buildStructuredSectionPdf === 'function') { h += buildStructuredSectionPdf(s, bc); } else { h += `<div style="margin-bottom:24px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:${bc};margin-bottom:6px">${esc(s.title)}</div><div style="color:#52525b;font-size:13px;line-height:1.7;padding-left:0">${editorJsToHtml(s.content, p)}</div></div>`; } });

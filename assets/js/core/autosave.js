@@ -73,7 +73,9 @@ function dirty() {
             name: get('fCNa') !== undefined ? get('fCNa') : p.client.name,
             contact: get('fCCo') !== undefined ? get('fCCo') : p.client.contact,
             email: get('fCEm') !== undefined ? get('fCEm') : p.client.email,
-            phone: get('fCPh') !== undefined ? get('fCPh') : p.client.phone
+            phone: get('fCPh') !== undefined ? get('fCPh') : p.client.phone,
+            address: get('fCAd') !== undefined ? get('fCAd') : (p.client.address || ''),
+            gstNumber: get('fCGst') !== undefined ? get('fCGst') : (p.client.gstNumber || '')
         };
         const curEl = document.getElementById('fCur');
         p.currency = curEl ? (cselGetValue(curEl) || p.currency) : p.currency;

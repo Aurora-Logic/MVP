@@ -244,6 +244,7 @@ export default [
                 closeMobileSidebar: 'readonly',
                 toggleSidebar: 'readonly',
                 toggleUserMenu: 'readonly',
+                openGuide: 'readonly',
                 openFeedbackModal: 'readonly',
                 selectFbType: 'readonly',
                 submitFeedback: 'readonly',
@@ -276,8 +277,12 @@ export default [
                 buildPagination: 'readonly',
 
                 // ── views/clients.js ──
+                INDIAN_STATES: 'readonly',
+                SALUTATIONS: 'readonly',
                 renderClients: 'readonly',
+                matchClient: 'readonly',
                 openAddClient: 'readonly',
+                initStateDropdown: 'readonly',
                 saveClient: 'readonly',
                 editClient: 'readonly',
                 delClient: 'readonly',
@@ -501,6 +506,7 @@ export default [
                 buildPricingHtml: 'readonly',
                 buildSenderDetails: 'readonly',
                 buildSenderTaxLine: 'readonly',
+                buildClientDetails: 'readonly',
                 buildBankFooterHtml: 'readonly',
                 buildCoverHtml: 'readonly',
                 buildModernTpl: 'readonly',

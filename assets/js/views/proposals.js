@@ -222,7 +222,7 @@ function renderProposals() {
   const total = baseList.length;
 
   if (total === 0 && currentFilter === 'all') {
-    body.innerHTML = `<div class="first-run"><div class="fr-center"><dotlottie-wc src="https://assets-v2.lottiefiles.com/a/7a754088-1187-11ee-96ce-1b80a1a80dd1/npZCl6daoz.lottie" autoplay loop speed="0.8" style="width:240px;height:240px;margin:0 auto"></dotlottie-wc><div class="fr-title">Create your first proposal</div><div class="fr-desc">Build professional proposals in minutes.<br>Pick a template or start from scratch.</div><div class="fr-actions"><button class="btn fr-btn-primary" onclick="openNewModal()"><i data-lucide="plus"></i> New proposal</button><button class="btn-outline fr-btn-outline" onclick="fromTpl('web')"><i data-lucide="sparkles"></i> Start from template</button></div></div></div>`;
+    body.innerHTML = `<div class="first-run"><div class="fr-center"><dotlottie-wc src="https://assets-v2.lottiefiles.com/a/e5ad4708-1153-11ee-99af-8b4501471254/KY6YhwKCDP.lottie" autoplay loop speed="0.8" style="width:240px;height:240px;margin:0 auto"></dotlottie-wc><div class="fr-title">Create your first proposal</div><div class="fr-desc">Build professional proposals in minutes.<br>Pick a template or start from scratch.</div><div class="fr-actions"><button class="btn fr-btn-primary" onclick="openNewModal()"><i data-lucide="plus"></i> New proposal</button><button class="btn-outline fr-btn-outline" onclick="fromTpl('web')"><i data-lucide="sparkles"></i> Start from template</button></div></div></div>`;
     lucide.createIcons();
     return;
   }

@@ -91,59 +91,71 @@ function renderSettings() {
     <div class="settings-content">
       ${loggedIn ? `<div class="settings-section" id="sec-account">${buildAccountCard()}</div>` : ''}
       <div class="settings-section" id="sec-profile">
-        <div class="settings-section-head"><div class="settings-section-t">Profile</div><div class="settings-section-d">Auto-filled into every new proposal</div></div>
-        <div class="fg"><label class="fl">Company Name</label><input type="text" id="setCo" value="${esc(CONFIG?.company)}" oninput="saveSettings()"></div>
-        <div class="fr"><div class="fg"><label class="fl">Your Name</label><input type="text" id="setName" value="${esc(CONFIG?.name)}" oninput="saveSettings()"></div>
-          <div class="fg"><label class="fl">Email</label><input type="email" id="setEmail" value="${esc(CONFIG?.email)}" oninput="saveSettings()"></div></div>
-        <div class="fr"><div class="fg"><label class="fl">Phone</label><input type="tel" id="setPhone" value="${esc(CONFIG?.phone)}" oninput="saveSettings()"></div>
-          <div class="fg"><label class="fl">Country</label><div id="setCountry"></div></div></div>
-        <div class="fg"><label class="fl">Address</label><input type="text" id="setAddr" value="${esc(CONFIG?.address)}" oninput="saveSettings()"></div>
-        <div class="fg"><label class="fl">Website</label><input type="url" id="setWebsite" value="${esc(CONFIG?.website)}" oninput="saveSettings()"></div>
-        <div id="setTaxFields">${getCountryTaxHtml()}</div>
+        <div class="card card-p settings-card">
+          <div class="settings-section-head"><div class="settings-section-t">Profile</div><div class="settings-section-d">Auto-filled into every new proposal</div></div>
+          <div class="fg"><label class="fl">Company name</label><input type="text" id="setCo" value="${esc(CONFIG?.company)}" oninput="saveSettings()"></div>
+          <div class="fr"><div class="fg"><label class="fl">Your name</label><input type="text" id="setName" value="${esc(CONFIG?.name)}" oninput="saveSettings()"></div>
+            <div class="fg"><label class="fl">Email</label><input type="email" id="setEmail" value="${esc(CONFIG?.email)}" oninput="saveSettings()"></div></div>
+          <div class="fr"><div class="fg"><label class="fl">Phone</label><input type="tel" id="setPhone" value="${esc(CONFIG?.phone)}" oninput="saveSettings()"></div>
+            <div class="fg"><label class="fl">Country</label><div id="setCountry"></div></div></div>
+          <div class="fg"><label class="fl">Address</label><input type="text" id="setAddr" value="${esc(CONFIG?.address)}" oninput="saveSettings()"></div>
+          <div class="fg"><label class="fl">Website</label><input type="url" id="setWebsite" value="${esc(CONFIG?.website)}" oninput="saveSettings()"></div>
+          <div id="setTaxFields">${getCountryTaxHtml()}</div>
+        </div>
       </div>
       <div class="settings-section" id="sec-payments">
-        <div class="settings-section-head"><div class="settings-section-t">Payments</div><div class="settings-section-d">Bank details shown on proposals</div></div>
-        <div class="fr"><div class="fg"><label class="fl">Bank Name</label><input type="text" id="setBankName" value="${esc(b.name)}" oninput="saveSettings()"></div>
-          <div class="fg"><label class="fl">Account Holder</label><input type="text" id="setBankHolder" value="${esc(b.holder)}" oninput="saveSettings()"></div></div>
-        <div class="fg"><label class="fl">Account Number</label><input type="text" id="setBankAccount" value="${esc(b.account)}" oninput="saveSettings()"></div>
-        <div class="fr"><div class="fg"><label class="fl">IFSC / Sort Code</label><input type="text" id="setBankIfsc" value="${esc(b.ifsc)}" oninput="saveSettings()"></div>
-          <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="setBankSwift" value="${esc(b.swift)}" oninput="saveSettings()"></div></div>
-        ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="setBankUpi" value="${esc(b.upi || '')}" placeholder="e.g. business@upi" oninput="saveSettings()"><div class="fh">Shown as QR code on PDFs (India only)</div></div>` : ''}
+        <div class="card card-p settings-card">
+          <div class="settings-section-head"><div class="settings-section-t">Payments</div><div class="settings-section-d">Bank details shown on proposals</div></div>
+          <div class="fr"><div class="fg"><label class="fl">Bank name</label><input type="text" id="setBankName" value="${esc(b.name)}" oninput="saveSettings()"></div>
+            <div class="fg"><label class="fl">Account holder</label><input type="text" id="setBankHolder" value="${esc(b.holder)}" oninput="saveSettings()"></div></div>
+          <div class="fg"><label class="fl">Account number</label><input type="text" id="setBankAccount" value="${esc(b.account)}" oninput="saveSettings()"></div>
+          <div class="fr"><div class="fg"><label class="fl">IFSC / Sort code</label><input type="text" id="setBankIfsc" value="${esc(b.ifsc)}" oninput="saveSettings()"></div>
+            <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="setBankSwift" value="${esc(b.swift)}" oninput="saveSettings()"></div></div>
+          ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="setBankUpi" value="${esc(b.upi || '')}" placeholder="e.g. business@upi" oninput="saveSettings()"><div class="fh">Shown as QR code on PDFs (India only)</div></div>` : ''}
+        </div>
       </div>
       <div class="settings-section" id="sec-email">
-        <div class="settings-section-head"><div class="settings-section-t">Email templates</div><div class="settings-section-d">Quick emails for sending proposals</div></div>
-        <button class="btn-sm-outline" onclick="addEmailTemplate()" style="margin-bottom:12px"><i data-lucide="plus"></i> Add Template</button>
-        <div id="emailTplList"></div>
+        <div class="card card-p settings-card">
+          <div class="settings-section-head"><div class="settings-section-t">Email templates</div><div class="settings-section-d">Quick emails for sending proposals</div></div>
+          <button class="btn-sm-outline" onclick="addEmailTemplate()" style="margin-bottom:12px"><i data-lucide="plus"></i> Add template</button>
+          <div id="emailTplList"></div>
+        </div>
       </div>
       ${typeof renderTeamSettings === 'function' ? `<div class="settings-section" id="sec-team">${renderTeamSettings()}</div>` : ''}
       ${typeof renderAiSettingsCard === 'function' ? `<div class="settings-section" id="sec-ai">${renderAiSettingsCard()}</div>` : ''}
       <div class="settings-section" id="sec-branding">
-        <div class="settings-section-head"><div class="settings-section-t">Branding</div><div class="settings-section-d">Logo and colors for your proposals</div></div>
-        <div class="fg"><label class="fl">Logo</label>
-          <div class="brand-logo-box" onclick="document.getElementById('setLogoInput').click()" id="setLogoBox">${CONFIG?.logo ? '<img src="' + esc(CONFIG.logo) + '" alt="Company logo">' : '<i data-lucide="image-plus"></i>'}</div>
-          <input type="file" id="setLogoInput" accept="image/*" style="display:none" onchange="handleLogo(this);saveSettings()"><div class="fh">PNG, JPG, or SVG</div></div>
-        <div class="fg"><div class="color-row" id="setColors"></div></div>
-        <div class="fg"><label class="fl">Font Family</label><div id="setFont"></div></div>
-        <div class="fg" style="margin-top:8px;padding-top:12px;border-top:1px solid var(--border)">
-          <label class="fl">White Label</label>
-          <label class="toggle-row"><input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()"><span class="toggle-label">Remove ProposalKit branding</span></label>
-          <div class="fh">Replaces ProposalKit name with your company name in sidebar, page titles, client portal, and exports</div>
+        <div class="card card-p settings-card">
+          <div class="settings-section-head"><div class="settings-section-t">Branding</div><div class="settings-section-d">Logo and colors for your proposals</div></div>
+          <div class="fg"><label class="fl">Logo</label>
+            <div class="brand-logo-box" onclick="document.getElementById('setLogoInput').click()" id="setLogoBox">${CONFIG?.logo ? '<img src="' + esc(CONFIG.logo) + '" alt="Company logo">' : '<i data-lucide="image-plus"></i>'}</div>
+            <input type="file" id="setLogoInput" accept="image/*" style="display:none" onchange="handleLogo(this);saveSettings()"><div class="fh">PNG, JPG, or SVG</div></div>
+          <div class="fg"><div class="color-row" id="setColors"></div></div>
+          <div class="fg"><label class="fl">Font family</label><div id="setFont"></div></div>
+          <div class="fg" style="margin-top:8px;padding-top:12px;border-top:1px solid var(--border)">
+            <label class="fl">White label</label>
+            <label class="toggle-row"><input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()"><span class="toggle-label">Remove ProposalKit branding</span></label>
+            <div class="fh">Replaces ProposalKit name with your company name in sidebar, page titles, client portal, and exports</div>
+          </div>
         </div>
       </div>
       <div class="settings-section" id="sec-signature">
-        <div class="settings-section-head"><div class="settings-section-t">Signature</div><div class="settings-section-d">Draw your signature to include in proposals</div></div>
-        <div class="sig-wrap" id="sigWrap"><div id="sigDisplay"></div></div>
+        <div class="card card-p settings-card">
+          <div class="settings-section-head"><div class="settings-section-t">Signature</div><div class="settings-section-d">Draw your signature to include in proposals</div></div>
+          <div class="sig-wrap" id="sigWrap"><div id="sigDisplay"></div></div>
+        </div>
       </div>
-      <div class="settings-danger-divider"><span class="settings-danger-label">Danger Zone</span></div>
+      <div class="settings-danger-divider"><span class="settings-danger-label">Danger zone</span></div>
       <div class="settings-section" id="sec-data">
-        <div class="settings-section-head"><div class="settings-section-t">Data management</div><div class="settings-section-d">Export, import, or clear your local data</div></div>
-        <div class="fg"><label class="fl">Webhook URL</label>
-          <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
-          <div class="fh">POST proposal data to this URL on export</div></div>
-        <div class="sec-header-actions">
-          <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export</button>
-          <button class="btn-sm-outline" onclick="importData()"><i data-lucide="upload"></i> Import</button>
-          <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear All</button>
+        <div class="card card-p settings-card settings-card-danger">
+          <div class="settings-section-head"><div class="settings-section-t">Data management</div><div class="settings-section-d">Export, import, or clear your local data</div></div>
+          <div class="fg"><label class="fl">Webhook URL</label>
+            <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
+            <div class="fh">POST proposal data to this URL on export</div></div>
+          <div class="sec-header-actions">
+            <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export</button>
+            <button class="btn-sm-outline" onclick="importData()"><i data-lucide="upload"></i> Import</button>
+            <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear all</button>
+          </div>
         </div>
       </div>
     </div></div>`;

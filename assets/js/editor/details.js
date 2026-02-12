@@ -70,15 +70,17 @@ function renderDetails(p) {
       <div class="fg"><label class="fl">Address</label><input type="text" id="fSAd" value="${esc(p.sender.address)}" oninput="dirty()"></div>
     </div>
     <div class="card card-p">
-      <div class="card-head"><div><div class="card-t">To (client)</div></div><button class="btn-sm-outline" onclick="showClientPicker()"><i data-lucide="users"></i> Pick Client</button></div>
+      <div class="card-head"><div><div class="card-t">To (client)</div></div><button class="btn-sm-outline" onclick="showClientPicker()"><i data-lucide="users"></i> Pick client</button></div>
       <div class="fr">
         <div class="fg"><label class="fl">Company / Name</label><input type="text" id="fCNa" value="${esc(p.client.name)}" oninput="dirty()"></div>
-        <div class="fg"><label class="fl">Contact Person</label><input type="text" id="fCCo" value="${esc(p.client.contact)}" oninput="dirty()"></div>
+        <div class="fg"><label class="fl">Contact person</label><input type="text" id="fCCo" value="${esc(p.client.contact)}" oninput="dirty()"></div>
       </div>
       <div class="fr">
         <div class="fg"><label class="fl">Email</label><input type="email" id="fCEm" value="${esc(p.client.email)}" oninput="dirty()"></div>
         <div class="fg"><label class="fl">Phone</label><input type="tel" id="fCPh" value="${esc(p.client.phone)}" oninput="dirty()"></div>
       </div>
+      <div class="fg"><label class="fl">Address</label><input type="text" id="fCAd" value="${esc(p.client.address || '')}" oninput="dirty()"></div>
+      <div class="fg"><label class="fl">GST number</label><input type="text" id="fCGst" value="${esc(p.client.gstNumber || '')}" oninput="dirty()" placeholder="e.g. 22AAAAA0000A1Z5" maxlength="15"></div>
     </div>
   `;
     lucide.createIcons();

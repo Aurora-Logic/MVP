@@ -233,7 +233,7 @@ function renderDashboard() {
     body.innerHTML = `
       <div class="first-run">
         <div class="fr-center">
-          <dotlottie-wc src="https://assets-v2.lottiefiles.com/a/7a754088-1187-11ee-96ce-1b80a1a80dd1/npZCl6daoz.lottie" autoplay loop speed="0.8" style="width:280px;height:280px;margin:0 auto"></dotlottie-wc>
+          <dotlottie-wc src="https://assets-v2.lottiefiles.com/a/8788d0be-1169-11ee-a200-7385787ccb3e/JUKb6OWVz0.lottie" autoplay loop speed="0.8" style="width:280px;height:280px;margin:0 auto"></dotlottie-wc>
           <div class="fr-title">Create something great</div>
           <div class="fr-desc">Build professional proposals, invoices, and contracts.<br>Pick a template, add your content, and export a polished PDF.</div>
           <div class="fr-actions">

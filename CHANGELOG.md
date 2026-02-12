@@ -4,6 +4,46 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.13.0 (build 20260212) — 2026-02-12
+
+### Features
+- Expanded client fields: customer type, salutation, first/last name, company, display name, work/mobile phone, address (street, city, state, pin), GST number
+- Searchable state dropdown for India (33 states/UTs)
+- Client address and GST number in all 13 PDF templates via `buildClientDetails()` helper
+- "How to use" guide modal accessible from sidebar (5-step getting started guide)
+- Unique Lottie animations per empty state page (dashboard, proposals, clients)
+- Profile page cards with gradient backgrounds matching dashboard metric cards
+
+### Style
+- Client portal (client.html) redesigned with topbar matching main app, pill buttons, SF Pro font
+- Settings sections wrapped in card containers matching dashboard design pattern
+- Danger zone data card has red-tinted border
+- All settings labels converted to sentence case
+
+### Files Changed
+- `assets/js/views/clients.js` — Full rewrite with expanded fields, INDIAN_STATES, SALUTATIONS, matchClient
+- `assets/js/core/store.js` — Client and Proposal typedefs expanded
+- `assets/js/globals.d.ts` — Client/Proposal interfaces updated, buildClientDetails/openGuide declared
+- `assets/js/core/autosave.js` — Collect address and gstNumber from client fields
+- `assets/js/editor/details.js` — Address and GST number fields in client section
+- `assets/js/export/templates.js` — buildClientDetails() helper, 4 templates updated
+- `assets/js/export/pdf-templates2.js` — 9 templates updated with buildClientDetails()
+- `assets/js/views/nav.js` — openGuide() function, guideModal ESC handler
+- `assets/js/views/settings.js` — Card-wrapped sections, sentence case labels
+- `assets/js/views/dashboard.js` — Unique Lottie animation URL
+- `assets/js/views/proposals.js` — Unique Lottie animation URL
+- `assets/js/client.js` — New topbar structure, buildTopbar() helper
+- `assets/css/client.css` — Full redesign with app design tokens
+- `assets/css/pages.css` — settings-card styles, profile card gradients
+- `assets/css/features.css` — Guide step styles (.guide-step, .guide-num, kbd)
+- `assets/css/variables.css` — Minor token adjustment
+- `client.html` — Updated CSP, CDN Lucide, CSS spinner loading
+- `index.html` — "How to use" sidebar button, sentence case
+- `eslint.config.js` — New globals (INDIAN_STATES, SALUTATIONS, etc.)
+- `assets/js/boot.js` — Version 2.12.0 → 2.13.0, What's New updated
+
+---
+
 ## v2.12.0 (build 20260212) — 2026-02-12
 
 ### Features
