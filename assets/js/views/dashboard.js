@@ -152,6 +152,55 @@ function buildActivityFeed() {
   return `<div class="dash-activity"><div class="dash-activity-title">Recent Activity</div>${recents.map(p => `<div class="act-item" onclick="loadEditor('${escAttr(p.id)}')"><i data-lucide="${si[p.status] || 'file-text'}" style="color:${sc[p.status] || 'var(--text3)'}"></i><div class="act-body"><div class="act-name">${esc(p.title || 'Untitled')}</div><div class="act-time">${timeAgo(p.updatedAt || p.createdAt)}</div></div></div>`).join('')}</div>`;
 }
 
+function buildDuesCard(active, c) {
+  if (typeof paymentTotals !== 'function') return '';
+  const accepted = active.filter(p => p.status === 'accepted');
+  if (!accepted.length) return '';
+  let totalDue = 0, countPartial = 0, countUnpaid = 0;
+  accepted.forEach(p => {
+    const pt = paymentTotals(p);
+    if (pt.balanceDue > 0) { totalDue += pt.balanceDue; if (pt.status === 'partial') countPartial++; else countUnpaid++; }
+  });
+  if (totalDue <= 0) return '';
+  const count = countPartial + countUnpaid;
+  return `<div class="dues-card" role="button" tabindex="0" onclick="setFilter('dues');goNav('editor')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+    <div class="resume-card-header">
+      <span class="resume-card-label">Outstanding Payments</span>
+      <div class="resume-card-title dues-card-val">${fmtCur(totalDue, c)}</div>
+      <div class="resume-card-action"><span class="resume-card-badge status-declined">${count} unpaid</span></div>
+    </div>
+    <div class="resume-card-footer">
+      <div class="resume-card-trend">${countUnpaid} unpaid, ${countPartial} partial</div>
+      <div class="resume-card-desc">Requires follow-up</div>
+    </div>
+  </div>`;
+}
+
+function buildStatusChart(active) {
+  const counts = { draft: 0, sent: 0, accepted: 0, declined: 0, expired: 0 };
+  active.forEach(p => { if (counts[p.status] !== undefined) counts[p.status]++; });
+  const total = active.length;
+  if (total === 0) return '';
+  const items = [
+    { key: 'draft', label: 'Draft', color: 'var(--muted-foreground)' },
+    { key: 'sent', label: 'Sent', color: 'var(--blue)' },
+    { key: 'accepted', label: 'Accepted', color: 'var(--green)' },
+    { key: 'declined', label: 'Declined', color: 'var(--red)' },
+    { key: 'expired', label: 'Expired', color: 'var(--amber)' }
+  ].filter(i => counts[i.key] > 0);
+  const bar = items.map(i =>
+    `<div class="sbc-seg" style="flex:${counts[i.key]};background:${i.color}" data-tooltip="${i.label}: ${counts[i.key]}"></div>`
+  ).join('');
+  const legend = items.map(i =>
+    `<div class="sbc-legend-item"><span class="sbc-dot" style="background:${i.color}"></span>${i.label} <strong>${counts[i.key]}</strong></div>`
+  ).join('');
+  return `<div class="an-widget">
+    <div class="an-header"><div><div class="an-title">Proposal Status</div><div class="an-subtitle">${total} total proposals</div></div></div>
+    <div class="sbc-bar">${bar}</div>
+    <div class="sbc-legend">${legend}</div>
+  </div>`;
+}
+
 function dismissExpiry(id) {
   const dismissed = safeGetStorage('pk_dismissed', []);
   if (!dismissed.includes(id)) { dismissed.push(id); safeLsSet('pk_dismissed', dismissed); }
@@ -203,13 +252,19 @@ function renderDashboard() {
 
   const c = defaultCurrency();
 
+  const resumeHtml = buildResumeBar();
+  const duesCardHtml = buildDuesCard(active, c);
+  const hasTwoCol = resumeHtml && duesCardHtml;
+  const expiryHtml = buildExpiryBanner();
+
   body.innerHTML = `
     <div class="dash-container">
       ${buildMetricCards(active, c)}
       <div class="dash-content">
-        ${buildResumeBar()}
-        ${buildAlertsSection(active)}
+        ${hasTwoCol ? `<div class="dash-two-col">${resumeHtml}${duesCardHtml}</div>` : `${resumeHtml}${duesCardHtml}`}
+        ${expiryHtml ? `<div class="dash-alerts">${expiryHtml}</div>` : ''}
         ${typeof buildAnalyticsWidget === 'function' && active.length >= 3 ? buildAnalyticsWidget() : ''}
+        ${active.length >= 2 ? buildStatusChart(active) : ''}
       </div>
     </div>`;
   lucide.createIcons();

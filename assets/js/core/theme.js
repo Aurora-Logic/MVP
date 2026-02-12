@@ -1,57 +1,25 @@
-/* exported toggleTheme, getCurrentTheme */
+/* exported getCurrentTheme */
 /* ═══════════════════════════════════════════════════════════════════════
-   THEME — Dark/Light Mode Toggle (shadcn pattern)
+   THEME — Light Mode Only + Font Management
    ═══════════════════════════════════════════════════════════════════════ */
 
-// ─── Initialize theme on page load (runs immediately) ───
+// ─── Ensure light mode (remove any stored dark preference) ───
 (function initTheme() {
-  const storedTheme = localStorage.getItem('pk_theme');
+  document.documentElement.classList.remove('dark');
+  localStorage.removeItem('pk_theme');
 
-  // Default to light — only dark if explicitly stored
-  const theme = storedTheme === 'dark' ? 'dark' : 'light';
-
-  // Apply immediately to prevent flash
-  document.documentElement.classList.toggle('dark', theme === 'dark');
-
-  // Update meta theme-color for mobile browsers
-  updateMetaTheme(theme);
-})();
-
-// ─── Toggle theme function (called by UI button) ───
-function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.classList.contains('dark');
-  const newTheme = isDark ? 'light' : 'dark';
-
-  // Toggle class
-  html.classList.toggle('dark', !isDark);
-
-  // Persist preference
-  safeLsSet('pk_theme', newTheme);
-
-  // Update meta theme-color
-  updateMetaTheme(newTheme);
-
-  // Re-initialize Lucide icons for theme toggle button
-  if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-  }
-}
-
-// ─── Update meta theme-color for mobile browsers ───
-function updateMetaTheme(theme) {
   let metaTheme = document.querySelector('meta[name="theme-color"]');
   if (!metaTheme) {
     metaTheme = document.createElement('meta');
     metaTheme.name = 'theme-color';
     document.head.appendChild(metaTheme);
   }
-  metaTheme.content = theme === 'dark' ? '#09090b' : '#ffffff';
-}
+  metaTheme.content = '#ffffff';
+})();
 
-// ─── Get current theme ───
+// ─── Get current theme (always light) ───
 function getCurrentTheme() {
-  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  return 'light';
 }
 
 // ─── Apply font family (Google Fonts) ───
@@ -87,6 +55,3 @@ function applyFont(fontName) {
         if (cfg?.font) applyFont(cfg.font);
     } catch (e) { /* ignore */ }
 })();
-
-// System theme auto-detection removed — app defaults to light mode only.
-// Users can toggle dark mode manually from Settings if desired.

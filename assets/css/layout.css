@@ -89,23 +89,32 @@
 }
 
 .side.collapsed .side-new-wrap {
-  padding: 0;
+  padding: 0 8px;
   flex-direction: column;
   gap: 4px;
+  align-items: center;
 }
 
 .side.collapsed .side-new-full {
   width: 32px;
   height: 32px;
   padding: 0;
-  margin: 0 auto;
+  margin: 0;
   justify-content: center;
+  border-radius: var(--r2);
+  flex: none;
+}
+
+.side.collapsed .side-new-full svg {
+  width: 18px;
+  height: 18px;
 }
 
 .side.collapsed .side-new-icon {
   width: 32px;
   height: 32px;
-  margin: 0 auto;
+  margin: 0;
+  border-radius: var(--r2);
 }
 
 .side.collapsed .side-nav {

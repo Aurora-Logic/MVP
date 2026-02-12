@@ -27,7 +27,7 @@ function destroyAllEditors() {
 
 function goNav(view) {
     closeMobileSidebar();
-    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', clients: 'Clients', analytics: 'Analytics', settings: 'Settings' };
+    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', clients: 'Clients', analytics: 'Analytics', settings: 'Settings', profile: 'My Profile' };
     const an = typeof appName === 'function' ? appName() : 'ProposalKit';
     document.title = (titles[view] || an) + ' \u2014 ' + an;
     const topSearch = document.getElementById('topSearch');
@@ -45,6 +45,7 @@ function goNav(view) {
     if (view === 'dashboard') renderDashboard();
     else if (view === 'editor') { if (CUR) loadEditor(CUR); else renderProposals(); }
     else if (view === 'clients') renderClients();
+    else if (view === 'profile') { if (typeof renderProfile === 'function') renderProfile(); else renderSettings(); }
     else if (view === 'settings') renderSettings();
 }
 
@@ -251,7 +252,6 @@ function toggleUserMenu() {
         </div>
         <div class="side-user-menu-sep"></div>
         <button class="side-user-menu-item" onclick="goNav('settings');document.querySelector('.side-user-menu')?.remove()"><i data-lucide="settings"></i>Settings</button>
-        <button class="side-user-menu-item" onclick="toggleTheme();document.querySelector('.side-user-menu')?.remove()"><i data-lucide="sun" class="theme-icon-light"></i><i data-lucide="moon" class="theme-icon-dark"></i>Theme</button>
         ${teamHtml}
         <div class="side-user-menu-sep"></div>
         <button class="side-user-menu-item" onclick="logoutApp()"><i data-lucide="log-out"></i>Log out</button>`;

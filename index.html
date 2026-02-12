@@ -15,7 +15,7 @@
     <meta name="twitter:title" content="ProposalKit — Professional Proposals">
     <meta name="twitter:description" content="Create professional proposals with 13 PDF templates. Free forever.">
     <meta name="twitter:image" content="https://proposalkit.vercel.app/assets/icons/og-image.png">
-    <meta name="theme-color" content="#18181b">
+    <meta name="theme-color" content="#ffffff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://api.anthropic.com https://plausible.io https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://*.supabase.co https://api.anthropic.com https://plausible.io https://accounts.google.com https://*.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com; frame-src https://accounts.google.com https://*.supabase.co;">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -33,13 +33,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.0.0"></script>
     <!-- Supabase JS Client (vendored locally) -->
     <script src="assets/js/vendor/supabase-2.49.1.js"></script>
-    <!-- Inline theme detection (prevent FOUC — default light) -->
-    <script>
-        (function () {
-            const theme = localStorage.getItem('pk_theme');
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        })();
-    </script>
+    <!-- Light mode only — no theme detection needed -->
     <!-- App CSS (modular) -->
     <link rel="stylesheet" href="assets/css/variables.css">
     <link rel="stylesheet" href="assets/css/components.css">
@@ -128,8 +122,8 @@
             <!-- SidebarFooter -->
             <div class="side-foot">
                 <button class="side-user-btn" id="sideUserBtn">
-                    <div class="side-user-avatar" id="sideUserAvatar" onclick="goNav('settings')">U</div>
-                    <div class="side-user-info" onclick="goNav('settings')">
+                    <div class="side-user-avatar" id="sideUserAvatar" onclick="goNav('profile')">U</div>
+                    <div class="side-user-info" onclick="goNav('profile')">
                         <span class="side-user-name" id="sideUserName">User</span>
                         <span class="side-user-email" id="sideUserEmail">Settings</span>
                     </div>
@@ -303,6 +297,7 @@
     <script src="assets/js/export/signature.js"></script>
     <script src="assets/js/views/settings.js"></script>
     <script src="assets/js/views/settings-templates.js"></script>
+    <script src="assets/js/views/profile.js"></script>
     <script src="assets/js/export/tpl-data.js"></script>
     <script src="assets/js/export/sharing.js"></script>
     <script src="assets/js/export/create.js"></script>

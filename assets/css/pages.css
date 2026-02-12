@@ -541,6 +541,80 @@
   color: var(--muted-foreground);
 }
 
+/* ═══ Dashboard Two-Column Row ═══ */
+.dash-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ═══ Dues Card — matches resume-card-v2 ═══ */
+.dues-card {
+  position: relative;
+  background: linear-gradient(to top, color-mix(in srgb, var(--red) 5%, transparent), var(--card));
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: box-shadow 150ms ease-out;
+}
+
+.dues-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+.dues-card-val {
+  color: var(--red) !important;
+}
+
+/* ═══ Status Bar Chart ═══ */
+.sbc-bar {
+  display: flex;
+  height: 12px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  gap: 2px;
+  margin: 0 24px;
+}
+
+.sbc-seg {
+  border-radius: var(--r-pill);
+  min-width: 4px;
+  transition: flex 300ms ease-out;
+}
+
+.sbc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 24px 0;
+}
+
+.sbc-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+
+.sbc-legend-item strong {
+  font-weight: 600;
+  color: var(--card-foreground);
+}
+
+.sbc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 /* ═══ Dashboard Alerts — simple stack ═══ */
 .dash-alerts {
   display: flex;
@@ -4354,6 +4428,207 @@
   height: 1px;
   background: var(--border);
   margin: 6px 0;
+}
+
+/* ════════ MY PROFILE PAGE ════════ */
+
+.prof-container {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 0;
+}
+
+.prof-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.prof-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 600;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.prof-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.prof-hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.prof-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--card-foreground);
+  line-height: 1.2;
+}
+
+.prof-company {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+
+.prof-email {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+
+.prof-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.prof-stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.prof-stat-val {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--card-foreground);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prof-stat-label {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 4px;
+}
+
+.prof-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.prof-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.prof-card-t {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--card-foreground);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.prof-card-t svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted-foreground);
+}
+
+.prof-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.prof-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+.prof-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.prof-row:first-child {
+  padding-top: 0;
+}
+
+.prof-row-label {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.prof-row-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--card-foreground);
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.prof-row-empty {
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+
+.prof-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.prof-logo-thumb {
+  height: 24px;
+  width: auto;
+  border-radius: 4px;
+}
+
+.prof-footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  padding: 8px 0;
 }
 
 /* ════════ AUTH SPLIT LAYOUT (shadcn style) ════════ */

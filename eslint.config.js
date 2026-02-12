@@ -91,8 +91,6 @@ export default [
                 initDatePickers: 'readonly',
 
                 // ── core/theme.js ──
-                toggleTheme: 'readonly',
-                updateMetaTheme: 'readonly',
                 getCurrentTheme: 'readonly',
                 FONT_URLS: 'readonly',
                 applyFont: 'readonly',
@@ -308,6 +306,9 @@ export default [
                 importData: 'readonly',
                 applyWhiteLabel: 'readonly',
                 appName: 'readonly',
+
+                // ── views/profile.js ──
+                renderProfile: 'readonly',
 
                 // ── views/analytics.js ──
                 analyticsFilter: 'writable',
