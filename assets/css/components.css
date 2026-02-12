@@ -729,7 +729,7 @@ input[type="number"] {
   padding: 5px 10px;
   background: var(--primary);
   color: var(--primary-foreground);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   border-radius: 6px;
   white-space: nowrap;
