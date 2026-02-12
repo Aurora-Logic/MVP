@@ -268,68 +268,190 @@
 }
 
 /* First run (dashboard) */
+/* Animations */
+@keyframes frFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes frFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(0, -8px); }
+}
+
+@keyframes frOrb {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 0.8; }
+}
+
 .first-run {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 32px;
+  padding: 20px 0;
+  animation: frFadeUp 0.4s ease-out;
+}
+
+/* Hero — burgundy gradient card with floating orbs */
+.fr-hero {
+  position: relative;
+  background: linear-gradient(135deg, #800020 0%, #4A0D24 60%, #2D0816 100%);
+  border-radius: 20px;
+  padding: 56px 40px;
+  overflow: hidden;
   text-align: center;
-  padding: 60px 20px;
 }
-.fr-icon {
-  width: 56px;
-  height: 56px;
-  background: var(--muted);
-  border-radius: var(--r3);
-  display: flex;
+
+.fr-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: frOrb 4s ease-in-out infinite;
+}
+
+.fr-orb-1 {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(253, 164, 175, 0.15) 0%, transparent 70%);
+  top: -60px;
+  right: -40px;
+  animation-delay: 0s;
+}
+
+.fr-orb-2 {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(184, 96, 122, 0.2) 0%, transparent 70%);
+  bottom: -30px;
+  left: -20px;
+  animation-delay: 1.5s;
+}
+
+.fr-orb-3 {
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(212, 137, 158, 0.15) 0%, transparent 70%);
+  top: 30%;
+  left: 15%;
+  animation-delay: 3s;
+}
+
+.fr-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.fr-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-.fr-icon svg { width: 28px; height: 28px; color: var(--blue); }
-.fr-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text);
-}
-.fr-desc {
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: var(--r-pill);
   font-size: 14px;
-  color: var(--text3);
-  max-width: 420px;
-  line-height: 1.6;
-  margin: 8px 0 20px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
 }
+
+.fr-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.fr-desc {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 460px;
+  line-height: 1.6;
+  margin: 0 auto 28px;
+}
+
 .fr-actions {
   display: flex;
-  gap: 10px;
-  margin-bottom: 40px;
+  gap: 12px;
+  justify-content: center;
 }
+
+.fr-btn-primary {
+  background: #fff !important;
+  color: #800020 !important;
+  border: none !important;
+  font-weight: 600 !important;
+}
+
+.fr-btn-primary:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.fr-btn-outline {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.fr-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Feature cards — staggered entrance */
 .fr-features {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  max-width: 500px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
-.fr-feat { text-align: center; }
+
+.fr-feat {
+  text-align: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 16px;
+  animation: frFadeUp 0.4s ease-out both;
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.fr-feat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sh2);
+}
+
 .fr-feat-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--muted);
-  border-radius: var(--r2);
+  width: 48px;
+  height: 48px;
+  background: rgba(128, 0, 32, 0.06);
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 8px;
+  margin: 0 auto 12px;
+  animation: frFloat 3s ease-in-out infinite;
 }
-.fr-feat-icon svg { width: 18px; height: 18px; color: var(--text3); }
+
+.fr-feat:nth-child(2) .fr-feat-icon { animation-delay: 0.5s; }
+.fr-feat:nth-child(3) .fr-feat-icon { animation-delay: 1s; }
+.fr-feat:nth-child(4) .fr-feat-icon { animation-delay: 1.5s; }
+
+.fr-feat-icon svg { width: 22px; height: 22px; color: #800020; }
+
 .fr-feat-t {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
+  margin-bottom: 4px;
 }
+
 .fr-feat-d {
   font-size: 14px;
   color: var(--text4);
-  margin-top: 2px;
+  line-height: 1.4;
 }
 
 /* ════════ EXPIRY BANNERS ════════ */

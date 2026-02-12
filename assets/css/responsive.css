@@ -28,7 +28,7 @@
   }
 
   .fr-features {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .tpl-grid {
@@ -254,9 +254,11 @@
   }
 
   /* First run */
+  .fr-hero { padding: 40px 20px; border-radius: 14px; }
+  .fr-title { font-size: 22px; }
   .fr-features {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   /* Topbar right — base already has overflow-x handling */

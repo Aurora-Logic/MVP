@@ -78,7 +78,7 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .trusted-row{display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap}
 .trusted-item{display:flex;flex-direction:column;align-items:center;text-align:center}
 .trusted-val{font-size:28px;font-weight:700;color:#000;font-variant-numeric:tabular-nums}
-.trusted-label{font-size:12px;color:#737373;font-weight:500;margin-top:2px}
+.trusted-label{font-size: 14px;color:#737373;font-weight:500;margin-top:2px}
 
 /* ── Section common ── */
 .section{padding:96px 0}
@@ -122,7 +122,7 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .tpl-bar.brand{height:4px;border-radius:2px}
 .tpl-bar.w30{width:30%}.tpl-bar.w50{width:50%}.tpl-bar.w70{width:70%}.tpl-bar.w80{width:80%}.tpl-bar.w90{width:90%}.tpl-bar.w100{width:100%}
 .tpl-block{flex:1;border-radius:2px;background:#f0f0f0;margin-top:2px}
-.tpl-name{font-size:12px;font-weight:500;color:#525252}
+.tpl-name{font-size: 14px;font-weight:500;color:#525252}
 
 /* ── Steps ── */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;position:relative}
@@ -151,7 +151,7 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .price-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.05);border-color:#d4d4d4}
 .price-card.featured{border-color:rgba(0,151,254,.4);background:linear-gradient(180deg,rgba(0,151,254,.04) 0%,#fff 50%)}
 .price-card.featured:hover{box-shadow:0 8px 24px rgba(0,151,254,.1);border-color:rgba(0,151,254,.5)}
-.price-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#0097fe;background:rgba(0,151,254,.1);padding:5px 12px;border-radius:8px;margin-bottom:14px;width:fit-content}
+.price-badge{display:inline-flex;align-items:center;gap:4px;font-size: 14px;font-weight:600;color:#0097fe;background:rgba(0,151,254,.1);padding:5px 12px;border-radius:8px;margin-bottom:14px;width:fit-content}
 .price-name{font-size:20px;font-weight:600;margin-bottom:4px.price-desc{font-size:14px;color:#737373;margin-bottom:20px;line-height:1.5}
 .price-amt{font-size:40px;font-weight:800;color:#000;margin-bottom:4px}
 .price-amt .period{font-size:14px;font-weight:400;color:#a3a3a3.price-amt .cur{font-size:16px;font-weight:700;vertical-align:super;margin-right:1px}
@@ -192,9 +192,9 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 /* ── Footer ── */
 .footer{padding:32px 0;border-top:1px solid #e5e5e5}
 .footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-.footer-left{font-size:12px;color:#737373}
+.footer-left{font-size: 14px;color:#737373}
 .footer-links{display:flex;gap:24px}
-.footer-links a{font-size:12px;color:#737373;transition:color .15s}
+.footer-links a{font-size: 14px;color:#737373;transition:color .15s}
 .footer-links a:hover{color:#000}
 
 /* ── Responsive ── */
@@ -222,6 +222,6 @@ button{font:inherit;cursor:pointer;border:none;background:none}
     .feat{min-width:240px;max-width:240px;padding:20px 18px}
     .tpl-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
     .tpl-card{padding:10px 8px 8px}
-    .tpl-name{font-size:11px}
+    .tpl-name{font-size: 14px}
 }
 @media print{.nav,.cta-section{display:none}}
