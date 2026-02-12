@@ -6,7 +6,7 @@
   /* Hide all chrome */
   .side, .topbar, .prop-stats, .prop-actions,
   .toasts, .ctx, .modal-wrap, .overlay, .preview,
-  .loading-overlay, .hamburger-btn, .onboard,
+  .loading-overlay, .topbar-trigger, .onboard,
   .save-indicator, .side-overlay,
   dialog.command-dialog {
     display: none !important;

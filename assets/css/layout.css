@@ -176,7 +176,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
+  font-weight: 600;
   font-size: 10px;
   flex-shrink: 0;
 }
@@ -706,16 +706,51 @@
   background: var(--bg);
 }
 
-/* Topbar — sleek breadcrumb + search */
+/* Topbar — shadcn dashboard-01 header: SidebarTrigger + Separator + Breadcrumb */
 .topbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 24px;
+  gap: 8px;
+  padding: 0 16px;
   border-bottom: 1px solid var(--border);
   background: var(--background);
-  height: 48px;
+  height: 52px;
   flex-shrink: 0;
+}
+
+/* SidebarTrigger (panel-left icon button) */
+.topbar-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: var(--r);
+  cursor: pointer;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+  transition: background 150ms ease-out, color 150ms ease-out;
+}
+
+.topbar-trigger:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.topbar-trigger svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Vertical Separator between trigger and breadcrumb */
+.topbar-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 4px;
 }
 
 /* Breadcrumb */
@@ -772,31 +807,6 @@
 
 .topbar-right::-webkit-scrollbar {
   display: none;
-}
-
-/* Hamburger (mobile) */
-.hamburger-btn {
-  display: none;
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: transparent;
-  border-radius: var(--r);
-  cursor: pointer;
-  color: var(--text3);
-  align-items: center;
-  justify-content: center;
-  transition: all var(--t);
-}
-
-.hamburger-btn:hover {
-  background: var(--muted);
-  color: var(--text);
-}
-
-.hamburger-btn svg {
-  width: 20px;
-  height: 20px;
 }
 
 /* Body scroll */

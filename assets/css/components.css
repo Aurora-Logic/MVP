@@ -388,7 +388,7 @@ input.csel-input::placeholder { color: var(--text4) !important; }
 
 .csel-group-label {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text4);
@@ -483,7 +483,7 @@ input[type="number"] {
 
 .card-t {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text);
 }
 
@@ -634,7 +634,7 @@ input[type="number"] {
   font-size: 9px;
   padding: 1px 5px;
   border-radius: var(--r-pill);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.3px;
   vertical-align: 1px;
   margin-left: 4px;
@@ -699,7 +699,7 @@ input[type="number"] {
 
 .modal-t {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text);
   margin-bottom: 4px;
 }
@@ -1061,7 +1061,7 @@ input[type="number"] {
 }
 
 .dp-day.today {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--blue);
   background: var(--blue-bg);
 }
@@ -1184,7 +1184,7 @@ dialog.command-dialog::backdrop {
   display: block;
   padding: 8px 10px 4px;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text4);
@@ -1304,7 +1304,7 @@ dialog.command-dialog::backdrop {
 .var-dropdown-head {
   padding: 8px 10px 6px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text4);

@@ -25,7 +25,7 @@
     <script defer data-domain="proposalkit.vercel.app" src="https://plausible.io/js/script.js"></script>
     <!-- Inter fallback + JetBrains Mono (SF Pro Display loads as system font) -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <!-- Lucide Icons (vendored locally) -->
     <script src="assets/js/vendor/lucide-0.460.0.js"></script>
@@ -138,10 +138,10 @@
         <!-- Main -->
         <div class="main">
             <div class="topbar">
-                <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileSidebar()"
-                    aria-label="Toggle menu">
-                    <i data-lucide="menu"></i>
+                <button class="topbar-trigger" id="sidebarTrigger" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                    <i data-lucide="panel-left"></i>
                 </button>
+                <div class="topbar-sep" aria-hidden="true"></div>
                 <div class="topbar-breadcrumb">
                     <span class="breadcrumb-item breadcrumb-root" id="breadcrumbRoot" onclick="goNav('dashboard')">ProposalKit</span>
                     <i data-lucide="chevron-right" class="breadcrumb-sep"></i>

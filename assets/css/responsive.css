@@ -94,7 +94,7 @@
     background: #800020;
     color: #fff;
     border-radius: 10px;
-    font-weight: 800;
+    font-weight: 600;
     font-size: 18px;
     margin-bottom: 20px;
   }
@@ -130,10 +130,7 @@
     display: none !important;
   }
 
-  /* Show hamburger */
-  .hamburger-btn {
-    display: flex;
-  }
+  /* On mobile, topbar trigger opens mobile sidebar instead of collapse */
 
   /* Layout */
   .body-scroll {

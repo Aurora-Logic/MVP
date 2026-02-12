@@ -4,6 +4,35 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.11 (build 20260212) — 2026-02-12
+
+### Style
+- Topbar redesigned to match shadcn dashboard-01 header: SidebarTrigger (panel-left icon) + vertical Separator + Breadcrumb
+- Font weights normalized across entire app: 800→600, 700→600 (shadcn/ui uses 400/500/600 scale only)
+- Inter font import trimmed to 400;500;600 weights (removed unused 700/800)
+- Hamburger button replaced by unified topbar-trigger that handles both desktop sidebar collapse and mobile offcanvas
+
+### Refactor
+- `toggleSidebar()` now detects viewport width — desktop triggers collapse, mobile triggers offcanvas
+- Removed old `.hamburger-btn` CSS (replaced by `.topbar-trigger`)
+
+### Files Changed
+- `index.html` — Topbar: SidebarTrigger + Separator + Breadcrumb; trimmed font weights
+- `assets/css/layout.css` — `.topbar-trigger`, `.topbar-sep`; removed `.hamburger-btn`; topbar h:52px gap:8px
+- `assets/css/pages.css` — All font-weight 700/800 → 600
+- `assets/css/components.css` — All font-weight 700 → 600
+- `assets/css/features.css` — All font-weight 700/800 → 600
+- `assets/css/responsive.css` — Removed hamburger show rule; fixed auth icon weight
+- `assets/css/pdf.css` — Font-weight 700/800 → 600
+- `assets/css/client.css` — Font-weight 700 → 600
+- `assets/css/print.css` — Updated print hide selector
+- `assets/js/views/nav.js` — Smart `toggleSidebar()` for mobile/desktop
+- `assets/js/boot.js` — Version 2.10 → 2.11, What's New updated
+- `sw.js` — Cache bump v10 → v11
+- `package.json` — Version 2.10.0 → 2.11.0
+
+---
+
 ## v2.10 (build 20260212) — 2026-02-12
 
 ### Features

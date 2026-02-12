@@ -43,14 +43,12 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.10';
+const APP_VERSION = '2.11';
 const APP_BUILD = '20260212';
 const WHATS_NEW_ITEMS = [
-    { icon: 'panel-left', title: 'shadcn Sidebar', desc: 'Rebuilt sidebar with team header, grouped navigation, recent documents, and user dropdown menu.' },
-    { icon: 'chevron-right', title: 'Breadcrumb Topbar', desc: 'New breadcrumb navigation in the topbar with clickable path segments.' },
-    { icon: 'circle-plus', title: 'Quick Create', desc: 'Redesigned sidebar button for faster proposal creation.' },
-    { icon: 'area-chart', title: 'Analytics Widget', desc: 'Revenue overview chart with time filters and win rate stats on the dashboard.' },
-    { icon: 'ellipsis-vertical', title: 'User Menu', desc: 'Footer user button with dropdown for Settings, Theme, team switching, and logout.' }
+    { icon: 'panel-left', title: 'Dashboard-01 Header', desc: 'Topbar redesigned with shadcn SidebarTrigger + vertical Separator + Breadcrumb pattern.' },
+    { icon: 'type', title: 'Typography Overhaul', desc: 'Font weights normalized to 400/500/600 scale — cleaner, more refined text hierarchy.' },
+    { icon: 'sidebar', title: 'Smart Sidebar Toggle', desc: 'Single trigger button handles both desktop collapse and mobile offcanvas.' }
 ];
 
 function checkWhatsNew() {

@@ -62,11 +62,15 @@ function closeMobileSidebar() {
     overlay.classList.remove('show');
 }
 
-// Collapsible sidebar
+// Collapsible sidebar (desktop) / offcanvas (mobile)
 function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('collapsed');
-    safeLsSet('pk_sidebarCollapsed', sidebar.classList.contains('collapsed') ? 'true' : 'false');
+    if (window.innerWidth <= 768) {
+        toggleMobileSidebar();
+    } else {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('collapsed');
+        safeLsSet('pk_sidebarCollapsed', sidebar.classList.contains('collapsed') ? 'true' : 'false');
+    }
 }
 
 function initSidebarState() {
