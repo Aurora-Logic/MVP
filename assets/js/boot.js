@@ -43,13 +43,14 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.9';
+const APP_VERSION = '2.10';
 const APP_BUILD = '20260212';
 const WHATS_NEW_ITEMS = [
-    { icon: 'layout-grid', title: 'shadcn Metric Cards', desc: 'Dashboard now features 4 gradient metric cards — Total Pipeline, Active Proposals, Won Deals, and Outstanding.' },
-    { icon: 'trending-up', title: '30-Day Trend Badges', desc: 'Each metric card shows a trend badge comparing the last 30 days vs the prior period.' },
-    { icon: 'banknote', title: 'Currency-Aware Icons', desc: 'Pipeline card icon adapts to your currency — Rupee, Dollar, Euro, Pound, or Yen.' },
-    { icon: 'mouse-pointer-click', title: 'Clickable Metric Cards', desc: 'Click any metric card to jump straight to filtered proposals.' }
+    { icon: 'panel-left', title: 'shadcn Sidebar', desc: 'Rebuilt sidebar with team header, grouped navigation, recent documents, and user dropdown menu.' },
+    { icon: 'chevron-right', title: 'Breadcrumb Topbar', desc: 'New breadcrumb navigation in the topbar with clickable path segments.' },
+    { icon: 'circle-plus', title: 'Quick Create', desc: 'Redesigned sidebar button for faster proposal creation.' },
+    { icon: 'area-chart', title: 'Analytics Widget', desc: 'Revenue overview chart with time filters and win rate stats on the dashboard.' },
+    { icon: 'ellipsis-vertical', title: 'User Menu', desc: 'Footer user button with dropdown for Settings, Theme, team switching, and logout.' }
 ];
 
 function checkWhatsNew() {

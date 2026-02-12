@@ -4,6 +4,41 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.10 (build 20260212) — 2026-02-12
+
+### Features
+- Rebuilt sidebar to exact shadcn/ui sidebar-07 pattern: team header, grouped nav, Recent documents, user footer with dropdown menu
+- Breadcrumb topbar replaces flat title — clickable path segments (ProposalKit > Dashboard / Proposals > Title)
+- Quick Create button with circle-plus icon in sidebar
+- User dropdown menu (Settings, Theme, team switching, Log out) from footer avatar
+- Analytics revenue chart widget with time filters and stats grid on dashboard
+- Notion-style proposal table with filter tabs, sort menu, and view toggle (table/list/kanban)
+
+### Style
+- Sidebar uses dedicated `--sidebar-*` CSS tokens matching shadcn specification
+- Metric cards with per-card accent gradients (primary, blue, green, red)
+- Resume card with blue gradient and status badge
+- Auth screens and onboarding redesigned
+- Responsive breakpoints updated for new sidebar + topbar layout
+
+### Files Changed
+- `index.html` — Rebuilt sidebar HTML (shadcn groups), breadcrumb topbar
+- `assets/css/layout.css` — Sidebar styles (header, groups, footer, user menu, rail)
+- `assets/css/pages.css` — Dashboard metric cards, resume card, proposal table, analytics widget, filter tabs
+- `assets/css/variables.css` — Sidebar tokens, type scale, spacing
+- `assets/css/responsive.css` — Mobile sidebar, metric grid breakpoints
+- `assets/js/views/nav.js` — `goNav()` breadcrumb reset, `toggleUserMenu()` dropdown
+- `assets/js/export/create.js` — `refreshSide()` updates new sidebar elements
+- `assets/js/editor/editor.js` — Editor breadcrumb (root→Proposals, current→title)
+- `assets/js/views/dashboard.js` — Metric cards, resume bar, analytics widget integration
+- `assets/js/views/proposals.js` — Filter tabs, Notion-style table/list, sort menu
+- `assets/js/views/analytics.js` — Revenue chart, stats grid, toggle group filters
+- `assets/js/core/team.js` — `updateSidebarUser()` for new avatar/name/email elements
+- `assets/js/boot.js` — Version 2.9 → 2.10, What's New items
+- `sw.js` — Cache bump v9 → v10
+
+---
+
 ## v2.9 (build 20260212) — 2026-02-12
 
 ### Features
