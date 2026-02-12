@@ -2,7 +2,7 @@
 // NAVIGATION + MOBILE + KEYBOARD
 // ════════════════════════════════════════
 
-/* exported goNav, toggleMobileSidebar, toggleSidebar, initSidebarState, initKeyboardShortcuts */
+/* exported goNav, toggleMobileSidebar, toggleSidebar, initSidebarState, initKeyboardShortcuts, openFeedbackModal, selectFbType, submitFeedback */
 function destroyAllEditors() {
     // Destroy section editors
     if (typeof sectionEditors === 'object' && sectionEditors) {
@@ -115,7 +115,7 @@ function initKeyboardShortcuts() {
             const wnModal = document.getElementById('whatsNewModal');
             if (wnModal) { if (typeof dismissWhatsNew === 'function') dismissWhatsNew(); else wnModal.remove(); return; }
             // Dynamic modals (remove from DOM)
-            const dynamicModals = ['shortcutsModal', 'completenessModal', 'clientModal', 'cpModal', 'libModal', 'tcModal', 'tplModal', 'emailTplModal', 'shareModal', 'dupClientModal', 'confirmModal', 'csvModal'];
+            const dynamicModals = ['feedbackModal', 'shortcutsModal', 'completenessModal', 'clientModal', 'cpModal', 'libModal', 'tcModal', 'tplModal', 'emailTplModal', 'shareModal', 'dupClientModal', 'confirmModal', 'csvModal'];
             for (const modalId of dynamicModals) {
                 const modal = document.getElementById(modalId);
                 if (modal) { modal.remove(); return; }
@@ -174,6 +174,51 @@ function initKeyboardShortcuts() {
         const um = document.querySelector('.side-user-menu');
         if (um) um.remove();
     });
+}
+
+// ── Send Feedback modal ──
+function openFeedbackModal() {
+    const existing = document.getElementById('feedbackModal');
+    if (existing) existing.remove();
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-wrap'; wrap.id = 'feedbackModal';
+    wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
+    wrap.innerHTML = `<div class="modal" style="max-width:440px" onclick="event.stopPropagation()">
+        <div class="modal-t">Send Feedback</div>
+        <div class="modal-d" style="margin-bottom:12px">Report a bug, suggest a feature, or share your thoughts.</div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+            <button class="btn-sm-outline fb-type-btn on" data-type="bug" onclick="selectFbType(this)"><i data-lucide="bug"></i>Bug</button>
+            <button class="btn-sm-outline fb-type-btn" data-type="feature" onclick="selectFbType(this)"><i data-lucide="lightbulb"></i>Feature</button>
+            <button class="btn-sm-outline fb-type-btn" data-type="other" onclick="selectFbType(this)"><i data-lucide="message-circle"></i>Other</button>
+        </div>
+        <textarea id="fbText" rows="4" placeholder="Describe the issue or suggestion..." style="width:100%;resize:vertical"></textarea>
+        <div class="modal-foot" style="margin-top:16px">
+            <button class="btn-sm-ghost" onclick="document.getElementById('feedbackModal').remove()">Cancel</button>
+            <button class="btn-sm" onclick="submitFeedback()">Send Feedback</button>
+        </div>
+    </div>`;
+    document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
+    lucide.createIcons();
+    document.getElementById('fbText')?.focus();
+}
+
+function selectFbType(btn) {
+    btn.closest('div').querySelectorAll('.fb-type-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+}
+
+function submitFeedback() {
+    const text = document.getElementById('fbText')?.value?.trim();
+    if (!text) { toast('Please describe your feedback', 'error'); return; }
+    const type = document.querySelector('.fb-type-btn.on')?.dataset?.type || 'bug';
+    const payload = { type, text, version: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '', ts: new Date().toISOString() };
+    // Store locally (future: send to API)
+    const fb = safeGetStorage('pk_feedback', []);
+    fb.push(payload);
+    safeLsSet('pk_feedback', JSON.stringify(fb));
+    document.getElementById('feedbackModal')?.remove();
+    toast('Thank you for your feedback!');
 }
 
 // ── User menu dropdown (shadcn NavUser) ──

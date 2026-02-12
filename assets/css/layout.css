@@ -90,6 +90,8 @@
 
 .side.collapsed .side-new-wrap {
   padding: 0;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .side.collapsed .side-new-full {
@@ -98,6 +100,12 @@
   padding: 0;
   margin: 0 auto;
   justify-content: center;
+}
+
+.side.collapsed .side-new-icon {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto;
 }
 
 .side.collapsed .side-nav {
@@ -241,6 +249,8 @@
 
 /* ── New Proposal button — shadcn Quick Create style (bg-primary in SidebarMenuButton) ── */
 .side-new-wrap {
+  display: flex;
+  gap: 6px;
   padding: 0;
   margin-bottom: 8px;
 }
@@ -249,7 +259,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   height: 36px;
   padding: 0 12px;
   background: var(--sidebar-primary);
@@ -275,6 +286,32 @@
   width: 16px;
   height: 16px;
   flex-shrink: 0;
+}
+
+/* Search icon button beside Quick Create */
+.side-new-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--sidebar-border);
+  border-radius: var(--r-pill);
+  color: var(--sidebar-foreground);
+  cursor: pointer;
+  transition: background 150ms ease-out, color 150ms ease-out;
+}
+
+.side-new-icon:hover {
+  background: var(--sidebar-accent);
+  color: var(--sidebar-accent-foreground);
+}
+
+.side-new-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* ── SidebarMenuButton — gap-2 rounded-md p-2 h-8 text-sm (exact shadcn) ── */

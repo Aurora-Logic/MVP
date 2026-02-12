@@ -246,6 +246,9 @@ export default [
                 closeMobileSidebar: 'readonly',
                 toggleSidebar: 'readonly',
                 toggleUserMenu: 'readonly',
+                openFeedbackModal: 'readonly',
+                selectFbType: 'readonly',
+                submitFeedback: 'readonly',
                 initSidebarState: 'readonly',
                 initKeyboardShortcuts: 'readonly',
 

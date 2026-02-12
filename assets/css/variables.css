@@ -70,10 +70,10 @@
   --sh2: 0 4px 16px rgba(0, 0, 0, 0.07);
   --sh3: 0 16px 48px rgba(0, 0, 0, 0.1);
 
-  /* Typography */
-  --font: 'SF Pro Display', 'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-text: 'SF Pro Text', 'SF Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --letter-spacing: 0;
+  /* Typography — SF Pro → Helvetica Neue → Helvetica fallback */
+  --font: 'SF Pro Display', 'SF Pro', 'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-text: 'SF Pro Text', 'SF Pro', 'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --letter-spacing: -0.02em;
   --mono: 'SF Mono', ui-monospace, monospace;
 
   /* Spacing Scale (4px base) */
@@ -201,6 +201,7 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
+  letter-spacing: var(--letter-spacing);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

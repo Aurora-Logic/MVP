@@ -23,9 +23,9 @@
     <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
     <!-- Analytics (Plausible — no cookies, GDPR compliant) -->
     <script defer data-domain="proposalkit.vercel.app" src="https://plausible.io/js/script.js"></script>
-    <!-- Inter fallback + JetBrains Mono (SF Pro Display loads as system font) -->
+    <!-- JetBrains Mono for code (SF Pro / Helvetica Neue are system fonts) -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <!-- Lucide Icons (vendored locally) -->
     <script src="assets/js/vendor/lucide-0.460.0.js"></script>
@@ -33,11 +33,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.0.0"></script>
     <!-- Supabase JS Client (vendored locally) -->
     <script src="assets/js/vendor/supabase-2.49.1.js"></script>
-    <!-- Inline theme detection (prevent FOUC) -->
+    <!-- Inline theme detection (prevent FOUC — default light) -->
     <script>
         (function () {
-            const theme = localStorage.getItem('pk_theme') ||
-                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const theme = localStorage.getItem('pk_theme');
             document.documentElement.classList.toggle('dark', theme === 'dark');
         })();
     </script>
@@ -105,6 +104,9 @@
                         <button class="side-new-full" onclick="openNewModal()" data-tooltip="New Proposal (⌘N)" data-side="bottom">
                             <i data-lucide="circle-plus"></i><span>Quick Create</span>
                         </button>
+                        <button class="side-new-icon" onclick="openCommandPalette()" data-tooltip="Search (⌘K)" data-side="bottom">
+                            <i data-lucide="search"></i>
+                        </button>
                     </div>
                     <div class="side-nav">
                         <button class="side-btn on" data-nav="dashboard" onclick="goNav('dashboard')"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></button>
@@ -119,18 +121,19 @@
                 </div>
                 <!-- NavSecondary group (mt-auto) -->
                 <div class="side-group side-group-secondary">
+                    <button class="side-btn" onclick="openFeedbackModal()"><i data-lucide="message-square-warning"></i><span>Send Feedback</span></button>
                     <button class="side-btn" data-nav="settings" onclick="goNav('settings')"><i data-lucide="settings"></i><span>Settings</span></button>
                 </div>
             </div>
             <!-- SidebarFooter -->
             <div class="side-foot">
-                <button class="side-user-btn" onclick="toggleUserMenu()" id="sideUserBtn">
-                    <div class="side-user-avatar" id="sideUserAvatar">U</div>
-                    <div class="side-user-info">
+                <button class="side-user-btn" id="sideUserBtn">
+                    <div class="side-user-avatar" id="sideUserAvatar" onclick="goNav('settings')">U</div>
+                    <div class="side-user-info" onclick="goNav('settings')">
                         <span class="side-user-name" id="sideUserName">User</span>
                         <span class="side-user-email" id="sideUserEmail">Settings</span>
                     </div>
-                    <i data-lucide="ellipsis-vertical" class="side-user-chevron"></i>
+                    <i data-lucide="ellipsis-vertical" class="side-user-chevron" onclick="event.stopPropagation();toggleUserMenu()"></i>
                 </button>
             </div>
         </aside>

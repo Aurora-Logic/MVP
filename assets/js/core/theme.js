@@ -6,10 +6,9 @@
 // ─── Initialize theme on page load (runs immediately) ───
 (function initTheme() {
   const storedTheme = localStorage.getItem('pk_theme');
-  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-  // Determine theme: stored preference > system preference > light default
-  const theme = storedTheme || (systemPrefersDark ? 'dark' : 'light');
+  // Default to light — only dark if explicitly stored
+  const theme = storedTheme === 'dark' ? 'dark' : 'light';
 
   // Apply immediately to prevent flash
   document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -66,8 +65,8 @@ const FONT_URLS = {
 };
 
 function applyFont(fontName) {
-    if (!fontName || fontName === 'Inter') {
-        document.documentElement.style.setProperty('--font', "'Inter', system-ui, sans-serif");
+    if (!fontName || fontName === 'Inter' || fontName === 'System') {
+        document.documentElement.style.setProperty('--font', "'SF Pro Display', 'SF Pro', 'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, system-ui, sans-serif");
         return;
     }
     const url = FONT_URLS[fontName];

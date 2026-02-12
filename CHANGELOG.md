@@ -4,6 +4,33 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.12.0 (build 20260212) — 2026-02-12
+
+### Features
+- Send Feedback modal: report bugs, suggest features, or share thoughts from the sidebar
+- Quick search icon button next to Quick Create opens command palette (⌘K)
+- Sidebar footer profile click navigates to Settings; ellipsis opens user menu
+
+### Style
+- Font stack switched to SF Pro Display → Helvetica Neue → Helvetica (system fonts, no web font load)
+- Global letter-spacing set to -0.02em for tighter, more refined typography
+- Google Fonts import trimmed to JetBrains Mono only (UI fonts are all system)
+- Default theme changed to light mode (dark mode opt-in via Settings)
+- Version numbering switched to semver x.x.x format
+
+### Files Changed
+- `index.html` — Font import trimmed, FOUC script light-default, sidebar restructure (search btn, feedback btn, profile nav)
+- `assets/css/variables.css` — Font stack to SF Pro + Helvetica, --letter-spacing: -0.02em
+- `assets/css/layout.css` — .side-new-wrap flex, .side-new-icon styles
+- `assets/js/views/nav.js` — openFeedbackModal(), selectFbType(), submitFeedback(), ESC handler
+- `assets/js/core/theme.js` — Default light mode, applyFont() SF Pro stack
+- `assets/js/boot.js` — Version 2.11 → 2.12.0, What's New updated
+- `sw.js` — Cache bump v11 → v12
+- `package.json` — Version 2.11.0 → 2.12.0
+- `eslint.config.js` — Added feedback function globals
+
+---
+
 ## v2.11 (build 20260212) — 2026-02-12
 
 ### Style

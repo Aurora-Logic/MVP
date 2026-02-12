@@ -43,12 +43,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.11';
+const APP_VERSION = '2.12.0';
 const APP_BUILD = '20260212';
 const WHATS_NEW_ITEMS = [
-    { icon: 'panel-left', title: 'Dashboard-01 Header', desc: 'Topbar redesigned with shadcn SidebarTrigger + vertical Separator + Breadcrumb pattern.' },
-    { icon: 'type', title: 'Typography Overhaul', desc: 'Font weights normalized to 400/500/600 scale — cleaner, more refined text hierarchy.' },
-    { icon: 'sidebar', title: 'Smart Sidebar Toggle', desc: 'Single trigger button handles both desktop collapse and mobile offcanvas.' }
+    { icon: 'type', title: 'SF Pro Typography', desc: 'System font stack with SF Pro Display, Helvetica Neue, and -0.02em letter-spacing.' },
+    { icon: 'search', title: 'Quick Search Button', desc: 'New search icon next to Quick Create opens the command palette instantly.' },
+    { icon: 'message-square-warning', title: 'Send Feedback', desc: 'Report bugs, suggest features, or share thoughts — right from the sidebar.' },
+    { icon: 'sun', title: 'Light Mode Default', desc: 'App now defaults to light mode. Dark mode available in settings.' }
 ];
 
 function checkWhatsNew() {
