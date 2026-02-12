@@ -111,7 +111,7 @@ function showResponded(status) {
                 </div>
                 ${isAccepted && (cr.clientName || sigImg) ? `
                     <div style="margin-top:24px;padding:20px;background:var(--muted);border-radius:12px;text-align:left;max-width:400px;margin-left:auto;margin-right:auto">
-                        <div style="font-size:12px;font-weight:600;color:var(--text4);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Acceptance Record</div>
+                        <div style="font-size:14px;font-weight:600;color:var(--text4);margin-bottom:8px;text-transform:uppercase">Acceptance Record</div>
                         ${cr.clientName ? `<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">${esc(cr.clientName)}</div>` : ''}
                         <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${new Date(cr.respondedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
                         ${sigImg ? `<img src="${sigImg}" alt="Client signature" style="max-width:200px;height:auto;border-bottom:1px solid var(--border);padding-bottom:8px">` : ''}

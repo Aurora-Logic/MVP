@@ -177,9 +177,10 @@
   .an-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
   /* Profile */
-  .prof-hero { flex-wrap: wrap; }
-  .prof-stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .prof-cards { grid-template-columns: 1fr; }
+  .prof-banner { padding: 24px; }
+  .prof-banner-inner { flex-wrap: wrap; }
+  .prof-stats-row { grid-template-columns: repeat(3, 1fr); }
+  .prof-grid { grid-template-columns: 1fr; }
 
   /* Proposals — Notion table/list */
   .prop-toolbar { flex-direction: column; align-items: stretch; gap: 10px; }

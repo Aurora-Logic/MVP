@@ -21,7 +21,7 @@ function openShortcutsPanel() {
             <div class="modal-d">Press <kbd class="kbd">?</kbd> to toggle this panel</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px">
                 <div>
-                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text4);margin-bottom:8px">Navigation</div>
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text4);margin-bottom:8px">Navigation</div>
                     <div class="sc-list">
                         ${shortcutRow('⌘ K', 'Command palette')}
                         ${shortcutRow('⌘ N', 'New proposal')}
@@ -29,7 +29,7 @@ function openShortcutsPanel() {
                     </div>
                 </div>
                 <div>
-                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text4);margin-bottom:8px">Editor</div>
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text4);margin-bottom:8px">Editor</div>
                     <div class="sc-list">
                         ${shortcutRow('⌘ Z', 'Undo')}
                         ${shortcutRow('⌘ ⇧ Z', 'Redo')}
@@ -38,7 +38,7 @@ function openShortcutsPanel() {
                     </div>
                 </div>
                 <div>
-                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text4);margin-bottom:8px">Actions</div>
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text4);margin-bottom:8px">Actions</div>
                     <div class="sc-list">
                         ${shortcutRow('⌘ P', 'Preview')}
                         ${shortcutRow('⌘ E', 'Export PDF')}
@@ -46,7 +46,7 @@ function openShortcutsPanel() {
                     </div>
                 </div>
                 <div>
-                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text4);margin-bottom:8px">Dashboard</div>
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text4);margin-bottom:8px">Dashboard</div>
                     <div class="sc-list">
                         ${shortcutRow('1-5', 'Filter by status')}
                         ${shortcutRow('/', 'Focus search')}

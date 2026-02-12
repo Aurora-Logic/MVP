@@ -46,7 +46,7 @@ function bootApp() {
 const APP_VERSION = '2.12.0';
 const APP_BUILD = '20260212';
 const WHATS_NEW_ITEMS = [
-    { icon: 'type', title: 'SF Pro Typography', desc: 'System font stack with SF Pro Display, Helvetica Neue, and -0.02em letter-spacing.' },
+    { icon: 'type', title: 'SF Pro Typography', desc: 'System font stack with SF Pro Display, Helvetica Neue, and system-ui fallbacks.' },
     { icon: 'search', title: 'Quick Search Button', desc: 'New search icon next to Quick Create opens the command palette instantly.' },
     { icon: 'message-square-warning', title: 'Send Feedback', desc: 'Report bugs, suggest features, or share thoughts — right from the sidebar.' },
     { icon: 'sun', title: 'Light Mode Default', desc: 'App now defaults to light mode. Dark mode available in settings.' }

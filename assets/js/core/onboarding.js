@@ -32,7 +32,7 @@ function renderOnboarding() {
     if (obStep === 2) {
         csel(document.getElementById('obCountry'), {
             value: CONFIG?.country || '', placeholder: 'Select country', searchable: true,
-            items: OB_COUNTRIES, onChange: (val) => onCountryChange(val)
+            items: OB_COUNTRIES, onChange: (val) => { if (!CONFIG) CONFIG = {}; CONFIG.country = val; onCountryChange(val); }
         });
         if (CONFIG?.country) onCountryChange(CONFIG.country);
     }

@@ -4459,39 +4459,39 @@
 
 /* ════════ MY PROFILE PAGE ════════ */
 
-.prof-container {
-  max-width: 720px;
-  margin: 0 auto;
+.prof-page {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 8px 0;
 }
 
-.prof-hero {
+/* Banner — burgundy gradient hero */
+.prof-banner {
+  background: linear-gradient(135deg, #800020 0%, #4A0D24 100%);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.prof-banner-inner {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  gap: 20px;
 }
 
 .prof-avatar {
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 600;
   flex-shrink: 0;
   overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .prof-avatar img {
@@ -4506,27 +4506,45 @@
 }
 
 .prof-name {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
-  color: var(--card-foreground);
+  color: #fff;
   line-height: 1.2;
 }
 
 .prof-company {
-  font-size: 14px;
-  color: var(--muted-foreground);
-  margin-top: 2px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
 }
 
 .prof-email {
   font-size: 14px;
-  color: var(--muted-foreground);
+  color: rgba(255, 255, 255, 0.6);
   margin-top: 2px;
 }
 
-.prof-stats-grid {
+.prof-since {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+}
+
+.prof-edit-btn {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.prof-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Stats row — full width */
+.prof-stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
 }
 
@@ -4534,13 +4552,12 @@
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px 16px;
   text-align: center;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .prof-stat-val {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--card-foreground);
   line-height: 1.2;
@@ -4555,9 +4572,10 @@
   margin-top: 4px;
 }
 
-.prof-cards {
+/* Cards grid — full width, 3 columns */
+.prof-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
@@ -4565,8 +4583,7 @@
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 24px;
 }
 
 .prof-card-t {
@@ -4575,16 +4592,16 @@
   gap: 8px;
   font-size: 15px;
   font-weight: 600;
-  color: var(--card-foreground);
+  color: #800020;
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
 }
 
 .prof-card-t svg {
-  width: 16px;
-  height: 16px;
-  color: var(--muted-foreground);
+  width: 18px;
+  height: 18px;
+  color: #800020;
 }
 
 .prof-card-body {
@@ -4598,7 +4615,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 0;
+  padding: 10px 0;
   border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
 }
 
@@ -4646,16 +4663,9 @@
 }
 
 .prof-logo-thumb {
-  height: 24px;
+  height: 28px;
   width: auto;
   border-radius: 4px;
-}
-
-.prof-footer {
-  text-align: center;
-  font-size: 14px;
-  color: var(--muted-foreground);
-  padding: 8px 0;
 }
 
 /* ════════ AUTH SPLIT LAYOUT (shadcn style) ════════ */

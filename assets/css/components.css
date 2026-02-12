@@ -390,7 +390,6 @@ input.csel-input::placeholder { color: var(--text4) !important; }
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: var(--text4);
   padding: 6px 10px 4px;
 }
@@ -635,7 +634,6 @@ input[type="number"] {
   padding: 1px 5px;
   border-radius: var(--r-pill);
   font-weight: 600;
-  letter-spacing: 0.3px;
   vertical-align: 1px;
   margin-left: 4px;
 }
@@ -1186,7 +1184,6 @@ dialog.command-dialog::backdrop {
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: var(--text4);
 }
 
@@ -1306,7 +1303,6 @@ dialog.command-dialog::backdrop {
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: var(--text4);
 }
 
@@ -1316,7 +1312,6 @@ dialog.command-dialog::backdrop {
   font-weight: 600;
   color: var(--text4);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 .var-item {

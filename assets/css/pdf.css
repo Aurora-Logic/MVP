@@ -12,7 +12,6 @@
   font-weight: 600;
   color: #09090b;
   margin-bottom: 8px;
-  letter-spacing: -0.3px;
 }
 .prev-doc h2 {
   font-size: 18px;
@@ -51,7 +50,6 @@
   font-weight: 600;
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
   color: #71717a;
   background: #f9f9fa;
 }
@@ -99,7 +97,6 @@
   font-weight: 600;
   color: rgba(0, 0, 0, 0.04);
   text-transform: uppercase;
-  letter-spacing: 10px;
   pointer-events: none;
   white-space: nowrap;
 }

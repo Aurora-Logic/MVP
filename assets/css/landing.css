@@ -18,7 +18,7 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .nav-pill{display:flex;align-items:center;gap:4px;padding:6px 6px 6px 18px;background:rgba(255,255,255,.48);backdrop-filter:blur(12px) saturate(1.6);-webkit-backdrop-filter:blur(12px) saturate(1.6);border-radius:40px;border:1px solid rgba(255,255,255,.6);box-shadow:0 0 0 1px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.06),0 4px 8px rgba(0,0,0,.04),0 12px 24px rgba(0,0,0,.03);transition:background .3s,border-color .3s,box-shadow .3s}
 .nav.scrolled .nav-pill{background:rgba(255,255,255,.82);border-color:rgba(0,0,0,.06);box-shadow:0 0 0 1px rgba(0,0,0,.04),0 2px 4px rgba(0,0,0,.06),0 8px 16px rgba(0,0,0,.06)}
 @keyframes navIn{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.nav-logo{display:flex;align-items:center;gap:7px;font-weight:700;font-size:15px;letter-spacing:-.3px;flex-shrink:0;color:#000;transition:opacity .15s}
+.nav-logo{display:flex;align-items:center;gap:7px;font-weight:700;font-size:15px;flex-shrink:0;color:#000;transition:opacity .15s}
 .nav-logo:hover{opacity:.7}
 .nav-logo svg{width:20px;height:20px}
 .nav-links{display:flex;align-items:center;gap:2px;flex-shrink:0;margin-left:12px}
@@ -59,7 +59,7 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 
 .hero .wrap{position:relative;z-index:1}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:#fff;border-radius:8px;font-size:14px;font-weight:700;font-style:italic;color:#000;margin-bottom:28px;box-shadow:0 1px 3px rgba(0,0,0,.06);animation:fadeUp 500ms ease-out both}
-.hero h1{font-size:clamp(36px,6vw,64px);font-weight:500;letter-spacing:-.04em;line-height:1.2;color:#000;margin-bottom:20px;animation:fadeUp 500ms ease-out 80ms both}
+.hero h1{font-size:clamp(36px,6vw,64px);font-weight:500;line-height:1.2;color:#000;margin-bottom:20px;animation:fadeUp 500ms ease-out 80ms both}
 .hero h1 strong{font-weight:700}
 .hero-sub{font-size:16px;color:#525252;max-width:480px;margin:0 auto 36px;line-height:1.5;animation:fadeUp 500ms ease-out 160ms both}
 .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp 500ms ease-out 240ms both}
@@ -77,14 +77,14 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .trusted{padding:48px 0}
 .trusted-row{display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap}
 .trusted-item{display:flex;flex-direction:column;align-items:center;text-align:center}
-.trusted-val{font-size:28px;font-weight:700;color:#000;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.trusted-val{font-size:28px;font-weight:700;color:#000;font-variant-numeric:tabular-nums}
 .trusted-label{font-size:12px;color:#737373;font-weight:500;margin-top:2px}
 
 /* ── Section common ── */
 .section{padding:96px 0}
 .section-head{max-width:520px;margin:0 auto 48px;text-align:center}
 .section-head .label{font-size:14px;font-weight:600;color:#0097fe;margin-bottom:10px}
-.section-head h2{font-size:clamp(26px,3.5vw,36px);font-weight:500;letter-spacing:-.03em;line-height:1.2;color:#000;margin-bottom:12px}
+.section-head h2{font-size:clamp(26px,3.5vw,36px);font-weight:500;line-height:1.2;color:#000;margin-bottom:12px}
 .section-head p{font-size:16px;color:#525252;line-height:1.5}
 
 /* ── Reveal ── */
@@ -102,8 +102,7 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .feat{background:#fff;border:1px solid #e5e5e5;border-radius:20px;padding:24px 22px;min-width:280px;max-width:280px;flex-shrink:0;transition:all .2s ease-out;position:relative}
 .feat:hover{box-shadow:0 4px 16px rgba(0,0,0,.05);border-color:#d4d4d4;transform:translateY(-2px)}
 .feat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;backdrop-filter:blur(6px)}
-.feat-t{font-size:16px;font-weight:500;color:#000;margin-bottom:5px;letter-spacing:-.01em}
-.feat-d{font-size:13px;color:#525252;line-height:1.5}
+.feat-t{font-size:16px;font-weight:500;color:#000;margin-bottom:5px.feat-d{font-size:13px;color:#525252;line-height:1.5}
 
 /* ── Section glow tops ── */
 .glow-blue{background:radial-gradient(50% 60% at 50% 0%,rgba(0,151,254,.07) 0%,#fff 100%)}
@@ -137,7 +136,7 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .hl-row{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;text-align:left}
 .hl-row+.hl-row{margin-top:80px}
 .hl-visual{border:1px solid #e5e5e5;border-radius:20px;padding:32px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
-.hl-text h3{font-size:26px;font-weight:500;letter-spacing:-.03em;margin-bottom:10px;color:#000}
+.hl-text h3{font-size:26px;font-weight:500;margin-bottom:10px;color:#000}
 .hl-text p{font-size:15px;color:#525252;line-height:1.5;margin-bottom:18px}
 .hl-list{list-style:none;display:flex;flex-direction:column;gap:10px}
 .hl-list li{font-size:14px;color:#525252;display:flex;align-items:center;gap:10px;line-height:1.4}
@@ -153,12 +152,10 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .price-card.featured{border-color:rgba(0,151,254,.4);background:linear-gradient(180deg,rgba(0,151,254,.04) 0%,#fff 50%)}
 .price-card.featured:hover{box-shadow:0 8px 24px rgba(0,151,254,.1);border-color:rgba(0,151,254,.5)}
 .price-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#0097fe;background:rgba(0,151,254,.1);padding:5px 12px;border-radius:8px;margin-bottom:14px;width:fit-content}
-.price-name{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.01em}
-.price-desc{font-size:14px;color:#737373;margin-bottom:20px;line-height:1.5}
-.price-amt{font-size:40px;font-weight:800;letter-spacing:-.04em;color:#000;margin-bottom:4px}
-.price-amt .period{font-size:14px;font-weight:400;color:#a3a3a3;letter-spacing:0}
-.price-amt .cur{font-size:16px;font-weight:700;vertical-align:super;margin-right:1px}
-.price-free{font-size:40px;font-weight:800;letter-spacing:-.03em;color:#000;margin-bottom:4px}
+.price-name{font-size:20px;font-weight:600;margin-bottom:4px.price-desc{font-size:14px;color:#737373;margin-bottom:20px;line-height:1.5}
+.price-amt{font-size:40px;font-weight:800;color:#000;margin-bottom:4px}
+.price-amt .period{font-size:14px;font-weight:400;color:#a3a3a3.price-amt .cur{font-size:16px;font-weight:700;vertical-align:super;margin-right:1px}
+.price-free{font-size:40px;font-weight:800;color:#000;margin-bottom:4px}
 .price-feats{list-style:none;margin:20px 0;display:flex;flex-direction:column;gap:10px;flex:1}
 .price-feats li{font-size:14px;color:#525252;display:flex;align-items:flex-start;gap:10px;line-height:1.5}
 .price-feats li::before{content:'';display:inline-block;width:16px;height:16px;min-width:16px;border-radius:50%;background-image:url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 5L4 7L8 3' stroke='%230097fe' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-color:rgba(0,151,254,.08);margin-top:2px}
@@ -185,7 +182,7 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .cta-box{position:relative;overflow:hidden;border-radius:24px;padding:72px 48px;text-align:center;background:linear-gradient(180deg,#0a0a0a 0%,#1a1a2e 100%);border:1px solid rgba(255,255,255,.08);box-shadow:0 0 0 1px rgba(0,0,0,.1),0 8px 40px rgba(0,0,0,.15)}
 .cta-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(97deg,#FF4747 0%,#E39400 18%,#00AD09 38%,#0097FE 58%,#96F 77%,#F347FF 100%)}
 .cta-box::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(0,151,254,.1) 0%,transparent 70%);pointer-events:none}
-.cta-box h2{font-size:clamp(26px,3.5vw,36px);font-weight:600;color:#fff;letter-spacing:-.03em;margin-bottom:12px;position:relative;z-index:1}
+.cta-box h2{font-size:clamp(26px,3.5vw,36px);font-weight:600;color:#fff;margin-bottom:12px;position:relative;z-index:1}
 .cta-box p{font-size:16px;color:rgba(255,255,255,.6);margin-bottom:32px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.5;position:relative;z-index:1}
 .cta-box .btn-dark{background:#fff;color:#000;position:relative;z-index:1}
 .cta-box .btn-dark:hover{background:#f5f5f5;box-shadow:0 4px 16px rgba(255,255,255,.2)}

@@ -31,31 +31,51 @@ function renderProfile() {
     const revenue = active.reduce((a, p) =>
         a + (p.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0), 0);
     const clients = typeof CLIENTS !== 'undefined' ? CLIENTS.length : 0;
+    const winRate = total > 0 ? Math.round((accepted / total) * 100) : 0;
 
     // Account info (if logged in)
     const user = typeof sbSession !== 'undefined' ? sbSession?.user : null;
     const memberSince = user?.created_at ? fmtDate(user.created_at) : '';
 
     body.innerHTML = `
-    <div class="prof-container">
-      <div class="prof-hero">
-        <div class="prof-avatar">${logo ? `<img src="${esc(logo)}" alt="Logo">` : initial}</div>
-        <div class="prof-hero-info">
-          <div class="prof-name">${esc(name)}</div>
-          ${company ? `<div class="prof-company">${esc(company)}</div>` : ''}
-          ${email ? `<div class="prof-email">${esc(email)}</div>` : ''}
+    <div class="prof-page">
+      <div class="prof-banner">
+        <div class="prof-banner-inner">
+          <div class="prof-avatar">${logo ? `<img src="${esc(logo)}" alt="Logo">` : initial}</div>
+          <div class="prof-hero-info">
+            <div class="prof-name">${esc(name)}</div>
+            ${company ? `<div class="prof-company">${esc(company)}</div>` : ''}
+            ${email ? `<div class="prof-email">${esc(email)}</div>` : ''}
+            ${memberSince ? `<div class="prof-since">Member since ${memberSince}</div>` : ''}
+          </div>
+          <button class="btn-sm-outline prof-edit-btn" onclick="goNav('settings')"><i data-lucide="settings"></i> Edit Profile</button>
         </div>
-        <button class="btn-sm-outline" onclick="goNav('settings')"><i data-lucide="settings"></i> Edit Profile</button>
       </div>
 
-      <div class="prof-stats-grid">
-        <div class="prof-stat"><div class="prof-stat-val">${total}</div><div class="prof-stat-label">Proposals</div></div>
-        <div class="prof-stat"><div class="prof-stat-val">${accepted}</div><div class="prof-stat-label">Won Deals</div></div>
-        <div class="prof-stat"><div class="prof-stat-val">${fmtCur(revenue, c)}</div><div class="prof-stat-label">Revenue</div></div>
-        <div class="prof-stat"><div class="prof-stat-val">${clients}</div><div class="prof-stat-label">Clients</div></div>
+      <div class="prof-stats-row">
+        <div class="prof-stat">
+          <div class="prof-stat-val">${total}</div>
+          <div class="prof-stat-label">Proposals</div>
+        </div>
+        <div class="prof-stat">
+          <div class="prof-stat-val">${accepted}</div>
+          <div class="prof-stat-label">Won Deals</div>
+        </div>
+        <div class="prof-stat">
+          <div class="prof-stat-val">${fmtCur(revenue, c)}</div>
+          <div class="prof-stat-label">Revenue</div>
+        </div>
+        <div class="prof-stat">
+          <div class="prof-stat-val">${clients}</div>
+          <div class="prof-stat-label">Clients</div>
+        </div>
+        <div class="prof-stat">
+          <div class="prof-stat-val">${winRate}%</div>
+          <div class="prof-stat-label">Win Rate</div>
+        </div>
       </div>
 
-      <div class="prof-cards">
+      <div class="prof-grid">
         <div class="prof-card">
           <div class="prof-card-t"><i data-lucide="building-2"></i> Business Details</div>
           <div class="prof-card-body">
@@ -91,8 +111,6 @@ function renderProfile() {
           </div>
         </div>
       </div>
-
-      ${memberSince ? `<div class="prof-footer">Member since ${memberSince}</div>` : ''}
     </div>`;
     lucide.createIcons();
 }
