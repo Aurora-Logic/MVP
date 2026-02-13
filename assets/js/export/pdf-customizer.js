@@ -33,6 +33,15 @@ function getPdfStyles() {
 }
 
 function savePdfStyles(styles) {
+    // PLAN GATING: PDF customizer is Pro/Team only
+    if (typeof getCurrentPlan === 'function') {
+        const plan = getCurrentPlan();
+        if (plan === 'free') {
+            toast('PDF customization requires Pro or Team plan', 'error');
+            return;
+        }
+    }
+
     if (!CONFIG) return;
     CONFIG.pdfStyles = styles;
     saveConfig();
@@ -40,6 +49,15 @@ function savePdfStyles(styles) {
 }
 
 function resetPdfStyles() {
+    // PLAN GATING: PDF customizer is Pro/Team only
+    if (typeof getCurrentPlan === 'function') {
+        const plan = getCurrentPlan();
+        if (plan === 'free') {
+            toast('PDF customization requires Pro or Team plan', 'error');
+            return;
+        }
+    }
+
     if (!CONFIG) return;
     CONFIG.pdfStyles = structuredClone(DEFAULT_PDF_STYLES);
     saveConfig();

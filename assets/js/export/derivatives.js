@@ -6,6 +6,32 @@
 function generateDerivative(type) {
     const p = cur();
     if (!p) { toast('Open a proposal first'); return; }
+
+    // PLAN GATING: Check derivative generation limits
+    if (typeof getCurrentPlan === 'function' && typeof PLAN_LIMITS !== 'undefined') {
+        const plan = getCurrentPlan();
+        const limits = PLAN_LIMITS[plan];
+
+        // Track derivative count
+        if (!CONFIG.derivativeCount) CONFIG.derivativeCount = 0;
+        if (!CONFIG.derivativeResetAt) CONFIG.derivativeResetAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+
+        // Reset monthly counter
+        if (Date.now() > CONFIG.derivativeResetAt) {
+            CONFIG.derivativeCount = 0;
+            CONFIG.derivativeResetAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        }
+
+        // Check limit
+        if (limits.derivatives !== -1 && CONFIG.derivativeCount >= limits.derivatives) {
+            toast(`${plan === 'free' ? 'Free plan' : 'Plan'} limit: ${limits.derivatives} derivatives/month`, 'error');
+            return;
+        }
+
+        CONFIG.derivativeCount++;
+        saveConfig();
+    }
+
     const labels = { sow: 'Statement of Work', contract: 'Service Agreement', receipt: 'Receipt' };
     const win = window.open('', '_blank');
     if (!win) { toast('Please allow popups', 'error'); return; }

@@ -4,6 +4,31 @@
 
 /* exported doExport, toggleBulkCheck, toggleSelectAll, bulkExport */
 function doExport(mode) {
+    // PLAN GATING: Track export count
+    if (typeof getCurrentPlan === 'function' && typeof PLAN_LIMITS !== 'undefined') {
+        const plan = getCurrentPlan();
+        const limits = PLAN_LIMITS[plan];
+
+        // Initialize export tracking
+        if (!CONFIG.exportCount) CONFIG.exportCount = 0;
+        if (!CONFIG.exportResetAt) CONFIG.exportResetAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+
+        // Reset monthly counter
+        if (Date.now() > CONFIG.exportResetAt) {
+            CONFIG.exportCount = 0;
+            CONFIG.exportResetAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        }
+
+        // Check limit (if not unlimited)
+        if (limits.exports !== -1 && CONFIG.exportCount >= limits.exports) {
+            toast(`${plan === 'free' ? 'Free plan' : 'Plan'} limit: ${limits.exports} exports/month`, 'error');
+            return;
+        }
+
+        CONFIG.exportCount++;
+        saveConfig();
+    }
+
     showLoading('Saving changes...');
     dirty();
     const win = window.open('', '_blank');

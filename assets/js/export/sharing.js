@@ -9,13 +9,40 @@ function generateShareToken() {
     return 'sh_' + Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// SECURITY FIX: Rate limiting for share token access
+const SHARE_RATE_LIMIT = 10; // max attempts per minute
+const _shareAttempts = new Map(); // IP → {count, resetAt}
+
+function checkShareRateLimit(identifier) {
+    const now = Date.now();
+    const record = _shareAttempts.get(identifier);
+
+    if (!record || now > record.resetAt) {
+        _shareAttempts.set(identifier, { count: 1, resetAt: now + 60000 });
+        return true;
+    }
+
+    if (record.count >= SHARE_RATE_LIMIT) {
+        console.warn('[Security] Share rate limit exceeded:', identifier);
+        return false;
+    }
+
+    record.count++;
+    return true;
+}
+
 function shareProposal() {
     const p = cur();
     if (!p) return;
 
-    if (!p.shareToken) {
+    // SECURITY FIX: Add expiration (30 days default)
+    const expiresIn = 30 * 24 * 60 * 60 * 1000; // 30 days
+    const now = Date.now();
+
+    if (!p.shareToken || (p.shareExpiresAt && p.shareExpiresAt < now)) {
         p.shareToken = generateShareToken();
-        p.sharedAt = Date.now();
+        p.sharedAt = now;
+        p.shareExpiresAt = now + expiresIn;
         p.viewCount = 0;
         persist();
     }
@@ -76,7 +103,20 @@ function copyShareLink() {
 }
 
 function getProposalByToken(token) {
-    return DB.find(p => p.shareToken === token);
+    // SECURITY FIX: Check rate limit and expiration
+    const identifier = 'share_' + token.substring(0, 8);
+    if (!checkShareRateLimit(identifier)) {
+        console.warn('[Security] Rate limit exceeded for token:', token);
+        return null;
+    }
+
+    const p = DB.find(p => p.shareToken === token);
+    if (p && p.shareExpiresAt && p.shareExpiresAt < Date.now()) {
+        console.warn('[Security] Expired share token:', token);
+        return null; // Token expired
+    }
+
+    return p;
 }
 
 function recordProposalView(token) {
