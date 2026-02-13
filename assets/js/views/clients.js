@@ -143,7 +143,7 @@ function openAddClient(idx) {
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap'; wrap.id = 'clientModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-    const salOpts = SALUTATIONS.map(s => `<option value="${s}"${c.salutation === s ? ' selected' : ''}>${s}</option>`).join('');
+    const salItems = [...SALUTATIONS.map(s => ({ value: s, label: s })), { value: '', label: 'None' }];
     const isBiz = (c.customerType || 'business') === 'business';
     wrap.innerHTML = `<div class="modal acm-modal" onclick="event.stopPropagation()">
       <div class="acm-header">
@@ -159,7 +159,7 @@ function openAddClient(idx) {
       <div class="acm-body">
         <div class="acm-section-label">Contact details</div>
         <div class="fg"><label class="fl">Primary contact</label>
-          <div style="display:flex;gap:8px"><select id="acSalutation" style="width:80px;flex-shrink:0">${salOpts}<option value="">None</option></select>
+          <div style="display:flex;gap:8px"><div id="acSalutation" style="width:80px;flex-shrink:0"></div>
             <input type="text" id="acFirstName" value="${esc(c.firstName || '')}" placeholder="First name" style="flex:1">
             <input type="text" id="acLastName" value="${esc(c.lastName || '')}" placeholder="Last name" style="flex:1"></div>
         </div>
@@ -190,6 +190,10 @@ function openAddClient(idx) {
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
     if (typeof csel === 'function') {
+        csel(document.getElementById('acSalutation'), {
+            value: c.salutation || '', placeholder: 'Title',
+            items: salItems
+        });
         csel(document.getElementById('acCountry'), {
             value: c.country || '', placeholder: 'Select country', searchable: true,
             items: typeof OB_COUNTRIES !== 'undefined' ? OB_COUNTRIES : [],
@@ -227,7 +231,7 @@ function saveClient(idx) {
     const country = countryEl && typeof cselGetValue === 'function' ? cselGetValue(countryEl) : '';
     if (!autoDisplay && !displayName) { toast('Name or company is required', 'error'); return; }
     const c = {
-        customerType: type, salutation: document.getElementById('acSalutation')?.value || '',
+        customerType: type, salutation: (typeof cselGetValue === 'function' ? cselGetValue(document.getElementById('acSalutation')) : '') || '',
         firstName, lastName, companyName, displayName: displayName || autoDisplay, name: displayName || autoDisplay,
         email: document.getElementById('acEmail')?.value?.trim() || '',
         workPhone: document.getElementById('acWorkPhone')?.value?.trim() || '',

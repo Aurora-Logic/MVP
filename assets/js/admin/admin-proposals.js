@@ -30,28 +30,19 @@ function renderAdminProposals() {
         '<button class="btn-sm-outline" onclick="_propPage=Math.min(' + totalPages + ',_propPage+1);renderAdminProposals()"' + (_propPage >= totalPages ? ' disabled' : '') + '>Next</button>' +
         '</div></div>';
     lucide.createIcons();
+    _bindProposalToolbar();
 }
 
 function buildProposalToolbar() {
     return '<div class="admin-toolbar">' +
         '<div class="admin-search"><i data-lucide="search"></i>' +
         '<input placeholder="Search proposals..." value="' + esc(_propSearch) + '" oninput="_propSearch=this.value;_propPage=1;renderAdminProposals()"></div>' +
-        '<select onchange="_propFilter=this.value;_propPage=1;renderAdminProposals()" style="font-size:12px;padding:4px 10px;border-radius:9999px;border:1px solid var(--border);background:var(--background);color:var(--text)">' +
-        '<option value="all"' + (_propFilter === 'all' ? ' selected' : '') + '>All statuses</option>' +
-        '<option value="draft"' + (_propFilter === 'draft' ? ' selected' : '') + '>Draft</option>' +
-        '<option value="sent"' + (_propFilter === 'sent' ? ' selected' : '') + '>Sent</option>' +
-        '<option value="accepted"' + (_propFilter === 'accepted' ? ' selected' : '') + '>Accepted</option>' +
-        '<option value="declined"' + (_propFilter === 'declined' ? ' selected' : '') + '>Declined</option>' +
-        '<option value="expired"' + (_propFilter === 'expired' ? ' selected' : '') + '>Expired</option>' +
-        '<option value="archived"' + (_propFilter === 'archived' ? ' selected' : '') + '>Archived</option>' +
-        '</select>' +
-        '<select onchange="_propSort=this.value;_propPage=1;renderAdminProposals()" style="font-size:12px;padding:4px 10px;border-radius:9999px;border:1px solid var(--border);background:var(--background);color:var(--text)">' +
-        '<option value="date-desc"' + (_propSort === 'date-desc' ? ' selected' : '') + '>Newest first</option>' +
-        '<option value="date-asc"' + (_propSort === 'date-asc' ? ' selected' : '') + '>Oldest first</option>' +
-        '<option value="value-desc"' + (_propSort === 'value-desc' ? ' selected' : '') + '>Highest value</option>' +
-        '<option value="value-asc"' + (_propSort === 'value-asc' ? ' selected' : '') + '>Lowest value</option>' +
-        '<option value="title"' + (_propSort === 'title' ? ' selected' : '') + '>Title A-Z</option>' +
-        '</select></div>';
+        _adminCsel('apFilter') + _adminCsel('apSort') + '</div>';
+}
+
+function _bindProposalToolbar() {
+    _adminCselBind('apFilter', [{value:'all',label:'All statuses'},{value:'draft',label:'Draft'},{value:'sent',label:'Sent'},{value:'accepted',label:'Accepted'},{value:'declined',label:'Declined'},{value:'expired',label:'Expired'},{value:'archived',label:'Archived'}], _propFilter, function(v){_propFilter=v;_propPage=1;renderAdminProposals();});
+    _adminCselBind('apSort', [{value:'date-desc',label:'Newest first'},{value:'date-asc',label:'Oldest first'},{value:'value-desc',label:'Highest value'},{value:'value-asc',label:'Lowest value'},{value:'title',label:'Title A-Z'}], _propSort, function(v){_propSort=v;_propPage=1;renderAdminProposals();});
 }
 
 function getFilteredProposals() {

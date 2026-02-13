@@ -34,9 +34,9 @@ function renderAdminFeedback() {
     html += '</div></div>';
     // Filters
     html += '<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">';
-    html += _afSel('afTy', [['','All Types'],['bug','Bug'],['feature','Feature'],['praise','Praise'],['complaint','Complaint']], _afType);
-    html += _afSel('afSt', [['','All Status'],['new','New'],['reviewed','Reviewed'],['actioned','Actioned']], _afStatus);
-    html += _afSel('afSe', [['','All Sentiment'],['positive','Positive'],['neutral','Neutral'],['negative','Negative']], _afSentiment);
+    html += _adminCsel('afTy');
+    html += _adminCsel('afSt');
+    html += _adminCsel('afSe');
     html += '<div style="flex:1"></div>';
     html += '<button class="btn-sm-outline" onclick="exportFeedback()"><i data-lucide="download" style="width:14px;height:14px"></i> Export CSV</button>';
     html += '</div>';
@@ -56,12 +56,9 @@ function renderAdminFeedback() {
     html += '<button class="btn-sm-outline" onclick="_afGo(1)"' + (_afPage >= totalP ? ' disabled' : '') + '>Next</button></div></div></div>';
     el.innerHTML = html;
     lucide.createIcons();
-    var tyEl = document.getElementById('afTy');
-    if (tyEl) tyEl.onchange = function() { _afType = tyEl.value; _afPage = 1; renderAdminFeedback(); };
-    var stEl = document.getElementById('afSt');
-    if (stEl) stEl.onchange = function() { _afStatus = stEl.value; _afPage = 1; renderAdminFeedback(); };
-    var seEl = document.getElementById('afSe');
-    if (seEl) seEl.onchange = function() { _afSentiment = seEl.value; _afPage = 1; renderAdminFeedback(); };
+    _adminCselBind('afTy', [['','All Types'],['bug','Bug'],['feature','Feature'],['praise','Praise'],['complaint','Complaint']].map(function(o){return{value:o[0],label:o[1]};}), _afType, function(v){_afType=v;_afPage=1;renderAdminFeedback();});
+    _adminCselBind('afSt', [['','All Status'],['new','New'],['reviewed','Reviewed'],['actioned','Actioned']].map(function(o){return{value:o[0],label:o[1]};}), _afStatus, function(v){_afStatus=v;_afPage=1;renderAdminFeedback();});
+    _adminCselBind('afSe', [['','All Sentiment'],['positive','Positive'],['neutral','Neutral'],['negative','Negative']].map(function(o){return{value:o[0],label:o[1]};}), _afSentiment, function(v){_afSentiment=v;_afPage=1;renderAdminFeedback();});
 }
 
 function _afStat(label, val, color, bg) {
@@ -70,11 +67,7 @@ function _afStat(label, val, color, bg) {
         '<div style="font-size:24px;font-weight:700;color:' + color + '">' + esc(String(val)) + '</div></div>';
 }
 
-function _afSel(id, opts, cur) {
-    var h = '<select id="' + id + '" style="padding:7px 12px;border:1px solid var(--border);border-radius:9999px;font-size:13px;outline:none">';
-    for (var i = 0; i < opts.length; i++) h += '<option value="' + opts[i][0] + '"' + (cur === opts[i][0] ? ' selected' : '') + '>' + opts[i][1] + '</option>';
-    return h + '</select>';
-}
+// _afSel removed — replaced by _adminCsel / _adminCselBind
 
 function _afNPS() {
     var scored = A_FEEDBACK.filter(function(f) { return f.npsScore != null; });

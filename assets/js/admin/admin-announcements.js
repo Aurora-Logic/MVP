@@ -90,20 +90,27 @@ function openAnnouncementModal(existingId) {
         body += '<span style="color:' + ANN_COLORS[t] + '">' + t + '</span></label>';
     }
     body += '</div></label>';
-    body += '<label ' + ls + '>Target<select id="annTarget" ' + fs + '>';
-    var targets = [['all','All Users'],['free','Free Users'],['pro','Pro Users'],['team','Team Users']];
-    for (var k = 0; k < targets.length; k++) body += '<option value="' + targets[k][0] + '"' + (target === targets[k][0] ? ' selected' : '') + '>' + targets[k][1] + '</option>';
-    body += '</select></label>';
-    body += '<label ' + ls + '>Status<select id="annStatus" ' + fs + '>';
-    var statuses = [['draft','Draft'],['active','Active'],['expired','Expired']];
-    for (var m = 0; m < statuses.length; m++) body += '<option value="' + statuses[m][0] + '"' + (status === statuses[m][0] ? ' selected' : '') + '>' + statuses[m][1] + '</option>';
-    body += '</select></label>';
+    body += '<div ' + ls + '>Target<div id="annTarget" style="margin-top:4px"></div></div>';
+    body += '<div ' + ls + '>Status<div id="annStatus" style="margin-top:4px"></div></div>';
     body += '<div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px">Preview</div>';
     body += '<div id="annPreview" style="border:1px solid var(--border);border-radius:8px;overflow:hidden"></div>';
     body += '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">';
     body += '<button class="btn-sm" onclick="saveAnnouncement(\'' + (existingId ? esc(existingId) : '') + '\')">' + (existingId ? 'Update' : 'Create') + '</button></div>';
     adminModal(existingId ? 'Edit Announcement' : 'New Announcement', body, { width: '600px' });
-    setTimeout(function() { _annUpdatePreview(); _annBindPreview(); }, 50);
+    setTimeout(function() {
+        if (typeof csel === 'function') {
+            var tEl = document.getElementById('annTarget');
+            if (tEl) csel(tEl, { value: target, items: [
+                { value: 'all', label: 'All Users' }, { value: 'free', label: 'Free Users' },
+                { value: 'pro', label: 'Pro Users' }, { value: 'team', label: 'Team Users' }
+            ] });
+            var sEl = document.getElementById('annStatus');
+            if (sEl) csel(sEl, { value: status, items: [
+                { value: 'draft', label: 'Draft' }, { value: 'active', label: 'Active' }, { value: 'expired', label: 'Expired' }
+            ] });
+        }
+        _annUpdatePreview(); _annBindPreview();
+    }, 50);
 }
 
 function _annUpdatePreview() {
@@ -139,8 +146,10 @@ function saveAnnouncement(existingId) {
     var bodyText = (document.getElementById('annBody') || {}).value || '';
     var typeRadio = document.querySelector('input[name="annType"]:checked');
     var type = typeRadio ? typeRadio.value : 'info';
-    var target = (document.getElementById('annTarget') || {}).value || 'all';
-    var status = (document.getElementById('annStatus') || {}).value || 'draft';
+    var targetEl = document.getElementById('annTarget');
+    var target = targetEl && typeof cselGetValue === 'function' ? cselGetValue(targetEl) || 'all' : 'all';
+    var statusEl = document.getElementById('annStatus');
+    var status = statusEl && typeof cselGetValue === 'function' ? cselGetValue(statusEl) || 'draft' : 'draft';
     if (existingId) {
         for (var i = 0; i < A_ANNOUNCEMENTS.length; i++) {
             if (A_ANNOUNCEMENTS[i].id === existingId) {

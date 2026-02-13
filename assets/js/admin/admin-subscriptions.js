@@ -156,27 +156,36 @@ function _asSyncUser(userId, newPlan) {
 }
 
 function showAddSubscriptionModal() {
-    var userOpts = '';
+    var userItems = [];
     var existingIds = new Set(A_SUBSCRIPTIONS.map(function(s) { return s.userId; }));
     A_USERS.forEach(function(u) {
-        if (!existingIds.has(u.id)) userOpts += '<option value="' + esc(u.id) + '">' + esc(u.name || u.email) + '</option>';
+        if (!existingIds.has(u.id)) userItems.push({ value: u.id, label: u.name || u.email || u.id });
     });
-    if (!userOpts) return adminToast('All users already have subscriptions', 'info');
-    var body = '<label style="font-size:12px;font-weight:600;color:var(--text3);display:block;margin-bottom:12px">User' +
-        '<select id="asUser" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin-top:4px">' + userOpts + '</select></label>';
-    body += '<label style="font-size:12px;font-weight:600;color:var(--text3);display:block;margin-bottom:12px">Plan' +
-        '<select id="asPlan" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin-top:4px">' +
-        '<option value="free">Free ($0/mo)</option><option value="pro">Pro ($12/mo)</option><option value="team">Team ($29/mo)</option></select></label>';
+    if (!userItems.length) return adminToast('All users already have subscriptions', 'info');
+    var ls = 'style="font-size:12px;font-weight:600;color:var(--text3);display:block;margin-bottom:12px"';
+    var body = '<div ' + ls + '>User<div id="asUser" style="margin-top:4px"></div></div>';
+    body += '<div ' + ls + '>Plan<div id="asPlan" style="margin-top:4px"></div></div>';
     body += '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">' +
         '<button class="btn-sm" onclick="submitAddSubscription()">Create</button></div>';
     adminModal('Add Subscription', body, { width: '400px' });
+    setTimeout(function() {
+        if (typeof csel === 'function') {
+            var uEl = document.getElementById('asUser');
+            if (uEl) csel(uEl, { value: userItems[0].value, searchable: userItems.length > 5, items: userItems });
+            var pEl = document.getElementById('asPlan');
+            if (pEl) csel(pEl, { value: 'free', items: [
+                { value: 'free', label: 'Free ($0/mo)' }, { value: 'pro', label: 'Pro ($12/mo)' }, { value: 'team', label: 'Team ($29/mo)' }
+            ] });
+        }
+    }, 20);
 }
 
 function submitAddSubscription() {
     var uSel = document.getElementById('asUser');
     var pSel = document.getElementById('asPlan');
     if (!uSel || !pSel) return;
-    var userId = uSel.value, plan = pSel.value;
+    var userId = typeof cselGetValue === 'function' ? cselGetValue(uSel) : '';
+    var plan = typeof cselGetValue === 'function' ? cselGetValue(pSel) : 'free';
     A_SUBSCRIPTIONS.push({ userId: userId, plan: plan, status: 'active',
         startDate: Date.now(), nextBilling: Date.now() + 30 * 86400000,
         cancelledAt: null, mrr: PLAN_PRICES[plan] || 0 });

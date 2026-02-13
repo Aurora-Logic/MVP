@@ -18,9 +18,9 @@ function renderAdminUsers() {
     html += '</div>';
     html += '<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">';
     html += '<input type="text" id="auSearch" placeholder="Search users…" value="' + esc(_auSearch) + '" style="padding:7px 12px;border:1px solid var(--border);border-radius:9999px;font-size:13px;width:220px;outline:none">';
-    html += _auSelect('auPlan', [['','All Plans'],['free','Free'],['pro','Pro'],['team','Team']], _auPlan);
-    html += _auSelect('auStatus', [['','All Status'],['active','Active'],['suspended','Suspended'],['churned','Churned']], _auStatus);
-    html += _auSelect('auSort', [['newest','Newest'],['oldest','Oldest'],['name','Name A-Z'],['active','Last Active']], _auSort);
+    html += _adminCsel('auPlan');
+    html += _adminCsel('auStatus');
+    html += _adminCsel('auSort');
     html += '<div style="flex:1"></div>';
     html += '<button class="btn-sm" onclick="showAddUserModal()"><i data-lucide="plus" style="width:14px;height:14px"></i> Add User</button>';
     html += '</div>';
@@ -50,12 +50,9 @@ function renderAdminUsers() {
         var v = se.value;
         _auTimer = setTimeout(function() { _auSearch = v; _auPage = 1; renderAdminUsers(); }, 200);
     });
-    var pe = document.getElementById('auPlan');
-    if (pe) pe.onchange = function() { _auPlan = pe.value; _auPage = 1; renderAdminUsers(); };
-    var ste = document.getElementById('auStatus');
-    if (ste) ste.onchange = function() { _auStatus = ste.value; _auPage = 1; renderAdminUsers(); };
-    var so = document.getElementById('auSort');
-    if (so) so.onchange = function() { _auSort = so.value; _auPage = 1; renderAdminUsers(); };
+    _adminCselBind('auPlan', [['','All Plans'],['free','Free'],['pro','Pro'],['team','Team']].map(function(o){return{value:o[0],label:o[1]};}), _auPlan, function(v){_auPlan=v;_auPage=1;renderAdminUsers();});
+    _adminCselBind('auStatus', [['','All Status'],['active','Active'],['suspended','Suspended'],['churned','Churned']].map(function(o){return{value:o[0],label:o[1]};}), _auStatus, function(v){_auStatus=v;_auPage=1;renderAdminUsers();});
+    _adminCselBind('auSort', [['newest','Newest'],['oldest','Oldest'],['name','Name A-Z'],['active','Last Active']].map(function(o){return{value:o[0],label:o[1]};}), _auSort, function(v){_auSort=v;_auPage=1;renderAdminUsers();});
 }
 
 function _auStat(label, val, color, bg) {
@@ -75,11 +72,7 @@ function _auCounts() {
     return { total: t, active: a, suspended: s, churned: c };
 }
 
-function _auSelect(id, opts, cur) {
-    var h = '<select id="' + id + '" style="padding:7px 12px;border:1px solid var(--border);border-radius:9999px;font-size:13px;outline:none">';
-    for (var i = 0; i < opts.length; i++) h += '<option value="' + opts[i][0] + '"' + (cur === opts[i][0] ? ' selected' : '') + '>' + opts[i][1] + '</option>';
-    return h + '</select>';
-}
+// _auSelect removed — replaced by _adminCsel / _adminCselBind
 
 function _auFiltered() {
     var out = [], q = _auSearch.toLowerCase();
@@ -148,16 +141,33 @@ function _auForm(u) {
     var h = '<label ' + ls + '>Name<input id="auFN" ' + fs + ' value="' + n + '"></label>';
     h += '<label ' + ls + '>Email<input id="auFE" type="email" ' + fs + ' value="' + e + '"></label>';
     h += '<label ' + ls + '>Company<input id="auFC" ' + fs + ' value="' + c + '"></label>';
-    h += '<label ' + ls + '>Plan<select id="auFP" ' + fs + '><option value="free"' + (p === 'free' ? ' selected' : '') + '>Free</option><option value="pro"' + (p === 'pro' ? ' selected' : '') + '>Pro</option><option value="team"' + (p === 'team' ? ' selected' : '') + '>Team</option></select></label>';
-    h += '<label ' + ls + '>Status<select id="auFS" ' + fs + '><option value="active"' + (s === 'active' ? ' selected' : '') + '>Active</option><option value="suspended"' + (s === 'suspended' ? ' selected' : '') + '>Suspended</option><option value="churned"' + (s === 'churned' ? ' selected' : '') + '>Churned</option></select></label>';
+    h += '<div ' + ls + '>Plan<div id="auFP" style="margin-top:4px" data-init-val="' + p + '"></div></div>';
+    h += '<div ' + ls + '>Status<div id="auFS" style="margin-top:4px" data-init-val="' + s + '"></div></div>';
     h += '<label ' + ls + '>Notes<textarea id="auFNt" ' + fs + ' rows="3">' + nt + '</textarea></label>';
     return h;
 }
 
 function _auRead() {
+    var pEl = document.getElementById('auFP'), sEl = document.getElementById('auFS');
     return { name: (document.getElementById('auFN') || {}).value || '', email: (document.getElementById('auFE') || {}).value || '',
-        company: (document.getElementById('auFC') || {}).value || '', plan: (document.getElementById('auFP') || {}).value || 'free',
-        status: (document.getElementById('auFS') || {}).value || 'active', notes: (document.getElementById('auFNt') || {}).value || '' };
+        company: (document.getElementById('auFC') || {}).value || '',
+        plan: pEl && typeof cselGetValue === 'function' ? cselGetValue(pEl) || 'free' : 'free',
+        status: sEl && typeof cselGetValue === 'function' ? cselGetValue(sEl) || 'active' : 'active',
+        notes: (document.getElementById('auFNt') || {}).value || '' };
+}
+
+function _auBindFormCsels(plan, status) {
+    setTimeout(function() {
+        if (typeof csel !== 'function') return;
+        var pEl = document.getElementById('auFP');
+        if (pEl) csel(pEl, { value: plan, items: [
+            { value: 'free', label: 'Free' }, { value: 'pro', label: 'Pro' }, { value: 'team', label: 'Team' }
+        ] });
+        var sEl = document.getElementById('auFS');
+        if (sEl) csel(sEl, { value: status, items: [
+            { value: 'active', label: 'Active' }, { value: 'suspended', label: 'Suspended' }, { value: 'churned', label: 'Churned' }
+        ] });
+    }, 20);
 }
 
 function showEditUserModal(id) {
@@ -166,6 +176,7 @@ function showEditUserModal(id) {
     var body = _auForm(u) + '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">' +
         '<button class="btn-sm" onclick="saveEditUser(\'' + esc(u.id) + '\')">Save</button></div>';
     adminModal('Edit User', body, { width: '500px' });
+    _auBindFormCsels(u.plan || 'free', u.status || 'active');
 }
 
 function saveEditUser(id) {
@@ -185,6 +196,7 @@ function showAddUserModal() {
     var body = _auForm(null) + '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">' +
         '<button class="btn-sm" onclick="submitAddUser()">Add User</button></div>';
     adminModal('Add User', body, { width: '500px' });
+    _auBindFormCsels('free', 'active');
 }
 
 function submitAddUser() {

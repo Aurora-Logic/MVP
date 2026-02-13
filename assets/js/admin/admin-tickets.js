@@ -25,9 +25,9 @@ function renderAdminTickets() {
     html += '</div>';
     html += '<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">';
     html += '<input type="text" id="atSearch" placeholder="Search tickets…" value="' + esc(_atSearch) + '" style="padding:7px 12px;border:1px solid var(--border);border-radius:9999px;font-size:13px;width:220px;outline:none">';
-    html += _atSel('atSt', [['','All Status'],['open','Open'],['in-progress','In Progress'],['resolved','Resolved'],['closed','Closed']], _atStatus);
-    html += _atSel('atPr', [['','All Priority'],['low','Low'],['medium','Medium'],['high','High'],['urgent','Urgent']], _atPriority);
-    html += _atSel('atCat', [['','All Categories'],['general','General'],['bug','Bug'],['feature','Feature'],['billing','Billing']], _atCategory);
+    html += _adminCsel('atSt');
+    html += _adminCsel('atPr');
+    html += _adminCsel('atCat');
     html += '</div>';
     var filtered = _atFiltered();
     var totalP = Math.max(1, Math.ceil(filtered.length / _atPerPage));
@@ -52,12 +52,9 @@ function renderAdminTickets() {
         clearTimeout(_atTimer); var v = se.value;
         _atTimer = setTimeout(function() { _atSearch = v; _atPage = 1; renderAdminTickets(); }, 200);
     });
-    var stEl = document.getElementById('atSt');
-    if (stEl) stEl.onchange = function() { _atStatus = stEl.value; _atPage = 1; renderAdminTickets(); };
-    var prEl = document.getElementById('atPr');
-    if (prEl) prEl.onchange = function() { _atPriority = prEl.value; _atPage = 1; renderAdminTickets(); };
-    var caEl = document.getElementById('atCat');
-    if (caEl) caEl.onchange = function() { _atCategory = caEl.value; _atPage = 1; renderAdminTickets(); };
+    _adminCselBind('atSt', [['','All Status'],['open','Open'],['in-progress','In Progress'],['resolved','Resolved'],['closed','Closed']].map(function(o){return{value:o[0],label:o[1]};}), _atStatus, function(v){_atStatus=v;_atPage=1;renderAdminTickets();});
+    _adminCselBind('atPr', [['','All Priority'],['low','Low'],['medium','Medium'],['high','High'],['urgent','Urgent']].map(function(o){return{value:o[0],label:o[1]};}), _atPriority, function(v){_atPriority=v;_atPage=1;renderAdminTickets();});
+    _adminCselBind('atCat', [['','All Categories'],['general','General'],['bug','Bug'],['feature','Feature'],['billing','Billing']].map(function(o){return{value:o[0],label:o[1]};}), _atCategory, function(v){_atCategory=v;_atPage=1;renderAdminTickets();});
 }
 
 function _atStat(label, val, color, bg) {
@@ -66,11 +63,7 @@ function _atStat(label, val, color, bg) {
         '<div style="font-size:24px;font-weight:700;color:' + color + '">' + esc(String(val)) + '</div></div>';
 }
 
-function _atSel(id, opts, cur) {
-    var h = '<select id="' + id + '" style="padding:7px 12px;border:1px solid var(--border);border-radius:9999px;font-size:13px;outline:none">';
-    for (var i = 0; i < opts.length; i++) h += '<option value="' + opts[i][0] + '"' + (cur === opts[i][0] ? ' selected' : '') + '>' + opts[i][1] + '</option>';
-    return h + '</select>';
-}
+// _atSel removed — replaced by _adminCsel / _adminCselBind
 
 function _atFiltered() {
     var out = [], q = _atSearch.toLowerCase();
@@ -125,14 +118,8 @@ function openTicket(id) {
     body += '<span style="' + (sc[t.status] || sc.open) + ';' + badge + '">' + esc(t.status) + '</span>';
     body += '<span style="font-size:12px;color:var(--text3)">' + esc(t.userName || t.userEmail || '') + '</span>';
     body += '<div style="flex:1"></div>';
-    body += '<select id="tkSt" style="padding:4px 10px;border:1px solid var(--border);border-radius:9999px;font-size:12px">';
-    var sts = ['open', 'in-progress', 'resolved', 'closed'];
-    for (var j = 0; j < sts.length; j++) body += '<option value="' + sts[j] + '"' + (t.status === sts[j] ? ' selected' : '') + '>' + sts[j] + '</option>';
-    body += '</select>';
-    body += '<select id="tkPr" style="padding:4px 10px;border:1px solid var(--border);border-radius:9999px;font-size:12px">';
-    var prs = ['low', 'medium', 'high', 'urgent'];
-    for (var k = 0; k < prs.length; k++) body += '<option value="' + prs[k] + '"' + (t.priority === prs[k] ? ' selected' : '') + '>' + prs[k] + '</option>';
-    body += '</select></div>';
+    body += '<div id="tkSt"></div>';
+    body += '<div id="tkPr"></div></div>';
     body += '<div id="tkMsgs" style="max-height:320px;overflow-y:auto;padding:8px 0;display:flex;flex-direction:column;gap:8px">';
     var msgs = t.messages || [];
     for (var m = 0; m < msgs.length; m++) {
@@ -159,10 +146,18 @@ function openTicket(id) {
     body += '</div>';
     var mid = adminModal(esc(t.subject || 'Ticket'), body, { width: '700px' });
     setTimeout(function() {
-        var stSel = document.getElementById('tkSt');
-        if (stSel) stSel.onchange = function() { updateTicketStatus(id, stSel.value); };
-        var prSel = document.getElementById('tkPr');
-        if (prSel) prSel.onchange = function() { updateTicketPriority(id, prSel.value); };
+        if (typeof csel === 'function') {
+            var stEl = document.getElementById('tkSt');
+            if (stEl) { csel(stEl, { value: t.status, small: true, items: [
+                { value: 'open', label: 'open' }, { value: 'in-progress', label: 'in-progress' },
+                { value: 'resolved', label: 'resolved' }, { value: 'closed', label: 'closed' }
+            ], onChange: function(v) { updateTicketStatus(id, v); } }); stEl.classList.add('csel-xs'); }
+            var prEl = document.getElementById('tkPr');
+            if (prEl) { csel(prEl, { value: t.priority, small: true, items: [
+                { value: 'low', label: 'low' }, { value: 'medium', label: 'medium' },
+                { value: 'high', label: 'high' }, { value: 'urgent', label: 'urgent' }
+            ], onChange: function(v) { updateTicketPriority(id, v); } }); prEl.classList.add('csel-xs'); }
+        }
     }, 50);
 }
 

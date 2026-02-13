@@ -71,10 +71,7 @@ function renderAdminAudit() {
 
     var actions = {};
     entries.forEach(function(e) { actions[e.action] = true; });
-    var actionOpts = '<option value="all">All actions</option>' +
-        Object.keys(actions).sort().map(function(a) {
-            return '<option value="' + esc(a) + '"' + (a === _auditFilter ? ' selected' : '') + '>' + esc(a) + '</option>';
-        }).join('');
+    var actionItems = [{value:'all',label:'All actions'}].concat(Object.keys(actions).sort().map(function(a){return{value:a,label:a};}));
 
     var rows = page.map(function(e) {
         var d = new Date(e.ts);
@@ -99,7 +96,7 @@ function renderAdminAudit() {
         '<div class="admin-toolbar">' +
         '<div class="admin-search"><i data-lucide="search"></i>' +
         '<input placeholder="Search audit log..." value="' + esc(_auditSearch) + '" oninput="_auditSearch=this.value;_auditPage=1;renderAdminAudit()"></div>' +
-        '<select class="btn-sm-outline" onchange="_auditFilter=this.value;_auditPage=1;renderAdminAudit()" style="font-size:12px;padding:4px 10px;border-radius:9999px;border:1px solid var(--border);background:var(--background);color:var(--text)">' + actionOpts + '</select>' +
+        _adminCsel('aaFilter') +
         '</div>' +
         '<div class="admin-table-wrap"><table class="admin-table"><thead><tr>' +
         '<th>Time</th><th>User</th><th>Action</th><th>Target</th><th>Details</th>' +
@@ -111,6 +108,7 @@ function renderAdminAudit() {
         '<button class="btn-sm-outline" onclick="_auditPage=Math.min(' + totalPages + ',_auditPage+1);renderAdminAudit()"' + (_auditPage >= totalPages ? ' disabled' : '') + '>Next</button>' +
         '</div></div>';
     lucide.createIcons();
+    _adminCselBind('aaFilter', actionItems, _auditFilter, function(v){_auditFilter=v;_auditPage=1;renderAdminAudit();});
 }
 
 function exportAuditLog() {

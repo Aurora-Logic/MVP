@@ -31,6 +31,7 @@ function renderAdminClients() {
         '<button class="btn-sm-outline" onclick="_clientPage=Math.min(' + totalPages + ',_clientPage+1);renderAdminClients()"' + (_clientPage >= totalPages ? ' disabled' : '') + '>Next</button>' +
         '</div></div>';
     lucide.createIcons();
+    _bindClientToolbar();
 }
 
 function buildClientToolbar() {
@@ -39,11 +40,11 @@ function buildClientToolbar() {
         '<input placeholder="Search clients..." value="' + esc(_clientSearch) + '" oninput="_clientSearch=this.value;_clientPage=1;renderAdminClients()"></div>' +
         '<button class="' + (_clientOrphanOnly ? 'btn-sm' : 'btn-sm-outline') + '" onclick="_clientOrphanOnly=!_clientOrphanOnly;_clientPage=1;renderAdminClients()" style="font-size:12px">' +
         '<i data-lucide="alert-triangle"></i> Orphaned only</button>' +
-        '<select onchange="_clientSort=this.value;_clientPage=1;renderAdminClients()" style="font-size:12px;padding:4px 10px;border-radius:9999px;border:1px solid var(--border);background:var(--background);color:var(--text)">' +
-        '<option value="name"' + (_clientSort === 'name' ? ' selected' : '') + '>Name A-Z</option>' +
-        '<option value="proposals"' + (_clientSort === 'proposals' ? ' selected' : '') + '>Most proposals</option>' +
-        '<option value="email"' + (_clientSort === 'email' ? ' selected' : '') + '>Email A-Z</option>' +
-        '</select></div>';
+        _adminCsel('acSort') + '</div>';
+}
+
+function _bindClientToolbar() {
+    _adminCselBind('acSort', [{value:'name',label:'Name A-Z'},{value:'proposals',label:'Most proposals'},{value:'email',label:'Email A-Z'}], _clientSort, function(v){_clientSort=v;_clientPage=1;renderAdminClients();});
 }
 
 function getClientDisplayName(c) {

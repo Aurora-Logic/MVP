@@ -419,6 +419,12 @@ input.csel-input::placeholder { color: var(--text4) !important; }
 .csel-sm .csel-trigger { padding: 4px 28px 4px 10px !important; font-size: 14px !important; }
 .csel-sm .csel-opt { padding: 5px 8px; font-size: 14px; }
 
+/* Extra-small variant (admin toolbars) */
+.csel-xs { width: auto !important; display: inline-block; }
+.csel-xs .csel-trigger { padding: 4px 26px 4px 10px !important; font-size: 12px !important; height: auto !important; border-radius: 9999px !important; }
+.csel-xs .csel-opt { padding: 4px 8px; font-size: 12px; }
+.csel-xs .csel-menu { min-width: 140px; max-height: 200px; }
+
 textarea {
   resize: vertical;
   min-height: 80px;

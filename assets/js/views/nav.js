@@ -266,10 +266,16 @@ function _renderFeedbackForm(body) {
 function _renderNewTicketForm(body) {
     body.innerHTML = `<div style="display:flex;flex-direction:column;gap:14px">
         <div><label class="fl">Subject</label><input id="spSubj" placeholder="Brief summary" style="font-size:13px"></div>
-        <div><label class="fl">Category</label><select id="spCat" style="font-size:13px"><option value="general">General</option><option value="bug">Bug Report</option><option value="feature">Feature Request</option><option value="billing">Billing</option></select></div>
+        <div><label class="fl">Category</label><div id="spCat"></div></div>
         <div><label class="fl">Description</label><textarea id="spDesc" rows="5" placeholder="Describe your issue\u2026" style="font-size:13px;resize:vertical"></textarea></div>
         <button class="btn-sm" onclick="if(typeof submitNewTicket==='function')submitNewTicket()" style="align-self:flex-start">Submit Ticket</button>
     </div>`;
+    if (typeof csel === 'function') {
+        csel(document.getElementById('spCat'), { value: 'general', items: [
+            { value: 'general', label: 'General' }, { value: 'bug', label: 'Bug Report' },
+            { value: 'feature', label: 'Feature Request' }, { value: 'billing', label: 'Billing' }
+        ] });
+    }
 }
 
 function selectFbType(btn) {

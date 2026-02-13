@@ -106,7 +106,7 @@ function submitNewTicket() {
     if (!desc || !desc.value.trim()) { if (typeof toast === 'function') toast('Describe the issue', 'error'); return; }
     const ticket = {
         id: 'tk_' + Date.now().toString(36) + Array.from(crypto.getRandomValues(new Uint8Array(4)), b => b.toString(16).padStart(2, '0')).join(''),
-        subject: subj.value.trim(), category: cat ? cat.value : 'general', status: 'open',
+        subject: subj.value.trim(), category: cat ? (typeof cselGetValue === 'function' ? cselGetValue(cat) : cat.value) || 'general' : 'general', status: 'open',
         priority: 'medium',
         userId: typeof getDeviceId === 'function' ? getDeviceId() : ((typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || ''),
         userEmail: (typeof CONFIG !== 'undefined' && CONFIG.email) || '',

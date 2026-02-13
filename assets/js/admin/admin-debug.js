@@ -9,6 +9,8 @@ function renderAdminDebug() {
     if (!el) return;
     el.innerHTML = buildStorageInspector() + buildRawJsonEditor() + buildErrorLog() + buildSwControls() + buildPerfSection();
     lucide.createIcons();
+    var rawKeyItems = Object.keys(STORAGE_KEYS).map(function(k) { return { value: k, label: STORAGE_KEYS[k] + ' (' + k + ')' }; });
+    _adminCselBind('rawEditorKey', rawKeyItems, rawKeyItems[0].value, function() { loadRawEditor(); });
 }
 
 // ─── Storage Inspector ───
@@ -77,13 +79,13 @@ function exportStorageKey(key) {
 
 // ─── Raw JSON Editor ───
 function buildRawJsonEditor() {
-    var keyOpts = Object.keys(STORAGE_KEYS).map(function(k) {
-        return '<option value="' + k + '">' + esc(STORAGE_KEYS[k]) + ' (' + k + ')</option>';
-    }).join('');
+    var _rawKeyItems = Object.keys(STORAGE_KEYS).map(function(k) {
+        return { value: k, label: esc(STORAGE_KEYS[k]) + ' (' + k + ')' };
+    });
 
     return '<div class="admin-section"><div class="admin-section-title" style="margin-bottom:12px">Raw JSON Editor</div>' +
         '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">' +
-        '<select id="rawEditorKey" onchange="loadRawEditor()" style="font-size:12px;padding:4px 10px;border-radius:9999px;border:1px solid var(--border);background:var(--background);color:var(--text)">' + keyOpts + '</select>' +
+        _adminCsel('rawEditorKey') +
         '<button class="btn-sm-outline" onclick="formatRawEditor()"><i data-lucide="align-left"></i> Format</button>' +
         '<button class="btn-sm-outline" onclick="minifyRawEditor()"><i data-lucide="minus"></i> Minify</button>' +
         '<button class="btn-sm-outline" onclick="revertRawEditor()"><i data-lucide="undo-2"></i> Revert</button>' +
@@ -92,8 +94,13 @@ function buildRawJsonEditor() {
         '<div id="rawEditorStatus" style="margin-top:4px;font-size:12px"></div></div>';
 }
 
+function _getRawKey() {
+    var el2 = document.getElementById('rawEditorKey');
+    return (typeof cselGetValue === 'function' ? cselGetValue(el2) : (el2 ? el2.value : '')) || 'pk_db';
+}
+
 function loadRawEditor() {
-    var key = document.getElementById('rawEditorKey').value;
+    var key = _getRawKey();
     var raw = localStorage.getItem(key) || '';
     var ed = document.getElementById('rawJsonEditor');
     if (!ed) return;
@@ -133,7 +140,7 @@ function revertRawEditor() {
 }
 
 function saveRawEditor() {
-    var key = document.getElementById('rawEditorKey').value;
+    var key = _getRawKey();
     var ed = document.getElementById('rawJsonEditor');
     if (!ed) return;
     try {

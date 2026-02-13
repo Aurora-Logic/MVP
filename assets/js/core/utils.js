@@ -50,20 +50,15 @@ class DatePicker {
         today.setHours(0, 0, 0, 0);
         const currentYear = today.getFullYear();
 
-        const monthOpts = monthsFull.map((m, i) =>
-            `<option value="${i}" ${i === month ? 'selected' : ''}>${m}</option>`
-        ).join('');
-
-        let yearOpts = '';
-        for (let y = currentYear - 10; y <= currentYear + 10; y++) {
-            yearOpts += `<option value="${y}" ${y === year ? 'selected' : ''}>${y}</option>`;
-        }
+        const monthItems = monthsFull.map((m, i) => ({ value: String(i), label: m }));
+        const yearItems = [];
+        for (let y = currentYear - 10; y <= currentYear + 10; y++) yearItems.push({ value: String(y), label: String(y) });
 
         let html = `
             <div class="dp-header">
                 <div class="dp-selects">
-                    <select class="dp-month-select" onchange="datePickers['${this.input.id}'].setMonth(this.value)">${monthOpts}</select>
-                    <select class="dp-year-select" onchange="datePickers['${this.input.id}'].setYear(this.value)">${yearOpts}</select>
+                    <div class="dp-month-wrap"></div>
+                    <div class="dp-year-wrap"></div>
                 </div>
                 <div class="dp-nav">
                     <button type="button" onclick="event.stopPropagation();datePickers['${this.input.id}'].prevMonth()"><i data-lucide="chevron-left"></i></button>
@@ -105,6 +100,13 @@ class DatePicker {
                 <button type="button" class="dp-today-btn" onclick="event.stopPropagation();datePickers['${this.input.id}'].setToday()">Today</button>
             </div>`;
         this.picker.innerHTML = html;
+        const self = this;
+        const mw = this.picker.querySelector('.dp-month-wrap');
+        const yw = this.picker.querySelector('.dp-year-wrap');
+        if (typeof csel === 'function') {
+            if (mw) csel(mw, { value: String(month), small: true, items: monthItems, onChange: v => self.setMonth(v) });
+            if (yw) csel(yw, { value: String(year), small: true, items: yearItems, onChange: v => self.setYear(v) });
+        }
         lucide.createIcons();
     }
 

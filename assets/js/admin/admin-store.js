@@ -10,6 +10,7 @@
 /* exported esc, escAttr, uid, fmtCur, fmtDate, fmtNum, timeAgo, fmtBytes */
 /* exported proposalValue, downloadBlob, getStorageKeySize, getTotalStorageSize */
 /* exported adminToast, adminModal, closeAdminModal, adminConfirm */
+/* exported _adminCsel, _adminCselBind */
 
 // ═══ GLOBALS ═══
 let A_DB = [], A_CONFIG = {}, A_CLIENTS = [];
@@ -327,4 +328,18 @@ function adminConfirm(message, onConfirm, opts) {
         if (e.key === 'Escape') { closeAdminModal(id); document.removeEventListener('keydown', escHandler); }
     };
     document.addEventListener('keydown', escHandler);
+}
+
+// ═══ ADMIN CUSTOM SELECT HELPERS ═══
+function _adminCsel(id) {
+    return '<div id="' + id + '"></div>';
+}
+
+function _adminCselBind(id, items, current, onChange) {
+    setTimeout(function() {
+        var el = document.getElementById(id);
+        if (!el || typeof csel !== 'function') return;
+        csel(el, { value: current || '', items: items, small: true, onChange: onChange });
+        el.classList.add('csel-xs');
+    }, 20);
 }

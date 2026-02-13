@@ -22,6 +22,8 @@ function renderAdminConfig() {
     if (!el) return;
     el.innerHTML = buildFeatureFlags() + buildApiKeysSection() + buildOverridesSection() + buildDangerZone();
     lucide.createIcons();
+    var dkItems = Object.keys(STORAGE_KEYS).map(function(k) { return { value: k, label: esc(STORAGE_KEYS[k]) + ' (' + k + ')' }; });
+    _adminCselBind('dangerKeySelect', dkItems, dkItems[0].value, function() {});
 }
 
 // ─── Feature Flags ───
@@ -124,23 +126,26 @@ function saveApiKey(modalId) {
 function editAiModel() {
     var modalId = adminModal('Change AI Model',
         '<div class="fg"><label class="fl">Model</label>' +
-        '<select id="adminModelSelect" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--r);background:var(--background);color:var(--text)">' +
-        '<option value="sonnet"' + (A_CONFIG.aiModel === 'sonnet' ? ' selected' : '') + '>Claude Sonnet (fast)</option>' +
-        '<option value="opus"' + (A_CONFIG.aiModel === 'opus' ? ' selected' : '') + '>Claude Opus (powerful)</option>' +
-        '<option value="haiku"' + (A_CONFIG.aiModel === 'haiku' ? ' selected' : '') + '>Claude Haiku (quick)</option>' +
-        '</select></div>' +
+        '<div id="adminModelSelect"></div></div>' +
         '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">' +
-        '<button class="btn" onclick="saveAiModel(\'' + modalId + '\')">Save</button></div>', { width: '400px' });
+        '<button class="btn" onclick="saveAiModel()">Save</button></div>', { width: '400px' });
+    setTimeout(function() {
+        var el2 = document.getElementById('adminModelSelect');
+        if (el2 && typeof csel === 'function') csel(el2, { value: A_CONFIG.aiModel || 'sonnet', items: [
+            { value: 'sonnet', label: 'Claude Sonnet (fast)' }, { value: 'opus', label: 'Claude Opus (powerful)' }, { value: 'haiku', label: 'Claude Haiku (quick)' }
+        ] });
+    }, 20);
 }
 
-function saveAiModel(modalId) {
+function saveAiModel() {
     var sel = document.getElementById('adminModelSelect');
     if (!sel) return;
-    A_CONFIG.aiModel = sel.value;
+    var val = typeof cselGetValue === 'function' ? cselGetValue(sel) : 'sonnet';
+    A_CONFIG.aiModel = val;
     adminSave('pk_config', A_CONFIG);
-    closeAdminModal(modalId);
-    adminToast('AI model changed to ' + sel.value);
-    auditLog('edit_ai_model', 'config', 'Model: ' + sel.value);
+    document.querySelectorAll('.modal-wrap').forEach(function(m) { m.remove(); });
+    adminToast('AI model changed to ' + val);
+    auditLog('edit_ai_model', 'config', 'Model: ' + val);
     renderAdminConfig();
 }
 
@@ -198,15 +203,11 @@ function buildOverridesSection() {
 
 // ─── Danger Zone ───
 function buildDangerZone() {
-    var keyOpts = Object.keys(STORAGE_KEYS).map(function(k) {
-        return '<option value="' + k + '">' + esc(STORAGE_KEYS[k]) + ' (' + k + ')</option>';
-    }).join('');
-
     return '<div class="admin-section"><div class="admin-danger">' +
         '<div class="admin-danger-title"><i data-lucide="alert-triangle" style="width:16px;height:16px"></i> Danger Zone</div>' +
         '<div class="admin-danger-row"><div><strong>Clear specific key</strong><br><span style="font-size:12px;color:var(--text3)">Remove one localStorage key</span></div>' +
         '<div style="display:flex;gap:8px;align-items:center">' +
-        '<select id="dangerKeySelect" style="font-size:12px;padding:4px 8px;border-radius:var(--r);border:1px solid var(--border);background:var(--background);color:var(--text)">' + keyOpts + '</select>' +
+        _adminCsel('dangerKeySelect') +
         '<button class="btn-sm-destructive" onclick="clearSpecificKey()">Clear</button></div></div>' +
         '<div class="admin-danger-row"><div><strong>Clear version histories</strong><br><span style="font-size:12px;color:var(--text3)">Remove all version snapshots to save space</span></div>' +
         '<button class="btn-sm-destructive" onclick="clearVersionHistories()">Clear</button></div>' +
@@ -220,7 +221,7 @@ function buildDangerZone() {
 function clearSpecificKey() {
     var sel = document.getElementById('dangerKeySelect');
     if (!sel) return;
-    var key = sel.value;
+    var key = typeof cselGetValue === 'function' ? cselGetValue(sel) : '';
     adminConfirm('Clear "' + (STORAGE_KEYS[key] || key) + '"? This will delete all data for this key.', function() {
         localStorage.removeItem(key);
         adminLoad();
