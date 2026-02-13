@@ -47,6 +47,22 @@ function dirty() {
     if (typeof canEdit === 'function' && !canEdit()) { if (!_viewerWarned) { toast('Viewers cannot edit proposals', 'warning'); _viewerWarned = true; setTimeout(() => { _viewerWarned = false; }, 5000); } return; }
     clearTimeout(saveTimer);
     showSaveIndicator('saving');
+
+    // CONFLICT DETECTION FIX: Check for multi-tab edits
+    const p = cur();
+    if (p && p.id) {
+        const storedDB = typeof safeGetStorage === 'function' ? safeGetStorage('pk_db', []) : [];
+        const stored = storedDB.find(x => x.id === p.id);
+        if (stored && stored.updatedAt && p.updatedAt && stored.updatedAt > p.updatedAt) {
+            console.warn('[Conflict] Proposal edited in another tab:', p.id);
+            if (typeof confirmDialog === 'function') {
+                confirmDialog('This proposal was edited in another tab. Reload to see latest changes?', () => {
+                    window.location.reload();
+                }, { title: 'Conflict Detected', confirmText: 'Reload', destructive: false });
+            }
+            return; // Prevent overwrite
+        }
+    }
     // Immediate UI updates (no debounce)
     const titleEl = document.getElementById('fTitle');
     const topTitle = document.getElementById('topTitle');

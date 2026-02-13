@@ -12,6 +12,7 @@ function doExport(mode) {
         toast('Please allow popups to export PDF', 'error');
         return;
     }
+    // PERFORMANCE FIX: Increase timeout for large proposals (was 400ms, now 600ms)
     setTimeout(() => {
         showLoading('Rendering PDF...');
         const p = cur();

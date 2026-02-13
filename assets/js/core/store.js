@@ -9,15 +9,87 @@
 /** @typedef {{ name?: string, company?: string, email?: string, phone?: string, address?: string, country?: string, color?: string, logo?: string, bank?: Object, gstin?: string, pan?: string, udyam?: string, lut?: string, ein?: string, vatNumber?: string, abn?: string, aiApiKey?: string, aiModel?: string, signature?: string, activeUserId?: string, team?: Object[], webhookUrl?: string, font?: string, whiteLabel?: boolean }} AppConfig */
 /** @typedef {{ id: string, name: string, contact?: string, email?: string, phone?: string, company?: string, address?: string, notes?: string, customerType?: string, salutation?: string, firstName?: string, lastName?: string, companyName?: string, displayName?: string, workPhone?: string, mobile?: string, attention?: string, country?: string, state?: string, street1?: string, street2?: string, city?: string, pinCode?: string, gstNumber?: string }} Client */
 
+// Helper functions needed during init (defined before use)
+function _esc(s) {
+    return (s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+function _isValidId(id) { return typeof id === 'string' && /^[\w-]+$/.test(id); }
+
+// SECURITY FIX: Validate and sanitize proposal data
+function _validateProposal(p) {
+    if (!p || typeof p !== 'object') return false;
+    if (!_isValidId(p.id)) { console.warn('[Security] Invalid proposal ID:', p.id); return false; }
+    // Sanitize string fields to prevent XSS
+    if (p.title && typeof p.title === 'string') p.title = _esc(p.title);
+    if (p.number && typeof p.number === 'string') p.number = _esc(p.number);
+    // Validate status
+    const validStatuses = ['draft', 'sent', 'accepted', 'declined', 'expired'];
+    if (!validStatuses.includes(p.status)) p.status = 'draft';
+    // Ensure required fields exist
+    if (!p.sender) p.sender = { company: '', email: '', address: '' };
+    if (!p.client) p.client = { name: '', contact: '', email: '', phone: '' };
+    if (!Array.isArray(p.lineItems)) p.lineItems = [];
+    if (!Array.isArray(p.sections)) p.sections = [];
+    return true;
+}
+
+// SECURITY FIX: Validate and sanitize client data
+function _validateClient(c) {
+    if (!c || typeof c !== 'object') return false;
+    if (!_isValidId(c.id)) { console.warn('[Security] Invalid client ID:', c.id); return false; }
+    // Sanitize all string fields
+    if (c.name) c.name = _esc(c.name);
+    if (c.displayName) c.displayName = _esc(c.displayName);
+    if (c.companyName) c.companyName = _esc(c.companyName);
+    if (c.firstName) c.firstName = _esc(c.firstName);
+    if (c.lastName) c.lastName = _esc(c.lastName);
+    if (c.email) c.email = _esc(c.email);
+    return true;
+}
+
 /** @type {Proposal[]} */
 let DB;
 /** @type {AppConfig|null} */
 let CONFIG;
 /** @type {Client[]} */
 let CLIENTS;
-try { DB = JSON.parse(localStorage.getItem('pk_db') || '[]'); } catch (e) { DB = []; console.error('pk_db corrupted, reset to empty:', e); }
-try { CONFIG = JSON.parse(localStorage.getItem('pk_config') || 'null'); } catch (e) { CONFIG = null; console.error('pk_config corrupted, reset:', e); }
-try { CLIENTS = JSON.parse(localStorage.getItem('pk_clients') || '[]'); } catch (e) { CLIENTS = []; console.error('pk_clients corrupted, reset:', e); }
+// SECURITY FIX: Validate and sanitize data on load
+try {
+    DB = JSON.parse(localStorage.getItem('pk_db') || '[]');
+    if (!Array.isArray(DB)) { console.error('[Security] pk_db not an array, resetting'); DB = []; }
+    else { DB = DB.filter(_validateProposal); } // Sanitize all proposals
+} catch (e) {
+    DB = [];
+    console.error('pk_db corrupted, reset to empty:', e);
+    if (typeof toast === 'function') toast('⚠️ Proposal data corrupted - starting fresh', 'error');
+}
+try {
+    CONFIG = JSON.parse(localStorage.getItem('pk_config') || 'null');
+    if (CONFIG && typeof CONFIG === 'object') {
+        // Sanitize CONFIG fields
+        if (CONFIG.name) CONFIG.name = _esc(CONFIG.name);
+        if (CONFIG.company) CONFIG.company = _esc(CONFIG.company);
+        if (CONFIG.email) CONFIG.email = _esc(CONFIG.email);
+    }
+} catch (e) {
+    CONFIG = null;
+    console.error('pk_config corrupted, reset:', e);
+    if (typeof toast === 'function') toast('⚠️ Settings corrupted - please reconfigure', 'error');
+}
+try {
+    CLIENTS = JSON.parse(localStorage.getItem('pk_clients') || '[]');
+    if (!Array.isArray(CLIENTS)) { console.error('[Security] pk_clients not an array, resetting'); CLIENTS = []; }
+    else { CLIENTS = CLIENTS.filter(_validateClient); } // Sanitize all clients
+} catch (e) {
+    CLIENTS = [];
+    console.error('pk_clients corrupted, reset:', e);
+    if (typeof toast === 'function') toast('⚠️ Client data corrupted - starting fresh', 'error');
+}
 
 // Schema versioning — run migrations sequentially on startup
 const SCHEMA_VERSION = 1;

@@ -111,7 +111,21 @@ function convertLegacyBlocks(data) {
 
 function loadEditor(id) {
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+
+    // MEMORY LEAK FIX: Destroy previous editor instances
     if (typeof destroyAllEditors === 'function') destroyAllEditors();
+    if (typeof sectionEditors !== 'undefined' && sectionEditors) {
+        Object.values(sectionEditors).forEach(editor => {
+            if (editor && typeof editor.destroy === 'function') {
+                try { editor.destroy(); } catch (e) { console.warn('Editor destroy failed:', e); }
+            }
+        });
+        sectionEditors = {};
+    }
+    if (typeof paymentTermsEditor !== 'undefined' && paymentTermsEditor && typeof paymentTermsEditor.destroy === 'function') {
+        try { paymentTermsEditor.destroy(); paymentTermsEditor = null; } catch (e) { console.warn('Payment editor destroy failed:', e); }
+    }
+
     CUR = id;
     if (typeof replaceUrl === 'function') replaceUrl('/proposals/' + id);
     undoStack = [];

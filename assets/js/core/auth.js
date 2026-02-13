@@ -496,7 +496,19 @@ async function doLogout() {
         try { await sb().auth.signOut(); } catch (e) { console.warn('Signout error:', e); }
     }
     sbSession = null;
-    // Clear auth-related storage
-    sessionStorage.removeItem('pk_csrf');
+
+    // SECURITY FIX: Clear ALL sensitive data on logout
+    const keysToRemove = [
+        'pk_db', 'pk_config', 'pk_clients', 'pk_email_tpl',
+        'pk_seclib', 'pk_tclib', 'pk_templates', 'pk_dismissed',
+        'pk_subscription', 'pk_analytics', 'pk_feedback',
+        'pk_client_responses', 'pk_csrf'
+    ];
+    keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+    });
+    console.log('[Security] All sensitive data cleared on logout');
+
     // onAuthStateChange SIGNED_OUT will call renderAuthScreen()
 }

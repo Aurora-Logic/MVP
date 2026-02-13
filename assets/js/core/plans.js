@@ -9,10 +9,25 @@ const PLAN_LIMITS = {
     team:  { proposals: Infinity, clients: Infinity, ai: true, team: 10, templates: Infinity, branding: true, offline: true, pdfCustomization: true }
 };
 
+// SECURITY FIX: Validate plan to prevent localStorage manipulation
 function getCurrentPlan() {
     const sub = typeof safeGetStorage === 'function' ? safeGetStorage('pk_subscription', null) : null;
     if (!sub || !sub.plan || sub.status === 'cancelled') return 'free';
-    return PLAN_LIMITS[sub.plan] ? sub.plan : 'free';
+
+    // Validate plan is a legitimate tier
+    const validPlans = ['free', 'pro', 'team'];
+    if (!validPlans.includes(sub.plan)) {
+        console.warn('[Security] Invalid plan detected in localStorage:', sub.plan, '- defaulting to free');
+        return 'free';
+    }
+
+    // Additional validation: ensure PLAN_LIMITS hasn't been tampered with
+    if (!PLAN_LIMITS[sub.plan]) {
+        console.warn('[Security] Plan limits missing for:', sub.plan, '- defaulting to free');
+        return 'free';
+    }
+
+    return sub.plan;
 }
 
 function checkLimit(feature) {

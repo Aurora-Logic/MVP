@@ -280,11 +280,22 @@ function editClient(i) { openAddClient(i); }
 function delClient(i) {
     const c = CLIENTS[i]; if (!c) return;
     const clientName = c.displayName || c.name || 'this customer';
-    const propCount = DB.filter(p => matchClient(p, c)).length;
-    const msg = propCount > 0 ? `Delete ${clientName}? ${propCount} proposal(s) reference this customer.` : `Delete ${clientName}?`;
+    const linkedProposals = DB.filter(p => matchClient(p, c));
+    const propCount = linkedProposals.length;
+    const msg = propCount > 0 ? `Delete ${clientName}? ${propCount} proposal(s) reference this customer. References will be unlinked.` : `Delete ${clientName}?`;
     confirmDialog(msg, () => {
-        CLIENTS.splice(i, 1); saveClients();
-        renderClients(); toast('Customer deleted');
+        // DATA INTEGRITY FIX: Clean up orphaned references
+        linkedProposals.forEach(p => {
+            p.client = { name: clientName + ' (deleted)', contact: '', email: '', phone: '' };
+        });
+        if (propCount > 0) {
+            persist(); // Save proposals with cleaned references
+            console.log('[Data Integrity] Cleaned', propCount, 'orphaned proposal references');
+        }
+        CLIENTS.splice(i, 1);
+        saveClients();
+        renderClients();
+        toast(propCount > 0 ? `Customer deleted (${propCount} proposals unlinked)` : 'Customer deleted');
     }, { title: 'Delete customer', confirmText: 'Delete' });
 }
 
