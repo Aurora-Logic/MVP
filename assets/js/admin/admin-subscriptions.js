@@ -4,7 +4,6 @@
 /* exported renderAdminSubscriptions */
 
 var _asPage = 1, _asPerPage = 20;
-var PLAN_PRICES = { free: 0, pro: 12, team: 29 };
 
 function renderAdminSubscriptions() {
     var el = document.getElementById('adminContent');
@@ -144,6 +143,7 @@ function changePlan(userId) {
     }
     adminSave('pk_subscriptions', A_SUBSCRIPTIONS);
     _asSyncUser(userId, newPlan);
+    _asSyncAppSubscription();
     adminToast('Plan updated to ' + newPlan);
     renderAdminSubscriptions();
 }
@@ -182,6 +182,7 @@ function submitAddSubscription() {
         cancelledAt: null, mrr: PLAN_PRICES[plan] || 0 });
     adminSave('pk_subscriptions', A_SUBSCRIPTIONS);
     _asSyncUser(userId, plan);
+    _asSyncAppSubscription();
     adminToast('Subscription created');
     renderAdminSubscriptions();
 }
@@ -199,7 +200,18 @@ function cancelSubscription(userId) {
         }
         adminSave('pk_subscriptions', A_SUBSCRIPTIONS);
         _asSyncUser(userId, 'free');
+        _asSyncAppSubscription();
         adminToast('Subscription cancelled');
         renderAdminSubscriptions();
     }, { destructive: true });
+}
+
+// Sync active user's subscription to pk_subscription (singular) for main app
+function _asSyncAppSubscription() {
+    var ownerId = (A_CONFIG && A_CONFIG.activeUserId) || 'owner';
+    var sub = null;
+    for (var i = 0; i < A_SUBSCRIPTIONS.length; i++) {
+        if (A_SUBSCRIPTIONS[i].userId === ownerId) { sub = A_SUBSCRIPTIONS[i]; break; }
+    }
+    safePut('pk_subscription', sub);
 }

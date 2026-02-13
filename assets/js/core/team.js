@@ -55,7 +55,7 @@ function addTeamMember(name, email, role) {
     if (!CONFIG.team) CONFIG.team = [];
     const validRole = VALID_ROLES.includes(role) ? role : 'editor';
     const member = {
-        id: 'u_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+        id: 'u_' + Date.now().toString(36) + Array.from(crypto.getRandomValues(new Uint8Array(3)), b => b.toString(16).padStart(2, '0')).join(''),
         name, email: email || '', role: validRole,
         color: TEAM_COLORS[CONFIG.team.length % TEAM_COLORS.length],
         createdAt: Date.now()

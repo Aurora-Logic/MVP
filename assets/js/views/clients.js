@@ -241,7 +241,10 @@ function saveClient(idx) {
         gstNumber: document.getElementById('acGst')?.value?.trim() || ''
     };
     if (idx >= 0) { c.id = CLIENTS[idx].id; CLIENTS[idx] = c; }
-    else { c.id = uid(); CLIENTS.push(c); }
+    else {
+        if (typeof enforceLimit === 'function' && !enforceLimit('clients')) return;
+        c.id = uid(); CLIENTS.push(c);
+    }
     saveClients(); document.getElementById('clientModal')?.remove();
     renderClients(); toast(idx >= 0 ? 'Customer updated' : 'Customer added');
 }

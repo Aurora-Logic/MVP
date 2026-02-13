@@ -17,6 +17,7 @@ let A_SECLIB = [], A_TCLIB = [], A_EMAIL_TPL = [], A_TEMPLATES = [];
 let A_USERS = [], A_TICKETS = [], A_SUBSCRIPTIONS = [];
 let A_ANNOUNCEMENTS = [], A_FEEDBACK = [], A_ANALYTICS = [];
 let A_CURRENT_SECTION = 'dashboard';
+var PLAN_PRICES = { free: 0, pro: 12, team: 29 };
 
 const STORAGE_KEYS = {
     pk_db: 'Proposals',
@@ -166,17 +167,17 @@ function esc(s) {
 function escAttr(s) { return esc(s).replace(/\\/g, '\\\\'); }
 
 function uid() {
-    return 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    return 'a' + Date.now().toString(36) + Array.from(crypto.getRandomValues(new Uint8Array(4)), b => b.toString(16).padStart(2, '0')).join('');
 }
 
 function fmtCur(n, c) {
-    if (n == null || isNaN(n)) return '\u2014';
     var dc = c === '\u00A5CN' ? '\u00A5' : (c || '\u20B9');
+    var val = (typeof n === 'number' && isFinite(n)) ? n : 0;
     var locale = dc === '\u20B9' ? 'en-IN' : 'en-US';
     try {
-        return dc + new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(n);
+        return dc + new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(val);
     } catch (e) {
-        return dc + Number(n).toFixed(2);
+        return dc + Number(val).toFixed(2);
     }
 }
 

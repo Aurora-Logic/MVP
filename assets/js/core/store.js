@@ -40,7 +40,7 @@ const SCHEMA_VERSION = 1;
         try { localStorage.setItem('pk_db', JSON.stringify(DB)); } catch (e) { /* persist will handle */ }
     }
     // Future migrations: if (stored < 2) { ... }
-    localStorage.setItem('pk_schema', String(SCHEMA_VERSION));
+    try { localStorage.setItem('pk_schema', String(SCHEMA_VERSION)); } catch (e) { /* full */ }
 })();
 
 /* eslint-disable prefer-const -- These are reassigned in other files */
@@ -114,12 +114,30 @@ function saveClients() {
 
 /** @returns {Proposal|undefined} */
 function cur() { return DB.find(p => p.id === CUR); }
-function uid() { return 'p' + Date.now() + Math.random().toString(36).slice(2, 7); }
+function uid() { const a = new Uint8Array(5); crypto.getRandomValues(a); return 'p' + Date.now() + Array.from(a, b => b.toString(36)).join('').slice(0, 7); }
 function activeDB() { return DB.filter(p => !p.archived); }
 
 function safeGetStorage(key, fallback) {
     try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
     catch (e) { console.warn('Corrupted ' + key + ', resetting'); return fallback; }
+}
+
+/** Check admin feature flag — defaults to true (enabled) if not set */
+function isFeatureEnabled(flag) {
+    const cfg = safeGetStorage('pk_admin_config', {});
+    const flags = cfg.flags || {};
+    return flags[flag] !== false;
+}
+
+/** Stable device identifier — falls back when no userId is set */
+function getDeviceId() {
+    if (CONFIG?.activeUserId) return CONFIG.activeUserId;
+    let did = localStorage.getItem('pk_device_id');
+    if (!did) {
+        did = 'dev_' + Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, '0')).join('');
+        try { localStorage.setItem('pk_device_id', did); } catch (e) { /* full */ }
+    }
+    return did;
 }
 
 // Merge client responses from client.html (stored in pk_client_responses)
@@ -167,6 +185,9 @@ window.addEventListener('storage', (e) => {
     }
     if (e.key === 'pk_clients' && e.newValue) {
         try { CLIENTS = JSON.parse(e.newValue); } catch (err) { /* ignore */ }
+    }
+    if (e.key === 'pk_subscription' && e.newValue) {
+        // Plan changed from admin — getCurrentPlan() will pick it up on next call
     }
     if (e.key === 'pk_announcements') {
         if (typeof checkAnnouncements === 'function') checkAnnouncements();

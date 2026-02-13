@@ -114,7 +114,7 @@ function collectPaymentsData(p) {
     p.payments = [];
     rows.forEach(row => {
         p.payments.push({
-            id: row.dataset.payId || ('pay_' + Date.now() + Math.random().toString(36).slice(2, 5)),
+            id: row.dataset.payId || ('pay_' + Date.now() + Array.from(crypto.getRandomValues(new Uint8Array(3)), b => b.toString(16).padStart(2, '0')).join('')),
             date: row.querySelector('.pay-date')?.dataset?.value || row.querySelector('.pay-date')?.value || '',
             amount: Math.max(0, parseFloat(row.querySelector('.pay-amt')?.value) || 0),
             method: (typeof cselGetValue === 'function' ? cselGetValue(row.querySelector('.pay-method-sel')) : row.querySelector('.pay-method')?.value) || 'Bank',

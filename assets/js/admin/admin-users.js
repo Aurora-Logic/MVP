@@ -200,12 +200,11 @@ function submitAddUser() {
 }
 
 function _auSyncSubscription(userId, newPlan) {
-    var PP = { free: 0, pro: 12, team: 29 };
     var found = false;
     for (var i = 0; i < A_SUBSCRIPTIONS.length; i++) {
         if (A_SUBSCRIPTIONS[i].userId === userId) {
             A_SUBSCRIPTIONS[i].plan = newPlan;
-            A_SUBSCRIPTIONS[i].mrr = PP[newPlan] || 0;
+            A_SUBSCRIPTIONS[i].mrr = PLAN_PRICES[newPlan] || 0;
             A_SUBSCRIPTIONS[i].status = newPlan === 'free' ? 'active' : A_SUBSCRIPTIONS[i].status;
             found = true; break;
         }
@@ -213,9 +212,10 @@ function _auSyncSubscription(userId, newPlan) {
     if (!found) {
         A_SUBSCRIPTIONS.push({ userId: userId, plan: newPlan, status: 'active',
             startDate: Date.now(), nextBilling: Date.now() + 30 * 86400000,
-            cancelledAt: null, mrr: PP[newPlan] || 0 });
+            cancelledAt: null, mrr: PLAN_PRICES[newPlan] || 0 });
     }
     adminSave('pk_subscriptions', A_SUBSCRIPTIONS);
+    if (typeof _asSyncAppSubscription === 'function') _asSyncAppSubscription();
 }
 
 function toggleUserStatus(id) {

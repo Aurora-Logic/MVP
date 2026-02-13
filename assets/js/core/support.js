@@ -64,7 +64,7 @@ function loadMyTickets() {
     const body = document.getElementById('supportBody');
     if (!body) return;
     const tickets = typeof safeGetStorage === 'function' ? safeGetStorage('pk_tickets', []) : [];
-    const userId = (typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '';
+    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '');
     const email = (typeof CONFIG !== 'undefined' && CONFIG.email) || '';
     const mine = tickets.filter(function(t) { return t.userId === userId || t.userEmail === email; });
     mine.sort(function(a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
@@ -147,10 +147,10 @@ function _spSubmit() {
     if (!subj || !subj.value.trim()) { if (typeof toast === 'function') toast('Enter a subject', 'error'); return; }
     if (!desc || !desc.value.trim()) { if (typeof toast === 'function') toast('Describe the issue', 'error'); return; }
     const ticket = {
-        id: 'tk_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+        id: 'tk_' + Date.now().toString(36) + Array.from(crypto.getRandomValues(new Uint8Array(4)), b => b.toString(16).padStart(2, '0')).join(''),
         subject: subj.value.trim(), category: cat ? cat.value : 'general', status: 'open',
         priority: 'medium',
-        userId: (typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '',
+        userId: typeof getDeviceId === 'function' ? getDeviceId() : ((typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || ''),
         userEmail: (typeof CONFIG !== 'undefined' && CONFIG.email) || '',
         userName: (typeof CONFIG !== 'undefined' && CONFIG.name) || '',
         createdAt: Date.now(), updatedAt: Date.now(), resolvedAt: null,
@@ -159,6 +159,11 @@ function _spSubmit() {
     };
     const tickets = typeof safeGetStorage === 'function' ? safeGetStorage('pk_tickets', []) : [];
     tickets.push(ticket);
+    // Cap at 500 tickets — remove oldest resolved/closed first
+    while (tickets.length > 500) {
+        const idx = tickets.findIndex(t => t.status === 'resolved' || t.status === 'closed');
+        tickets.splice(idx >= 0 ? idx : 0, 1);
+    }
     try { localStorage.setItem('pk_tickets', JSON.stringify(tickets)); } catch (e) { /* full */ }
     if (typeof toast === 'function') toast('Ticket submitted!');
     showSupportTab('tickets');
@@ -186,7 +191,7 @@ function _spCheckUnread() {
     const dot = document.getElementById('supportDot');
     if (!dot) return;
     const tickets = typeof safeGetStorage === 'function' ? safeGetStorage('pk_tickets', []) : [];
-    const userId = (typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '';
+    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '');
     const email = (typeof CONFIG !== 'undefined' && CONFIG.email) || '';
     let hasUnread = false;
     for (let i = 0; i < tickets.length; i++) {

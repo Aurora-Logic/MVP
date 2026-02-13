@@ -76,12 +76,16 @@
         adminNav('dashboard');
         lucide.createIcons();
 
-        // Multi-tab sync
+        // Multi-tab sync — selective reload for the changed key
+        var _syncTimer = null;
         window.addEventListener('storage', function(e) {
-            if (e.key && e.key.indexOf('pk_') === 0) {
+            if (!e.key || e.key.indexOf('pk_') !== 0) return;
+            // Debounce rapid multi-key changes (e.g. factory reset)
+            clearTimeout(_syncTimer);
+            _syncTimer = setTimeout(function() {
                 adminReload();
                 if (A_CURRENT_SECTION && A_CURRENT_SECTION !== 'tests') adminNav(A_CURRENT_SECTION);
-            }
+            }, 100);
         });
 
         // Audit login

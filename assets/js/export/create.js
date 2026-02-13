@@ -4,6 +4,7 @@
 
 /* exported doDupWithClient, fromTpl, fromSavedTpl, saveAsTemplate, doSaveAsTemplate, deleteSavedTpl, bumpVersion, toggleCover, ctxAction */
 function createProp(tpl) {
+    if (typeof enforceLimit === 'function' && !enforceLimit('proposals')) return;
     const id = uid();
     const existingNumbers = DB.map(p => {
         const match = (p.number || '').match(/PROP-(\d+)/);
@@ -225,7 +226,11 @@ function refreshSide() {
     if (logo) {
         const an = typeof appName === 'function' ? appName() : 'ProposalKit';
         if (CONFIG.logo) {
-            logo.innerHTML = `<img src="${CONFIG.logo}" alt="">`;
+            const img = document.createElement('img');
+            img.src = CONFIG.logo;
+            img.alt = '';
+            logo.textContent = '';
+            logo.appendChild(img);
         } else {
             logo.textContent = an.charAt(0).toUpperCase();
         }

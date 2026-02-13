@@ -267,6 +267,7 @@ function toggleUserMenu() {
         </div>
         <div class="side-user-menu-sep"></div>
         <button class="side-user-menu-item" onclick="goNav('settings');document.querySelector('.side-user-menu')?.remove()"><i data-lucide="settings"></i>Settings</button>
+        ${typeof isAdmin === 'function' && isAdmin() ? '<button class="side-user-menu-item" onclick="window.open(\'/admin\',\'_blank\');document.querySelector(\'.side-user-menu\')?.remove()"><i data-lucide="shield"></i>Admin Panel</button>' : ''}
         ${teamHtml}
         <div class="side-user-menu-sep"></div>
         <button class="side-user-menu-item" onclick="logoutApp()"><i data-lucide="log-out"></i>Log out</button>`;

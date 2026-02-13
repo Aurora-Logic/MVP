@@ -31,9 +31,8 @@ function buildAdminMetrics() {
     var activeUsers = (A_USERS || []).filter(function(u) { return u.status === 'active'; }).length;
     var openTickets = (A_TICKETS || []).filter(function(t) { return t.status === 'open' || t.status === 'in-progress'; }).length;
     var mrr = 0;
-    var PLAN_PRICES = { free: 0, pro: 12, team: 29 };
     (A_SUBSCRIPTIONS || []).forEach(function(s) {
-        if (s.status === 'active' || s.status === 'trial') mrr += (PLAN_PRICES[s.plan] || 0);
+        if (s.status === 'active' || s.status === 'trialing') mrr += (PLAN_PRICES[s.plan] || 0);
     });
 
     return '<div class="admin-stat-grid">' +

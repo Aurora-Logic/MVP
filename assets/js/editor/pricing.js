@@ -227,7 +227,7 @@ function addLine() {
     const tr = document.createElement('tr');
     tr.className = 'li-row';
     const c = cselGetValue(document.getElementById('fCur')) || defaultCurrency();
-    const uniqueId = 'li-' + Date.now() + Math.random().toString(36).slice(2, 5);
+    const uniqueId = 'li-' + Date.now() + Array.from(crypto.getRandomValues(new Uint8Array(3)), b => b.toString(16).padStart(2, '0')).join('');
     tr.setAttribute('draggable', 'false');
     tr.innerHTML = `<td class="li-grip-td"><span class="li-grip" onmousedown="this.closest('.li-row').draggable=true" onmouseup="this.closest('.li-row').draggable=false"><i data-lucide="grip-vertical"></i></span></td><td><div class="li-title-wrap"><input type="text" class="ld" placeholder="Item title" oninput="dirty()"><div class="tiptap-wrap li-desc-editor" id="${uniqueId}"></div></div></td><td><input type="number" class="lq" value="1" min="0" oninput="reRow(this);dirty()"></td><td><input type="number" class="lr" value="0" min="0" oninput="reRow(this);dirty()"></td><td class="li-amt">${fmtCur(0, c)}</td><td><button class="btn-sm-icon-ghost" onclick="deleteLineItem(this)" aria-label="Delete item" data-tooltip="Delete" data-side="bottom" data-align="center"><i data-lucide="x"></i></button></td>`;
     body.appendChild(tr);

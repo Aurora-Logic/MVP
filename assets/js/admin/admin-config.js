@@ -279,11 +279,8 @@ function executeFactoryReset(modalId) {
         return;
     }
     auditLog('factory_reset', 'all', 'Factory reset executed');
-    Object.keys(STORAGE_KEYS).forEach(function(k) { localStorage.removeItem(k); });
-    localStorage.removeItem('pk_admin_config');
-    localStorage.removeItem('pk_admin_audit');
-    localStorage.removeItem('pk_admin_errors');
-    localStorage.removeItem('pk_theme');
+    // Clear ALL pk_* keys to ensure complete reset
+    Object.keys(localStorage).filter(function(k) { return k.indexOf('pk_') === 0; }).forEach(function(k) { localStorage.removeItem(k); });
     closeAdminModal(modalId);
     adminToast('All data cleared. Redirecting...');
     setTimeout(function() { window.location.href = 'index.html'; }, 1500);
