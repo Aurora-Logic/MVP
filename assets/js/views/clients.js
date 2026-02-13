@@ -146,19 +146,17 @@ function openAddClient(idx) {
     const salOpts = SALUTATIONS.map(s => `<option value="${s}"${c.salutation === s ? ' selected' : ''}>${s}</option>`).join('');
     const isBiz = (c.customerType || 'business') === 'business';
     wrap.innerHTML = `<div class="modal acm-modal" onclick="event.stopPropagation()">
-      <div style="text-align:center;margin-bottom:16px">
-        <div class="modal-t">${isEdit ? 'Edit' : 'New'} customer</div>
-        <div class="modal-d" style="margin-bottom:0">Complete customer details for proposals and invoices</div>
+      <div class="acm-header">
+        <div><div class="modal-t">${isEdit ? 'Edit' : 'New'} customer</div>
+          <div class="modal-d" style="margin-bottom:0">Complete customer details for proposals and invoices</div></div>
+        <div class="acm-type-toggle">
+          <button class="filter-tab${isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=business]').checked=true;document.getElementById('acCompanyRow').style.display=''">Business</button>
+          <button class="filter-tab${!isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=individual]').checked=true;document.getElementById('acCompanyRow').style.display='none'">Individual</button>
+        </div>
+        <input type="radio" name="acType" value="business" ${isBiz ? 'checked' : ''} style="display:none">
+        <input type="radio" name="acType" value="individual" ${!isBiz ? 'checked' : ''} style="display:none">
       </div>
       <div class="acm-body">
-        <div style="display:flex;justify-content:center;margin-bottom:16px">
-          <div class="acm-type-toggle">
-            <button class="filter-tab${isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=business]').checked=true;document.getElementById('acCompanyRow').style.display=''">Business</button>
-            <button class="filter-tab${!isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=individual]').checked=true;document.getElementById('acCompanyRow').style.display='none'">Individual</button>
-          </div>
-          <input type="radio" name="acType" value="business" ${isBiz ? 'checked' : ''} style="display:none">
-          <input type="radio" name="acType" value="individual" ${!isBiz ? 'checked' : ''} style="display:none">
-        </div>
         <div class="acm-section-label">Contact details</div>
         <div class="fg"><label class="fl">Primary contact</label>
           <div style="display:flex;gap:8px"><select id="acSalutation" style="width:80px;flex-shrink:0">${salOpts}<option value="">None</option></select>
@@ -184,7 +182,7 @@ function openAddClient(idx) {
         <div class="fr"><div class="fg"><label class="fl">Pin code</label><input type="text" id="acPinCode" value="${esc(c.pinCode || '')}" maxlength="10"></div>
           <div class="fg"><label class="fl">GST number</label><input type="text" id="acGst" value="${esc(c.gstNumber || '')}" maxlength="15" placeholder="e.g. 22AAAAA0000A1Z5"></div></div>
       </div>
-      <div class="modal-foot" style="margin-top:16px">
+      <div class="acm-foot">
         <button class="btn-sm-ghost" onclick="document.getElementById('clientModal').remove()">Cancel</button>
         <button class="btn-sm" onclick="saveClient(${isEdit ? idx : -1})">${isEdit ? 'Update' : 'Add customer'}</button>
       </div>

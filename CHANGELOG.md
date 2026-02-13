@@ -4,6 +4,20 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.15.2 (build 20260213) — 2026-02-13
+
+### Style
+- Redesign add customer modal: header with left-aligned title + right-aligned type toggle
+- Seamless modal layout with bordered header, scrollable body, and pinned footer
+- Tighter type toggle styling (smaller padding/font)
+
+### Files Changed
+- `clients.js` — restructure modal HTML: `.acm-header` with title+toggle, `.acm-foot` for buttons
+- `pages.css` — new `.acm-header`, `.acm-foot` styles, modal `padding: 0` with section padding
+- `boot.js` — version bump to 2.15.2
+
+---
+
 ## v2.15.1 (build 20260213) — 2026-02-13
 
 ### Fix

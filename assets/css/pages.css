@@ -2812,14 +2812,25 @@
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  padding: 32px !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.acm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .acm-body {
   overflow-y: auto;
   flex: 1;
-  padding-right: 4px;
-  margin-right: -4px;
+  padding: 20px 24px;
+  min-height: 0;
 }
 
 .acm-section-label {
@@ -2837,16 +2848,27 @@
   margin: 16px 0;
 }
 
+.acm-foot {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
 .acm-type-toggle {
   display: inline-flex;
   gap: 2px;
   background: var(--muted);
   padding: 3px;
   border-radius: var(--r-pill);
+  flex-shrink: 0;
 }
 
 .acm-type-toggle .filter-tab {
-  padding: 6px 16px;
+  padding: 5px 14px;
+  font-size: 13px;
 }
 
 /* ════════ SETTINGS — Modal overlay (Notion-style) ════════ */
