@@ -28,7 +28,7 @@ function replaceVariables(text, p) {
 
     return text.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
         const k = key.trim().toLowerCase();
-        return vars[k] !== undefined ? vars[k] : match;
+        return vars[k] !== undefined ? esc(vars[k]) : match;
     });
 }
 

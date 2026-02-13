@@ -67,27 +67,27 @@ function convertLegacyBlocks(data) {
     return data.blocks.map(b => {
         const d = b.data || {};
         switch (b.type) {
-            case 'paragraph': return `<p>${d.text || ''}</p>`;
+            case 'paragraph': return `<p>${sanitizeHtml(d.text || '')}</p>`;
             case 'header': {
                 const lvl = d.level || 2;
-                return `<h${lvl}>${d.text || ''}</h${lvl}>`;
+                return `<h${lvl}>${sanitizeHtml(d.text || '')}</h${lvl}>`;
             }
             case 'list': {
                 const tag = d.style === 'ordered' ? 'ol' : 'ul';
                 const items = (d.items || []).map(item => {
                     const txt = typeof item === 'object' ? (item.content || '') : item;
-                    return `<li>${txt}</li>`;
+                    return `<li>${sanitizeHtml(txt)}</li>`;
                 }).join('');
                 return `<${tag}>${items}</${tag}>`;
             }
             case 'checklist': {
                 const items = (d.items || []).map(item => {
                     const checked = item.checked ? ' data-checked="true"' : '';
-                    return `<li${checked}><label><input type="checkbox"${item.checked ? ' checked' : ''}>${item.text || ''}</label></li>`;
+                    return `<li${checked}><label><input type="checkbox"${item.checked ? ' checked' : ''}>${sanitizeHtml(item.text || '')}</label></li>`;
                 }).join('');
                 return `<ul data-type="taskList">${items}</ul>`;
             }
-            case 'quote': return `<blockquote><p>${d.text || ''}</p>${d.caption ? `<cite>${d.caption}</cite>` : ''}</blockquote>`;
+            case 'quote': return `<blockquote><p>${sanitizeHtml(d.text || '')}</p>${d.caption ? `<cite>${sanitizeHtml(d.caption)}</cite>` : ''}</blockquote>`;
             case 'code': return `<pre><code>${esc(d.code || '')}</code></pre>`;
             case 'delimiter': return '<hr>';
             case 'table': {
@@ -97,7 +97,7 @@ function convertLegacyBlocks(data) {
                     h += '<tr>';
                     (row || []).forEach(cell => {
                         const tag = ri === 0 && d.withHeadings ? 'th' : 'td';
-                        h += `<${tag}>${cell || ''}</${tag}>`;
+                        h += `<${tag}>${sanitizeHtml(cell || '')}</${tag}>`;
                     });
                     h += '</tr>';
                 });

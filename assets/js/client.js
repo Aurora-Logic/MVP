@@ -295,8 +295,13 @@ function getSectionIcon(type) {
 function formatContent(content) {
     if (!content) return '';
 
-    // Handle plain string content
+    // Handle string content (Tiptap HTML or plain text)
     if (typeof content === 'string') {
+        // Tiptap HTML — sanitize dangerous elements/attrs but keep formatting
+        if (content.includes('<') && content.includes('>')) {
+            return sanitizeHtml(content);
+        }
+        // Plain text legacy — escape and wrap in paragraphs
         let html = esc(content);
         html = html.split('\n\n').map(p => `<p>${p}</p>`).join('');
         html = html.replace(/\n/g, '<br>');

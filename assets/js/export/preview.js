@@ -40,11 +40,12 @@ function calcTotals(p) {
 function editorJsToHtml(content, p = null) {
     if (!content) return '';
 
-    // Tiptap: content is already HTML string — pass through
+    // Tiptap: content is already HTML string — sanitize then pass through
     if (typeof content === 'string') {
         // Check if it looks like HTML (has tags) or is plain text
         if (content.includes('<') && content.includes('>')) {
-            return p ? replaceVariables(content, p) : content;
+            const clean = sanitizeHtml(content);
+            return p ? replaceVariables(clean, p) : clean;
         }
         // Plain text legacy
         const escaped = esc(content).replace(/\n/g, '<br>');

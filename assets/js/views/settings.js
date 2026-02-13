@@ -233,8 +233,10 @@ function clearInvalid(id) {
 }
 
 function exportData() {
+    // Strip sensitive keys (API key, signature image) from exported config
+    const safeConfig = CONFIG ? Object.fromEntries(Object.entries(CONFIG).filter(([k]) => !['aiApiKey'].includes(k))) : null;
     const data = {
-        config: CONFIG, proposals: DB, clients: CLIENTS,
+        config: safeConfig, proposals: DB, clients: CLIENTS,
         sectionLibrary: safeGetStorage('pk_seclib', []), tcLibrary: safeGetStorage('pk_tclib', []),
         emailTemplates: safeGetStorage('pk_email_tpl', []), proposalTemplates: safeGetStorage('pk_templates', [])
     };
@@ -245,31 +247,58 @@ function exportData() {
     toast('Data exported');
 }
 
+// Sanitize all string values in an object tree (for imported data)
+function sanitizeImportStrings(obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    if (Array.isArray(obj)) return obj.map(sanitizeImportStrings);
+    const result = {};
+    for (const [k, v] of Object.entries(obj)) {
+        if (typeof v === 'string') result[k] = sanitizeHtml(v);
+        else if (typeof v === 'object' && v !== null) result[k] = sanitizeImportStrings(v);
+        else result[k] = v;
+    }
+    return result;
+}
+
 function importData() {
     const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
     input.onchange = () => {
         const file = input.files?.[0]; if (!file) return;
+        if (file.size > 10 * 1024 * 1024) { toast('File too large (max 10MB)', 'error'); return; }
         const reader = new FileReader();
         reader.onload = () => {
             try {
                 const data = JSON.parse(reader.result);
-                if (!data || typeof data !== 'object') throw new Error('Invalid format');
+                if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid format');
                 const counts = [];
-                if (data.config && typeof data.config === 'object') { Object.assign(CONFIG, data.config); localStorage.setItem('pk_config', JSON.stringify(CONFIG)); counts.push('config'); }
+                if (data.config && typeof data.config === 'object' && !Array.isArray(data.config)) {
+                    const safeConfig = sanitizeImportStrings(data.config);
+                    Object.assign(CONFIG, safeConfig);
+                    localStorage.setItem('pk_config', JSON.stringify(CONFIG));
+                    counts.push('config');
+                }
                 if (Array.isArray(data.proposals) && data.proposals.length) {
                     const ids = new Set(DB.map(p => p.id)); let added = 0;
-                    data.proposals.forEach(p => { if (p.id && !ids.has(p.id)) { DB.push(p); added++; } });
+                    data.proposals.forEach(p => {
+                        if (p.id && typeof p.id === 'string' && !ids.has(p.id)) {
+                            DB.push(sanitizeImportStrings(p)); added++;
+                        }
+                    });
                     persist(); counts.push(added + ' proposals');
                 }
                 if (Array.isArray(data.clients) && data.clients.length) {
                     const ids = new Set(CLIENTS.map(cl => cl.id)); let added = 0;
-                    data.clients.forEach(cl => { if (cl.id && !ids.has(cl.id)) { CLIENTS.push(cl); added++; } });
+                    data.clients.forEach(cl => {
+                        if (cl.id && typeof cl.id === 'string' && !ids.has(cl.id)) {
+                            CLIENTS.push(sanitizeImportStrings(cl)); added++;
+                        }
+                    });
                     localStorage.setItem('pk_clients', JSON.stringify(CLIENTS)); counts.push(added + ' clients');
                 }
-                if (Array.isArray(data.sectionLibrary)) localStorage.setItem('pk_seclib', JSON.stringify(data.sectionLibrary));
-                if (Array.isArray(data.tcLibrary)) localStorage.setItem('pk_tclib', JSON.stringify(data.tcLibrary));
-                if (Array.isArray(data.emailTemplates)) localStorage.setItem('pk_email_tpl', JSON.stringify(data.emailTemplates));
-                if (Array.isArray(data.proposalTemplates)) localStorage.setItem('pk_templates', JSON.stringify(data.proposalTemplates));
+                if (Array.isArray(data.sectionLibrary)) localStorage.setItem('pk_seclib', JSON.stringify(data.sectionLibrary.map(sanitizeImportStrings)));
+                if (Array.isArray(data.tcLibrary)) localStorage.setItem('pk_tclib', JSON.stringify(data.tcLibrary.map(sanitizeImportStrings)));
+                if (Array.isArray(data.emailTemplates)) localStorage.setItem('pk_email_tpl', JSON.stringify(data.emailTemplates.map(sanitizeImportStrings)));
+                if (Array.isArray(data.proposalTemplates)) localStorage.setItem('pk_templates', JSON.stringify(data.proposalTemplates.map(sanitizeImportStrings)));
                 toast('Imported: ' + (counts.join(', ') || 'data'));
                 closeSettings(); openSettings();
             } catch (e) { toast('Invalid file — could not parse JSON', 'error'); }

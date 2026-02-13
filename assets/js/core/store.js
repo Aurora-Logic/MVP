@@ -43,12 +43,24 @@ function persist() {
     try {
         localStorage.setItem('pk_db', JSON.stringify(DB));
         if (typeof syncAfterPersist === 'function') syncAfterPersist();
+        // Clear any persist-failure banner on success
+        const banner = document.getElementById('persistFailBanner');
+        if (banner) banner.remove();
         return true;
     } catch (e) {
-        if (e.name === 'QuotaExceededError') {
-            toast('Storage limit reached! Please export your data and clear some proposals.', 'error');
-        } else {
-            toast('Error saving data. Please check your browser settings.', 'error');
+        const msg = e.name === 'QuotaExceededError'
+            ? 'Storage full! Export your data now to avoid losing changes.'
+            : 'Failed to save data. Check browser storage settings.';
+        // Show persistent non-dismissible banner so user can't miss it
+        if (!document.getElementById('persistFailBanner')) {
+            const b = document.createElement('div');
+            b.id = 'persistFailBanner';
+            b.setAttribute('role', 'alert');
+            b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#FF3B30;color:#fff;padding:10px 16px;text-align:center;font-size:14px;font-weight:600;';
+            b.textContent = msg + ' Click here to export.';
+            b.style.cursor = 'pointer';
+            b.onclick = () => { if (typeof exportData === 'function') exportData(); };
+            document.body.appendChild(b);
         }
         console.error('localStorage error:', e);
         return false;
