@@ -2,7 +2,7 @@
 // SERVICE WORKER — Offline Support
 // ════════════════════════════════════════
 
-const CACHE_NAME = 'proposalkit-v19';
+const CACHE_NAME = 'proposalkit-v20';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -34,8 +34,27 @@ const OFFLINE_HTML = `<!DOCTYPE html>
 <div class="hint">Your saved data is still safe in your browser</div>
 </div></body></html>`;
 
-// Install — cache static assets
+// Plan check helper — service worker can't access localStorage, so we check via message
+let hasOfflineAccess = false;
+
+// Listen for plan updates from the main app
+self.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'CHECK_PLAN') {
+    hasOfflineAccess = e.data.hasOffline;
+    if (!hasOfflineAccess) {
+      // Free user detected — unregister immediately
+      self.registration.unregister().then(() => {
+        self.clients.matchAll().then(clients => {
+          clients.forEach(client => client.navigate(client.url));
+        });
+      });
+    }
+  }
+});
+
+// Install — cache static assets (only for paid plans)
 self.addEventListener('install', (e) => {
+  // Note: The main app will unregister this SW before install completes for free users
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
   );
@@ -63,8 +82,8 @@ self.addEventListener('fetch', (e) => {
   if (e.request.mode === 'navigate') {
     const path = url.pathname;
     // Known HTML files served directly; all other paths are SPA routes
-    const htmlFiles = ['/admin.html', '/client.html', '/landing.html', '/privacy.html', '/terms.html'];
-    const spaExclude = ['/admin', '/client', '/landing', '/privacy', '/terms'];
+    const htmlFiles = ['/client.html', '/landing.html', '/privacy.html', '/terms.html'];
+    const spaExclude = ['/client', '/landing', '/privacy', '/terms'];
     const isHtmlFile = path === '/' || path === '/index.html' || htmlFiles.includes(path);
     const isExcluded = spaExclude.includes(path);
     const hasExtension = path.includes('.') && !path.endsWith('/');

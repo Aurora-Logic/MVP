@@ -322,22 +322,84 @@
     <script src="assets/js/boot.js?v=18"></script>
     <script>
         // Service Worker registration (paid plans only)
-        if ('serviceWorker' in navigator) {
-            setTimeout(function() {
-                var plan = typeof getCurrentPlan === 'function' ? getCurrentPlan() : 'free';
+        (function() {
+            if (!('serviceWorker' in navigator)) return;
+
+            function checkAndManageServiceWorker() {
+                // Read subscription from localStorage directly (before app loads)
+                var sub = null;
+                try {
+                    var stored = localStorage.getItem('pk_subscription');
+                    sub = stored ? JSON.parse(stored) : null;
+                } catch (e) { sub = null; }
+
+                var plan = 'free';
+                if (sub && sub.plan && sub.status !== 'cancelled') {
+                    var validPlans = ['free', 'pro', 'team'];
+                    plan = validPlans.includes(sub.plan) ? sub.plan : 'free';
+                }
+
                 var hasOffline = plan === 'pro' || plan === 'team';
+
                 if (hasOffline) {
+                    // Register service worker for paid users
                     navigator.serviceWorker.register('/sw.js').then(function(reg) {
                         if (reg) reg.update();
                     }).catch(function() {});
                 } else {
-                    // Unregister SW for free users
+                    // Immediately unregister SW for free users and clear all caches
                     navigator.serviceWorker.getRegistration().then(function(reg) {
-                        if (reg) reg.unregister();
+                        if (reg) {
+                            reg.unregister().then(function() {
+                                // Clear all caches after unregistering
+                                if ('caches' in window) {
+                                    caches.keys().then(function(names) {
+                                        names.forEach(function(name) { caches.delete(name); });
+                                    });
+                                }
+                            });
+                        }
                     }).catch(function() {});
                 }
-            }, 100);
-        }
+            }
+
+            // Check immediately on page load
+            checkAndManageServiceWorker();
+
+            // Notify active service worker about plan status
+            if (navigator.serviceWorker.controller) {
+                var sub = null;
+                try {
+                    var stored = localStorage.getItem('pk_subscription');
+                    sub = stored ? JSON.parse(stored) : null;
+                } catch (err) { sub = null; }
+                var plan = (sub && sub.plan && sub.status !== 'cancelled') ? sub.plan : 'free';
+                var hasOffline = plan === 'pro' || plan === 'team';
+
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CHECK_PLAN',
+                    hasOffline: hasOffline
+                });
+            }
+
+            // Prevent PWA installation prompt for free users
+            window.addEventListener('beforeinstallprompt', function(e) {
+                var sub = null;
+                try {
+                    var stored = localStorage.getItem('pk_subscription');
+                    sub = stored ? JSON.parse(stored) : null;
+                } catch (err) { sub = null; }
+                var plan = (sub && sub.plan && sub.status !== 'cancelled') ? sub.plan : 'free';
+                var hasOffline = plan === 'pro' || plan === 'team';
+
+                if (!hasOffline) {
+                    e.preventDefault(); // Block install prompt for free users
+                    if (typeof showUpgradeModal === 'function') {
+                        showUpgradeModal('offline', {allowed: false, plan: 'free'});
+                    }
+                }
+            });
+        })();
         // Offline / Online detection banner
         (function() {
             function showOfflineBanner() {
