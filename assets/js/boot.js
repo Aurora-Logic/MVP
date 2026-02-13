@@ -37,8 +37,22 @@ function bootApp() {
     goNav('dashboard');
     initKeyboardShortcuts();
     lucide.createIcons();
+    patchAriaLabels();
     checkWhatsNew();
 }
+
+// Auto-derive aria-label from data-tooltip for icon-only buttons missing accessible names
+function patchAriaLabels() {
+    document.querySelectorAll('[data-tooltip]:not([aria-label])').forEach(el => {
+        el.setAttribute('aria-label', el.getAttribute('data-tooltip'));
+    });
+}
+// Patch after every lucide.createIcons() call via observer
+const _origCreateIcons = lucide.createIcons.bind(lucide);
+lucide.createIcons = function(opts) {
+    _origCreateIcons(opts);
+    patchAriaLabels();
+};
 
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL

@@ -255,7 +255,8 @@ function reTotal() {
         const r = Math.max(0, parseFloat(row.querySelector('.lr')?.value) || 0);
         subtotal += q * r;
     });
-    const disc = Math.max(0, parseFloat(document.getElementById('fDiscount')?.value) || 0);
+    const rawDisc = Math.max(0, parseFloat(document.getElementById('fDiscount')?.value) || 0);
+    const disc = Math.min(rawDisc, subtotal); // clamp discount to subtotal
     const taxRate = Math.min(100, Math.max(0, parseFloat(document.getElementById('fTaxRate')?.value) || 0));
     const afterDisc = Math.max(0, subtotal - disc);
     const taxAmt = Math.round(afterDisc * taxRate / 100);

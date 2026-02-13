@@ -20,7 +20,7 @@ function computeAnalytics(proposals) {
     const accepted = proposals.filter(p => p.status === 'accepted');
     const winRate = decided.length > 0 ? Math.round(accepted.length / decided.length * 100) : 0;
 
-    const pipeline = proposals.filter(p => p.status === 'draft' || p.status === 'sent')
+    const pipeline = proposals.filter(p => p.status === 'sent')
         .reduce((sum, p) => sum + (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0), 0);
 
     const allValues = proposals.map(p => (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0)).filter(v => v > 0);

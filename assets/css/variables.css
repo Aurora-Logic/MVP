@@ -199,7 +199,7 @@ body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  /* line-height: 1.5; */
+  line-height: 1.5;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -232,12 +232,8 @@ body {
 
 /* ─── Global Focus Ring ─── */
 :focus-visible {
-  outline: none;
-  box-shadow: none;
-}
-
-.dark :focus-visible {
-  box-shadow: none;
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 /* ─── Lucide Icons Base ─── */
