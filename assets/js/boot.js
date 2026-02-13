@@ -34,8 +34,11 @@ function bootApp() {
     initSidebarState();
     if (typeof initTeam === 'function') initTeam();
     refreshSide();
-    goNav('dashboard');
+    handleRoute();
     initKeyboardShortcuts();
+    if (typeof initSupportWidget === 'function') initSupportWidget();
+    if (typeof checkAnnouncements === 'function') checkAnnouncements();
+    if (typeof trackEvent === 'function') trackEvent('app_open');
     lucide.createIcons();
     patchAriaLabels();
     checkWhatsNew();

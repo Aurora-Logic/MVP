@@ -2,7 +2,7 @@
   "name": "ProposalKit",
   "short_name": "ProposalKit",
   "description": "Professional proposals in minutes. Build, preview, and export polished PDFs.",
-  "start_url": "/index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#18181b",

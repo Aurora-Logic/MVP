@@ -143,7 +143,15 @@ function setProposalStatus(id, status) {
   toast(`Status updated to ${status.charAt(0).toUpperCase() + status.slice(1)}`);
 }
 
-function setFilter(f) { currentFilter = f; currentPage = 1; renderProposals(); }
+function setFilter(f) {
+  currentFilter = f; currentPage = 1;
+  if (typeof replaceUrl === 'function') {
+    const params = new URLSearchParams();
+    if (f !== 'all') params.set('filter', f);
+    replaceUrl('/proposals' + (params.toString() ? '?' + params : ''));
+  }
+  renderProposals();
+}
 function filterList() {
   const q = document.getElementById('searchInput')?.value?.trim() || '';
   if (!CUR && q) {
@@ -293,7 +301,16 @@ function renderProposals() {
   if (typeof lucideScope === 'function') lucideScope(body); else lucide.createIcons();
 }
 
-function goPage(page) { if (page < 1) return; currentPage = page; renderProposals(); }
+function goPage(page) {
+  if (page < 1) return; currentPage = page;
+  if (typeof replaceUrl === 'function') {
+    const params = new URLSearchParams();
+    if (currentFilter !== 'all') params.set('filter', currentFilter);
+    if (page > 1) params.set('page', page);
+    replaceUrl('/proposals' + (params.toString() ? '?' + params : ''));
+  }
+  renderProposals();
+}
 
 function toggleSortProposals() {
   const cycle = ['date', 'value', 'name'];

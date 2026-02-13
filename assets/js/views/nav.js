@@ -25,28 +25,19 @@ function destroyAllEditors() {
     });
 }
 
-function goNav(view) {
-    closeMobileSidebar();
-    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', clients: 'Customers', analytics: 'Analytics', settings: 'Settings', profile: 'My Profile' };
-    const an = typeof appName === 'function' ? appName() : 'ProposalKit';
-    document.title = (titles[view] || an) + ' \u2014 ' + an;
-    const topSearch = document.getElementById('topSearch');
-    if (topSearch) topSearch.style.display = (view === 'analytics' || view === 'settings') ? 'none' : '';
-    document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
-    const btn = document.querySelector(`[data-nav="${view}"]`);
-    if (btn) btn.classList.add('on');
-    // Reset breadcrumb root to app name
-    const root = document.getElementById('breadcrumbRoot');
-    if (root) { root.textContent = an; root.onclick = () => goNav('dashboard'); }
-    // Destroy EditorJS instances when leaving editor
-    if (view !== 'editor') destroyAllEditors();
-    // Hide TOC on non-editor views
-    if (view !== 'editor' && typeof hideTOC === 'function') hideTOC();
-    if (view === 'dashboard') renderDashboard();
-    else if (view === 'editor') { if (CUR) loadEditor(CUR); else renderProposals(); }
-    else if (view === 'clients') renderClients();
-    else if (view === 'profile') { if (typeof renderProfile === 'function') renderProfile(); else renderSettings(); }
-    else if (view === 'settings') { openSettings(); return; }
+function goNav(view, opts) {
+    const paths = { dashboard: '/dashboard', proposals: '/proposals', clients: '/clients', profile: '/profile', settings: '/settings' };
+    // 'editor' with no CUR → go to proposals list (preserve filter in URL)
+    if (view === 'editor' && !CUR) {
+        const params = new URLSearchParams();
+        if (typeof currentFilter !== 'undefined' && currentFilter !== 'all') params.set('filter', currentFilter);
+        const qs = params.toString();
+        navigate('/proposals' + (qs ? '?' + qs : ''), opts);
+    } else if (view === 'editor' && CUR) {
+        navigate('/proposals/' + CUR, opts);
+    } else {
+        navigate(paths[view] || '/dashboard', opts);
+    }
 }
 
 function toggleMobileSidebar() {

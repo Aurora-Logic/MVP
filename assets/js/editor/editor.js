@@ -113,6 +113,7 @@ function loadEditor(id) {
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     if (typeof destroyAllEditors === 'function') destroyAllEditors();
     CUR = id;
+    if (typeof replaceUrl === 'function') replaceUrl('/proposals/' + id);
     undoStack = [];
     redoStack = [];
     const p = cur();
@@ -125,7 +126,7 @@ function loadEditor(id) {
 
     // Update breadcrumb: root → "Proposals" (clickable), current → proposal title
     const bRoot = document.getElementById('breadcrumbRoot');
-    if (bRoot) { bRoot.textContent = 'Proposals'; bRoot.onclick = () => { renderProposals(); document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on')); document.querySelector('[data-nav="editor"]')?.classList.add('on'); }; }
+    if (bRoot) { bRoot.textContent = 'Proposals'; bRoot.onclick = () => navigate('/proposals'); }
     document.getElementById('topTitle').textContent = p.title || 'Untitled';
     document.title = (p.title || 'Untitled') + ' \u2014 ' + (typeof appName === 'function' ? appName() : 'ProposalKit');
 

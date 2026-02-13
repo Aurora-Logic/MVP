@@ -2,7 +2,7 @@
 // SERVICE WORKER — Offline Support
 // ════════════════════════════════════════
 
-const CACHE_NAME = 'proposalkit-v13';
+const CACHE_NAME = 'proposalkit-v14';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -46,6 +46,21 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   if (url.origin !== self.location.origin) return;
 
+  // Navigation requests (HTML pages) — SPA fallback to /index.html
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request)
+        .then(res => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+          return res;
+        })
+        .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  // Assets (JS, CSS, images) — network first, cache fallback
   e.respondWith(
     fetch(e.request)
       .then(res => {
