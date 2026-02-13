@@ -132,7 +132,9 @@ function setTab(btn, key) {
             <div class="fg"><label class="toggle-row"><input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()"><span class="toggle-label">Remove ProposalKit branding</span></label>
               <div class="fh">Replaces ProposalKit name with your company name everywhere</div></div>`,
         pdfTemplate: () => {
+            // eslint-disable-next-line no-undef
             const html = typeof renderPdfCustomizer === 'function' ? renderPdfCustomizer() : '<div class="empty"><div class="empty-t">PDF Customizer not loaded</div></div>';
+            // eslint-disable-next-line no-undef
             setTimeout(() => { if (typeof initPdfCustomizerSelects === 'function') initPdfCustomizerSelects(); lucide.createIcons(); }, 50);
             return html;
         },

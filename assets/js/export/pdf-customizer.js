@@ -51,7 +51,7 @@ function resetPdfStyles() {
 function applyPdfStyles(html) {
     const styles = getPdfStyles();
     // Replace hardcoded colors with custom styles
-    let styled = html
+    const styled = html
         .replace(/#800020/g, styles.primaryColor)
         .replace(/#09090b/g, styles.headingColor)
         .replace(/#3f3f46/g, styles.textColor)
@@ -300,7 +300,8 @@ function updatePdfStyle(key, value) {
     }
 }
 
-// Initialize font selectors after rendering
+// Initialize font selectors after rendering (called from settings.js)
+// eslint-disable-next-line no-unused-vars
 function initPdfCustomizerSelects() {
     if (typeof csel !== 'function') return;
 
@@ -510,6 +511,8 @@ function updatePdfStyleDrawer(key, value) {
     }, 300);
 }
 
+// Called from HTML onclick handler
+// eslint-disable-next-line no-unused-vars
 function resetPdfStylesDrawer() {
     if (!CONFIG) return;
     CONFIG.pdfStyles = structuredClone(DEFAULT_PDF_STYLES);

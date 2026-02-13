@@ -120,6 +120,7 @@ function buildPreview(mode) {
 
     // Apply custom PDF styles (Pro/Team feature)
     if (typeof applyPdfStyles === 'function') {
+        // eslint-disable-next-line no-undef
         html = applyPdfStyles(html);
     }
 
