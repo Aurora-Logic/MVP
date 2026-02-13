@@ -176,8 +176,10 @@ function confirmCsvImport() {
         const desc = _csvMap.desc >= 0 ? (row[_csvMap.desc] || '').trim() : '';
         if (!desc) return;
         const detail = _csvMap.detail >= 0 ? (row[_csvMap.detail] || '').trim() : '';
-        const qty = _csvMap.qty >= 0 ? parseFloat(row[_csvMap.qty]) || 1 : 1;
-        const rate = _csvMap.rate >= 0 ? parseFloat(row[_csvMap.rate]?.replace(/[^0-9.-]/g, '')) || 0 : 0;
+        const rawQty = _csvMap.qty >= 0 ? parseFloat(row[_csvMap.qty]) : 1;
+        const rawRate = _csvMap.rate >= 0 ? parseFloat(row[_csvMap.rate]?.replace(/[^0-9.-]/g, '')) : 0;
+        const qty = isFinite(rawQty) && rawQty >= 0 ? rawQty : 1;
+        const rate = isFinite(rawRate) && rawRate >= 0 ? rawRate : 0;
         p.lineItems.push({ desc, detail, qty, rate });
         added++;
     });

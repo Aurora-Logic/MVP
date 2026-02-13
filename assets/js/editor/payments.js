@@ -25,7 +25,7 @@ function renderPayments(p) {
             <div class="pay-row-num">${i + 1}</div>
             <div class="pay-row-body">
                 <div class="pay-row-top">
-                    <input type="text" class="pay-date" data-datepicker id="payDate${i}" data-value="${pay.date || ''}" oninput="dirty()">
+                    <input type="text" class="pay-date" data-datepicker id="payDate${i}" data-value="${pay.date || ''}" data-max-date="${new Date().toISOString().split('T')[0]}" oninput="dirty()">
                     <input type="number" class="pay-amt" value="${pay.amount || 0}" min="0" step="500" oninput="updatePaymentSummary();dirty()">
                     <div class="pay-method-sel" id="payMethod${i}" data-init-val="${esc(pay.method || 'Bank')}"></div>
                     <button class="btn-sm-icon-ghost" onclick="removePayment(${i})" data-tooltip="Remove" data-side="bottom"><i data-lucide="x"></i></button>
@@ -160,6 +160,7 @@ function quickRecordPayment(pid) {
     const today = new Date().toISOString().split('T')[0];
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap';
+    wrap.id = 'quickPayModal';
     wrap.innerHTML = `<div class="modal" style="max-width:420px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
             <div class="modal-t">Record payment</div>
@@ -168,7 +169,7 @@ function quickRecordPayment(pid) {
         <div style="margin-bottom:12px;font-size:13px;color:var(--text3)">${esc(p.title || 'Untitled')} — Balance: <strong style="color:var(--red)">${fmtCur(pt.balanceDue, c)}</strong></div>
         <div class="fg"><label class="fl">Amount</label><input type="number" id="qpAmt" value="${pt.balanceDue}" min="0" step="500"></div>
         <div class="fr">
-            <div class="fg"><label class="fl">Date</label><input type="text" id="qpDate" data-datepicker data-value="${today}"></div>
+            <div class="fg"><label class="fl">Date</label><input type="text" id="qpDate" data-datepicker data-value="${today}" data-max-date="${today}"></div>
             <div class="fg"><label class="fl">Method</label><div id="qpMethod"></div></div>
         </div>
         <div class="fg"><label class="fl">Note</label><input type="text" id="qpNote" placeholder="Optional"></div>
@@ -190,6 +191,10 @@ function saveQuickPayment(pid) {
     const amt = Math.max(0, parseFloat(document.getElementById('qpAmt')?.value) || 0);
     if (amt <= 0) { toast('Enter a valid amount', 'error'); return; }
     const dateEl = document.getElementById('qpDate');
+    const dateStr = dateEl?.dataset?.value || dateEl?.value || '';
+    if (dateStr && new Date(dateStr) > new Date()) { toast('Payment date cannot be in the future', 'error'); return; }
+    const pt = paymentTotals(p);
+    if (amt > pt.balanceDue && pt.balanceDue > 0) { toast('Amount exceeds balance due (' + fmtCur(pt.balanceDue, p.currency || defaultCurrency()) + ')', 'error'); return; }
     p.payments.push({
         id: 'pay_' + Date.now(),
         date: dateEl?.dataset?.value || dateEl?.value || '',
@@ -198,7 +203,8 @@ function saveQuickPayment(pid) {
         note: document.getElementById('qpNote')?.value || ''
     });
     persist();
-    document.querySelector('.modal-wrap')?.remove();
+    const payModal = document.getElementById('quickPayModal');
+    if (payModal) { payModal.classList.remove('show'); setTimeout(() => payModal.remove(), 200); }
     toast('Payment recorded');
     if (typeof renderProposals === 'function') renderProposals();
 }

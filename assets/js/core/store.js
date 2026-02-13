@@ -168,6 +168,12 @@ window.addEventListener('storage', (e) => {
     if (e.key === 'pk_clients' && e.newValue) {
         try { CLIENTS = JSON.parse(e.newValue); } catch (err) { /* ignore */ }
     }
+    if (e.key === 'pk_announcements') {
+        if (typeof checkAnnouncements === 'function') checkAnnouncements();
+    }
+    if (e.key === 'pk_tickets') {
+        if (typeof _spCheckUnread === 'function') _spCheckUnread();
+    }
 });
 
 /** @param {string} s @returns {string} HTML-escaped string */

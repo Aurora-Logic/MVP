@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/client", "destination": "/client.html" },
+    { "source": "/landing", "destination": "/landing.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" }
+  ]
+}

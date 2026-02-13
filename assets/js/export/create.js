@@ -40,6 +40,9 @@ function dupProp(id) {
     dup.number = 'PROP-' + String((existingNums.length ? Math.max(...existingNums) : 0) + 1).padStart(3, '0');
     dup.status = 'draft';
     dup.createdAt = Date.now();
+    delete dup.shareToken; delete dup.sharedAt; delete dup.viewCount;
+    delete dup.lastViewedAt; delete dup.clientResponse; delete dup.versionHistory;
+    dup.version = 1;
     dup.notes = [{ text: 'Duplicated from ' + src.number, time: Date.now(), type: 'system' }];
     DB.unshift(dup); persist();
     loadEditor(dup.id);
@@ -70,6 +73,9 @@ function doDupWithClient(id, clientIdx) {
     dup.number = 'PROP-' + String((existingNums.length ? Math.max(...existingNums) : 0) + 1).padStart(3, '0');
     dup.status = 'draft';
     dup.createdAt = Date.now();
+    delete dup.shareToken; delete dup.sharedAt; delete dup.viewCount;
+    delete dup.lastViewedAt; delete dup.clientResponse; delete dup.versionHistory;
+    dup.version = 1;
     if (clientIdx >= 0 && CLIENTS[clientIdx]) {
         const c = CLIENTS[clientIdx];
         dup.client = { name: c.name || '', contact: c.contact || '', email: c.email || '', phone: c.phone || '' };

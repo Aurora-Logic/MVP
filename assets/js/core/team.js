@@ -68,6 +68,8 @@ function addTeamMember(name, email, role) {
 function removeTeamMember(userId) {
     if ((CONFIG?.team || []).length <= 1) { toast('Cannot remove the last member'); return; }
     if (userId === CONFIG.activeUserId) { toast('Switch to another user first'); return; }
+    const member = (CONFIG.team || []).find(m => m.id === userId);
+    if (member?.role === 'admin' && (CONFIG.team || []).filter(m => m.role === 'admin').length <= 1) { toast('Cannot remove the last admin'); return; }
     const propCount = DB.filter(p => p.owner === userId).length;
     const msg = propCount > 0 ? `Remove this team member? ${propCount} proposal(s) will be reassigned to you.` : 'Remove this team member?';
     confirmDialog(msg, () => {

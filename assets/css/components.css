@@ -1074,6 +1074,14 @@ input[type="number"] {
   color: var(--text4);
 }
 
+.dp-day.disabled,
+.dp-day:disabled {
+  color: var(--text4);
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .dp-footer {
   display: flex;
   justify-content: space-between;

@@ -9,6 +9,7 @@ class DatePicker {
         const initialValue = input.dataset.value;
         this.selectedDate = initialValue ? new Date(initialValue) : null;
         this.viewDate = this.selectedDate ? new Date(this.selectedDate) : new Date();
+        this.maxDate = input.dataset.maxDate || null;
         this.isOpen = false;
         this.init();
     }
@@ -88,7 +89,9 @@ class DatePicker {
             const classes = ['dp-day'];
             if (isToday) classes.push('today');
             if (isSelected) classes.push('selected');
-            html += `<button type="button" class="${classes.join(' ')}" onclick="datePickers['${this.input.id}'].select(${year}, ${month}, ${d})">${d}</button>`;
+            let dayDisabled = false;
+            if (this.maxDate) { const mx = new Date(this.maxDate); mx.setHours(0,0,0,0); if (date > mx) { classes.push('disabled'); dayDisabled = true; } }
+            html += `<button type="button" class="${classes.join(' ')}"${dayDisabled ? ' disabled' : ''} onclick="datePickers['${this.input.id}'].select(${year}, ${month}, ${d})">${d}</button>`;
         }
         const totalCells = firstDay + daysInMonth;
         const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
@@ -111,8 +114,13 @@ class DatePicker {
     setYear(year) { this.viewDate.setFullYear(parseInt(year)); this.render(); }
 
     select(year, month, day) {
-        this.selectedDate = new Date(year, month, day);
-        this.selectedDate.setHours(0, 0, 0, 0);
+        const d = new Date(year, month, day);
+        d.setHours(0, 0, 0, 0);
+        if (this.maxDate) {
+            const max = new Date(this.maxDate); max.setHours(0, 0, 0, 0);
+            if (d > max) return;
+        }
+        this.selectedDate = d;
         this.viewDate = new Date(this.selectedDate);
         this.input.value = this.formatDisplay(this.selectedDate);
         this.input.dataset.value = this.formatISO(this.selectedDate);

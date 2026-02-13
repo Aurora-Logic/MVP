@@ -2,7 +2,7 @@
 // SERVICE WORKER — Offline Support
 // ════════════════════════════════════════
 
-const CACHE_NAME = 'proposalkit-v14';
+const CACHE_NAME = 'proposalkit-v15';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -48,6 +48,23 @@ self.addEventListener('fetch', (e) => {
 
   // Navigation requests (HTML pages) — SPA fallback to /index.html
   if (e.request.mode === 'navigate') {
+    const path = url.pathname;
+    // Known HTML files served directly; all other paths are SPA routes
+    const htmlFiles = ['/admin.html', '/client.html', '/landing.html', '/privacy.html', '/terms.html'];
+    const spaExclude = ['/admin', '/client', '/landing', '/privacy', '/terms'];
+    const isHtmlFile = path === '/' || path === '/index.html' || htmlFiles.includes(path);
+    const isExcluded = spaExclude.includes(path);
+    const hasExtension = path.includes('.') && !path.endsWith('/');
+
+    if (!isHtmlFile && !isExcluded && !hasExtension) {
+      // SPA route (e.g. /dashboard, /proposals/abc123) — always serve index.html
+      e.respondWith(
+        caches.match('/index.html')
+          .then(cached => cached || fetch('/index.html'))
+      );
+      return;
+    }
+
     e.respondWith(
       fetch(e.request)
         .then(res => {
@@ -55,7 +72,7 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
           return res;
         })
-        .catch(() => caches.match('/index.html'))
+        .catch(() => caches.match(e.request).then(r => r || caches.match('/index.html')))
     );
     return;
   }

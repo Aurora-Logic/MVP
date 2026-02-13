@@ -3,7 +3,7 @@ import globals from 'globals';
 import prettierConfig from 'eslint-config-prettier';
 
 export default [
-    { ignores: ['assets/js/vendor/**'] },
+    { ignores: ['assets/js/vendor/**', 'assets/js/admin/**'] },
     js.configs.recommended,
     prettierConfig,
     {
@@ -83,6 +83,7 @@ export default [
                 COLORS: 'readonly',
                 COLOR_NAMES: 'readonly',
                 logoutApp: 'readonly',
+                statusIcon: 'readonly',
 
                 // ── core/utils.js ──
                 DatePicker: 'readonly',
@@ -125,6 +126,31 @@ export default [
                 _cselFilterMenu: 'readonly',
                 cselFilter: 'readonly',
                 cselGetValue: 'readonly',
+
+                // ── core/router.js ──
+                navigate: 'readonly',
+                replaceUrl: 'readonly',
+                handleRoute: 'readonly',
+                render404: 'readonly',
+                buildUrl: 'readonly',
+
+                // ── core/support.js ──
+                _supportTab: 'writable',
+                initSupportWidget: 'readonly',
+                _spCheckUnread: 'readonly',
+
+                // ── core/plans.js ──
+                PLAN_LIMITS: 'readonly',
+                enforceLimit: 'readonly',
+                checkLimit: 'readonly',
+                showUpgradeModal: 'readonly',
+                getCurrentPlan: 'readonly',
+                getPlanBadge: 'readonly',
+                trackEvent: 'readonly',
+
+                // ── core/announcements.js ──
+                checkAnnouncements: 'readonly',
+                dismissAnnouncement: 'readonly',
 
                 // ── core/completeness.js ──
                 calcCompleteness: 'readonly',
@@ -293,6 +319,7 @@ export default [
                 createProposalForClient: 'readonly',
 
                 // ── views/settings.js ──
+                openSettings: 'readonly',
                 getCountryTaxHtml: 'readonly',
                 buildAccountCard: 'readonly',
                 renderSettings: 'readonly',
@@ -616,6 +643,8 @@ export default [
                 // ── boot.js ──
                 initApp: 'readonly',
                 bootApp: 'readonly',
+                lucideScope: 'readonly',
+                patchAriaLabels: 'readonly',
                 APP_VERSION: 'readonly',
                 APP_BUILD: 'readonly',
                 WHATS_NEW_ITEMS: 'readonly',
