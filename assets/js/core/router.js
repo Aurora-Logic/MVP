@@ -151,11 +151,11 @@ function render404(path) {
     body.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:center;min-height:60vh;padding:32px">
             <div class="card" style="max-width:440px;text-align:center;padding:48px 32px">
-                <div style="width:64px;height:64px;margin:0 auto 20px;background:var(--muted);border-radius:16px;display:flex;align-items:center;justify-content:center"><i data-lucide="file-question" style="width:28px;height:28px;color:var(--text4)"></i></div>
-                <div style="font-size:20px;font-weight:700;color:var(--foreground);margin-bottom:6px">Page not found</div>
+                <div style="font-size:56px;font-weight:800;color:var(--text4);line-height:1">404</div>
+                <div style="font-size:20px;font-weight:700;color:var(--foreground);margin:12px 0 6px">Page not found</div>
                 <div style="font-size:14px;color:var(--text3);line-height:1.5">The page <code style="font-size:13px;padding:2px 6px;background:var(--muted);border-radius:6px">${safePath}</code> doesn't exist or may have been moved.</div>
                 <div style="display:flex;gap:8px;justify-content:center;margin-top:24px">
-                    <button class="btn" onclick="navigate('/dashboard')"><i data-lucide="arrow-left"></i> Dashboard</button>
+                    <button class="btn" onclick="navigate('/dashboard')"><i data-lucide="arrow-left"></i> Go to Dashboard</button>
                     <button class="btn-outline" onclick="navigate('/proposals')"><i data-lucide="file-text"></i> Proposals</button>
                 </div>
             </div>
