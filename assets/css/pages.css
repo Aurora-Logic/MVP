@@ -2668,15 +2668,52 @@
 }
 
 .cl-search-wrap {
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex: 1;
   max-width: 280px;
+  background: var(--muted);
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  padding: 5px 12px;
+  transition: all var(--t);
+}
+
+.cl-search-wrap:focus-within {
+  border-color: var(--border);
+  background: var(--card);
+  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.06);
+}
+
+.dark .cl-search-wrap:focus-within {
+  box-shadow: 0 0 0 2px rgba(212, 212, 216, 0.15);
+}
+
+.cl-search-wrap svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text4);
+  flex-shrink: 0;
 }
 
 .cl-search {
-  width: 100% !important;
-  padding-left: 36px !important;
-  height: 36px;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 14px !important;
+  flex: 1;
+  min-width: 0;
+  box-shadow: none !important;
+  height: auto !important;
+}
+
+.cl-search::placeholder {
+  color: var(--text4) !important;
+}
+
+.cl-search:focus {
+  box-shadow: none !important;
 }
 
 .cl-count {
@@ -2749,20 +2786,34 @@
   color: var(--text3);
 }
 
-/* ════════ ADD CLIENT MODAL ════════ */
+/* ════════ ADD/EDIT CLIENT — Full Page ════════ */
 
-.acm-modal {
-  max-width: 560px;
-  max-height: 85vh;
+.acm-container {
+  max-width: 640px;
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
 
-.acm-body {
-  overflow-y: auto;
-  flex: 1;
-  padding-right: 4px;
-  margin-right: -4px;
+.acm-card {
+  padding: 24px !important;
+  border-radius: 12px;
+}
+
+.acm-card .fg {
+  margin-bottom: 16px;
+}
+
+.acm-card .fg:last-child {
+  margin-bottom: 0;
+}
+
+.acm-card .fr {
+  margin-bottom: 16px;
+}
+
+.acm-card .fr:last-child {
+  margin-bottom: 0;
 }
 
 .acm-section-label {
@@ -2771,13 +2822,9 @@
   color: var(--muted-foreground);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 12px;
-}
-
-.acm-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 16px 0;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .acm-type-toggle {
@@ -2802,11 +2849,13 @@
 }
 
 .set-tabs {
+  display: flex;
+  gap: 4px;
   position: sticky;
   top: 0;
   z-index: 10;
   background: var(--background);
-  padding-bottom: 4px;
+  padding: 4px 0 8px;
   overflow-x: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -2816,29 +2865,89 @@
   display: none;
 }
 
-.settings-card {
+.set-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--t);
+}
+
+.set-tab svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.set-tab:hover {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+.set-tab.on {
+  color: var(--foreground);
+  background: var(--card);
+  border-color: var(--border);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+}
+
+/* Settings cards — accent gradient per section */
+.set-card {
   padding: 24px !important;
   border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-.settings-card-danger {
+.set-card-blue {
+  background: linear-gradient(to top, color-mix(in srgb, var(--blue) 4%, transparent), var(--card));
+}
+
+.set-card-green {
+  background: linear-gradient(to top, color-mix(in srgb, var(--green) 4%, transparent), var(--card));
+}
+
+.set-card-orange {
+  background: linear-gradient(to top, color-mix(in srgb, var(--amber) 4%, transparent), var(--card));
+}
+
+.set-card-purple {
+  background: linear-gradient(to top, color-mix(in srgb, var(--purple) 4%, transparent), var(--card));
+}
+
+.set-card-danger {
   border-color: color-mix(in srgb, var(--red) 20%, var(--border));
-  background: linear-gradient(to top, color-mix(in srgb, var(--red) 3%, transparent), var(--card));
+  background: linear-gradient(to top, color-mix(in srgb, var(--red) 4%, transparent), var(--card));
 }
 
-.settings-card .fg {
+.dark .set-card-blue,
+.dark .set-card-green,
+.dark .set-card-orange,
+.dark .set-card-purple {
+  background: var(--card);
+}
+
+.set-card .fg {
   margin-bottom: 16px;
 }
 
-.settings-card .fg:last-child {
+.set-card .fg:last-child {
   margin-bottom: 0;
 }
 
-.settings-card .fr {
+.set-card .fr {
   margin-bottom: 16px;
 }
 
-.settings-card .fr:last-child {
+.set-card .fr:last-child {
   margin-bottom: 0;
 }
 

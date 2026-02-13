@@ -348,6 +348,7 @@
   .side-user-menu-item { min-height: 44px; }
   .ri { min-height: 40px; }
   .tab { min-height: 44px; padding: 8px 16px; }
+  .set-tab { min-height: 44px; padding: 8px 14px; }
   .btn-sm, .btn-sm-outline, .btn-sm-ghost, .btn-sm-icon-ghost, .btn-sm-destructive { min-height: 44px; }
   .ctx-item { min-height: 44px; }
   .csel-opt { min-height: 44px; }

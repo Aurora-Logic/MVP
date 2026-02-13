@@ -79,7 +79,7 @@ function renderClients() {
         <div class="cl-metric-card"><div class="cl-metric-label">Win rate</div><div class="cl-metric-value">${winRate}%</div></div>
       </div>
       <div class="cl-toolbar">
-        <div class="cl-search-wrap"><i data-lucide="search" style="width:14px;height:14px;color:var(--text4);position:absolute;left:12px;top:50%;transform:translateY(-50%)"></i><input type="text" class="cl-search" id="clientSearch" placeholder="Search clients..." oninput="filterClients()"></div>
+        <div class="cl-search-wrap"><i data-lucide="search"></i><input type="text" class="cl-search" id="clientSearch" placeholder="Search clients..." oninput="filterClients()"></div>
         <span class="cl-count">${CLIENTS.length} client${CLIENTS.length !== 1 ? 's' : ''}</span>
       </div>
       <div class="nt-wrap"><table class="nt-table"><thead><tr class="nt-head">
@@ -104,53 +104,54 @@ function matchClient(p, c) {
 function openAddClient(idx) {
     const isEdit = idx !== undefined;
     const c = isEdit ? CLIENTS[idx] : {};
-    const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap'; wrap.id = 'clientModal';
-    wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
+    const clientName = isEdit ? (c.displayName || c.name || 'Edit client') : 'Add client';
+    const body = document.getElementById('bodyScroll');
+    document.getElementById('topTitle').textContent = clientName;
+    document.getElementById('topRight').innerHTML = `<div style="display:flex;gap:8px">
+      <button class="btn-sm-outline" onclick="renderClients()"><i data-lucide="arrow-left"></i> Back</button>
+      <button class="btn-sm" onclick="saveClient(${isEdit ? idx : -1})"><i data-lucide="check"></i> ${isEdit ? 'Update' : 'Save'}</button></div>`;
     const salOpts = SALUTATIONS.map(s => `<option value="${s}"${c.salutation === s ? ' selected' : ''}>${s}</option>`).join('');
     const isBiz = (c.customerType || 'business') === 'business';
-    wrap.innerHTML = `<div class="modal acm-modal" onclick="event.stopPropagation()">
-    <div class="modal-t">${isEdit ? 'Edit' : 'Add'} client</div>
-    <div class="modal-d">Complete client details for proposals and invoices</div>
-    <div class="acm-body">
-      <div class="acm-type-toggle">
-        <button class="filter-tab${isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=business]').checked=true;document.getElementById('acCompanyRow').style.display=''">Business</button>
-        <button class="filter-tab${!isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=individual]').checked=true;document.getElementById('acCompanyRow').style.display='none'">Individual</button>
-        <input type="radio" name="acType" value="business" ${isBiz ? 'checked' : ''} style="display:none">
-        <input type="radio" name="acType" value="individual" ${!isBiz ? 'checked' : ''} style="display:none">
+    body.innerHTML = `<div class="acm-container">
+      <div class="card card-p acm-card">
+        <div class="set-head"><div class="set-head-icon" style="background:#007AFF18;color:#007AFF"><i data-lucide="user-plus"></i></div><div><div class="set-head-t">${isEdit ? 'Edit' : 'New'} client</div><div class="set-head-d">Complete client details for proposals and invoices</div></div></div>
+        <div class="acm-type-toggle">
+          <button class="filter-tab${isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=business]').checked=true;document.getElementById('acCompanyRow').style.display=''">Business</button>
+          <button class="filter-tab${!isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=individual]').checked=true;document.getElementById('acCompanyRow').style.display='none'">Individual</button>
+          <input type="radio" name="acType" value="business" ${isBiz ? 'checked' : ''} style="display:none">
+          <input type="radio" name="acType" value="individual" ${!isBiz ? 'checked' : ''} style="display:none">
+        </div>
       </div>
-      <div class="acm-divider"></div>
-      <div class="acm-section-label">Contact details</div>
-      <div class="fg"><label class="fl">Primary contact</label>
-        <div style="display:flex;gap:8px"><select id="acSalutation" style="width:80px;flex-shrink:0">${salOpts}<option value="">None</option></select>
-          <input type="text" id="acFirstName" value="${esc(c.firstName || '')}" placeholder="First name" style="flex:1">
-          <input type="text" id="acLastName" value="${esc(c.lastName || '')}" placeholder="Last name" style="flex:1"></div>
+      <div class="card card-p acm-card">
+        <div class="acm-section-label">Contact details</div>
+        <div class="fg"><label class="fl">Primary contact</label>
+          <div style="display:flex;gap:8px"><select id="acSalutation" style="width:80px;flex-shrink:0">${salOpts}<option value="">None</option></select>
+            <input type="text" id="acFirstName" value="${esc(c.firstName || '')}" placeholder="First name" style="flex:1">
+            <input type="text" id="acLastName" value="${esc(c.lastName || '')}" placeholder="Last name" style="flex:1"></div>
+        </div>
+        <div class="fg" id="acCompanyRow" style="${!isBiz ? 'display:none;' : ''}"><label class="fl">Company name</label><input type="text" id="acCompanyName" value="${esc(c.companyName || c.name || '')}"></div>
+        <div class="fg"><label class="fl">Display name</label><input type="text" id="acDisplayName" value="${esc(c.displayName || '')}" placeholder="Auto-generated if blank"></div>
       </div>
-      <div class="fg" id="acCompanyRow" style="${!isBiz ? 'display:none;' : ''}"><label class="fl">Company name</label><input type="text" id="acCompanyName" value="${esc(c.companyName || c.name || '')}"></div>
-      <div class="fg"><label class="fl">Display name</label><input type="text" id="acDisplayName" value="${esc(c.displayName || '')}" placeholder="Auto-generated if blank"></div>
-      <div class="acm-divider"></div>
-      <div class="acm-section-label">Communication</div>
-      <div class="fg"><label class="fl">Email address</label><input type="email" id="acEmail" value="${esc(c.email || '')}"></div>
-      <div class="fr"><div class="fg"><label class="fl">Work phone</label><input type="tel" id="acWorkPhone" value="${esc(c.workPhone || c.phone || '')}"></div>
-        <div class="fg"><label class="fl">Mobile</label><input type="tel" id="acMobile" value="${esc(c.mobile || '')}"></div></div>
-      <div class="fg"><label class="fl">Attention</label><input type="text" id="acAttention" value="${esc(c.attention || '')}" placeholder="e.g. Accounts Dept"></div>
-      <div class="acm-divider"></div>
-      <div class="acm-section-label">Billing address</div>
-      <div class="fg"><label class="fl">Country / Region</label><div id="acCountry"></div></div>
-      <div class="fg"><label class="fl">Address</label>
-        <input type="text" id="acStreet1" value="${esc(c.street1 || '')}" placeholder="Street 1" style="margin-bottom:8px">
-        <input type="text" id="acStreet2" value="${esc(c.street2 || '')}" placeholder="Street 2"></div>
-      <div class="fr"><div class="fg"><label class="fl">City</label><input type="text" id="acCity" value="${esc(c.city || '')}"></div>
-        <div class="fg"><label class="fl">State</label><div id="acState"></div></div></div>
-      <div class="fr"><div class="fg"><label class="fl">Pin code</label><input type="text" id="acPinCode" value="${esc(c.pinCode || '')}" maxlength="10"></div>
-        <div class="fg"><label class="fl">GST number</label><input type="text" id="acGst" value="${esc(c.gstNumber || '')}" maxlength="15" placeholder="e.g. 22AAAAA0000A1Z5"></div></div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-sm-outline" onclick="document.getElementById('clientModal').remove()">Cancel</button>
-      <button class="btn-sm" onclick="saveClient(${isEdit ? idx : -1})">${isEdit ? 'Update' : 'Add client'}</button>
-    </div></div>`;
-    document.body.appendChild(wrap);
-    requestAnimationFrame(() => wrap.classList.add('show'));
+      <div class="card card-p acm-card">
+        <div class="acm-section-label">Communication</div>
+        <div class="fg"><label class="fl">Email address</label><input type="email" id="acEmail" value="${esc(c.email || '')}"></div>
+        <div class="fr"><div class="fg"><label class="fl">Work phone</label><input type="tel" id="acWorkPhone" value="${esc(c.workPhone || c.phone || '')}"></div>
+          <div class="fg"><label class="fl">Mobile</label><input type="tel" id="acMobile" value="${esc(c.mobile || '')}"></div></div>
+        <div class="fg"><label class="fl">Attention</label><input type="text" id="acAttention" value="${esc(c.attention || '')}" placeholder="e.g. Accounts Dept"></div>
+      </div>
+      <div class="card card-p acm-card">
+        <div class="acm-section-label">Billing address</div>
+        <div class="fg"><label class="fl">Country / Region</label><div id="acCountry"></div></div>
+        <div class="fg"><label class="fl">Address</label>
+          <input type="text" id="acStreet1" value="${esc(c.street1 || '')}" placeholder="Street 1" style="margin-bottom:8px">
+          <input type="text" id="acStreet2" value="${esc(c.street2 || '')}" placeholder="Street 2"></div>
+        <div class="fr"><div class="fg"><label class="fl">City</label><input type="text" id="acCity" value="${esc(c.city || '')}"></div>
+          <div class="fg"><label class="fl">State</label><div id="acState"></div></div></div>
+        <div class="fr"><div class="fg"><label class="fl">Pin code</label><input type="text" id="acPinCode" value="${esc(c.pinCode || '')}" maxlength="10"></div>
+          <div class="fg"><label class="fl">GST number</label><input type="text" id="acGst" value="${esc(c.gstNumber || '')}" maxlength="15" placeholder="e.g. 22AAAAA0000A1Z5"></div></div>
+      </div>
+    </div>`;
+    lucide.createIcons();
     if (typeof csel === 'function') {
         csel(document.getElementById('acCountry'), {
             value: c.country || '', placeholder: 'Select country', searchable: true,
@@ -203,8 +204,7 @@ function saveClient(idx) {
     };
     if (idx >= 0) { c.id = CLIENTS[idx].id; CLIENTS[idx] = c; }
     else { c.id = uid(); CLIENTS.push(c); }
-    saveClients(); document.getElementById('clientModal')?.remove();
-    renderClients(); toast(idx >= 0 ? 'Client updated' : 'Client added');
+    saveClients(); renderClients(); toast(idx >= 0 ? 'Client updated' : 'Client added');
 }
 
 function editClient(i) { openAddClient(i); }

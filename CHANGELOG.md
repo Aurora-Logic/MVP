@@ -4,6 +4,28 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.14.1 (build 20260213) — 2026-02-13
+
+### Style
+- Client search input redesigned as pill (matches topbar search pattern with focus ring)
+- Settings tabs redesigned with inline icons, pill-shaped buttons, and active state border/shadow
+- Settings cards now have per-section accent gradients (blue, green, orange, purple, red) matching dashboard metric cards
+- Dark mode override for settings card gradients
+
+### Refactor
+- Add/edit client converted from modal overlay to full-page layout with sectioned cards
+- Add client page uses card-per-section pattern (contact, communication, billing) with icon header
+- Save/cancel actions moved to topbar (Back + Save buttons)
+
+### Files Changed
+- `assets/css/pages.css` — New `.set-tab` styles, `.set-card` accent gradient variants, `.cl-search-wrap` pill design, `.acm-container`/`.acm-card` full-page styles
+- `assets/css/responsive.css` — Added `.set-tab` 44px touch target for mobile
+- `assets/js/views/settings.js` — `SET_TABS` config array with icons, `.set-tab` buttons replace `.tab`, cards use `.set-card` + gradient classes
+- `assets/js/views/clients.js` — `openAddClient()` renders into bodyScroll as full page, `saveClient()` navigates back, search wrap uses topbar pill pattern
+- `assets/js/boot.js` — Version bump to 2.14.1, updated What's New items
+
+---
+
 ## v2.14.0 (build 20260213) — 2026-02-13
 
 ### Features

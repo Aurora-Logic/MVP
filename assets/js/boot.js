@@ -43,13 +43,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.14.0';
+const APP_VERSION = '2.14.1';
 const APP_BUILD = '20260213';
 const WHATS_NEW_ITEMS = [
-    { icon: 'sliders-horizontal', title: 'Settings Redesign', desc: 'Settings now uses horizontal tabs instead of sidebar scroll. Each section is its own focused page.' },
-    { icon: 'table', title: 'Client Table View', desc: 'Clients page rebuilt as a Notion-style table with metric strip, search, and inline actions.' },
-    { icon: 'bar-chart-3', title: 'Client Metrics', desc: 'New metric cards at the top of Clients showing total clients, total value, average, and win rate.' },
-    { icon: 'user-plus', title: 'Improved Add Client', desc: 'Add client modal now has organized sections (Contact, Communication, Billing) with a pill toggle for type.' }
+    { icon: 'sliders-horizontal', title: 'Settings Redesign', desc: 'Settings tabs now have icons and accent-gradient cards matching the dashboard polish.' },
+    { icon: 'search', title: 'Search Pill', desc: 'Client search input now uses the same pill design as the global topbar search.' },
+    { icon: 'user-plus', title: 'Full-page Add Client', desc: 'Add/edit client is now a full page with sectioned cards instead of a modal overlay.' },
+    { icon: 'palette', title: 'Card Gradients', desc: 'Settings cards now have per-section accent gradients (blue, green, orange, purple) matching dashboard.' }
 ];
 
 function checkWhatsNew() {

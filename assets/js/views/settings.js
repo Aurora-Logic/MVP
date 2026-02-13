@@ -23,6 +23,18 @@ function getCountryTaxHtml() {
 
 const _secHead = (icon, title, desc, color) => `<div class="set-head"><div class="set-head-icon" style="background:${color}18;color:${color}"><i data-lucide="${icon}"></i></div><div><div class="set-head-t">${title}</div><div class="set-head-d">${desc}</div></div></div>`;
 
+const SET_TABS = [
+    { key: 'account', label: 'Account', icon: 'user-circle', auth: true },
+    { key: 'profile', label: 'Profile', icon: 'building-2' },
+    { key: 'payments', label: 'Payments', icon: 'landmark' },
+    { key: 'email', label: 'Email', icon: 'mail' },
+    { key: 'team', label: 'Team', icon: 'users', fn: 'renderTeamSettings' },
+    { key: 'ai', label: 'AI', icon: 'sparkles', fn: 'renderAiSettingsCard' },
+    { key: 'branding', label: 'Branding', icon: 'palette' },
+    { key: 'signature', label: 'Signature', icon: 'pen-tool' },
+    { key: 'data', label: 'Data', icon: 'database' }
+];
+
 function buildAccountCard() {
     const user = sbSession?.user;
     if (!user) return '';
@@ -31,7 +43,7 @@ function buildAccountCard() {
     const since = user.created_at ? fmtDate(user.created_at) : '';
     const statusLabel = navigator.onLine ? (syncStatus === 'syncing' ? 'Syncing...' : 'Synced') : 'Offline';
     const statusIcon = navigator.onLine ? (syncStatus === 'syncing' ? 'refresh-cw' : 'check-circle') : 'wifi-off';
-    return `<div class="card card-p settings-card">
+    return `<div class="card card-p set-card set-card-blue">
         ${_secHead('user-circle', 'Account', 'Signed in as ' + esc(email), '#007AFF')}
         ${name ? `<div style="font-size:14px;color:var(--text3);margin-bottom:8px">${esc(name)}</div>` : ''}
         ${since ? `<div style="font-size:14px;color:var(--text4);margin-bottom:12px">Member since ${since}</div>` : ''}
@@ -44,9 +56,8 @@ function buildAccountCard() {
 }
 
 function scrollToSection(id) {
-    // Legacy compat — now triggers tab switch
     const key = id.replace('sec-', '');
-    const btn = document.querySelector(`.set-tabs .tab[data-key="${key}"]`);
+    const btn = document.querySelector(`.set-tabs .set-tab[data-key="${key}"]`);
     if (btn) setTab(btn, key);
 }
 
@@ -56,32 +67,31 @@ function renderSettings() {
     document.getElementById('topRight').innerHTML = '';
     const body = document.getElementById('bodyScroll');
     const loggedIn = typeof isLoggedIn === 'function' && isLoggedIn();
-    const tabs = [
-        ...(loggedIn ? [['account', 'Account']] : []),
-        ['profile', 'Profile'], ['payments', 'Payments'], ['email', 'Email'],
-        ...(typeof renderTeamSettings === 'function' ? [['team', 'Team']] : []),
-        ...(typeof renderAiSettingsCard === 'function' ? [['ai', 'AI']] : []),
-        ['branding', 'Branding'], ['signature', 'Signature'], ['data', 'Data']
-    ];
+    const tabs = SET_TABS.filter(t => {
+        if (t.auth && !loggedIn) return false;
+        if (t.fn && typeof window[t.fn] !== 'function') return false;
+        return true;
+    });
     const defaultTab = loggedIn ? 'account' : 'profile';
     body.innerHTML = `<div class="set-container">
-      <div class="tabs set-tabs" role="tablist">${tabs.map(([key, label]) =>
-        `<button class="tab${key === defaultTab ? ' on' : ''}" role="tab" data-key="${key}" onclick="setTab(this,'${key}')">${label}</button>`
+      <div class="set-tabs" role="tablist">${tabs.map(t =>
+        `<button class="set-tab${t.key === defaultTab ? ' on' : ''}" role="tab" data-key="${t.key}" onclick="setTab(this,'${t.key}')"><i data-lucide="${t.icon}"></i><span>${t.label}</span></button>`
       ).join('')}</div>
       <div id="setPanel"></div>
     </div>`;
+    lucide.createIcons();
     setTab(null, defaultTab);
 }
 
 function setTab(btn, key) {
-    if (btn) document.querySelectorAll('.set-tabs .tab').forEach(t => t.classList.remove('on'));
+    if (btn) document.querySelectorAll('.set-tabs .set-tab').forEach(t => t.classList.remove('on'));
     if (btn) btn.classList.add('on');
-    else document.querySelector(`.set-tabs .tab[data-key="${key}"]`)?.classList.add('on');
+    else document.querySelector(`.set-tabs .set-tab[data-key="${key}"]`)?.classList.add('on');
     const panel = document.getElementById('setPanel');
     const b = CONFIG?.bank || {};
     const panels = {
         account: () => buildAccountCard(),
-        profile: () => `<div class="card card-p settings-card">
+        profile: () => `<div class="card card-p set-card set-card-blue">
             ${_secHead('building-2', 'Profile', 'Your business info, auto-filled into every proposal', '#007AFF')}
             <div class="fg"><label class="fl">Company name</label><input type="text" id="setCo" value="${esc(CONFIG?.company)}" oninput="saveSettings()"></div>
             <div class="fr"><div class="fg"><label class="fl">Your name</label><input type="text" id="setName" value="${esc(CONFIG?.name)}" oninput="saveSettings()"></div>
@@ -92,7 +102,7 @@ function setTab(btn, key) {
             <div class="fg"><label class="fl">Website</label><input type="url" id="setWebsite" value="${esc(CONFIG?.website)}" oninput="saveSettings()"></div>
             <div id="setTaxFields">${getCountryTaxHtml()}</div>
           </div>`,
-        payments: () => `<div class="card card-p settings-card">
+        payments: () => `<div class="card card-p set-card set-card-green">
             ${_secHead('landmark', 'Payments', 'Bank details shown on proposals and invoices', '#34C759')}
             <div class="fr"><div class="fg"><label class="fl">Bank name</label><input type="text" id="setBankName" value="${esc(b.name)}" oninput="saveSettings()"></div>
               <div class="fg"><label class="fl">Account holder</label><input type="text" id="setBankHolder" value="${esc(b.holder)}" oninput="saveSettings()"></div></div>
@@ -101,14 +111,14 @@ function setTab(btn, key) {
               <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="setBankSwift" value="${esc(b.swift)}" oninput="saveSettings()"></div></div>
             ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="setBankUpi" value="${esc(b.upi || '')}" placeholder="e.g. business@upi" oninput="saveSettings()"><div class="fh">Shown as QR code on PDFs (India only)</div></div>` : ''}
           </div>`,
-        email: () => `<div class="card card-p settings-card">
+        email: () => `<div class="card card-p set-card set-card-orange">
             ${_secHead('mail', 'Email templates', 'Quick emails for sending proposals to clients', '#FF9500')}
             <button class="btn-sm-outline" onclick="addEmailTemplate()" style="margin-bottom:12px"><i data-lucide="plus"></i> Add template</button>
             <div id="emailTplList"></div>
           </div>`,
         team: () => typeof renderTeamSettings === 'function' ? renderTeamSettings() : '',
         ai: () => typeof renderAiSettingsCard === 'function' ? renderAiSettingsCard() : '',
-        branding: () => `<div class="card card-p settings-card">
+        branding: () => `<div class="card card-p set-card set-card-purple">
             ${_secHead('palette', 'Branding', 'Logo, colors, and fonts for your proposals', '#AF52DE')}
             <div class="fg"><label class="fl">Logo</label>
               <div class="brand-logo-box" onclick="document.getElementById('setLogoInput').click()" id="setLogoBox">${CONFIG?.logo ? '<img src="' + esc(CONFIG.logo) + '" alt="Company logo">' : '<i data-lucide="image-plus"></i>'}</div>
@@ -120,11 +130,11 @@ function setTab(btn, key) {
               <label class="toggle-row"><input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()"><span class="toggle-label">Remove ProposalKit branding</span></label>
               <div class="fh">Replaces ProposalKit name with your company name everywhere</div></div>
           </div>`,
-        signature: () => `<div class="card card-p settings-card">
+        signature: () => `<div class="card card-p set-card">
             ${_secHead('pen-tool', 'Signature', 'Draw your signature to include in proposals', '#18181b')}
             <div class="sig-wrap" id="sigWrap"><div id="sigDisplay"></div></div>
           </div>`,
-        data: () => `<div class="card card-p settings-card settings-card-danger">
+        data: () => `<div class="card card-p set-card set-card-danger">
             ${_secHead('database', 'Data management', 'Export, import, or clear your local data', '#FF3B30')}
             <div class="fg"><label class="fl">Webhook URL</label>
               <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
@@ -137,7 +147,6 @@ function setTab(btn, key) {
           </div>`
     };
     panel.innerHTML = (panels[key] || panels.profile)();
-    // Init per-tab widgets
     if (key === 'profile') {
         csel(document.getElementById('setCountry'), {
             value: CONFIG?.country || '', placeholder: 'Select country', searchable: true,
