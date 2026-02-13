@@ -102,7 +102,8 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .feat{background:#fff;border:1px solid #e5e5e5;border-radius:20px;padding:24px 22px;min-width:280px;max-width:280px;flex-shrink:0;transition:all .2s ease-out;position:relative}
 .feat:hover{box-shadow:0 4px 16px rgba(0,0,0,.05);border-color:#d4d4d4;transform:translateY(-2px)}
 .feat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;backdrop-filter:blur(6px)}
-.feat-t{font-size:16px;font-weight:500;color:#000;margin-bottom:5px.feat-d{font-size:13px;color:#525252;line-height:1.5}
+.feat-t{font-size:16px;font-weight:500;color:#000;margin-bottom:5px}
+.feat-d{font-size:13px;color:#525252;line-height:1.5}
 
 /* ── Section glow tops ── */
 .glow-blue{background:radial-gradient(50% 60% at 50% 0%,rgba(0,151,254,.07) 0%,#fff 100%)}
@@ -152,9 +153,11 @@ button{font:inherit;cursor:pointer;border:none;background:none}
 .price-card.featured{border-color:rgba(0,151,254,.4);background:linear-gradient(180deg,rgba(0,151,254,.04) 0%,#fff 50%)}
 .price-card.featured:hover{box-shadow:0 8px 24px rgba(0,151,254,.1);border-color:rgba(0,151,254,.5)}
 .price-badge{display:inline-flex;align-items:center;gap:4px;font-size: 14px;font-weight:600;color:#0097fe;background:rgba(0,151,254,.1);padding:5px 12px;border-radius:8px;margin-bottom:14px;width:fit-content}
-.price-name{font-size:20px;font-weight:600;margin-bottom:4px.price-desc{font-size:14px;color:#737373;margin-bottom:20px;line-height:1.5}
+.price-name{font-size:20px;font-weight:600;margin-bottom:4px}
+.price-desc{font-size:14px;color:#737373;margin-bottom:20px;line-height:1.5}
 .price-amt{font-size:40px;font-weight:800;color:#000;margin-bottom:4px}
-.price-amt .period{font-size:14px;font-weight:400;color:#a3a3a3.price-amt .cur{font-size:16px;font-weight:700;vertical-align:super;margin-right:1px}
+.price-amt .period{font-size:14px;font-weight:400;color:#a3a3a3}
+.price-amt .cur{font-size:16px;font-weight:700;vertical-align:super;margin-right:1px}
 .price-free{font-size:40px;font-weight:800;color:#000;margin-bottom:4px}
 .price-feats{list-style:none;margin:20px 0;display:flex;flex-direction:column;gap:10px;flex:1}
 .price-feats li{font-size:14px;color:#525252;display:flex;align-items:flex-start;gap:10px;line-height:1.5}
