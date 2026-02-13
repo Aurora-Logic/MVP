@@ -137,6 +137,9 @@ const MAX_UNDO = 20;
 
 /** @returns {boolean} true if saved successfully */
 function persist() {
+    // QUOTA MONITORING FIX: Check storage usage before save
+    if (typeof checkStorageQuota === 'function') checkStorageQuota();
+
     try {
         localStorage.setItem('pk_db', JSON.stringify(DB));
         if (typeof syncAfterPersist === 'function') syncAfterPersist();
@@ -161,6 +164,37 @@ function persist() {
         }
         console.error('localStorage error:', e);
         return false;
+    }
+}
+
+// QUOTA MONITORING FIX: Check localStorage usage and warn user
+function checkStorageQuota() {
+    try {
+        let total = 0;
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key)) {
+                total += localStorage[key].length + key.length;
+            }
+        }
+        const totalKB = total / 1024;
+        const totalMB = totalKB / 1024;
+        const quotaMB = 10; // Typical localStorage quota
+        const usagePercent = (totalMB / quotaMB) * 100;
+
+        // Warn at 80% usage
+        if (usagePercent >= 80 && !sessionStorage.getItem('pk_quota_warned')) {
+            sessionStorage.setItem('pk_quota_warned', '1');
+            const msg = `Storage ${Math.round(usagePercent)}% full (${totalMB.toFixed(1)}MB / ${quotaMB}MB). Consider archiving old proposals.`;
+            if (typeof toast === 'function') toast(msg, 'warning');
+            console.warn('[Storage]', msg);
+        }
+
+        // Log usage for debugging
+        if (usagePercent >= 50) {
+            console.log('[Storage] Usage:', Math.round(usagePercent) + '%', '(' + totalMB.toFixed(2) + 'MB)');
+        }
+    } catch (e) {
+        console.warn('[Storage] Quota check failed:', e);
     }
 }
 

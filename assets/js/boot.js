@@ -137,6 +137,25 @@ function initApp() {
 function bootApp() {
     console.log('[Boot] Starting app initialization...');
     try {
+        // SECURITY FIX: Enforce plan limits and monitor storage
+        if (typeof enforceFreePlanLimits === 'function') enforceFreePlanLimits();
+        if (typeof checkStorageQuota === 'function') checkStorageQuota();
+
+        // PLAN GATING: Check offline access for free users
+        if (typeof getCurrentPlan === 'function' && typeof PLAN_LIMITS !== 'undefined') {
+            const plan = getCurrentPlan();
+            const hasOffline = PLAN_LIMITS[plan]?.offlineAccess || false;
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CHECK_PLAN',
+                    hasOffline: hasOffline
+                });
+                if (!hasOffline) {
+                    console.log('[Boot] Free plan: SW will be unregistered for offline gating');
+                }
+            }
+        }
+
         initSidebarState();
         if (typeof initTeam === 'function') initTeam();
         refreshSide();
