@@ -4,6 +4,17 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.15.3 (build 20260213) — 2026-02-13
+
+### Fix
+- Add spacing between toolbar and table/card content (gap: 16px on container)
+
+### Files Changed
+- `pages.css` — `.cl-container` gap changed from 0 to 16px
+- `boot.js` — version bump to 2.15.3
+
+---
+
 ## v2.15.2 (build 20260213) — 2026-02-13
 
 ### Style
