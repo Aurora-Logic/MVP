@@ -510,5 +510,18 @@ async function doLogout() {
     });
     console.log('[Security] All sensitive data cleared on logout');
 
+    // MULTI-TAB SYNC FIX: Notify other tabs of logout
+    localStorage.setItem('pk_logout_signal', Date.now().toString());
+    localStorage.removeItem('pk_logout_signal'); // Trigger storage event
+
     // onAuthStateChange SIGNED_OUT will call renderAuthScreen()
 }
+
+// MULTI-TAB SYNC FIX: Listen for logout in other tabs
+window.addEventListener('storage', (e) => {
+    if (e.key === 'pk_logout_signal' && e.newValue) {
+        console.log('[Security] Logout detected in another tab');
+        // Force reload to clear all state and show auth screen
+        window.location.href = window.location.origin;
+    }
+});

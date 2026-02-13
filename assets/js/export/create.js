@@ -75,8 +75,18 @@ function doDupWithClient(id, clientIdx) {
 }
 
 function delProp(id) {
+    const p = DB.find(x => x.id === id);
+    if (!p) return;
+
+    // DATA INTEGRITY FIX: Create backup before deletion
+    const backupKey = 'pk_deleted_backup';
+    const backup = safeGetStorage(backupKey, []);
+    backup.unshift({ proposal: JSON.parse(JSON.stringify(p)), deletedAt: Date.now() });
+    if (backup.length > 10) backup.splice(10); // Keep last 10 deletions
+    safeLsSet(backupKey, backup);
+
     confirmDialog('Delete this proposal? This cannot be undone.', () => {
-        DB = DB.filter(p => p.id !== id); persist();
+        DB = DB.filter(x => x.id !== id); persist();
         if (CUR === id) CUR = null;
         renderDashboard();
         refreshSide();

@@ -42,6 +42,8 @@ function pushUndo() {
 }
 
 let _viewerWarned = false;
+let _saveQueue = Promise.resolve(); // RACE CONDITION FIX: Sequential save queue
+
 /** Debounced autosave — collects all editor data and persists to localStorage */
 function dirty() {
     if (typeof canEdit === 'function' && !canEdit()) { if (!_viewerWarned) { toast('Viewers cannot edit proposals', 'warning'); _viewerWarned = true; setTimeout(() => { _viewerWarned = false; }, 5000); } return; }

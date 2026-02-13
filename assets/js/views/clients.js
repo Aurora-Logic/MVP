@@ -283,6 +283,14 @@ function delClient(i) {
     const linkedProposals = DB.filter(p => matchClient(p, c));
     const propCount = linkedProposals.length;
     const msg = propCount > 0 ? `Delete ${clientName}? ${propCount} proposal(s) reference this customer. References will be unlinked.` : `Delete ${clientName}?`;
+
+    // DATA INTEGRITY FIX: Create backup before deletion
+    const backupKey = 'pk_deleted_clients';
+    const backup = safeGetStorage(backupKey, []);
+    backup.unshift({ client: JSON.parse(JSON.stringify(c)), deletedAt: Date.now() });
+    if (backup.length > 10) backup.splice(10); // Keep last 10 deletions
+    safeLsSet(backupKey, backup);
+
     confirmDialog(msg, () => {
         // DATA INTEGRITY FIX: Clean up orphaned references
         linkedProposals.forEach(p => {
