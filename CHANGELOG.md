@@ -4,6 +4,27 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.14.2 (build 20260213) — 2026-02-13
+
+### Style
+- Settings page redesigned as Notion-style sidebar + content panel (grouped nav: Account, Workspace, Admin)
+- Clients renamed to Customers throughout (sidebar, nav titles, page heading, breadcrumb)
+- Customer management page gets filter tabs (All/Business/Individual) matching Proposals page pattern
+- Add Customer button moved to toolbar right (alongside search pill)
+- Add Customer modal uses onboarding/auth-style layout (centered heading, full-width submit, cancel link)
+- Settings sidebar nav hidden on mobile (<768px), content goes full-width
+
+### Files Changed
+- `assets/js/views/settings.js` — Notion-style `renderSettings()` with `.sn-nav` sidebar, grouped nav items, `setTab()` renders into `.set-content` panel
+- `assets/js/views/clients.js` — Renamed to Customers, added `_clientFilter`/`setClientFilter()`, filter tabs, toolbar right layout, auth-style modal
+- `assets/js/views/nav.js` — Updated titles map: `clients: 'Customers'`
+- `assets/css/pages.css` — New `.set-layout`/`.sn-nav`/`.sn-group`/`.sn-item`/`.set-content` styles, `.cl-toolbar-right`, `.acm-modal` auth-style
+- `assets/css/responsive.css` — `.sn-nav` hidden on mobile, `.set-content` full-width, `.cl-toolbar-right` responsive
+- `index.html` — Sidebar label changed from "Clients" to "Customers"
+- `assets/js/boot.js` — Version bump to 2.14.2, updated What's New items
+
+---
+
 ## v2.14.1 (build 20260213) — 2026-02-13
 
 ### Style

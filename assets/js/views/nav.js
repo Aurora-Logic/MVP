@@ -27,7 +27,7 @@ function destroyAllEditors() {
 
 function goNav(view) {
     closeMobileSidebar();
-    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', clients: 'Clients', analytics: 'Analytics', settings: 'Settings', profile: 'My Profile' };
+    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', clients: 'Customers', analytics: 'Analytics', settings: 'Settings', profile: 'My Profile' };
     const an = typeof appName === 'function' ? appName() : 'ProposalKit';
     document.title = (titles[view] || an) + ' \u2014 ' + an;
     const topSearch = document.getElementById('topSearch');

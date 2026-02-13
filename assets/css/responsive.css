@@ -191,8 +191,10 @@
   .pg-nav { padding: 0 8px; min-width: 34px; }
   .pg-wrap { gap: 4px; padding: 12px 8px; }
 
-  /* Settings — tab bar scrolls on mobile */
-  .set-container { max-width: 100%; }
+  /* Settings — sidebar hidden on mobile, content full width */
+  .sn-nav { display: none; }
+  .set-layout { min-height: auto; }
+  .set-content { padding-left: 0 !important; max-width: 100%; }
 
   /* Filter tabs horizontal scroll */
   .filter-tabs {
@@ -238,8 +240,13 @@
     align-items: stretch;
   }
 
+  .cl-toolbar-right {
+    width: 100%;
+  }
+
   .cl-search-wrap {
     max-width: 100%;
+    flex: 1;
   }
 
   .cl-th-email,
@@ -348,7 +355,7 @@
   .side-user-menu-item { min-height: 44px; }
   .ri { min-height: 40px; }
   .tab { min-height: 44px; padding: 8px 16px; }
-  .set-tab { min-height: 44px; padding: 8px 14px; }
+  .sn-item { min-height: 44px; }
   .btn-sm, .btn-sm-outline, .btn-sm-ghost, .btn-sm-icon-ghost, .btn-sm-destructive { min-height: 44px; }
   .ctx-item { min-height: 44px; }
   .csel-opt { min-height: 44px; }

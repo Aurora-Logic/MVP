@@ -1399,13 +1399,33 @@
   border: none;
 }
 
-.nt-th-check { width: 40px; }
-.nt-th-title { width: auto; }
-.nt-th-client { width: 160px; }
-.nt-th-status { width: 110px; }
-.nt-th-value { width: 120px; }
-.nt-th-date { width: 140px; }
-.nt-th-actions { width: 100px; }
+.nt-th-check {
+  width: 40px;
+}
+
+.nt-th-title {
+  width: auto;
+}
+
+.nt-th-client {
+  width: 160px;
+}
+
+.nt-th-status {
+  width: 110px;
+}
+
+.nt-th-value {
+  width: 120px;
+}
+
+.nt-th-date {
+  width: 140px;
+}
+
+.nt-th-actions {
+  width: 100px;
+}
 
 .nt-row {
   border-bottom: 1px solid var(--border);
@@ -2631,7 +2651,7 @@
 }
 
 .cl-metric-grid {
-  display: grid;
+  display: none;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
@@ -2716,6 +2736,12 @@
   box-shadow: none !important;
 }
 
+.cl-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .cl-count {
   font-size: 14px;
   color: var(--muted-foreground);
@@ -2786,34 +2812,21 @@
   color: var(--text3);
 }
 
-/* ════════ ADD/EDIT CLIENT — Full Page ════════ */
+/* ════════ ADD/EDIT CUSTOMER — Onboarding-style modal ════════ */
 
-.acm-container {
-  max-width: 640px;
+.acm-modal {
+  max-width: 520px;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  padding: 32px !important;
 }
 
-.acm-card {
-  padding: 24px !important;
-  border-radius: 12px;
-}
-
-.acm-card .fg {
-  margin-bottom: 16px;
-}
-
-.acm-card .fg:last-child {
-  margin-bottom: 0;
-}
-
-.acm-card .fr {
-  margin-bottom: 16px;
-}
-
-.acm-card .fr:last-child {
-  margin-bottom: 0;
+.acm-body {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 4px;
+  margin-right: -4px;
 }
 
 .acm-section-label {
@@ -2822,9 +2835,13 @@
   color: var(--muted-foreground);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.acm-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
 }
 
 .acm-type-toggle {
@@ -2839,119 +2856,117 @@
   padding: 6px 16px;
 }
 
-/* ════════ SETTINGS — Tab-based layout ════════ */
+/* ════════ SETTINGS — Notion-style sidebar layout ════════ */
 
-.set-container {
-  max-width: 640px;
+.set-layout {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  gap: 0;
+  min-height: calc(100vh - 48px);
 }
 
-.set-tabs {
-  display: flex;
-  gap: 4px;
+/* Settings sidebar nav */
+.sn-nav {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 4px 16px 24px 0;
+  border-right: 1px solid var(--border);
   position: sticky;
   top: 0;
-  z-index: 10;
-  background: var(--background);
-  padding: 4px 0 8px;
-  overflow-x: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  height: fit-content;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
 }
 
-.set-tabs::-webkit-scrollbar {
-  display: none;
+.sn-group {
+  margin-bottom: 16px;
 }
 
-.set-tab {
-  display: inline-flex;
+.sn-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 10px 4px;
+}
+
+.sn-item {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
   font-size: 14px;
-  font-weight: 500;
-  color: var(--muted-foreground);
+  font-weight: 400;
+  color: var(--text3);
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--r-pill);
+  border: none;
+  border-radius: var(--r);
   cursor: pointer;
-  white-space: nowrap;
   transition: all var(--t);
+  text-align: left;
 }
 
-.set-tab svg {
-  width: 15px;
-  height: 15px;
+.sn-item svg {
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
+  opacity: 0.6;
 }
 
-.set-tab:hover {
-  color: var(--foreground);
+.sn-item:hover {
+  color: var(--text);
   background: var(--muted);
 }
 
-.set-tab.on {
-  color: var(--foreground);
-  background: var(--card);
-  border-color: var(--border);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+.sn-item.on {
+  color: var(--text);
+  background: var(--muted);
+  font-weight: 500;
+}
+
+.sn-item.on svg {
+  opacity: 1;
+}
+
+/* Settings content panel */
+.set-content {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0 24px 40px;
+  max-width: 560px;
+}
+
+.set-content .fg {
+  margin-bottom: 16px;
+}
+
+.set-content .fg:last-child {
+  margin-bottom: 0;
+}
+
+.set-content .fr {
+  margin-bottom: 16px;
+}
+
+.set-content .fr:last-child {
+  margin-bottom: 0;
+}
+
+.set-section-title {
+  font-size: 16px;
   font-weight: 600;
-}
-
-/* Settings cards — accent gradient per section */
-.set-card {
-  padding: 24px !important;
-  border-radius: 12px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.set-card-blue {
-  background: linear-gradient(to top, color-mix(in srgb, var(--blue) 4%, transparent), var(--card));
-}
-
-.set-card-green {
-  background: linear-gradient(to top, color-mix(in srgb, var(--green) 4%, transparent), var(--card));
-}
-
-.set-card-orange {
-  background: linear-gradient(to top, color-mix(in srgb, var(--amber) 4%, transparent), var(--card));
-}
-
-.set-card-purple {
-  background: linear-gradient(to top, color-mix(in srgb, var(--purple) 4%, transparent), var(--card));
-}
-
-.set-card-danger {
-  border-color: color-mix(in srgb, var(--red) 20%, var(--border));
-  background: linear-gradient(to top, color-mix(in srgb, var(--red) 4%, transparent), var(--card));
-}
-
-.dark .set-card-blue,
-.dark .set-card-green,
-.dark .set-card-orange,
-.dark .set-card-purple {
-  background: var(--card);
-}
-
-.set-card .fg {
+  color: var(--text);
   margin-bottom: 16px;
 }
 
-.set-card .fg:last-child {
-  margin-bottom: 0;
+.set-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
 }
 
-.set-card .fr {
-  margin-bottom: 16px;
-}
-
-.set-card .fr:last-child {
-  margin-bottom: 0;
-}
-
-/* Settings v3 — icon-adorned card headers */
+/* Keep set-head for Add Customer page card headers */
 .set-head {
   display: flex;
   align-items: flex-start;
@@ -2987,14 +3002,6 @@
   color: var(--text4);
   margin-top: 2px;
 }
-
-.set-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 16px 0;
-}
-
-/* Danger zone — removed (settings now tab-based, no divider needed) */
 
 /* Larger color swatches in settings v2 */
 .settings-section .color-swatch {
@@ -3427,13 +3434,29 @@
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-.ci-mc-total { background: linear-gradient(to top, color-mix(in srgb, var(--primary) 3%, transparent), var(--card)); }
-.ci-mc-accepted { background: linear-gradient(to top, color-mix(in srgb, var(--green) 3%, transparent), var(--card)); }
-.ci-mc-declined { background: linear-gradient(to top, color-mix(in srgb, var(--red) 3%, transparent), var(--card)); }
-.ci-mc-value { background: linear-gradient(to top, color-mix(in srgb, var(--blue) 3%, transparent), var(--card)); }
-.ci-mc-response { background: linear-gradient(to top, color-mix(in srgb, var(--amber) 3%, transparent), var(--card)); }
+.ci-mc-total {
+  background: linear-gradient(to top, color-mix(in srgb, var(--primary) 3%, transparent), var(--card));
+}
 
-.dark .ci-mc { background: var(--card); }
+.ci-mc-accepted {
+  background: linear-gradient(to top, color-mix(in srgb, var(--green) 3%, transparent), var(--card));
+}
+
+.ci-mc-declined {
+  background: linear-gradient(to top, color-mix(in srgb, var(--red) 3%, transparent), var(--card));
+}
+
+.ci-mc-value {
+  background: linear-gradient(to top, color-mix(in srgb, var(--blue) 3%, transparent), var(--card));
+}
+
+.ci-mc-response {
+  background: linear-gradient(to top, color-mix(in srgb, var(--amber) 3%, transparent), var(--card));
+}
+
+.dark .ci-mc {
+  background: var(--card);
+}
 
 .ci-mc-label {
   font-size: 14px;
@@ -3901,7 +3924,7 @@
   padding: 8px 0;
 }
 
-.an-hbar-row + .an-hbar-row {
+.an-hbar-row+.an-hbar-row {
   border-top: 1px solid var(--border);
 }
 

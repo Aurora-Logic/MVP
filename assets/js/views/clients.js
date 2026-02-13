@@ -1,8 +1,8 @@
 // ════════════════════════════════════════
-// CLIENT DATABASE
+// CUSTOMER DATABASE
 // ════════════════════════════════════════
 
-/* exported INDIAN_STATES, SALUTATIONS, matchClient, openAddClient, initStateDropdown, saveClient, editClient, delClient, showClientPicker, pickClient, showClientInsight, buildClientHistory, createProposalForClient, filterClients */
+/* exported INDIAN_STATES, SALUTATIONS, matchClient, openAddClient, initStateDropdown, saveClient, editClient, delClient, showClientPicker, pickClient, showClientInsight, buildClientHistory, createProposalForClient, filterClients, setClientFilter */
 
 const INDIAN_STATES = [
     { value: 'AN', label: 'Andaman & Nicobar' }, { value: 'AP', label: 'Andhra Pradesh' }, { value: 'AR', label: 'Arunachal Pradesh' },
@@ -17,32 +17,35 @@ const INDIAN_STATES = [
     { value: 'UK', label: 'Uttarakhand' }, { value: 'WB', label: 'West Bengal' }
 ];
 const SALUTATIONS = ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.'];
+let _clientFilter = 'all';
 
 function renderClients() {
     CUR = null;
-    document.getElementById('topTitle').textContent = 'Clients';
-    document.getElementById('topRight').innerHTML = '<button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add client</button>';
+    document.getElementById('topTitle').textContent = 'Customers';
+    document.getElementById('topRight').innerHTML = '';
     const body = document.getElementById('bodyScroll');
     if (!CLIENTS.length) {
         body.innerHTML = `<div class="empty" style="padding:60px 20px">
             <dotlottie-wc src="https://assets-v2.lottiefiles.com/a/421db1cc-118a-11ee-aed5-fb6b0052b9aa/1KyamM2lee.lottie" autoplay loop speed="0.8" style="width:200px;height:200px;margin:0 auto"></dotlottie-wc>
-            <div class="empty-t">Build your client database</div>
-            <div class="empty-d">Save client details once, reuse on every proposal. No more retyping names and emails.</div>
+            <div class="empty-t">Build your customer database</div>
+            <div class="empty-d">Save customer details once, reuse on every proposal. No more retyping names and emails.</div>
             <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
-                <button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add client</button>
+                <button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add customer</button>
             </div>
             <div style="display:flex;gap:24px;justify-content:center;margin-top:32px;color:var(--text4);font-size:14px">
                 <span><i data-lucide="zap" style="width:14px;height:14px;vertical-align:-2px"></i> Auto-fill proposals</span>
-                <span><i data-lucide="bar-chart-3" style="width:14px;height:14px;vertical-align:-2px"></i> Track per-client stats</span>
+                <span><i data-lucide="bar-chart-3" style="width:14px;height:14px;vertical-align:-2px"></i> Track per-customer stats</span>
                 <span><i data-lucide="repeat" style="width:14px;height:14px;vertical-align:-2px"></i> Reuse across proposals</span>
             </div>
         </div>`;
         lucide.createIcons(); return;
     }
-    // Compute metrics
-    let totalValue = 0, wonProps = 0, decidedProps = 0;
+    // Compute metrics + filter counts
+    let totalValue = 0, wonProps = 0, decidedProps = 0, bizCount = 0, indCount = 0;
     const cur = defaultCurrency();
     const clientData = CLIENTS.map((c, i) => {
+        const isBiz = (c.customerType || 'business') === 'business';
+        if (isBiz) bizCount++; else indCount++;
         const props = DB.filter(p => matchClient(p, c));
         let val = 0;
         props.forEach(p => {
@@ -54,12 +57,14 @@ function renderClients() {
         const last = props.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))[0];
         const displayName = c.displayName || c.companyName || ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || c.name || 'Unnamed';
         const ini = displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-        return { c, i, displayName, ini, props: props.length, val, last, email: c.email || '' };
+        return { c, i, displayName, ini, props: props.length, val, last, email: c.email || '', isBiz };
     });
     const avgValue = CLIENTS.length ? totalValue / CLIENTS.length : 0;
     const winRate = decidedProps > 0 ? Math.round(wonProps / decidedProps * 100) : 0;
 
-    const rows = clientData.map(d => `<tr class="nt-row" onclick="showClientInsight(${d.i})">
+    // Apply filter
+    const filtered = _clientFilter === 'all' ? clientData : _clientFilter === 'business' ? clientData.filter(d => d.isBiz) : clientData.filter(d => !d.isBiz);
+    const rows = filtered.map(d => `<tr class="nt-row" onclick="showClientInsight(${d.i})">
       <td class="nt-cell"><div class="cl-cell-name"><div class="cc-avi" style="background:var(--blue-bg);color:var(--blue)">${d.ini}</div><div><div class="cc-name">${esc(d.displayName)}</div><div class="cc-email">${esc(d.email)}</div></div></div></td>
       <td class="nt-cell cl-cell-email">${esc(d.email)}</td>
       <td class="nt-cell">${d.props}</td>
@@ -71,23 +76,30 @@ function renderClients() {
       </div></td>
     </tr>`).join('');
 
+    const ft = (key, label, count) => `<button class="filter-tab${_clientFilter === key ? ' on' : ''}${!count ? ' dimmed' : ''}" onclick="setClientFilter('${key}')">${label} <span class="fc">${count}</span></button>`;
+
     body.innerHTML = `<div class="cl-container">
       <div class="cl-metric-grid">
-        <div class="cl-metric-card"><div class="cl-metric-label">Total clients</div><div class="cl-metric-value">${CLIENTS.length}</div></div>
+        <div class="cl-metric-card"><div class="cl-metric-label">Total customers</div><div class="cl-metric-value">${CLIENTS.length}</div></div>
         <div class="cl-metric-card"><div class="cl-metric-label">Total value</div><div class="cl-metric-value">${fmtCur(totalValue, cur)}</div></div>
-        <div class="cl-metric-card"><div class="cl-metric-label">Avg per client</div><div class="cl-metric-value">${fmtCur(avgValue, cur)}</div></div>
+        <div class="cl-metric-card"><div class="cl-metric-label">Avg per customer</div><div class="cl-metric-value">${fmtCur(avgValue, cur)}</div></div>
         <div class="cl-metric-card"><div class="cl-metric-label">Win rate</div><div class="cl-metric-value">${winRate}%</div></div>
       </div>
       <div class="cl-toolbar">
-        <div class="cl-search-wrap"><i data-lucide="search"></i><input type="text" class="cl-search" id="clientSearch" placeholder="Search clients..." oninput="filterClients()"></div>
-        <span class="cl-count">${CLIENTS.length} client${CLIENTS.length !== 1 ? 's' : ''}</span>
+        <div class="prop-filters" role="tablist">${ft('all', 'All', CLIENTS.length)}${ft('business', 'Business', bizCount)}${ft('individual', 'Individual', indCount)}</div>
+        <div class="cl-toolbar-right">
+          <div class="cl-search-wrap"><i data-lucide="search"></i><input type="text" class="cl-search" id="clientSearch" placeholder="Search customers..." oninput="filterClients()"></div>
+          <button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add customer</button>
+        </div>
       </div>
       <div class="nt-wrap"><table class="nt-table"><thead><tr class="nt-head">
-        <th class="nt-th">Client</th><th class="nt-th cl-th-email">Email</th><th class="nt-th">Proposals</th><th class="nt-th nt-th-value">Value</th><th class="nt-th nt-th-date">Last active</th><th class="nt-th nt-th-actions"></th>
+        <th class="nt-th">Customer</th><th class="nt-th cl-th-email">Email</th><th class="nt-th">Proposals</th><th class="nt-th nt-th-value">Value</th><th class="nt-th nt-th-date">Last active</th><th class="nt-th nt-th-actions"></th>
       </tr></thead><tbody id="clientTable">${rows}</tbody></table></div>
     </div>`;
     lucide.createIcons();
 }
+
+function setClientFilter(f) { _clientFilter = f; renderClients(); }
 
 function filterClients() {
     const q = (document.getElementById('clientSearch')?.value || '').toLowerCase().trim();
@@ -104,25 +116,23 @@ function matchClient(p, c) {
 function openAddClient(idx) {
     const isEdit = idx !== undefined;
     const c = isEdit ? CLIENTS[idx] : {};
-    const clientName = isEdit ? (c.displayName || c.name || 'Edit client') : 'Add client';
-    const body = document.getElementById('bodyScroll');
-    document.getElementById('topTitle').textContent = clientName;
-    document.getElementById('topRight').innerHTML = `<div style="display:flex;gap:8px">
-      <button class="btn-sm-outline" onclick="renderClients()"><i data-lucide="arrow-left"></i> Back</button>
-      <button class="btn-sm" onclick="saveClient(${isEdit ? idx : -1})"><i data-lucide="check"></i> ${isEdit ? 'Update' : 'Save'}</button></div>`;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-wrap'; wrap.id = 'clientModal';
+    wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
     const salOpts = SALUTATIONS.map(s => `<option value="${s}"${c.salutation === s ? ' selected' : ''}>${s}</option>`).join('');
     const isBiz = (c.customerType || 'business') === 'business';
-    body.innerHTML = `<div class="acm-container">
-      <div class="card card-p acm-card">
-        <div class="set-head"><div class="set-head-icon" style="background:#007AFF18;color:#007AFF"><i data-lucide="user-plus"></i></div><div><div class="set-head-t">${isEdit ? 'Edit' : 'New'} client</div><div class="set-head-d">Complete client details for proposals and invoices</div></div></div>
-        <div class="acm-type-toggle">
+    wrap.innerHTML = `<div class="modal acm-modal" onclick="event.stopPropagation()">
+      <div class="auth-header" style="text-align:center;margin-bottom:20px">
+        <div class="auth-title">${isEdit ? 'Edit' : 'New'} customer</div>
+        <div class="auth-desc">Complete customer details for proposals and invoices</div>
+      </div>
+      <div class="acm-body">
+        <div class="acm-type-toggle" style="display:flex;justify-content:center;margin-bottom:16px">
           <button class="filter-tab${isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=business]').checked=true;document.getElementById('acCompanyRow').style.display=''">Business</button>
           <button class="filter-tab${!isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=individual]').checked=true;document.getElementById('acCompanyRow').style.display='none'">Individual</button>
           <input type="radio" name="acType" value="business" ${isBiz ? 'checked' : ''} style="display:none">
           <input type="radio" name="acType" value="individual" ${!isBiz ? 'checked' : ''} style="display:none">
         </div>
-      </div>
-      <div class="card card-p acm-card">
         <div class="acm-section-label">Contact details</div>
         <div class="fg"><label class="fl">Primary contact</label>
           <div style="display:flex;gap:8px"><select id="acSalutation" style="width:80px;flex-shrink:0">${salOpts}<option value="">None</option></select>
@@ -131,15 +141,13 @@ function openAddClient(idx) {
         </div>
         <div class="fg" id="acCompanyRow" style="${!isBiz ? 'display:none;' : ''}"><label class="fl">Company name</label><input type="text" id="acCompanyName" value="${esc(c.companyName || c.name || '')}"></div>
         <div class="fg"><label class="fl">Display name</label><input type="text" id="acDisplayName" value="${esc(c.displayName || '')}" placeholder="Auto-generated if blank"></div>
-      </div>
-      <div class="card card-p acm-card">
+        <div class="acm-divider"></div>
         <div class="acm-section-label">Communication</div>
         <div class="fg"><label class="fl">Email address</label><input type="email" id="acEmail" value="${esc(c.email || '')}"></div>
         <div class="fr"><div class="fg"><label class="fl">Work phone</label><input type="tel" id="acWorkPhone" value="${esc(c.workPhone || c.phone || '')}"></div>
           <div class="fg"><label class="fl">Mobile</label><input type="tel" id="acMobile" value="${esc(c.mobile || '')}"></div></div>
         <div class="fg"><label class="fl">Attention</label><input type="text" id="acAttention" value="${esc(c.attention || '')}" placeholder="e.g. Accounts Dept"></div>
-      </div>
-      <div class="card card-p acm-card">
+        <div class="acm-divider"></div>
         <div class="acm-section-label">Billing address</div>
         <div class="fg"><label class="fl">Country / Region</label><div id="acCountry"></div></div>
         <div class="fg"><label class="fl">Address</label>
@@ -150,8 +158,11 @@ function openAddClient(idx) {
         <div class="fr"><div class="fg"><label class="fl">Pin code</label><input type="text" id="acPinCode" value="${esc(c.pinCode || '')}" maxlength="10"></div>
           <div class="fg"><label class="fl">GST number</label><input type="text" id="acGst" value="${esc(c.gstNumber || '')}" maxlength="15" placeholder="e.g. 22AAAAA0000A1Z5"></div></div>
       </div>
+      <button class="btn auth-submit" style="width:100%;margin-top:16px" onclick="saveClient(${isEdit ? idx : -1})">${isEdit ? 'Update customer' : 'Add customer'}</button>
+      <div style="text-align:center;margin-top:8px"><a href="#" style="font-size:14px;color:var(--text3);text-decoration:underline" onclick="document.getElementById('clientModal').remove();return false">Cancel</a></div>
     </div>`;
-    lucide.createIcons();
+    document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
     if (typeof csel === 'function') {
         csel(document.getElementById('acCountry'), {
             value: c.country || '', placeholder: 'Select country', searchable: true,
@@ -160,6 +171,7 @@ function openAddClient(idx) {
         });
         initStateDropdown(c.country || '', c.state || '');
     }
+    lucide.createIcons();
 }
 
 function initStateDropdown(country, val) {
@@ -204,23 +216,24 @@ function saveClient(idx) {
     };
     if (idx >= 0) { c.id = CLIENTS[idx].id; CLIENTS[idx] = c; }
     else { c.id = uid(); CLIENTS.push(c); }
-    saveClients(); renderClients(); toast(idx >= 0 ? 'Client updated' : 'Client added');
+    saveClients(); document.getElementById('clientModal')?.remove();
+    renderClients(); toast(idx >= 0 ? 'Customer updated' : 'Customer added');
 }
 
 function editClient(i) { openAddClient(i); }
 
 function delClient(i) {
     const c = CLIENTS[i]; if (!c) return;
-    const clientName = c.displayName || c.name || 'this client';
+    const clientName = c.displayName || c.name || 'this customer';
     const propCount = DB.filter(p => matchClient(p, c)).length;
-    const msg = propCount > 0 ? `Delete ${clientName}? ${propCount} proposal(s) reference this client.` : `Delete ${clientName}?`;
+    const msg = propCount > 0 ? `Delete ${clientName}? ${propCount} proposal(s) reference this customer.` : `Delete ${clientName}?`;
     confirmDialog(msg, () => {
-        CLIENTS.splice(i, 1); saveClients(); renderClients(); toast('Client deleted');
-    }, { title: 'Delete client', confirmText: 'Delete' });
+        CLIENTS.splice(i, 1); saveClients(); renderClients(); toast('Customer deleted');
+    }, { title: 'Delete customer', confirmText: 'Delete' });
 }
 
 function showClientPicker() {
-    if (!CLIENTS.length) { toast('No saved clients. Add one in the Clients tab.'); return; }
+    if (!CLIENTS.length) { toast('No saved customers. Add one in the Customers tab.'); return; }
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap'; wrap.id = 'cpModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
@@ -228,7 +241,7 @@ function showClientPicker() {
         const name = c.displayName || c.name || '';
         return `<div class="cp-item" role="button" tabindex="0" onclick="pickClient(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><span class="cp-item-name">${esc(name)}</span><span class="cp-item-email">${esc(c.email || '')}</span></div>`;
     }).join('');
-    wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-t">Select client</div><div class="modal-d">Pick a saved client to auto-fill</div><div style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">${items}</div><div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('cpModal').remove()">Cancel</button></div></div>`;
+    wrap.innerHTML = `<div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-t">Select customer</div><div class="modal-d">Pick a saved customer to auto-fill</div><div style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">${items}</div><div class="modal-foot"><button class="btn-sm-outline" onclick="document.getElementById('cpModal').remove()">Cancel</button></div></div>`;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
 }
@@ -243,7 +256,7 @@ function pickClient(i) {
     document.getElementById('fCEm').value = c.email || '';
     document.getElementById('fCPh').value = c.workPhone || c.mobile || c.phone || '';
     document.getElementById('cpModal')?.remove();
-    dirty(); toast('Client filled');
+    dirty(); toast('Customer filled');
 }
 
 function showClientInsight(idx) {
@@ -296,7 +309,7 @@ function showClientInsight(idx) {
 }
 
 function buildClientHistory(props) {
-    if (!props.length) return '<div class="empty" style="padding:30px"><div class="empty-t">No proposals yet</div><div class="empty-d">Create a proposal for this client to see it here.</div></div>';
+    if (!props.length) return '<div class="empty" style="padding:30px"><div class="empty-t">No proposals yet</div><div class="empty-d">Create a proposal for this customer to see it here.</div></div>';
     const sorted = [...props].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     const rows = sorted.map(p => {
         const val = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);

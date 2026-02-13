@@ -43,13 +43,12 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.14.1';
+const APP_VERSION = '2.14.2';
 const APP_BUILD = '20260213';
 const WHATS_NEW_ITEMS = [
-    { icon: 'sliders-horizontal', title: 'Settings Redesign', desc: 'Settings tabs now have icons and accent-gradient cards matching the dashboard polish.' },
-    { icon: 'search', title: 'Search Pill', desc: 'Client search input now uses the same pill design as the global topbar search.' },
-    { icon: 'user-plus', title: 'Full-page Add Client', desc: 'Add/edit client is now a full page with sectioned cards instead of a modal overlay.' },
-    { icon: 'palette', title: 'Card Gradients', desc: 'Settings cards now have per-section accent gradients (blue, green, orange, purple) matching dashboard.' }
+    { icon: 'layout-list', title: 'Notion-style Settings', desc: 'Settings now uses a sidebar navigation with grouped categories, just like Notion.' },
+    { icon: 'users', title: 'Customers Rebrand', desc: 'Clients renamed to Customers with filter tabs and toolbar search.' },
+    { icon: 'user-plus', title: 'Add Customer Modal', desc: 'New customer form now uses a sleek onboarding-style modal with sectioned fields.' }
 ];
 
 function checkWhatsNew() {

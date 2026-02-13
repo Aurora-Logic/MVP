@@ -1,5 +1,5 @@
 // ════════════════════════════════════════
-// SETTINGS — Tab-based layout
+// SETTINGS — Notion-style sidebar layout
 // ════════════════════════════════════════
 
 /* exported exportData, importData, applyWhiteLabel, scrollToSection, setTab */
@@ -21,20 +21,6 @@ function getCountryTaxHtml() {
     return `<div class="fg"><label class="fl">Tax / Registration ID</label><input type="text" id="setTaxId" value="${esc(CONFIG?.taxId || '')}" oninput="saveSettings()"></div>`;
 }
 
-const _secHead = (icon, title, desc, color) => `<div class="set-head"><div class="set-head-icon" style="background:${color}18;color:${color}"><i data-lucide="${icon}"></i></div><div><div class="set-head-t">${title}</div><div class="set-head-d">${desc}</div></div></div>`;
-
-const SET_TABS = [
-    { key: 'account', label: 'Account', icon: 'user-circle', auth: true },
-    { key: 'profile', label: 'Profile', icon: 'building-2' },
-    { key: 'payments', label: 'Payments', icon: 'landmark' },
-    { key: 'email', label: 'Email', icon: 'mail' },
-    { key: 'team', label: 'Team', icon: 'users', fn: 'renderTeamSettings' },
-    { key: 'ai', label: 'AI', icon: 'sparkles', fn: 'renderAiSettingsCard' },
-    { key: 'branding', label: 'Branding', icon: 'palette' },
-    { key: 'signature', label: 'Signature', icon: 'pen-tool' },
-    { key: 'data', label: 'Data', icon: 'database' }
-];
-
 function buildAccountCard() {
     const user = sbSession?.user;
     if (!user) return '';
@@ -43,21 +29,20 @@ function buildAccountCard() {
     const since = user.created_at ? fmtDate(user.created_at) : '';
     const statusLabel = navigator.onLine ? (syncStatus === 'syncing' ? 'Syncing...' : 'Synced') : 'Offline';
     const statusIcon = navigator.onLine ? (syncStatus === 'syncing' ? 'refresh-cw' : 'check-circle') : 'wifi-off';
-    return `<div class="card card-p set-card set-card-blue">
-        ${_secHead('user-circle', 'Account', 'Signed in as ' + esc(email), '#007AFF')}
-        ${name ? `<div style="font-size:14px;color:var(--text3);margin-bottom:8px">${esc(name)}</div>` : ''}
+    return `<div class="set-section-title">Account</div>
+        ${name ? `<div style="font-size:14px;color:var(--text3);margin-bottom:4px">${esc(name)}</div>` : ''}
+        <div style="font-size:14px;color:var(--text4);margin-bottom:4px">${esc(email)}</div>
         ${since ? `<div style="font-size:14px;color:var(--text4);margin-bottom:12px">Member since ${since}</div>` : ''}
         <span class="acct-sync" style="display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--text3);margin-bottom:12px"><i data-lucide="${statusIcon}" style="width:14px;height:14px"></i> ${statusLabel}</span>
         <div class="sec-header-actions">
             <button class="btn-sm-outline" onclick="if(typeof pushToCloud==='function')pushToCloud().then(()=>toast('Data synced'))"><i data-lucide="refresh-cw"></i> Sync now</button>
             <button class="btn-sm-destructive" onclick="logoutApp()"><i data-lucide="log-out"></i> Sign out</button>
-        </div>
-    </div>`;
+        </div>`;
 }
 
 function scrollToSection(id) {
     const key = id.replace('sec-', '');
-    const btn = document.querySelector(`.set-tabs .set-tab[data-key="${key}"]`);
+    const btn = document.querySelector(`.sn-item[data-key="${key}"]`);
     if (btn) setTab(btn, key);
 }
 
@@ -67,32 +52,49 @@ function renderSettings() {
     document.getElementById('topRight').innerHTML = '';
     const body = document.getElementById('bodyScroll');
     const loggedIn = typeof isLoggedIn === 'function' && isLoggedIn();
-    const tabs = SET_TABS.filter(t => {
-        if (t.auth && !loggedIn) return false;
-        if (t.fn && typeof window[t.fn] !== 'function') return false;
-        return true;
-    });
+    const hasTeam = typeof renderTeamSettings === 'function';
+    const hasAi = typeof renderAiSettingsCard === 'function';
+
+    // Notion-style grouped nav
+    let navHtml = '';
+    if (loggedIn) navHtml += `<div class="sn-group"><div class="sn-group-label">Account</div>
+        <button class="sn-item on" data-key="account" onclick="setTab(this,'account')"><i data-lucide="user-circle"></i> ${esc(CONFIG?.name || 'My account')}</button>
+        <button class="sn-item" data-key="profile" onclick="setTab(this,'profile')"><i data-lucide="building-2"></i> Profile</button>
+        <button class="sn-item" data-key="payments" onclick="setTab(this,'payments')"><i data-lucide="landmark"></i> Payments</button></div>`;
+    else navHtml += `<div class="sn-group"><div class="sn-group-label">Account</div>
+        <button class="sn-item on" data-key="profile" onclick="setTab(this,'profile')"><i data-lucide="building-2"></i> Profile</button>
+        <button class="sn-item" data-key="payments" onclick="setTab(this,'payments')"><i data-lucide="landmark"></i> Payments</button></div>`;
+
+    navHtml += `<div class="sn-group"><div class="sn-group-label">Workspace</div>
+        <button class="sn-item" data-key="email" onclick="setTab(this,'email')"><i data-lucide="mail"></i> Email</button>
+        ${hasTeam ? '<button class="sn-item" data-key="team" onclick="setTab(this,\'team\')"><i data-lucide="users"></i> Team</button>' : ''}
+        ${hasAi ? '<button class="sn-item" data-key="ai" onclick="setTab(this,\'ai\')"><i data-lucide="sparkles"></i> AI</button>' : ''}
+        <button class="sn-item" data-key="branding" onclick="setTab(this,'branding')"><i data-lucide="palette"></i> Branding</button>
+        <button class="sn-item" data-key="signature" onclick="setTab(this,'signature')"><i data-lucide="pen-tool"></i> Signature</button></div>`;
+
+    navHtml += `<div class="sn-group"><div class="sn-group-label">Admin</div>
+        <button class="sn-item" data-key="data" onclick="setTab(this,'data')"><i data-lucide="database"></i> Data</button></div>`;
+
     const defaultTab = loggedIn ? 'account' : 'profile';
-    body.innerHTML = `<div class="set-container">
-      <div class="set-tabs" role="tablist">${tabs.map(t =>
-        `<button class="set-tab${t.key === defaultTab ? ' on' : ''}" role="tab" data-key="${t.key}" onclick="setTab(this,'${t.key}')"><i data-lucide="${t.icon}"></i><span>${t.label}</span></button>`
-      ).join('')}</div>
-      <div id="setPanel"></div>
+    body.innerHTML = `<div class="set-layout">
+      <nav class="sn-nav">${navHtml}</nav>
+      <div class="set-content" id="setPanel"></div>
     </div>`;
     lucide.createIcons();
     setTab(null, defaultTab);
 }
 
 function setTab(btn, key) {
-    if (btn) document.querySelectorAll('.set-tabs .set-tab').forEach(t => t.classList.remove('on'));
+    document.querySelectorAll('.sn-item').forEach(t => t.classList.remove('on'));
     if (btn) btn.classList.add('on');
-    else document.querySelector(`.set-tabs .set-tab[data-key="${key}"]`)?.classList.add('on');
+    else document.querySelector(`.sn-item[data-key="${key}"]`)?.classList.add('on');
     const panel = document.getElementById('setPanel');
     const b = CONFIG?.bank || {};
+    const sh = (t) => `<div class="set-section-title">${t}</div>`;
+    const sep = '<div class="set-sep"></div>';
     const panels = {
         account: () => buildAccountCard(),
-        profile: () => `<div class="card card-p set-card set-card-blue">
-            ${_secHead('building-2', 'Profile', 'Your business info, auto-filled into every proposal', '#007AFF')}
+        profile: () => `${sh('Profile')}
             <div class="fg"><label class="fl">Company name</label><input type="text" id="setCo" value="${esc(CONFIG?.company)}" oninput="saveSettings()"></div>
             <div class="fr"><div class="fg"><label class="fl">Your name</label><input type="text" id="setName" value="${esc(CONFIG?.name)}" oninput="saveSettings()"></div>
               <div class="fg"><label class="fl">Email</label><input type="email" id="setEmail" value="${esc(CONFIG?.email)}" oninput="saveSettings()"></div></div>
@@ -100,51 +102,38 @@ function setTab(btn, key) {
               <div class="fg"><label class="fl">Country</label><div id="setCountry"></div></div></div>
             <div class="fg"><label class="fl">Address</label><input type="text" id="setAddr" value="${esc(CONFIG?.address)}" oninput="saveSettings()"></div>
             <div class="fg"><label class="fl">Website</label><input type="url" id="setWebsite" value="${esc(CONFIG?.website)}" oninput="saveSettings()"></div>
-            <div id="setTaxFields">${getCountryTaxHtml()}</div>
-          </div>`,
-        payments: () => `<div class="card card-p set-card set-card-green">
-            ${_secHead('landmark', 'Payments', 'Bank details shown on proposals and invoices', '#34C759')}
+            ${sep}<div class="set-section-title">Tax information</div>
+            <div id="setTaxFields">${getCountryTaxHtml()}</div>`,
+        payments: () => `${sh('Payments')}
             <div class="fr"><div class="fg"><label class="fl">Bank name</label><input type="text" id="setBankName" value="${esc(b.name)}" oninput="saveSettings()"></div>
               <div class="fg"><label class="fl">Account holder</label><input type="text" id="setBankHolder" value="${esc(b.holder)}" oninput="saveSettings()"></div></div>
             <div class="fg"><label class="fl">Account number</label><input type="text" id="setBankAccount" value="${esc(b.account)}" oninput="saveSettings()"></div>
             <div class="fr"><div class="fg"><label class="fl">IFSC / Sort code</label><input type="text" id="setBankIfsc" value="${esc(b.ifsc)}" oninput="saveSettings()"></div>
               <div class="fg"><label class="fl">SWIFT / BIC</label><input type="text" id="setBankSwift" value="${esc(b.swift)}" oninput="saveSettings()"></div></div>
-            ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="setBankUpi" value="${esc(b.upi || '')}" placeholder="e.g. business@upi" oninput="saveSettings()"><div class="fh">Shown as QR code on PDFs (India only)</div></div>` : ''}
-          </div>`,
-        email: () => `<div class="card card-p set-card set-card-orange">
-            ${_secHead('mail', 'Email templates', 'Quick emails for sending proposals to clients', '#FF9500')}
-            <button class="btn-sm-outline" onclick="addEmailTemplate()" style="margin-bottom:12px"><i data-lucide="plus"></i> Add template</button>
-            <div id="emailTplList"></div>
-          </div>`,
+            ${CONFIG?.country === 'IN' ? `<div class="fg"><label class="fl">UPI ID</label><input type="text" id="setBankUpi" value="${esc(b.upi || '')}" placeholder="e.g. business@upi" oninput="saveSettings()"><div class="fh">Shown as QR code on PDFs (India only)</div></div>` : ''}`,
+        email: () => `${sh('Email templates')}<div style="margin-bottom:12px"><button class="btn-sm-outline" onclick="addEmailTemplate()"><i data-lucide="plus"></i> Add template</button></div><div id="emailTplList"></div>`,
         team: () => typeof renderTeamSettings === 'function' ? renderTeamSettings() : '',
         ai: () => typeof renderAiSettingsCard === 'function' ? renderAiSettingsCard() : '',
-        branding: () => `<div class="card card-p set-card set-card-purple">
-            ${_secHead('palette', 'Branding', 'Logo, colors, and fonts for your proposals', '#AF52DE')}
+        branding: () => `${sh('Branding')}
             <div class="fg"><label class="fl">Logo</label>
               <div class="brand-logo-box" onclick="document.getElementById('setLogoInput').click()" id="setLogoBox">${CONFIG?.logo ? '<img src="' + esc(CONFIG.logo) + '" alt="Company logo">' : '<i data-lucide="image-plus"></i>'}</div>
               <input type="file" id="setLogoInput" accept="image/*" style="display:none" onchange="handleLogo(this);saveSettings()"><div class="fh">PNG, JPG, or SVG</div></div>
-            <div class="fg"><div class="color-row" id="setColors"></div></div>
+            <div class="fg"><label class="fl">Accent color</label><div class="color-row" id="setColors"></div></div>
             <div class="fg"><label class="fl">Font family</label><div id="setFont"></div></div>
-            <div class="set-divider"></div>
-            <div class="fg"><label class="fl">White label</label>
-              <label class="toggle-row"><input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()"><span class="toggle-label">Remove ProposalKit branding</span></label>
-              <div class="fh">Replaces ProposalKit name with your company name everywhere</div></div>
-          </div>`,
-        signature: () => `<div class="card card-p set-card">
-            ${_secHead('pen-tool', 'Signature', 'Draw your signature to include in proposals', '#18181b')}
-            <div class="sig-wrap" id="sigWrap"><div id="sigDisplay"></div></div>
-          </div>`,
-        data: () => `<div class="card card-p set-card set-card-danger">
-            ${_secHead('database', 'Data management', 'Export, import, or clear your local data', '#FF3B30')}
+            ${sep}${sh('White label')}
+            <div class="fg"><label class="toggle-row"><input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()"><span class="toggle-label">Remove ProposalKit branding</span></label>
+              <div class="fh">Replaces ProposalKit name with your company name everywhere</div></div>`,
+        signature: () => `${sh('Signature')}<div class="sig-wrap" id="sigWrap"><div id="sigDisplay"></div></div>`,
+        data: () => `${sh('Data management')}
             <div class="fg"><label class="fl">Webhook URL</label>
               <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
               <div class="fh">POST proposal data to this URL on export</div></div>
-            <div class="sec-header-actions" style="margin-top:16px">
+            ${sep}<div class="set-section-title" style="color:var(--red)">Danger zone</div>
+            <div class="sec-header-actions">
               <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export</button>
               <button class="btn-sm-outline" onclick="importData()"><i data-lucide="upload"></i> Import</button>
               <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear all</button>
-            </div>
-          </div>`
+            </div>`
     };
     panel.innerHTML = (panels[key] || panels.profile)();
     if (key === 'profile') {
