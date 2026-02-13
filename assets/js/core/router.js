@@ -2,7 +2,7 @@
 // ROUTER — History API with clean URLs
 // ════════════════════════════════════════
 
-/* exported navigate, replaceUrl, handleRoute, render404, buildUrl */
+/* exported navigate, replaceUrl, handleRoute, render404, renderErrorPage, buildUrl */
 
 // ── Route definitions ──
 const ROUTES = [
@@ -147,13 +147,42 @@ function render404(path) {
     document.title = 'Page not found — ' + an;
     document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
     const body = document.getElementById('bodyScroll');
+    const safePath = typeof esc === 'function' ? esc(path || '') : (path || '');
     body.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:center;min-height:60vh;padding:32px">
-            <div class="card" style="max-width:420px;text-align:center;padding:48px 32px">
-                <div style="font-size:64px;font-weight:700;color:var(--text4);line-height:1">404</div>
-                <div style="font-size:18px;font-weight:600;margin-top:12px;color:var(--foreground)">Page not found</div>
-                <div style="font-size:14px;color:var(--text3);margin-top:8px">The page <code style="font-size:13px;padding:2px 6px;background:var(--muted);border-radius:6px">${typeof esc === 'function' ? esc(path || '') : (path || '')}</code> doesn't exist.</div>
-                <button class="btn" style="margin-top:24px" onclick="navigate('/dashboard')"><i data-lucide="arrow-left"></i> Go to Dashboard</button>
+            <div class="card" style="max-width:440px;text-align:center;padding:48px 32px">
+                <div style="width:64px;height:64px;margin:0 auto 20px;background:var(--muted);border-radius:16px;display:flex;align-items:center;justify-content:center"><i data-lucide="file-question" style="width:28px;height:28px;color:var(--text4)"></i></div>
+                <div style="font-size:20px;font-weight:700;color:var(--foreground);margin-bottom:6px">Page not found</div>
+                <div style="font-size:14px;color:var(--text3);line-height:1.5">The page <code style="font-size:13px;padding:2px 6px;background:var(--muted);border-radius:6px">${safePath}</code> doesn't exist or may have been moved.</div>
+                <div style="display:flex;gap:8px;justify-content:center;margin-top:24px">
+                    <button class="btn" onclick="navigate('/dashboard')"><i data-lucide="arrow-left"></i> Dashboard</button>
+                    <button class="btn-outline" onclick="navigate('/proposals')"><i data-lucide="file-text"></i> Proposals</button>
+                </div>
+            </div>
+        </div>`;
+    if (typeof lucideScope === 'function') lucideScope(body); else if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// ── Error Pages (called from anywhere) ──
+function renderErrorPage(type) {
+    const body = document.getElementById('bodyScroll');
+    if (!body) return;
+    const an = typeof appName === 'function' ? appName() : 'ProposalKit';
+    const pages = {
+        offline: { icon: 'wifi-off', title: 'You\'re offline', desc: 'Check your internet connection and try again.', btn: 'Retry', action: 'window.location.reload()' },
+        error: { icon: 'alert-triangle', title: 'Something went wrong', desc: 'An unexpected error occurred. Try refreshing the page.', btn: 'Refresh', action: 'window.location.reload()' },
+        forbidden: { icon: 'shield-off', title: 'Access denied', desc: 'You don\'t have permission to view this page.', btn: 'Go Home', action: 'navigate(\'/dashboard\')' },
+        maintenance: { icon: 'wrench', title: 'Under maintenance', desc: an + ' is being updated. Please check back in a few minutes.', btn: 'Retry', action: 'window.location.reload()' }
+    };
+    const p = pages[type] || pages.error;
+    document.title = p.title + ' — ' + an;
+    body.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;min-height:60vh;padding:32px">
+            <div class="card" style="max-width:440px;text-align:center;padding:48px 32px">
+                <div style="width:64px;height:64px;margin:0 auto 20px;background:var(--muted);border-radius:16px;display:flex;align-items:center;justify-content:center"><i data-lucide="${p.icon}" style="width:28px;height:28px;color:var(--text4)"></i></div>
+                <div style="font-size:20px;font-weight:700;color:var(--foreground);margin-bottom:6px">${p.title}</div>
+                <div style="font-size:14px;color:var(--text3);line-height:1.5">${p.desc}</div>
+                <button class="btn" style="margin-top:24px" onclick="${p.action}"><i data-lucide="refresh-cw"></i> ${p.btn}</button>
             </div>
         </div>`;
     if (typeof lucideScope === 'function') lucideScope(body); else if (typeof lucide !== 'undefined') lucide.createIcons();

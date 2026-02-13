@@ -96,7 +96,13 @@ async function initAuth() {
 
         if (event === 'SIGNED_OUT') {
             sbSession = null;
-            if (authBooted) renderAuthScreen();
+            if (authBooted) {
+                // Reset URL to root so refresh doesn't land on a protected route
+                if (window.location.pathname !== '/') {
+                    history.replaceState(null, '', '/');
+                }
+                renderAuthScreen();
+            }
             return;
         }
 

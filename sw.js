@@ -2,7 +2,7 @@
 // SERVICE WORKER — Offline Support
 // ════════════════════════════════════════
 
-const CACHE_NAME = 'proposalkit-v15';
+const CACHE_NAME = 'proposalkit-v16';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -20,6 +20,19 @@ const STATIC_ASSETS = [
   '/assets/css/responsive.css',
   '/assets/css/print.css'
 ];
+
+// Inline offline fallback page (when cache + network both fail)
+const OFFLINE_HTML = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Offline — ProposalKit</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fafafa;color:#18181b;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:32px}.card{max-width:440px;text-align:center;background:#fff;padding:48px 32px;border-radius:16px;border:1px solid #e4e4e7}.icon{font-size:48px;margin-bottom:16px}.title{font-size:20px;font-weight:700;margin-bottom:8px}.desc{font-size:14px;color:#71717a;line-height:1.6;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#18181b;color:#fff;border:none;border-radius:9999px;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none}.btn:hover{opacity:.9}.hint{margin-top:16px;font-size:12px;color:#a1a1aa}</style></head>
+<body><div class="card">
+<div class="icon">&#128268;</div>
+<div class="title">You're offline</div>
+<div class="desc">ProposalKit can't connect to the server right now. Check your internet connection and try again.</div>
+<button class="btn" onclick="window.location.reload()">Try again</button>
+<div class="hint">Your saved data is still safe in your browser</div>
+</div></body></html>`;
 
 // Install — cache static assets
 self.addEventListener('install', (e) => {
@@ -39,7 +52,7 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Fetch — network first, cache fallback
+// Fetch — network first, cache fallback, offline page last resort
 self.addEventListener('fetch', (e) => {
   // Skip non-GET and CDN requests
   if (e.request.method !== 'GET') return;
@@ -61,6 +74,7 @@ self.addEventListener('fetch', (e) => {
       e.respondWith(
         caches.match('/index.html')
           .then(cached => cached || fetch('/index.html'))
+          .catch(() => new Response(OFFLINE_HTML, { headers: { 'Content-Type': 'text/html' } }))
       );
       return;
     }
@@ -72,7 +86,11 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
           return res;
         })
-        .catch(() => caches.match(e.request).then(r => r || caches.match('/index.html')))
+        .catch(() =>
+          caches.match(e.request)
+            .then(r => r || caches.match('/index.html'))
+            .then(r => r || new Response(OFFLINE_HTML, { headers: { 'Content-Type': 'text/html' } }))
+        )
     );
     return;
   }

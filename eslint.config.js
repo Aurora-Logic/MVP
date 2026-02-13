@@ -132,6 +132,7 @@ export default [
                 replaceUrl: 'readonly',
                 handleRoute: 'readonly',
                 render404: 'readonly',
+                renderErrorPage: 'readonly',
                 buildUrl: 'readonly',
 
                 // ── core/support.js ──
