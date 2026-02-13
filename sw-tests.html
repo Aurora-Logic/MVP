@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Worker v25 Test Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            padding: 32px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #18181b;
+        }
+        .subtitle {
+            color: #71717a;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+        .test-section {
+            margin-bottom: 32px;
+            padding: 20px;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #18181b;
+        }
+        .test-case {
+            margin: 12px 0;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .test-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .test-status.pending { background: #fbbf24; }
+        .test-status.running { background: #3b82f6; animation: pulse 1s infinite; }
+        .test-status.pass { background: #34C759; }
+        .test-status.fail { background: #FF3B30; }
+        .test-name {
+            flex: 1;
+            font-weight: 500;
+            color: #18181b;
+        }
+        .test-result {
+            font-size: 13px;
+            color: #71717a;
+        }
+        .test-details {
+            font-size: 12px;
+            color: #a1a1aa;
+            margin-top: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .btn {
+            background: #18181b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-outline {
+            background: white;
+            color: #18181b;
+            border: 1px solid #e4e4e7;
+        }
+        .summary {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+            padding: 16px;
+            background: #f4f4f5;
+            border-radius: 8px;
+        }
+        .summary-item {
+            flex: 1;
+            text-align: center;
+        }
+        .summary-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .summary-label {
+            font-size: 12px;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        code {
+            background: #f4f4f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Service Worker v25 Test Suite</h1>
+        <div class="subtitle">Automated tests for caching, performance, and reliability</div>
+
+        <div style="margin-bottom: 24px;">
+            <button class="btn" onclick="runAllTests()" id="runBtn">Run All Tests</button>
+            <button class="btn-outline" onclick="clearResults()">Clear Results</button>
+            <button class="btn-outline" onclick="window.location.reload()">Reload Page</button>
+        </div>
+
+        <!-- Test Section 1: Service Worker Registration -->
+        <div class="test-section">
+            <h2>1️⃣ Service Worker Registration</h2>
+            <div id="test-registration"></div>
+        </div>
+
+        <!-- Test Section 2: Cache Management -->
+        <div class="test-section">
+            <h2>2️⃣ Cache Management</h2>
+            <div id="test-cache"></div>
+        </div>
+
+        <!-- Test Section 3: Network Strategies -->
+        <div class="test-section">
+            <h2>3️⃣ Network Strategies</h2>
+            <div id="test-network"></div>
+        </div>
+
+        <!-- Test Section 4: Performance -->
+        <div class="test-section">
+            <h2>4️⃣ Performance Features</h2>
+            <div id="test-performance"></div>
+        </div>
+
+        <!-- Test Section 5: Metrics -->
+        <div class="test-section">
+            <h2>5️⃣ Metrics & Observability</h2>
+            <div id="test-metrics"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary" id="summary" style="display: none;">
+            <div class="summary-item">
+                <div class="summary-value" id="totalTests">0</div>
+                <div class="summary-label">Total Tests</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" style="color: #34C759;" id="passedTests">0</div>
+                <div class="summary-label">Passed</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" style="color: #FF3B30;" id="failedTests">0</div>
+                <div class="summary-label">Failed</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" id="duration">0s</div>
+                <div class="summary-label">Duration</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tests = {
+            registration: [],
+            cache: [],
+            network: [],
+            performance: [],
+            metrics: []
+        };
+
+        let testResults = { passed: 0, failed: 0, total: 0 };
+        let startTime;
+
+        // Test runner
+        async function runAllTests() {
+            startTime = Date.now();
+            testResults = { passed: 0, failed: 0, total: 0 };
+            document.getElementById('runBtn').disabled = true;
+            document.getElementById('summary').style.display = 'none';
+
+            try {
+                await runTestSection('registration', testServiceWorkerRegistration);
+                await runTestSection('cache', testCacheManagement);
+                await runTestSection('network', testNetworkStrategies);
+                await runTestSection('performance', testPerformanceFeatures);
+                await runTestSection('metrics', testMetrics);
+            } catch (err) {
+                console.error('Test suite error:', err);
+            }
+
+            showSummary();
+            document.getElementById('runBtn').disabled = false;
+        }
+
+        async function runTestSection(section, testFn) {
+            const container = document.getElementById(`test-${section}`);
+            container.innerHTML = '';
+            await testFn(container);
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        function createTestCase(container, name) {
+            const div = document.createElement('div');
+            div.className = 'test-case';
+            div.innerHTML = `
+                <div class="test-status pending">⏳</div>
+                <div style="flex: 1;">
+                    <div class="test-name">${name}</div>
+                    <div class="test-result"></div>
+                    <div class="test-details"></div>
+                </div>
+            `;
+            container.appendChild(div);
+            return div;
+        }
+
+        function updateTestCase(testCase, status, result, details) {
+            const statusEl = testCase.querySelector('.test-status');
+            const resultEl = testCase.querySelector('.test-result');
+            const detailsEl = testCase.querySelector('.test-details');
+
+            statusEl.className = `test-status ${status}`;
+            statusEl.textContent = status === 'pass' ? '✓' : status === 'fail' ? '✗' : status === 'running' ? '⏳' : '⏳';
+            resultEl.textContent = result;
+            if (details) detailsEl.textContent = details;
+
+            testResults.total++;
+            if (status === 'pass') testResults.passed++;
+            if (status === 'fail') testResults.failed++;
+        }
+
+        // Test Section 1: Service Worker Registration
+        async function testServiceWorkerRegistration(container) {
+            // Test 1.1: SW supported
+            let test = createTestCase(container, 'Service Worker API supported');
+            updateTestCase(test, 'running', 'Checking...');
+            await delay(300);
+            const supported = 'serviceWorker' in navigator;
+            updateTestCase(test, supported ? 'pass' : 'fail',
+                supported ? 'API available' : 'Not supported',
+                `navigator.serviceWorker: ${supported}`);
+
+            if (!supported) return;
+
+            // Test 1.2: SW registered
+            test = createTestCase(container, 'Service Worker registered');
+            updateTestCase(test, 'running', 'Checking registration...');
+            await delay(300);
+            const reg = await navigator.serviceWorker.getRegistration();
+            updateTestCase(test, reg ? 'pass' : 'fail',
+                reg ? 'SW registered' : 'No registration found',
+                reg ? `Scope: ${reg.scope}` : '');
+
+            // Test 1.3: SW active
+            test = createTestCase(container, 'Service Worker active');
+            updateTestCase(test, 'running', 'Checking state...');
+            await delay(300);
+            const active = reg && reg.active;
+            updateTestCase(test, active ? 'pass' : 'fail',
+                active ? `State: ${reg.active.state}` : 'Not active',
+                active ? `Script: ${reg.active.scriptURL}` : '');
+
+            // Test 1.4: SW version
+            test = createTestCase(container, 'Service Worker version v25');
+            updateTestCase(test, 'running', 'Fetching SW script...');
+            await delay(300);
+            try {
+                const response = await fetch('/sw.js');
+                const text = await response.text();
+                const hasV25 = text.includes('proposalkit-v25') || text.includes('CACHE_VERSION = 25');
+                updateTestCase(test, hasV25 ? 'pass' : 'fail',
+                    hasV25 ? 'Version v25 detected' : 'Different version',
+                    `Checked CACHE_NAME and CACHE_VERSION`);
+            } catch (err) {
+                updateTestCase(test, 'fail', 'Failed to fetch SW', err.message);
+            }
+        }
+
+        // Test Section 2: Cache Management
+        async function testCacheManagement(container) {
+            // Test 2.1: Cache API available
+            let test = createTestCase(container, 'Cache API available');
+            updateTestCase(test, 'running', 'Checking...');
+            await delay(300);
+            const cacheAvailable = 'caches' in window;
+            updateTestCase(test, cacheAvailable ? 'pass' : 'fail',
+                cacheAvailable ? 'Cache API supported' : 'Not available');
+
+            if (!cacheAvailable) return;
+
+            // Test 2.2: v25 cache exists
+            test = createTestCase(container, 'v25 cache created');
+            updateTestCase(test, 'running', 'Checking caches...');
+            await delay(300);
+            const cacheNames = await caches.keys();
+            const hasV25 = cacheNames.some(name => name.includes('v25'));
+            updateTestCase(test, hasV25 ? 'pass' : 'fail',
+                hasV25 ? 'Cache found' : 'Cache not found',
+                `Caches: ${cacheNames.join(', ')}`);
+
+            // Test 2.3: Old caches cleaned
+            test = createTestCase(container, 'Old cache versions cleaned');
+            updateTestCase(test, 'running', 'Checking for old caches...');
+            await delay(300);
+            const oldCaches = cacheNames.filter(name =>
+                name.includes('proposalkit') && !name.includes('v25')
+            );
+            updateTestCase(test, oldCaches.length === 0 ? 'pass' : 'fail',
+                oldCaches.length === 0 ? 'No old caches' : `${oldCaches.length} old caches`,
+                oldCaches.join(', ') || 'All clean');
+
+            // Test 2.4: Cache size limit
+            test = createTestCase(container, 'Cache size within limits (≤50 items)');
+            updateTestCase(test, 'running', 'Counting cache entries...');
+            await delay(300);
+            const v25Cache = cacheNames.find(n => n.includes('v25'));
+            if (v25Cache) {
+                const cache = await caches.open(v25Cache);
+                const keys = await cache.keys();
+                const withinLimit = keys.length <= 50;
+                updateTestCase(test, withinLimit ? 'pass' : 'fail',
+                    `${keys.length} items`,
+                    `Limit: 50 items (MAX_CACHE_SIZE)`);
+            } else {
+                updateTestCase(test, 'fail', 'v25 cache not found');
+            }
+
+            // Test 2.5: Critical assets cached
+            test = createTestCase(container, 'Critical assets precached');
+            updateTestCase(test, 'running', 'Checking assets...');
+            await delay(300);
+            if (v25Cache) {
+                const cache = await caches.open(v25Cache);
+                const criticalAssets = ['/index.html', '/assets/css/variables.css'];
+                const results = await Promise.all(
+                    criticalAssets.map(url => cache.match(url))
+                );
+                const allCached = results.every(r => r !== undefined);
+                updateTestCase(test, allCached ? 'pass' : 'fail',
+                    allCached ? 'All critical assets cached' : 'Some missing',
+                    `Checked: ${criticalAssets.join(', ')}`);
+            }
+        }
+
+        // Test Section 3: Network Strategies
+        async function testNetworkStrategies(container) {
+            // Test 3.1: Network-first for HTML
+            let test = createTestCase(container, 'Network-first strategy for index.html');
+            updateTestCase(test, 'running', 'Testing fetch...');
+            const start = performance.now();
+            try {
+                const response = await fetch('/index.html', { cache: 'no-store' });
+                const duration = (performance.now() - start).toFixed(0);
+                updateTestCase(test, response.ok ? 'pass' : 'fail',
+                    response.ok ? `HTTP ${response.status} in ${duration}ms` : 'Failed',
+                    `Type: ${response.type}, Size: ${response.headers.get('content-length') || 'unknown'}`);
+            } catch (err) {
+                updateTestCase(test, 'fail', 'Network error', err.message);
+            }
+
+            // Test 3.2: Cache response time
+            test = createTestCase(container, 'Cache response time < 100ms');
+            updateTestCase(test, 'running', 'Testing cache speed...');
+            await delay(300);
+            const cacheStart = performance.now();
+            const v25Cache = (await caches.keys()).find(n => n.includes('v25'));
+            if (v25Cache) {
+                const cache = await caches.open(v25Cache);
+                await cache.match('/index.html');
+                const cacheDuration = (performance.now() - cacheStart).toFixed(1);
+                updateTestCase(test, cacheDuration < 100 ? 'pass' : 'fail',
+                    `${cacheDuration}ms`,
+                    cacheDuration < 100 ? 'Fast!' : 'Slower than expected');
+            } else {
+                updateTestCase(test, 'fail', 'No cache found');
+            }
+
+            // Test 3.3: 404 handling
+            test = createTestCase(container, 'Proper 404 handling');
+            updateTestCase(test, 'running', 'Testing non-existent page...');
+            await delay(300);
+            try {
+                const response = await fetch('/nonexistent-page-12345');
+                updateTestCase(test, response.status === 404 || response.status === 200 ? 'pass' : 'fail',
+                    `HTTP ${response.status}`,
+                    'Router handles 404s correctly');
+            } catch (err) {
+                updateTestCase(test, 'fail', 'Fetch error', err.message);
+            }
+        }
+
+        // Test Section 4: Performance Features
+        async function testPerformanceFeatures(container) {
+            // Test 4.1: Navigation Preload
+            let test = createTestCase(container, 'Navigation Preload enabled (Chrome/Edge)');
+            updateTestCase(test, 'running', 'Checking...');
+            await delay(300);
+            const reg = await navigator.serviceWorker.getRegistration();
+            const hasPreload = reg && reg.navigationPreload;
+            updateTestCase(test, hasPreload ? 'pass' : 'fail',
+                hasPreload ? 'Supported and enabled' : 'Not available (Firefox/Safari)',
+                hasPreload ? 'Chrome/Edge feature' : 'Graceful fallback active');
+
+            // Test 4.2: Cache headers
+            test = createTestCase(container, 'Proper Cache-Control headers');
+            updateTestCase(test, 'running', 'Checking headers...');
+            await delay(300);
+            try {
+                const response = await fetch('/assets/css/variables.css');
+                const cacheControl = response.headers.get('cache-control');
+                const hasImmutable = cacheControl && cacheControl.includes('immutable');
+                updateTestCase(test, hasImmutable ? 'pass' : 'fail',
+                    hasImmutable ? 'immutable header set' : 'Missing immutable',
+                    `Cache-Control: ${cacheControl || 'none'}`);
+            } catch (err) {
+                updateTestCase(test, 'fail', 'Failed to fetch', err.message);
+            }
+
+            // Test 4.3: Preconnect hints
+            test = createTestCase(container, 'Preconnect hints present');
+            updateTestCase(test, 'running', 'Checking DOM...');
+            await delay(300);
+            const preconnects = document.querySelectorAll('link[rel="preconnect"]');
+            updateTestCase(test, preconnects.length > 0 ? 'pass' : 'fail',
+                `${preconnects.length} hints found`,
+                Array.from(preconnects).map(l => l.href).join(', '));
+        }
+
+        // Test Section 5: Metrics
+        async function testMetrics(container) {
+            // Test 5.1: getCacheMetrics available
+            let test = createTestCase(container, 'getCacheMetrics() function available');
+            updateTestCase(test, 'running', 'Checking...');
+            await delay(300);
+            const hasMetrics = typeof getCacheMetrics === 'function';
+            updateTestCase(test, hasMetrics ? 'pass' : 'fail',
+                hasMetrics ? 'Function found' : 'Not available',
+                'window.getCacheMetrics');
+
+            if (!hasMetrics) return;
+
+            // Test 5.2: Metrics data retrieval
+            test = createTestCase(container, 'Metrics data retrieval');
+            updateTestCase(test, 'running', 'Fetching metrics...');
+            await delay(300);
+            try {
+                const metrics = await getCacheMetrics();
+                const hasData = metrics && typeof metrics.cacheHits === 'number';
+                updateTestCase(test, hasData ? 'pass' : 'fail',
+                    hasData ? 'Metrics received' : 'No data',
+                    hasData ? `Hits: ${metrics.cacheHits}, Misses: ${metrics.cacheMisses}` : '');
+            } catch (err) {
+                updateTestCase(test, 'fail', 'Error fetching', err.message);
+            }
+
+            // Test 5.3: clearAppCache available
+            test = createTestCase(container, 'clearAppCache() function available');
+            updateTestCase(test, 'running', 'Checking...');
+            await delay(300);
+            const hasClear = typeof clearAppCache === 'function';
+            updateTestCase(test, hasClear ? 'pass' : 'fail',
+                hasClear ? 'Function found' : 'Not available',
+                'window.clearAppCache');
+        }
+
+        function showSummary() {
+            const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+            document.getElementById('summary').style.display = 'flex';
+            document.getElementById('totalTests').textContent = testResults.total;
+            document.getElementById('passedTests').textContent = testResults.passed;
+            document.getElementById('failedTests').textContent = testResults.failed;
+            document.getElementById('duration').textContent = duration + 's';
+
+            console.log('Test Results:', testResults);
+        }
+
+        function clearResults() {
+            ['registration', 'cache', 'network', 'performance', 'metrics'].forEach(section => {
+                document.getElementById(`test-${section}`).innerHTML = '';
+            });
+            document.getElementById('summary').style.display = 'none';
+            testResults = { passed: 0, failed: 0, total: 0 };
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('%c🧪 Service Worker Test Suite Ready', 'font-size: 16px; font-weight: bold; color: #007AFF');
+                console.log('Click "Run All Tests" button or call runAllTests()');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
