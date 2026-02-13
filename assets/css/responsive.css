@@ -191,10 +191,8 @@
   .pg-nav { padding: 0 8px; min-width: 34px; }
   .pg-wrap { gap: 4px; padding: 12px 8px; }
 
-  /* Settings v2 */
-  .settings-nav { display: none; }
-  .settings-content { padding-left: 0; max-width: 100%; }
-  .settings-layout { max-width: 600px; }
+  /* Settings — tab bar scrolls on mobile */
+  .set-container { max-width: 100%; }
 
   /* Filter tabs horizontal scroll */
   .filter-tabs {
@@ -230,18 +228,36 @@
     grid-template-columns: 1fr;
   }
 
-  /* Clients */
-  .client-grid {
-    grid-template-columns: 1fr;
+  /* Clients — metric grid + toolbar */
+  .cl-metric-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .cc-actions {
-    opacity: 1;
+  .cl-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cl-search-wrap {
+    max-width: 100%;
+  }
+
+  .cl-th-email,
+  .cl-cell-email {
+    display: none;
   }
 
   /* Client insights responsive */
-  .ci-metrics {
+  .ci-metric-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .ci-header {
+    flex-direction: column;
+  }
+
+  .ci-header-actions {
+    width: 100%;
   }
 
   /* Template grid */
@@ -427,7 +443,7 @@
   }
 
   /* Client insights small mobile */
-  .ci-metrics {
+  .ci-metric-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 

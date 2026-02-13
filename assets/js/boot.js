@@ -43,13 +43,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.13.0';
-const APP_BUILD = '20260212';
+const APP_VERSION = '2.14.0';
+const APP_BUILD = '20260213';
 const WHATS_NEW_ITEMS = [
-    { icon: 'users', title: 'Expanded Client Fields', desc: 'Full client form with customer type, salutation, company, address, state dropdown, and GST number.' },
-    { icon: 'file-text', title: 'Client Portal Redesign', desc: 'Shared proposal viewer now matches the main app with a sleek topbar and pill buttons.' },
-    { icon: 'book-open', title: 'How to Use Guide', desc: 'New sidebar shortcut opens a 5-step guide to get started with the app.' },
-    { icon: 'layout-dashboard', title: 'Settings Card Layout', desc: 'Settings sections wrapped in cards matching the dashboard design pattern.' }
+    { icon: 'sliders-horizontal', title: 'Settings Redesign', desc: 'Settings now uses horizontal tabs instead of sidebar scroll. Each section is its own focused page.' },
+    { icon: 'table', title: 'Client Table View', desc: 'Clients page rebuilt as a Notion-style table with metric strip, search, and inline actions.' },
+    { icon: 'bar-chart-3', title: 'Client Metrics', desc: 'New metric cards at the top of Clients showing total clients, total value, average, and win rate.' },
+    { icon: 'user-plus', title: 'Improved Add Client', desc: 'Add client modal now has organized sections (Contact, Communication, Billing) with a pill toggle for type.' }
 ];
 
 function checkWhatsNew() {

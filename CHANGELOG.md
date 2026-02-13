@@ -4,7 +4,36 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
-## v2.13.0 (build 20260212) — 2026-02-12
+## v2.14.0 (build 20260213) — 2026-02-13
+
+### Features
+- Settings page completely redesigned: horizontal tab navigation replaces sidebar scroll-spy layout
+- Each settings section (Profile, Payments, Email, Branding, Signature, Data) is now a focused tab panel
+- Clients page rebuilt with Notion-style table layout replacing card grid
+- Client metric strip: 4 summary cards (Total Clients, Total Value, Avg Per Client, Win Rate)
+- Client search bar with real-time filtering across the table
+- Client insights page redesigned with card-wrapped header, shadcn metric cards with accent gradients, and Notion-style proposal history table
+- Add Client modal restructured into sections (Contact, Communication, Billing) with filter-tab pill toggle for customer type
+
+### Style
+- Settings tab bar uses existing `.tabs` component pattern, sticky with scroll overflow on mobile
+- Client table reuses `.nt-table` and `.nt-row` patterns from Proposals page for consistency
+- Client insight metric cards use per-card accent gradients matching dashboard (primary, green, red, blue, amber)
+- Add Client modal gets `.acm-*` classes with section labels, dividers, and scrollable body
+- Danger zone card now has red accent gradient matching `.mc-outstanding` pattern
+- Settings card form groups get 16px spacing (was 12px) for more breathing room
+- Settings section icon boxes enlarged to 40px with 12px border-radius
+
+### Files Changed
+- `assets/js/views/settings.js` — full rewrite: tab-based `setTab()` replaces scroll-spy `settingsNavHtml()`/`initSettingsScrollSpy()`
+- `assets/js/views/clients.js` — full rewrite: table view, metric strip, search, sectioned modal, card-based insights
+- `assets/css/pages.css` — replaced settings-nav/settings-layout with set-container/set-tabs, replaced client-grid with cl-container/cl-metric-grid/cl-toolbar, new ci-container/ci-mc card styles, new acm-modal section styles
+- `assets/css/responsive.css` — updated breakpoints for new cl-metric-grid, cl-toolbar, ci-metric-grid, ci-header layouts
+- `assets/js/boot.js` — version bump to 2.14.0, updated What's New items
+
+---
+
+## v2.12.1 (build 20260212) — 2026-02-12
 
 ### Features
 - Expanded client fields: customer type, salutation, first/last name, company, display name, work/mobile phone, address (street, city, state, pin), GST number

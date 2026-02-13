@@ -2622,43 +2622,82 @@
   height: 14px;
 }
 
-/* ════════ CLIENTS ════════ */
+/* ════════ CLIENTS — Table + Metric Strip ════════ */
 
-.client-grid {
+.cl-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cl-metric-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
 
-.client-card {
+.cl-metric-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--r3);
-  padding: 16px;
-  cursor: pointer;
-  transition: all var(--t);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-.client-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--sh2);
+.cl-metric-label {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  margin-bottom: 4px;
 }
 
-.cc-head {
+.cl-metric-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--card-foreground);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cl-toolbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+}
+
+.cl-search-wrap {
+  position: relative;
+  flex: 1;
+  max-width: 280px;
+}
+
+.cl-search {
+  width: 100% !important;
+  padding-left: 36px !important;
+  height: 36px;
+}
+
+.cl-count {
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+.cl-cell-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .cc-avi {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--r);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -2667,40 +2706,21 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
+  line-height: 1.2;
 }
 
 .cc-email {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text3);
+  line-height: 1.2;
 }
 
-.cc-actions {
-  display: flex;
-  gap: 2px;
-  margin-left: auto;
-  opacity: 0;
-  transition: opacity var(--t);
+.cl-th-email {
+  width: 180px;
 }
 
-.client-card:hover .cc-actions {
-  opacity: 1;
-}
-
-.cc-stats {
-  display: flex;
-  gap: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-}
-
-.cc-stat {
-  font-size: 14px;
+.cl-cell-email {
   color: var(--text3);
-}
-
-.cc-stat strong {
-  color: var(--text);
-  font-weight: 600;
 }
 
 /* Client picker */
@@ -2729,92 +2749,71 @@
   color: var(--text3);
 }
 
-/* ════════ SETTINGS ════════ */
+/* ════════ ADD CLIENT MODAL ════════ */
 
-.settings-layout {
+.acm-modal {
+  max-width: 560px;
+  max-height: 85vh;
   display: flex;
-  gap: 0;
-  max-width: 900px;
+  flex-direction: column;
 }
 
-.settings-nav {
-  width: 180px;
-  flex-shrink: 0;
-  padding: 0 20px 0 0;
-  border-right: 1px solid var(--border);
+.acm-body {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 4px;
+  margin-right: -4px;
+}
+
+.acm-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.acm-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+.acm-type-toggle {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--muted);
+  padding: 3px;
+  border-radius: var(--r-pill);
+}
+
+.acm-type-toggle .filter-tab {
+  padding: 6px 16px;
+}
+
+/* ════════ SETTINGS — Tab-based layout ════════ */
+
+.set-container {
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.set-tabs {
   position: sticky;
   top: 0;
-  height: fit-content;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  z-index: 10;
+  background: var(--background);
+  padding-bottom: 4px;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.settings-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
-  border-radius: var(--r);
-  font-family: var(--font);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text3);
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  transition: all var(--t);
-  white-space: nowrap;
-  width: 100%;
-  text-align: left;
-}
-
-.settings-nav-item:hover {
-  background: var(--muted);
-  color: var(--text);
-}
-
-.settings-nav-item.on {
-  background: var(--muted);
-  color: var(--text);
-  font-weight: 600;
-}
-
-.settings-nav-item svg {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.settings-nav-acct {
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.settings-nav-version {
-  margin-top: 16px;
-  padding: 12px 10px 4px;
-  font-size: 14px;
-  color: var(--text4);
-}
-
-.settings-content {
-  flex: 1;
-  max-width: 640px;
-  padding-left: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.settings-section {
-  padding: 0;
-  margin-bottom: 16px;
-}
-
-.settings-section:last-child {
-  margin-bottom: 0;
+.set-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .settings-card {
@@ -2823,51 +2822,70 @@
 }
 
 .settings-card-danger {
-  border-color: var(--red-bg);
+  border-color: color-mix(in srgb, var(--red) 20%, var(--border));
+  background: linear-gradient(to top, color-mix(in srgb, var(--red) 3%, transparent), var(--card));
 }
 
-.settings-section-head {
+.settings-card .fg {
   margin-bottom: 16px;
+}
+
+.settings-card .fg:last-child {
+  margin-bottom: 0;
+}
+
+.settings-card .fr {
+  margin-bottom: 16px;
+}
+
+.settings-card .fr:last-child {
+  margin-bottom: 0;
+}
+
+/* Settings v3 — icon-adorned card headers */
+.set-head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
 }
 
-.settings-section-t {
+.set-head-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.set-head-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.set-head-t {
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
 }
 
-.settings-section-d {
+.set-head-d {
   font-size: 14px;
   color: var(--text4);
   margin-top: 2px;
 }
 
-/* Danger zone */
-.settings-danger-divider {
-  padding: 12px 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.settings-danger-divider::before,
-.settings-danger-divider::after {
-  content: '';
-  flex: 1;
+.set-divider {
   height: 1px;
-  background: var(--red-bg);
+  background: var(--border);
+  margin: 16px 0;
 }
 
-.settings-danger-label {
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--red);
-}
+/* Danger zone — removed (settings now tab-based, no divider needed) */
 
 /* Larger color swatches in settings v2 */
 .settings-section .color-swatch {
@@ -3225,25 +3243,45 @@
   margin-right: auto;
 }
 
-/* ════════ CLIENT INSIGHTS ════════ */
+/* ════════ CLIENT INSIGHTS — Card-based ════════ */
+
+.ci-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ci-header-card {
+  padding: 24px;
+}
 
 .ci-header {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.ci-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ci-header-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .ci-avi {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   background: var(--blue-bg);
   color: var(--blue);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -3260,77 +3298,60 @@
   margin-top: 2px;
 }
 
-.ci-metrics {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.ci-metric {
-  padding: 12px;
-  background: var(--muted);
-  border-radius: var(--r2);
-  text-align: center;
-}
-
-.ci-metric-val {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.ci-metric-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text4);
-  text-transform: uppercase;
-  margin-top: 4px;
-}
-
-.ci-history {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.ci-prop {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  cursor: pointer;
-  transition: all var(--t);
-}
-
-.ci-prop:hover {
-  border-color: var(--border-h);
-  transform: translateY(-1px);
-  box-shadow: var(--sh2);
-}
-
-.ci-prop-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.ci-prop-meta {
+.ci-detail {
   font-size: 14px;
   color: var(--text4);
   margin-top: 2px;
 }
 
-.ci-prop-val {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  font-family: var(--mono);
-  white-space: nowrap;
+.ci-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
 }
+
+.ci-mc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.ci-mc-total { background: linear-gradient(to top, color-mix(in srgb, var(--primary) 3%, transparent), var(--card)); }
+.ci-mc-accepted { background: linear-gradient(to top, color-mix(in srgb, var(--green) 3%, transparent), var(--card)); }
+.ci-mc-declined { background: linear-gradient(to top, color-mix(in srgb, var(--red) 3%, transparent), var(--card)); }
+.ci-mc-value { background: linear-gradient(to top, color-mix(in srgb, var(--blue) 3%, transparent), var(--card)); }
+.ci-mc-response { background: linear-gradient(to top, color-mix(in srgb, var(--amber) 3%, transparent), var(--card)); }
+
+.dark .ci-mc { background: var(--card); }
+
+.ci-mc-label {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  margin-bottom: 4px;
+}
+
+.ci-mc-val {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--card-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.ci-history-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ci-history-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Old .ci-prop styles removed — history now uses .nt-table */
 
 /* ════════ ANALYTICS WIDGET ════════ */
 
