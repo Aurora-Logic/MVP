@@ -2,6 +2,7 @@
 // SUPPORT — In-App Ticket Widget
 // ════════════════════════════════════════
 /* exported initSupportWidget, toggleSupportPanel */
+/* global getDeviceId */
 
 let _supportTab = 'tickets';
 

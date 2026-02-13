@@ -2,6 +2,7 @@
 // ANNOUNCEMENTS — In-App Banner Display
 // ════════════════════════════════════════
 /* exported checkAnnouncements, dismissAnnouncement */
+/* global getDeviceId */
 
 function checkAnnouncements() {
     _annRemoveBanner();

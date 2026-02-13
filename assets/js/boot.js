@@ -1,6 +1,7 @@
 // ════════════════════════════════════════
 // BOOT — App initialization (loaded last)
 // ════════════════════════════════════════
+/* exported submitFeedback, closeFeedback */
 
 // Global error boundary
 /* exported APP_BUILD */
