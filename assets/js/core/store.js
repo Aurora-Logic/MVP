@@ -193,7 +193,7 @@ window.addEventListener('storage', (e) => {
         if (typeof checkAnnouncements === 'function') checkAnnouncements();
     }
     if (e.key === 'pk_tickets') {
-        if (typeof _spCheckUnread === 'function') _spCheckUnread();
+        // Ticket data synced — no floating widget to update
     }
 });
 

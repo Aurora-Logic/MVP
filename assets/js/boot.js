@@ -1,7 +1,7 @@
 // ════════════════════════════════════════
 // BOOT — App initialization (loaded last)
 // ════════════════════════════════════════
-/* exported submitFeedback, closeFeedback */
+/* exported submitNpsScore, closeNpsPrompt */
 
 // Global error boundary
 /* exported APP_BUILD */
@@ -37,13 +37,12 @@ function bootApp() {
     refreshSide();
     handleRoute();
     initKeyboardShortcuts();
-    if (typeof initSupportWidget === 'function') initSupportWidget();
     if (typeof checkAnnouncements === 'function') checkAnnouncements();
     if (typeof trackEvent === 'function') trackEvent('app_open');
     lucide.createIcons();
     patchAriaLabels();
     checkWhatsNew();
-    checkFeedbackPrompt();
+    checkNpsPrompt();
 }
 
 // Auto-derive aria-label from data-tooltip for icon-only buttons missing accessible names
@@ -108,38 +107,40 @@ function dismissWhatsNew() {
 }
 
 // ════════════════════════════════════════
-// FEEDBACK / NPS PROMPT
+// NPS PROMPT (periodic satisfaction survey)
 // ════════════════════════════════════════
-function checkFeedbackPrompt() {
+function checkNpsPrompt() {
     const last = safeGetStorage('pk_feedback_asked', 0);
     if (Date.now() - last < 30 * 86400000) return; // ask at most once per 30 days
     if (DB.filter(p => !p.archived).length < 5) return; // wait until 5 proposals
-    setTimeout(() => showFeedbackPrompt(), 2000);
+    setTimeout(() => showNpsPrompt(), 2000);
 }
 
-function showFeedbackPrompt() {
+function showNpsPrompt() {
+    // Don't show if the feedback modal is already open
+    if (document.getElementById('feedbackModal')) return;
     const wrap = document.createElement('div');
-    wrap.className = 'modal-wrap'; wrap.id = 'feedbackModal';
-    wrap.onclick = (e) => { if (e.target === wrap) closeFeedback(); };
+    wrap.className = 'modal-wrap'; wrap.id = 'npsModal';
+    wrap.onclick = (e) => { if (e.target === wrap) closeNpsPrompt(); };
     const scores = Array.from({ length: 11 }, (_, i) =>
-        `<button class="fb-score" onclick="submitFeedback(${i})" style="width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--foreground);transition:all 200ms" onmouseenter="this.style.background='var(--primary)';this.style.color='#fff'" onmouseleave="this.style.background='none';this.style.color='var(--foreground)'">${i}</button>`
+        `<button class="fb-score" onclick="submitNpsScore(${i})" style="width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--foreground);transition:all 200ms" onmouseenter="this.style.background='var(--primary)';this.style.color='#fff'" onmouseleave="this.style.background='none';this.style.color='var(--foreground)'">${i}</button>`
     ).join('');
     wrap.innerHTML = `<div class="modal" style="max-width:440px" onclick="event.stopPropagation()">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
             <div class="modal-t">Quick Feedback</div>
-            <button class="btn-sm-icon-ghost" onclick="closeFeedback()"><i data-lucide="x"></i></button>
+            <button class="btn-sm-icon-ghost" onclick="closeNpsPrompt()"><i data-lucide="x"></i></button>
         </div>
-        <p style="font-size:13px;color:var(--muted-foreground);margin-bottom:16px">How likely are you to recommend ProposalKit? (0 = not likely, 10 = very likely)</p>
+        <p style="font-size:13px;color:var(--muted-foreground);margin-bottom:16px">How likely are you to recommend ${typeof appName === 'function' ? appName() : 'ProposalKit'}? (0 = not likely, 10 = very likely)</p>
         <div style="display:flex;gap:4px;justify-content:center;margin-bottom:16px">${scores}</div>
-        <textarea id="fbComment" rows="2" placeholder="Any comments? (optional)" style="width:100%;font-size:13px;resize:none;padding:8px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px"></textarea>
+        <textarea id="npsComment" rows="2" placeholder="Any comments? (optional)" style="width:100%;font-size:13px;resize:none;padding:8px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px"></textarea>
     </div>`;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
     lucide.createIcons();
 }
 
-function submitFeedback(score) {
-    const comment = document.getElementById('fbComment')?.value?.trim() || '';
+function submitNpsScore(score) {
+    const comment = document.getElementById('npsComment')?.value?.trim() || '';
     const feedback = safeGetStorage('pk_feedback', []);
     feedback.push({
         id: uid(), score, comment, ts: Date.now(),
@@ -151,12 +152,12 @@ function submitFeedback(score) {
     });
     try { localStorage.setItem('pk_feedback', JSON.stringify(feedback)); } catch (e) { /* full */ }
     try { localStorage.setItem('pk_feedback_asked', JSON.stringify(Date.now())); } catch (e) { /* full */ }
-    closeFeedback();
+    closeNpsPrompt();
     toast(score >= 7 ? 'Thanks for the kind words!' : 'Thanks for your feedback!');
 }
 
-function closeFeedback() {
-    document.getElementById('feedbackModal')?.remove();
+function closeNpsPrompt() {
+    document.getElementById('npsModal')?.remove();
     try { localStorage.setItem('pk_feedback_asked', JSON.stringify(Date.now())); } catch (e) { /* full */ }
 }
 

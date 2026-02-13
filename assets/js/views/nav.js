@@ -2,7 +2,7 @@
 // NAVIGATION + MOBILE + KEYBOARD
 // ════════════════════════════════════════
 
-/* exported goNav, toggleMobileSidebar, toggleSidebar, initSidebarState, initKeyboardShortcuts, openFeedbackModal, selectFbType, submitFeedback, openGuide */
+/* exported goNav, toggleMobileSidebar, toggleSidebar, initSidebarState, initKeyboardShortcuts, openFeedbackModal, setFbTab, selectFbType, submitFeedback, openGuide */
 function destroyAllEditors() {
     // Destroy section editors
     if (typeof sectionEditors === 'object' && sectionEditors) {
@@ -107,7 +107,7 @@ function initKeyboardShortcuts() {
             const wnModal = document.getElementById('whatsNewModal');
             if (wnModal) { if (typeof dismissWhatsNew === 'function') dismissWhatsNew(); else wnModal.remove(); return; }
             // Dynamic modals (remove from DOM)
-            const dynamicModals = ['settingsModal', 'guideModal', 'feedbackModal', 'shortcutsModal', 'completenessModal', 'clientModal', 'cpModal', 'libModal', 'tcModal', 'tplModal', 'emailTplModal', 'shareModal', 'dupClientModal', 'confirmModal', 'csvModal'];
+            const dynamicModals = ['settingsModal', 'guideModal', 'feedbackModal', 'npsModal', 'shortcutsModal', 'completenessModal', 'clientModal', 'cpModal', 'libModal', 'tcModal', 'tplModal', 'emailTplModal', 'shareModal', 'dupClientModal', 'confirmModal', 'csvModal'];
             for (const modalId of dynamicModals) {
                 const modal = document.getElementById(modalId);
                 if (modal) { modal.remove(); return; }
@@ -192,31 +192,84 @@ function openGuide() {
     requestAnimationFrame(() => wrap.classList.add('show'));
 }
 
-// ── Send feedback modal ──
-function openFeedbackModal() {
+// ── Help & Feedback hub modal (tabbed: Feedback / My Tickets / New Ticket) ──
+let _fbTab = 'feedback';
+
+function openFeedbackModal(tab) {
     const existing = document.getElementById('feedbackModal');
     if (existing) existing.remove();
+    _fbTab = tab || 'feedback';
+    const unread = typeof hasUnreadTickets === 'function' && hasUnreadTickets();
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap'; wrap.id = 'feedbackModal';
     wrap.onclick = (e) => { if (e.target === wrap) wrap.remove(); };
-    wrap.innerHTML = `<div class="modal" style="max-width:440px" onclick="event.stopPropagation()">
-        <div class="modal-t">Send feedback</div>
-        <div class="modal-d" style="margin-bottom:12px">Report a bug, suggest a feature, or share your thoughts.</div>
+    wrap.innerHTML = `<div class="modal" style="max-width:480px;padding:0" onclick="event.stopPropagation()">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0">
+            <div class="modal-t" style="margin:0">Help & Feedback</div>
+            <button class="btn-sm-icon-ghost" onclick="document.getElementById('feedbackModal').remove()"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+        </div>
+        <div style="display:flex;border-bottom:1px solid var(--border);padding:0 20px;gap:0;margin-top:12px">
+            <button class="fb-tab${_fbTab === 'feedback' ? ' on' : ''}" onclick="setFbTab('feedback')">Feedback</button>
+            <button class="fb-tab${_fbTab === 'tickets' ? ' on' : ''}" onclick="setFbTab('tickets')">My Tickets${unread ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-left:6px;vertical-align:middle"></span>' : ''}</button>
+            <button class="fb-tab${_fbTab === 'new' ? ' on' : ''}" onclick="setFbTab('new')">New Ticket</button>
+        </div>
+        <div id="fbTabBody" style="padding:20px;max-height:420px;overflow-y:auto"></div>
+    </div>`;
+    // Inject tab styles once
+    if (!document.getElementById('fbTabStyle')) {
+        const style = document.createElement('style');
+        style.id = 'fbTabStyle';
+        style.textContent = '.fb-tab{padding:8px 12px;border:none;background:none;font-size:13px;cursor:pointer;color:var(--muted-foreground);border-bottom:2px solid transparent;transition:all 200ms;white-space:nowrap}.fb-tab.on{color:var(--foreground);font-weight:600;border-bottom-color:var(--primary)}';
+        document.head.appendChild(style);
+    }
+    document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
+    lucide.createIcons();
+    _renderFbTab();
+}
+
+function setFbTab(tab) {
+    _fbTab = tab;
+    document.querySelectorAll('.fb-tab').forEach(b => {
+        const match = (tab === 'feedback' && b.textContent.startsWith('Feedback')) ||
+                      (tab === 'tickets' && b.textContent.startsWith('My Tickets')) ||
+                      (tab === 'new' && b.textContent.startsWith('New Ticket'));
+        b.classList.toggle('on', match);
+    });
+    _renderFbTab();
+}
+
+function _renderFbTab() {
+    const body = document.getElementById('fbTabBody');
+    if (!body) return;
+    if (_fbTab === 'feedback') _renderFeedbackForm(body);
+    else if (_fbTab === 'tickets') { if (typeof loadMyTickets === 'function') loadMyTickets(body); }
+    else if (_fbTab === 'new') _renderNewTicketForm(body);
+}
+
+function _renderFeedbackForm(body) {
+    body.innerHTML = `<div style="margin-bottom:12px;font-size:13px;color:var(--muted-foreground)">Report a bug, suggest a feature, or share your thoughts.</div>
         <div style="display:flex;gap:8px;margin-bottom:16px">
             <button class="btn-sm-outline fb-type-btn on" data-type="bug" onclick="selectFbType(this)"><i data-lucide="bug"></i>Bug</button>
             <button class="btn-sm-outline fb-type-btn" data-type="feature" onclick="selectFbType(this)"><i data-lucide="lightbulb"></i>Feature</button>
             <button class="btn-sm-outline fb-type-btn" data-type="other" onclick="selectFbType(this)"><i data-lucide="message-circle"></i>Other</button>
         </div>
         <textarea id="fbText" rows="4" placeholder="Describe the issue or suggestion..." style="width:100%;resize:vertical"></textarea>
-        <div class="modal-foot" style="margin-top:16px">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
             <button class="btn-sm-ghost" onclick="document.getElementById('feedbackModal').remove()">Cancel</button>
             <button class="btn-sm" onclick="submitFeedback()">Send feedback</button>
-        </div>
-    </div>`;
-    document.body.appendChild(wrap);
-    requestAnimationFrame(() => wrap.classList.add('show'));
+        </div>`;
     lucide.createIcons();
     document.getElementById('fbText')?.focus();
+}
+
+function _renderNewTicketForm(body) {
+    body.innerHTML = `<div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="fl">Subject</label><input id="spSubj" placeholder="Brief summary" style="font-size:13px"></div>
+        <div><label class="fl">Category</label><select id="spCat" style="font-size:13px"><option value="general">General</option><option value="bug">Bug Report</option><option value="feature">Feature Request</option><option value="billing">Billing</option></select></div>
+        <div><label class="fl">Description</label><textarea id="spDesc" rows="5" placeholder="Describe your issue\u2026" style="font-size:13px;resize:vertical"></textarea></div>
+        <button class="btn-sm" onclick="if(typeof submitNewTicket==='function')submitNewTicket()" style="align-self:flex-start">Submit Ticket</button>
+    </div>`;
 }
 
 function selectFbType(btn) {
@@ -229,7 +282,6 @@ function submitFeedback() {
     if (!text) { toast('Please describe your feedback', 'error'); return; }
     const type = document.querySelector('.fb-type-btn.on')?.dataset?.type || 'bug';
     const payload = { type, text, version: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '', ts: new Date().toISOString() };
-    // Store locally (future: send to API)
     const fb = safeGetStorage('pk_feedback', []);
     fb.push(payload);
     safeLsSet('pk_feedback', JSON.stringify(fb));

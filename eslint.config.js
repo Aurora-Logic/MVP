@@ -136,9 +136,11 @@ export default [
                 buildUrl: 'readonly',
 
                 // ── core/support.js ──
-                _supportTab: 'writable',
-                initSupportWidget: 'readonly',
-                _spCheckUnread: 'readonly',
+                loadMyTickets: 'readonly',
+                showTicketDetail: 'readonly',
+                submitNewTicket: 'readonly',
+                spSendReply: 'readonly',
+                hasUnreadTickets: 'readonly',
 
                 // ── core/plans.js ──
                 PLAN_LIMITS: 'readonly',
@@ -273,6 +275,7 @@ export default [
                 toggleUserMenu: 'readonly',
                 openGuide: 'readonly',
                 openFeedbackModal: 'readonly',
+                setFbTab: 'readonly',
                 selectFbType: 'readonly',
                 submitFeedback: 'readonly',
                 initSidebarState: 'readonly',
@@ -652,6 +655,10 @@ export default [
                 checkWhatsNew: 'readonly',
                 showWhatsNew: 'readonly',
                 dismissWhatsNew: 'readonly',
+                checkNpsPrompt: 'readonly',
+                showNpsPrompt: 'readonly',
+                submitNpsScore: 'readonly',
+                closeNpsPrompt: 'readonly',
             },
         },
         rules: {
