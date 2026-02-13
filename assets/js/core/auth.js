@@ -285,7 +285,8 @@ function getLoginHtml() {
                 <div class="auth-title">Welcome back</div>
                 <div class="auth-desc">Sign in to your account to continue</div>
             </div>
-            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
+            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPhone').focus()"></div>
+            <div class="fg"><label class="fl">Phone</label><input type="tel" id="authPhone" placeholder="+91 98765 43210" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
             <div class="fg"><label class="fl">Password</label><input type="password" id="authPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
             <div id="authError" class="auth-error"></div>
             <button class="btn auth-submit" id="authSubmitBtn" onclick="doLogin()">Sign In with Email</button>
@@ -321,7 +322,8 @@ function getSignupHtml() {
                 <div class="auth-desc">Enter your details below to get started</div>
             </div>
             <div class="fg"><label class="fl">Full Name</label><input type="text" id="authName" placeholder="Your name" onkeydown="if(event.key==='Enter')document.getElementById('authEmail').focus()"></div>
-            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
+            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPhone').focus()"></div>
+            <div class="fg"><label class="fl">Phone</label><input type="tel" id="authPhone" placeholder="+91 98765 43210" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
             <div class="fg"><label class="fl">Password</label><input type="password" id="authPass" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doSignup()"></div>
             <div id="authError" class="auth-error"></div>
             <button class="btn auth-submit" id="authSubmitBtn" onclick="doSignup()">Create Account</button>
@@ -379,18 +381,40 @@ function setAuthLoading(loading) {
 }
 
 async function doLogin() {
+    console.log('[Auth] doLogin() called');
     const email = document.getElementById('authEmail')?.value?.trim();
+    const phone = document.getElementById('authPhone')?.value?.trim();
     const pass = document.getElementById('authPass')?.value;
     if (!email) { showAuthError('Please enter your email'); return; }
+    if (!phone) { showAuthError('Please enter your phone number'); return; }
     if (!pass || pass.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
     showAuthError('');
     setAuthLoading(true);
     try {
+        if (!sb()) {
+            showAuthError('Cloud authentication unavailable - use "Continue without account"');
+            setAuthLoading(false);
+            return;
+        }
         const { data, error } = await sb().auth.signInWithPassword({ email, password: pass });
-        if (error) { showAuthError(error.message); setAuthLoading(false); return; }
+        if (error) {
+            console.error('[Auth] Login error:', error);
+            showAuthError(error.message);
+            setAuthLoading(false);
+            return;
+        }
+        // Verify phone matches user metadata
+        if (data.user?.user_metadata?.phone && data.user.user_metadata.phone !== phone) {
+            showAuthError('Phone number does not match this account');
+            await sb().auth.signOut();
+            setAuthLoading(false);
+            return;
+        }
         sbSession = data.session;
+        console.log('[Auth] Login successful');
         // onAuthStateChange will handle the rest
     } catch (e) {
+        console.error('[Auth] Login exception:', e);
         showAuthError('Login failed. Please try again.');
         setAuthLoading(false);
     }
@@ -399,16 +423,24 @@ async function doLogin() {
 async function doSignup() {
     const name = document.getElementById('authName')?.value?.trim();
     const email = document.getElementById('authEmail')?.value?.trim();
+    const phone = document.getElementById('authPhone')?.value?.trim();
     const pass = document.getElementById('authPass')?.value;
     if (!name) { showAuthError('Please enter your name'); return; }
     if (!email) { showAuthError('Please enter your email'); return; }
+    if (!phone) { showAuthError('Please enter your phone number'); return; }
     if (!pass || pass.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
     showAuthError('');
     setAuthLoading(true);
     try {
+        if (!sb()) {
+            showAuthError('Cloud authentication unavailable - use "Continue without account"');
+            setAuthLoading(false);
+            return;
+        }
+        // Store phone in user metadata for uniqueness check
         const { data, error } = await sb().auth.signUp({
             email, password: pass,
-            options: { data: { full_name: name, name: name } }
+            options: { data: { full_name: name, name: name, phone: phone } }
         });
         if (error) { showAuthError(error.message); setAuthLoading(false); return; }
         if (data.user && !data.session) {
