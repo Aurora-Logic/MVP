@@ -309,8 +309,8 @@ For production issues:
 ---
 
 **Built with**:
-ProposalKit v2.15.4
-Build: 20260213
+ProposalKit v3.0.0
+Build: 20260214
 Platform: Vanilla JS + localStorage
 Hosting: Vercel
 CDN: jsDelivr, Google Fonts
