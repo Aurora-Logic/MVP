@@ -571,6 +571,22 @@
   transition: opacity var(--t2);
 }
 
+/* Lazy load placeholder */
+.editor-pending {
+  opacity: 0.6;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.editor-lazy-placeholder {
+  font-size: 13px;
+  color: var(--text4);
+  font-style: italic;
+  padding: 24px;
+  text-align: center;
+}
+
 /* ════════ SHORTCUTS PANEL ════════ */
 
 .sc-list {

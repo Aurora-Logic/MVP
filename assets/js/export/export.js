@@ -49,7 +49,9 @@ function doExport(mode) {
         buildPreview(mode || 'proposal');
         const html = document.getElementById('prevDoc')?.innerHTML;
         if (!html) { hideLoading(); win.close(); return; }
-        win.document.write(`<!DOCTYPE html><html><head><title>${esc(mode === 'invoice' ? 'Invoice' : p.title)}</title>
+        // SECURITY FIX: Privacy-conscious PDF metadata (no personal info leak)
+        const pdfAuthor = CONFIG.includePdfMetadata !== false ? (CONFIG.company || '') : '';
+        win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="author" content="${esc(pdfAuthor)}"><meta name="creator" content="ProposalKit"><title>${esc(mode === 'invoice' ? 'Invoice' : p.title)}</title>
       <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
       <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'SF Pro Display','Helvetica Neue',Helvetica,-apple-system,system-ui,sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}table{page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}img{page-break-inside:avoid;break-inside:avoid}}</style></head><body>${html}</body></html>`);
         win.document.close();
@@ -118,7 +120,8 @@ function bulkExport() {
             if (idx < ids.length - 1) combinedHtml += '<div style="page-break-after:always"></div>';
         });
     } finally { CUR = origCUR; }
-    win.document.write(`<!DOCTYPE html><html><head><title>Bulk Export - ${ids.length} Proposals</title>
+    const pdfAuthor = CONFIG.includePdfMetadata !== false ? (CONFIG.company || '') : '';
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="author" content="${esc(pdfAuthor)}"><meta name="creator" content="ProposalKit"><title>Bulk Export - ${ids.length} Proposals</title>
       <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
       <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'SF Pro Display','Helvetica Neue',Helvetica,-apple-system,system-ui,sans-serif;padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}table{page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}img{page-break-inside:avoid;break-inside:avoid}}</style></head><body>${combinedHtml}</body></html>`);
     win.document.close();

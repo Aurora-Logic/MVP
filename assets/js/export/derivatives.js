@@ -46,7 +46,9 @@ function generateDerivative(type) {
     const isSystem = !font || font === 'System' || font === 'Inter';
     const fontLink = isSystem ? '' : `<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700;800&display=swap" rel="stylesheet">`;
     const fontFamily = isSystem ? "'SF Pro Display','Helvetica Neue',Helvetica,-apple-system,system-ui,sans-serif" : `'${font}',system-ui,sans-serif`;
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${labels[type] || type}</title>
+    // SECURITY FIX: Privacy-conscious PDF metadata (no personal info leak)
+    const pdfAuthor = CONFIG.includePdfMetadata !== false ? (CONFIG.company || '') : '';
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="author" content="${esc(pdfAuthor)}"><meta name="creator" content="ProposalKit"><title>${labels[type] || type}</title>
 ${fontLink}<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:${fontFamily};padding:40px;color:#333;font-size:13px;line-height:1.7;max-width:700px;margin:0 auto}@media print{body{padding:20px}table{page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}img{page-break-inside:avoid;break-inside:avoid}}</style>
 </head><body>${html}</body></html>`);

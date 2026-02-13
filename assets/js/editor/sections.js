@@ -38,16 +38,72 @@ function destroyAllEditors() {
     sectionEditors = {};
 }
 
+// PERFORMANCE FIX: Lazy load section editors using IntersectionObserver
+let sectionObserver = null;
+
 function initSectionEditors(sections) {
     destroyAllEditors();
+
+    // Clean up previous observer
+    if (sectionObserver) {
+        sectionObserver.disconnect();
+        sectionObserver = null;
+    }
+
+    // Immediately initialize first 3 sections (above-the-fold)
     sections.forEach((s, i) => {
         if (s.type === 'testimonial' || s.type === 'case-study') return;
         const holderEl = document.getElementById(`sec-editor-${i}`);
         if (!holderEl) return;
-        holderEl.classList.add('editor-loading');
-        const html = migrateEditorContent(s.content);
-        initSingleSectionEditor(i, holderEl, html);
+
+        if (i < 3) {
+            // Load immediately
+            holderEl.classList.add('editor-loading');
+            const html = migrateEditorContent(s.content);
+            initSingleSectionEditor(i, holderEl, html);
+        } else {
+            // Mark as pending lazy load
+            holderEl.classList.add('editor-pending');
+            holderEl.innerHTML = '<div class="editor-lazy-placeholder">Editor will load when scrolled into view...</div>';
+        }
     });
+
+    // Set up IntersectionObserver for lazy loading
+    sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const holderEl = entry.target;
+            if (!holderEl.classList.contains('editor-pending')) return;
+
+            // Extract index from element ID
+            const match = holderEl.id.match(/sec-editor-(\d+)/);
+            if (!match) return;
+            const i = parseInt(match[1]);
+            const s = sections[i];
+            if (!s || s.type === 'testimonial' || s.type === 'case-study') return;
+
+            // Initialize editor on demand
+            holderEl.classList.remove('editor-pending');
+            holderEl.classList.add('editor-loading');
+            holderEl.innerHTML = '';
+            const html = migrateEditorContent(s.content);
+            initSingleSectionEditor(i, holderEl, html);
+
+            // Stop observing this element
+            sectionObserver.unobserve(holderEl);
+        });
+    }, { rootMargin: '200px' }); // Start loading 200px before visible
+
+    // Observe all pending editors
+    sections.forEach((s, i) => {
+        if (i < 3) return; // Skip already-loaded
+        if (s.type === 'testimonial' || s.type === 'case-study') return;
+        const holderEl = document.getElementById(`sec-editor-${i}`);
+        if (holderEl && holderEl.classList.contains('editor-pending')) {
+            sectionObserver.observe(holderEl);
+        }
+    });
+
     // Safety: force fallback for any editor still stuck after 2s
     setTimeout(() => sections.forEach((s, i) => {
         if (s.type === 'testimonial' || s.type === 'case-study') return;

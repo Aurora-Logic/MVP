@@ -141,6 +141,9 @@ function bootApp() {
         if (typeof enforceFreePlanLimits === 'function') enforceFreePlanLimits();
         if (typeof checkStorageQuota === 'function') checkStorageQuota();
 
+        // ERROR TRACKING: Initialize production error monitoring
+        if (typeof initErrorTracking === 'function') initErrorTracking();
+
         // PLAN GATING: Check offline access for free users
         if (typeof getCurrentPlan === 'function' && typeof PLAN_LIMITS !== 'undefined') {
             const plan = getCurrentPlan();

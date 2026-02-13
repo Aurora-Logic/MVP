@@ -1,7 +1,7 @@
 // ════════════════════════════════════════
 // PLANS — Subscription Limit Enforcement
 // ════════════════════════════════════════
-/* exported checkLimit, enforceLimit, showUpgradeModal, getCurrentPlan, getPlanBadge, trackEvent, PLAN_LIMITS */
+/* exported checkLimit, enforceLimit, enforceFreePlanLimits, showUpgradeModal, getCurrentPlan, getPlanBadge, trackEvent, PLAN_LIMITS */
 
 const PLAN_LIMITS = {
     free:  { proposals: 5, clients: 2, ai: false, team: 1, templates: 3, branding: false, offline: false, pdfCustomization: false },
@@ -82,6 +82,47 @@ function enforceLimit(feature, onBlock) {
         return false;
     }
     return true;
+}
+
+// SECURITY FIX: Enforce plan limits on app boot to prevent downgrade abuse
+function enforceFreePlanLimits() {
+    const plan = getCurrentPlan();
+    if (plan !== 'free') return; // Only enforce for free plan
+
+    const limits = PLAN_LIMITS.free;
+
+    // Check active proposals count (excluding archived)
+    if (typeof DB !== 'undefined' && Array.isArray(DB)) {
+        const activeProposals = DB.filter(p => !p.archived);
+        if (activeProposals.length > limits.proposals) {
+            const excess = activeProposals.length - limits.proposals;
+            console.warn('[Plan Enforcement] Free user has', activeProposals.length, 'proposals, limit is', limits.proposals);
+
+            // Archive excess proposals (oldest first)
+            const sorted = activeProposals.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+            for (let i = 0; i < excess; i++) {
+                sorted[i].archived = true;
+            }
+
+            if (typeof persist === 'function') persist();
+            if (typeof toast === 'function') {
+                toast('Free plan limit: ' + excess + ' older proposals archived. Upgrade for unlimited.', 'warning');
+            }
+        }
+    }
+
+    // Check clients count
+    if (typeof CLIENTS !== 'undefined' && Array.isArray(CLIENTS)) {
+        if (CLIENTS.length > limits.clients) {
+            const excess = CLIENTS.length - limits.clients;
+            console.warn('[Plan Enforcement] Free user has', CLIENTS.length, 'clients, limit is', limits.clients);
+
+            // Show warning but don't delete clients (too destructive)
+            if (typeof toast === 'function') {
+                toast('Free plan allows ' + limits.clients + ' clients. You have ' + CLIENTS.length + '. Upgrade to add more.', 'warning');
+            }
+        }
+    }
 }
 
 function showUpgradeModal(feature, check) {

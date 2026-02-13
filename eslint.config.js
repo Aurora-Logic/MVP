@@ -19,6 +19,7 @@ export default [
                 html2pdf: 'readonly',
                 QRCode: 'readonly',
                 qrcode: 'readonly',
+                DOMPurify: 'readonly',
 
                 // ── Tiptap (exposed on window via tiptap.bundle.js) ──
                 TiptapEditor: 'readonly',
@@ -67,6 +68,7 @@ export default [
                 sanitizeHtml: 'readonly',
                 sanitizeDataUrl: 'readonly',
                 isValidId: 'readonly',
+                checkStorageQuota: 'readonly',
                 TAX_VALIDATORS: 'readonly',
                 validateTaxId: 'readonly',
                 fmtCur: 'readonly',
@@ -147,6 +149,7 @@ export default [
                 PLAN_LIMITS: 'readonly',
                 enforceLimit: 'readonly',
                 checkLimit: 'readonly',
+                enforceFreePlanLimits: 'readonly',
                 showUpgradeModal: 'readonly',
                 getCurrentPlan: 'readonly',
                 getPlanBadge: 'readonly',
@@ -261,6 +264,9 @@ export default [
                 dirty: 'readonly',
                 undo: 'readonly',
                 redo: 'readonly',
+
+                // ── core/error-tracking.js ──
+                initErrorTracking: 'readonly',
 
                 // ── core/variables.js ──
                 replaceVariables: 'readonly',
