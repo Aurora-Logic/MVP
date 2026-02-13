@@ -60,12 +60,18 @@ function checkLimit(feature) {
             result.allowed = result.current < result.max;
             break;
         case 'branding':
+            result.current = limits.branding ? 1 : 0;
+            result.max = 1;
             result.allowed = limits.branding;
             break;
         case 'offline':
+            result.current = limits.offline ? 1 : 0;
+            result.max = 1;
             result.allowed = limits.offline;
             break;
         case 'pdfCustomization':
+            result.current = 0;
+            result.max = 0;
             result.allowed = limits.pdfCustomization;
             break;
         default:
@@ -128,14 +134,28 @@ function enforceFreePlanLimits() {
 function showUpgradeModal(feature, check) {
     const old = document.querySelector('.modal-wrap.upgrade-modal');
     if (old) old.remove();
-    const maxLabel = check.max === Infinity ? 'Unlimited' : check.max;
-    const featureLabel = feature.charAt(0).toUpperCase() + feature.slice(1);
-    const planLabel = check.plan.charAt(0).toUpperCase() + check.plan.slice(1);
-    const pct = check.max === Infinity || check.max === 0 ? 100 : Math.min(Math.round((check.current / check.max) * 100), 100);
 
-    // Detect Indian currency based on CONFIG or browser locale
-    const isIndian = (typeof CONFIG !== 'undefined' && CONFIG.currency === '₹') ||
-                     (typeof navigator !== 'undefined' && navigator.language === 'en-IN');
+    // Human-readable feature labels
+    const featureLabels = {
+        proposals: 'Proposals',
+        clients: 'Clients',
+        ai: 'AI Assistant',
+        team: 'Team Members',
+        templates: 'Templates',
+        branding: 'Custom Branding',
+        pdfCustomization: 'PDF Customization',
+        offline: 'Offline Access'
+    };
+
+    const featureLabel = featureLabels[feature] || (feature.charAt(0).toUpperCase() + feature.slice(1));
+    const maxLabel = check.max === Infinity ? 'Unlimited' : (check.max || 'feature');
+    const planLabel = check.plan.charAt(0).toUpperCase() + check.plan.slice(1);
+    const currentVal = check.current || 0;
+    const maxVal = check.max === Infinity ? 100 : (check.max || 1);
+    const pct = check.max === Infinity ? 100 : Math.min(Math.round((currentVal / maxVal) * 100), 100);
+
+    // Detect Indian currency based on CONFIG.country
+    const isIndian = (typeof CONFIG !== 'undefined' && CONFIG.country === 'IN');
     const proPriceUSD = '$12';
     const teamPriceUSD = '$29';
     const proPriceINR = '₹999';
@@ -169,22 +189,31 @@ function showUpgradeModal(feature, check) {
     const e = typeof esc === 'function' ? esc : function(s) { return String(s); };
     const wrap = document.createElement('div');
     wrap.className = 'modal-wrap upgrade-modal';
+
+    // Usage text for boolean features (0 used features vs available)
+    const usageText = (feature === 'branding' || feature === 'offline' || feature === 'pdfCustomization' || feature === 'ai')
+        ? 'Feature not available on ' + planLabel + ' plan'
+        : 'Usage: ' + currentVal + ' / ' + maxLabel;
+
     wrap.innerHTML = '<div class="modal" style="max-width:520px" onclick="event.stopPropagation()">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">' +
         '<div class="modal-t">Plan Limit Reached</div>' +
         '<button class="btn-sm-icon-ghost" onclick="this.closest(\'.modal-wrap\').remove()"><i data-lucide="x"></i></button></div>' +
         '<div style="text-align:center;margin-bottom:16px">' +
         '<i data-lucide="lock" style="width:32px;height:32px;color:var(--muted-foreground);margin-bottom:8px"></i>' +
-        '<p style="font-size:14px;font-weight:500;margin:0 0 4px">You\u2019ve reached your ' + e(planLabel) + ' limit of ' + maxLabel + ' ' + e(featureLabel.toLowerCase()) + '</p>' +
+        '<p style="font-size:14px;font-weight:500;margin:0 0 4px">You\u2019ve reached your ' + e(planLabel) + ' limit of ' + e(featureLabel) + '</p>' +
         '<p style="font-size:12px;color:var(--muted-foreground);margin:0">Upgrade your plan to unlock more</p></div>' +
         '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted-foreground);margin-bottom:4px">' +
-        '<span>Usage: ' + check.current + ' / ' + maxLabel + '</span><span>' + pct + '%</span></div>' +
+        '<span>' + usageText + '</span><span>' + pct + '%</span></div>' +
         '<div style="height:6px;background:var(--muted);border-radius:9999px;overflow:hidden">' +
         '<div style="height:100%;width:' + pct + '%;background:' + (pct >= 100 ? 'var(--destructive)' : 'var(--primary)') + ';border-radius:9999px"></div></div></div>' +
         tableHtml +
+        '<div style="background:var(--muted);border-radius:var(--r-lg);padding:12px;margin:16px 0;text-align:center">' +
+        '<p style="font-size:12px;font-weight:500;margin:0 0 4px;color:var(--primary)"><i data-lucide="gift" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px"></i>7-Day Free Trial</p>' +
+        '<p style="font-size:11px;color:var(--muted-foreground);margin:0">Try Pro free for 7 days. No credit card required.</p></div>' +
         '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">' +
         '<button class="btn-sm-outline" onclick="this.closest(\'.modal-wrap\').remove()">Maybe Later</button>' +
-        '<button class="btn-sm" onclick="window.open(\'https://proposalkit.com/pricing\', \'_blank\');trackEvent(\'upgrade_clicked\', {from: \'' + feature + '\'})">Upgrade Now</button></div></div>';
+        '<button class="btn-sm" onclick="window.open(\'https://proposalkit.com/pricing\', \'_blank\');trackEvent(\'upgrade_clicked\', {from: \'' + feature + '\'})">Start Free Trial</button></div></div>';
     wrap.addEventListener('click', function(ev) { if (ev.target === wrap) wrap.remove(); });
     document.body.appendChild(wrap);
     requestAnimationFrame(function() { wrap.classList.add('show'); });
