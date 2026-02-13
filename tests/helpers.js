@@ -10,8 +10,6 @@ export async function seedAndBoot(page, proposals = []) {
         }));
         localStorage.setItem('pk_db', JSON.stringify(props));
         localStorage.setItem('pk_clients', '[]');
-        // Dismiss What's New so it doesn't block interactions
-        localStorage.setItem('pk_whatsnew_ver', '99.0');
         // Suppress NPS prompt so it doesn't block interactions
         localStorage.setItem('pk_feedback_asked', JSON.stringify(Date.now()));
     }, proposals);
@@ -19,6 +17,8 @@ export async function seedAndBoot(page, proposals = []) {
     await page.evaluate(() => {
         document.getElementById('onboard')?.classList.add('hide');
         document.getElementById('appShell').style.display = 'flex';
+        // Dismiss What's New BEFORE bootApp() so the 800ms timeout never fires
+        if (typeof APP_VERSION !== 'undefined') localStorage.setItem('pk_whatsnew_ver', APP_VERSION);
         if (typeof bootApp === 'function') bootApp();
     });
     // Wait for app shell to be visible (more reliable than fixed timeout)
