@@ -45,6 +45,7 @@ function showSignatureCanvas() {
 function setupSigCanvas() {
     const canvas = document.getElementById('sigCanvas');
     if (!canvas) return;
+    canvas.style.touchAction = 'none';
     const ctx = canvas.getContext('2d');
     let drawing = false;
     let lastX = 0, lastY = 0;

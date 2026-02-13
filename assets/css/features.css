@@ -387,10 +387,10 @@
 .expiry-text { flex: 1; }
 .expiry-text strong { font-weight: 600; }
 
-.expiry-banner.expired { background: var(--red-bg); color: var(--red); border: 1px solid color-mix(in srgb, var(--red) 15%, transparent); }
-.expiry-banner.urgent { background: var(--red-bg); color: var(--red); border: 1px solid color-mix(in srgb, var(--red) 15%, transparent); }
-.expiry-banner.warning { background: var(--amber-bg); color: var(--amber); border: 1px solid color-mix(in srgb, var(--amber) 15%, transparent); }
-.expiry-banner.info { background: var(--blue-bg); color: var(--blue); border: 1px solid color-mix(in srgb, var(--blue) 15%, transparent); }
+.expiry-banner.expired { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); /* fallback */ border: 1px solid color-mix(in srgb, var(--red) 15%, transparent); }
+.expiry-banner.urgent { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); /* fallback */ border: 1px solid color-mix(in srgb, var(--red) 15%, transparent); }
+.expiry-banner.warning { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber); /* fallback */ border: 1px solid color-mix(in srgb, var(--amber) 15%, transparent); }
+.expiry-banner.info { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue); /* fallback */ border: 1px solid color-mix(in srgb, var(--blue) 15%, transparent); }
 
 /* Expiry warnings (Details tab) */
 .expiry-warn {

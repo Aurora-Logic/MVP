@@ -284,10 +284,12 @@
 }
 
 .side-new-full:hover {
+  background: var(--sidebar-primary); /* fallback */
   background: color-mix(in srgb, var(--sidebar-primary) 90%, transparent);
 }
 
 .side-new-full:active {
+  background: var(--sidebar-primary); /* fallback */
   background: color-mix(in srgb, var(--sidebar-primary) 90%, transparent);
 }
 

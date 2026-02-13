@@ -53,7 +53,7 @@ function renderPropTable(list) {
     const stIcon = statusIcon(st);
 
     if (viewMode === 'table') {
-      return `<tr class="nt-row" onclick="loadEditor('${pid}')" oncontextmenu="showCtx(event,'${pid}')">
+      return `<tr class="nt-row" tabindex="0" onclick="loadEditor('${pid}')" onkeydown="if(event.key==='Enter'){loadEditor('${pid}')}" oncontextmenu="showCtx(event,'${pid}')">
         <td class="nt-cell nt-cell-check">${!isArchived ? `<label class="bulk-check-wrap" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-input" data-id="${pid}" onchange="toggleBulkCheck('${pid}', this)"><span class="bulk-check-pill"></span></label>` : ''}</td>
         <td class="nt-cell nt-cell-title"><span class="nt-title-text">${esc(p.title || 'Untitled')}</span></td>
         <td class="nt-cell nt-cell-client"><span class="nt-client-text">${esc(p.client?.name || '\u2014')}</span></td>
@@ -70,7 +70,7 @@ function renderPropTable(list) {
       </tr>`;
     }
     // List view — compact single-line
-    return `<div class="nl-row" onclick="loadEditor('${pid}')" oncontextmenu="showCtx(event,'${pid}')">
+    return `<div class="nl-row" tabindex="0" role="button" onclick="loadEditor('${pid}')" onkeydown="if(event.key==='Enter'){loadEditor('${pid}')}" oncontextmenu="showCtx(event,'${pid}')">
       ${!isArchived ? `<label class="bulk-check-wrap" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-input" data-id="${pid}" onchange="toggleBulkCheck('${pid}', this)"><span class="bulk-check-pill"></span></label>` : ''}
       <i data-lucide="file-text" class="nl-icon"></i>
       <span class="nl-title">${esc(p.title || 'Untitled')}</span>
@@ -107,6 +107,19 @@ function renderPropTable(list) {
 function doQuickExport(id) { CUR = id; doExport('proposal'); }
 function quickPreview(id) { CUR = id; openPreview(); }
 
+function _menuKeyNav(menu, closeFn) {
+  menu.addEventListener('keydown', (e) => {
+    const items = menu.querySelectorAll('[role="menuitem"]');
+    const current = [...items].indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(current + 1) % items.length]?.focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(current - 1 + items.length) % items.length]?.focus(); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.activeElement?.click(); }
+    else if (e.key === 'Escape') { closeFn(); }
+    else if (e.key === 'Home') { e.preventDefault(); items[0]?.focus(); }
+    else if (e.key === 'End') { e.preventDefault(); items[items.length - 1]?.focus(); }
+  });
+}
+
 function showStatusMenu(event, id) {
   event.stopPropagation();
   const existing = document.querySelector('.status-dropdown');
@@ -119,8 +132,9 @@ function showStatusMenu(event, id) {
   ];
   const dropdown = document.createElement('div');
   dropdown.className = 'status-dropdown';
+  dropdown.setAttribute('role', 'menu');
   dropdown.innerHTML = statuses.map(s =>
-    `<button class="status-opt" onclick="setProposalStatus('${escAttr(id)}','${escAttr(s.status)}')">
+    `<button class="status-opt" role="menuitem" tabindex="-1" onclick="setProposalStatus('${escAttr(id)}','${escAttr(s.status)}')">
       <i data-lucide="${s.icon}" class="status-opt-icon" style="color:${s.color}"></i><span>${s.label}</span>
     </button>`
   ).join('');
@@ -128,6 +142,9 @@ function showStatusMenu(event, id) {
   dropdown.style.top = Math.min(event.clientY, window.innerHeight - 200) + 'px';
   document.body.appendChild(dropdown);
   if (typeof lucideScope === 'function') lucideScope(dropdown); else lucide.createIcons();
+  _menuKeyNav(dropdown, () => { dropdown.remove(); document.removeEventListener('click', close); });
+  const firstItem = dropdown.querySelector('[role="menuitem"]');
+  if (firstItem) firstItem.focus();
   const close = () => { dropdown.remove(); document.removeEventListener('click', close); };
   setTimeout(() => document.addEventListener('click', close), 10);
 }
@@ -200,8 +217,9 @@ function showSortMenu(event) {
   ];
   const dd = document.createElement('div');
   dd.className = 'sort-dropdown';
+  dd.setAttribute('role', 'menu');
   dd.innerHTML = opts.map(o =>
-    `<button class="sort-opt${currentSort === o.key ? ' sort-opt-active' : ''}" onclick="currentSort='${o.key}';document.querySelector('.sort-dropdown')?.remove();renderProposals()">
+    `<button class="sort-opt${currentSort === o.key ? ' sort-opt-active' : ''}" role="menuitem" tabindex="-1" onclick="currentSort='${o.key}';document.querySelector('.sort-dropdown')?.remove();renderProposals()">
       <i data-lucide="${o.icon}" style="width:14px;height:14px"></i><span>${o.label}</span>${currentSort === o.key ? '<i data-lucide="check" style="width:14px;height:14px;margin-left:auto;color:var(--primary)"></i>' : ''}
     </button>`
   ).join('');
@@ -211,6 +229,9 @@ function showSortMenu(event) {
   dd.style.right = (window.innerWidth - rect.right) + 'px';
   document.body.appendChild(dd);
   if (typeof lucideScope === 'function') lucideScope(dd); else lucide.createIcons();
+  _menuKeyNav(dd, () => { dd.remove(); document.removeEventListener('click', close); });
+  const firstItem = dd.querySelector('[role="menuitem"]');
+  if (firstItem) firstItem.focus();
   const close = (e) => { if (!dd.contains(e.target) && e.target !== btn) { dd.remove(); document.removeEventListener('click', close); } };
   setTimeout(() => document.addEventListener('click', close), 10);
 }
@@ -285,6 +306,7 @@ function renderProposals() {
         <button class="btn-sm" onclick="openNewModal()" data-tooltip="⌘N" data-side="bottom"><i data-lucide="plus"></i> New</button>
       </div>
     </div>
+    <div id="filterAnnounce" aria-live="polite" class="sr-only"></div>
     <div id="propListWrap"></div>
     ${buildPagination(currentPage, totalPages)}
     <div class="bulk-bar" id="bulkBar" style="display:none"></div>`;
@@ -299,6 +321,8 @@ function renderProposals() {
     } else { renderPropTable(paginated); }
   }
   if (typeof lucideScope === 'function') lucideScope(body); else lucide.createIcons();
+  const announce = document.getElementById('filterAnnounce');
+  if (announce) announce.textContent = filtered.length + ' proposal' + (filtered.length !== 1 ? 's' : '') + ' found';
 }
 
 function goPage(page) {

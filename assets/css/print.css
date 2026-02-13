@@ -38,11 +38,26 @@
   }
 
   /* Cards lose borders/shadows */
-  .card, .stat-card, .client-card, .sec-b {
+  .card, .stat-card, .client-card, .sec-b, .section-block {
     border: none !important;
     box-shadow: none !important;
     break-inside: avoid;
   }
+
+  /* Table handling */
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  tr, .line-item-row { break-inside: avoid; }
+
+  /* Headings stay with following content */
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+
+  /* Orphan and widow control */
+  p, li { orphans: 2; widows: 2; }
+
+  /* Images don't break */
+  img { break-inside: avoid; }
 
   /* Buttons hidden */
   .btn, .btn-sm, .btn-outline, .btn-sm-outline,

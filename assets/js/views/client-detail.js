@@ -77,21 +77,5 @@ function buildClientHistory(props) {
 }
 
 function createProposalForClient(idx) {
-    const c = CLIENTS[idx]; if (!c) return;
-    const id = uid(), num = nextPropNumber();
-    const today = new Date().toISOString().split('T')[0];
-    const valid = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
-    const clientName = c.displayName || c.companyName || c.name || '';
-    const contact = (c.salutation ? c.salutation + ' ' : '') + ((c.firstName || '') + ' ' + (c.lastName || '')).trim();
-    const addrParts = [c.street1, c.street2, c.city, c.state, c.pinCode].filter(Boolean);
-    const p = {
-        id, status: 'draft', title: 'Proposal for ' + clientName, number: num, date: today, validUntil: valid,
-        sender: { company: CONFIG?.company || '', email: CONFIG?.email || '', address: CONFIG?.address || '' },
-        client: { name: clientName, contact, email: c.email || '', phone: c.workPhone || c.mobile || '', address: addrParts.join(', '), gstNumber: c.gstNumber || '' },
-        sections: [], lineItems: [], currency: defaultCurrency(), paymentTerms: '', version: 1, coverPage: false,
-        packagesEnabled: false, packages: null, packageFeatures: [], addOns: [], paymentSchedule: [], paymentScheduleMode: 'percentage',
-        notes: [{ text: 'Proposal created for ' + clientName, time: Date.now(), type: 'system' }], createdAt: Date.now()
-    };
-    DB.unshift(p); persist(); loadEditor(id);
-    toast('Proposal created for ' + clientName);
+    navigate('/proposals/new?client=' + idx);
 }

@@ -112,8 +112,10 @@ function updateExpiryWarning(p) {
 function toggleStatusMenu(e) {
     e.stopPropagation();
     const menu = document.getElementById('statusMenu');
-    menu.classList.toggle('show');
-    const close = (ev) => { if (!menu.contains(ev.target)) { menu.classList.remove('show'); document.removeEventListener('click', close); } };
+    const badge = document.getElementById('statusBadge');
+    const isOpen = menu.classList.toggle('show');
+    if (badge) badge.setAttribute('aria-expanded', String(isOpen));
+    const close = (ev) => { if (!menu.contains(ev.target)) { menu.classList.remove('show'); if (badge) badge.setAttribute('aria-expanded', 'false'); document.removeEventListener('click', close); } };
     setTimeout(() => document.addEventListener('click', close), 0);
 }
 

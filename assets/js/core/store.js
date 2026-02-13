@@ -315,7 +315,9 @@ function defaultCurrency() { return COUNTRY_CURRENCY[CONFIG?.country] || '₹'; 
 
 // Shared utility: calculate proposal line-item value
 function proposalValue(p) {
-    return (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
+    const lineTotal = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
+    const addOnsTotal = (p.addOns || []).filter(a => a.selected).reduce((s, a) => s + (a.price || 0), 0);
+    return lineTotal + addOnsTotal;
 }
 
 // Shared utility: capitalize first letter

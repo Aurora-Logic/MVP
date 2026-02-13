@@ -37,7 +37,8 @@ function loadMyTickets(container) {
     let html = '';
     for (let i = 0; i < mine.length; i++) {
         const t = mine[i];
-        const sc = { open: '#3b82f6', 'in-progress': '#f59e0b', resolved: '#16a34a', closed: '#71717a' };
+        const _cv = (v, fb) => getComputedStyle(document.documentElement).getPropertyValue(v).trim() || fb;
+        const sc = { open: _cv('--blue', '#3b82f6'), 'in-progress': _cv('--amber', '#f59e0b'), resolved: _cv('--green', '#16a34a'), closed: _cv('--muted-foreground', '#71717a') };
         let lastMsg = (t.messages && t.messages.length) ? t.messages[t.messages.length - 1].text || '' : '';
         if (lastMsg.length > 60) lastMsg = lastMsg.substring(0, 60) + '\u2026';
         html += `<div onclick="showTicketDetail('${typeof esc === 'function' ? esc(t.id) : t.id}')" style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:background 200ms" onmouseenter="this.style.background='var(--muted)'" onmouseleave="this.style.background='transparent'">`;

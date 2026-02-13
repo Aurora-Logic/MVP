@@ -90,7 +90,7 @@ function showFallbackEditor(holderEl, html, idx) {
 
 function secBlockHtml(s, i) {
     return `<div class="sec-b open" draggable="false" data-idx="${i}">
-    <div class="sec-hd" onclick="togSec(this)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togSec(this)}">
+    <div class="sec-hd" onclick="togSec(this)" role="button" tabindex="0" aria-expanded="true" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togSec(this)}">
       <span class="sec-grip" onmousedown="this.closest('.sec-b').draggable=true" onmouseup="this.closest('.sec-b').draggable=false"><i data-lucide="grip-vertical"></i></span>
       <span class="sec-nm">${esc(s.title) || 'New Section'}</span>
       <span class="sec-chv"><i data-lucide="chevron-down"></i></span>
@@ -134,7 +134,7 @@ function showAddSectionMenu(btn) {
     const close = (e) => { if (!menu.contains(e.target) && e.target !== btn) { menu.remove(); document.removeEventListener('click', close); } };
     setTimeout(() => document.addEventListener('click', close), 10);
 }
-function togSec(h) { h.closest('.sec-b').classList.toggle('open'); }
+function togSec(h) { const block = h.closest('.sec-b'); block.classList.toggle('open'); h.setAttribute('aria-expanded', block.classList.contains('open')); }
 function updSecName(inp) { inp.closest('.sec-b').querySelector('.sec-nm').textContent = inp.value || 'New Section'; }
 
 function delSec(btn) {

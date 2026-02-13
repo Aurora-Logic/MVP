@@ -217,15 +217,28 @@ function showPaymentPickerMenu(event) {
     if (!dues.length) { toast('No outstanding dues'); return; }
     const dd = document.createElement('div');
     dd.className = 'status-dropdown';
+    dd.setAttribute('role', 'menu');
     dd.style.maxHeight = '300px'; dd.style.overflowY = 'auto'; dd.style.minWidth = '240px';
     dd.innerHTML = dues.slice(0, 10).map(p => {
         const pt = paymentTotals(p);
         const c = p.currency || defaultCurrency();
-        return `<button class="status-opt" onclick="quickRecordPayment('${p.id}')" style="flex-direction:column;align-items:flex-start;gap:2px"><span style="font-weight:600;font-size:12px">${esc(p.title || 'Untitled')}</span><span style="font-size:11px;color:var(--red)">Due: ${fmtCur(pt.balanceDue, c)}</span></button>`;
+        return `<button class="status-opt" role="menuitem" tabindex="-1" onclick="quickRecordPayment('${p.id}')" style="flex-direction:column;align-items:flex-start;gap:2px"><span style="font-weight:600;font-size:12px">${esc(p.title || 'Untitled')}</span><span style="font-size:11px;color:var(--red)">Due: ${fmtCur(pt.balanceDue, c)}</span></button>`;
     }).join('');
     dd.style.left = Math.min(event.clientX, window.innerWidth - 260) + 'px';
     dd.style.top = Math.min(event.clientY + 8, window.innerHeight - 320) + 'px';
     document.body.appendChild(dd);
+    dd.addEventListener('keydown', (e) => {
+        const items = dd.querySelectorAll('[role="menuitem"]');
+        const idx = [...items].indexOf(document.activeElement);
+        if (e.key === 'ArrowDown') { e.preventDefault(); items[(idx + 1) % items.length]?.focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); items[(idx - 1 + items.length) % items.length]?.focus(); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.activeElement?.click(); }
+        else if (e.key === 'Escape') { dd.remove(); document.removeEventListener('click', close); }
+        else if (e.key === 'Home') { e.preventDefault(); items[0]?.focus(); }
+        else if (e.key === 'End') { e.preventDefault(); items[items.length - 1]?.focus(); }
+    });
+    const firstItem = dd.querySelector('[role="menuitem"]');
+    if (firstItem) firstItem.focus();
     const close = () => { dd.remove(); document.removeEventListener('click', close); };
     setTimeout(() => document.addEventListener('click', close), 10);
 }

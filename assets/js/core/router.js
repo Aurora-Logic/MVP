@@ -9,6 +9,7 @@ const ROUTES = [
     { path: '/',             view: 'dashboard' },
     { path: '/dashboard',    view: 'dashboard' },
     { path: '/proposals',    view: 'proposals' },
+    { path: '/proposals/new', view: 'create' },
     { path: '/proposals/:id', view: 'editor' },
     { path: '/clients',      view: 'clients' },
     { path: '/profile',      view: 'profile' },
@@ -86,20 +87,20 @@ function handleRoute() {
     const { route, params } = result;
     const view = route.view;
     const an = typeof appName === 'function' ? appName() : 'ProposalKit';
-    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', clients: 'Customers', settings: 'Settings', profile: 'My Profile' };
+    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', create: 'New Proposal', clients: 'Customers', settings: 'Settings', profile: 'My Profile' };
 
     // Update document title
     document.title = (titles[view] || an) + ' — ' + an;
 
     // Toggle search visibility
     const topSearch = document.getElementById('topSearch');
-    if (topSearch) topSearch.style.display = (view === 'settings') ? 'none' : '';
+    if (topSearch) topSearch.style.display = (view === 'settings' || view === 'create') ? 'none' : '';
 
     // Update sidebar active state
-    const navKey = (view === 'editor' || view === 'proposals') ? 'editor' : view;
-    document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
+    const navKey = (view === 'editor' || view === 'proposals' || view === 'create') ? 'editor' : view;
+    document.querySelectorAll('[data-nav]').forEach(b => { b.classList.remove('on'); b.removeAttribute('aria-current'); });
     const btn = document.querySelector(`[data-nav="${navKey}"]`);
-    if (btn) btn.classList.add('on');
+    if (btn) { btn.classList.add('on'); btn.setAttribute('aria-current', 'page'); }
 
     // Reset breadcrumb root
     const root = document.getElementById('breadcrumbRoot');
@@ -111,6 +112,10 @@ function handleRoute() {
     }
     // Hide TOC on non-editor views
     if (view !== 'editor' && typeof hideTOC === 'function') hideTOC();
+    // Close preview panel when navigating away
+    if (view === 'create') {
+        if (typeof closePreview === 'function') closePreview();
+    }
 
     _routing = true;
     try {
@@ -133,6 +138,10 @@ function handleRoute() {
         } else if (view === 'profile') {
             if (typeof renderProfile === 'function') renderProfile();
             else if (typeof openSettings === 'function') openSettings();
+        } else if (view === 'create') {
+            console.log('[ROUTER] Navigating to create page, renderCreatePage available:', typeof renderCreatePage);
+            if (typeof renderCreatePage === 'function') renderCreatePage();
+            else console.error('[ROUTER] renderCreatePage function not found!');
         } else if (view === 'settings') {
             if (typeof openSettings === 'function') openSettings();
         }
@@ -145,7 +154,7 @@ function handleRoute() {
 function render404(path) {
     const an = typeof appName === 'function' ? appName() : 'ProposalKit';
     document.title = 'Page not found — ' + an;
-    document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
+    document.querySelectorAll('[data-nav]').forEach(b => { b.classList.remove('on'); b.removeAttribute('aria-current'); });
     const body = document.getElementById('bodyScroll');
     const safePath = typeof esc === 'function' ? esc(path || '') : (path || '');
     body.innerHTML = `

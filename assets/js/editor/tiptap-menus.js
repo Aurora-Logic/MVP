@@ -87,12 +87,21 @@ function positionBubble(editor, bubble, wrap) {
 
 function promptLink(editor) {
     const existing = editor.getAttributes('link').href || '';
-    const url = prompt('Enter URL:', existing);
-    if (url === null) return;
-    if (url === '') { editor.chain().focus().unsetLink().run(); return; }
-    let safeUrl = url.trim();
-    if (!/^https?:\/\//i.test(safeUrl) && !safeUrl.startsWith('mailto:')) safeUrl = 'https://' + safeUrl;
-    editor.chain().focus().setLink({ href: safeUrl }).run();
+    if (typeof inputDialog === 'function') {
+        inputDialog('Enter URL:', existing, (url) => {
+            if (url === '') { editor.chain().focus().unsetLink().run(); return; }
+            let safeUrl = url.trim();
+            if (!/^https?:\/\//i.test(safeUrl) && !safeUrl.startsWith('mailto:')) safeUrl = 'https://' + safeUrl;
+            editor.chain().focus().setLink({ href: safeUrl }).run();
+        }, { title: 'Insert Link', placeholder: 'https://example.com' });
+    } else {
+        const url = prompt('Enter URL:', existing);
+        if (url === null) return;
+        if (url === '') { editor.chain().focus().unsetLink().run(); return; }
+        let safeUrl = url.trim();
+        if (!/^https?:\/\//i.test(safeUrl) && !safeUrl.startsWith('mailto:')) safeUrl = 'https://' + safeUrl;
+        editor.chain().focus().setLink({ href: safeUrl }).run();
+    }
 }
 
 // ─── Slash Command Menu (type / to get block options) ───

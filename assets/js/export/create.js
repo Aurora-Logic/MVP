@@ -2,52 +2,50 @@
 // CREATE / DUPLICATE / DELETE + SIDEBAR + CONTEXT MENU + SHARING
 // ════════════════════════════════════════
 
-/* exported doDupWithClient, fromTpl, fromSavedTpl, saveAsTemplate, doSaveAsTemplate, deleteSavedTpl, bumpVersion, toggleCover, ctxAction */
-function createProp(tpl) {
-    if (typeof enforceLimit === 'function' && !enforceLimit('proposals')) return;
-    const id = uid();
-    const existingNumbers = DB.map(p => {
-        const match = (p.number || '').match(/PROP-(\d+)/);
-        return match ? parseInt(match[1]) : 0;
-    });
-    const nextNum = existingNumbers.length ? Math.max(...existingNumbers) + 1 : 1;
-    const num = 'PROP-' + String(nextNum).padStart(3, '0');
+/* exported doDupWithClient, fromTpl, fromSavedTpl, saveAsTemplate, doSaveAsTemplate, deleteSavedTpl, bumpVersion, toggleCover, ctxAction, createPropFromPage */
+
+function _nextPropNum() {
+    const nums = DB.map(p => { const m = (p.number || '').match(/PROP-(\d+)/); return m ? parseInt(m[1]) : 0; });
+    return 'PROP-' + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(3, '0');
+}
+
+function _baseProp(id, title, sections, lineItems, paymentTerms, client) {
     const today = new Date().toISOString().split('T')[0];
-    const valid = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
-    const p = {
-        id, status: 'draft', title: tpl.title || 'Untitled', number: num, date: today, validUntil: valid,
+    return {
+        id, status: 'draft', title: title || 'Untitled', number: _nextPropNum(), date: today,
+        validUntil: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
         sender: { company: CONFIG?.company || '', email: CONFIG?.email || '', address: CONFIG?.address || '' },
-        client: { name: '', contact: '', email: '', phone: '' },
-        sections: JSON.parse(JSON.stringify(tpl.sections || [])),
-        lineItems: JSON.parse(JSON.stringify(tpl.lineItems || [])),
-        currency: defaultCurrency(), paymentTerms: tpl.paymentTerms || '', version: 1, coverPage: false,
+        client: client || { name: '', contact: '', email: '', phone: '' },
+        sections: JSON.parse(JSON.stringify(sections || [])),
+        lineItems: JSON.parse(JSON.stringify(lineItems || [])),
+        currency: defaultCurrency(), paymentTerms: paymentTerms || '', version: 1, coverPage: false,
         packagesEnabled: false, packages: null, packageFeatures: [],
         addOns: [], paymentSchedule: [], paymentScheduleMode: 'percentage', payments: [],
         notes: [{ text: 'Proposal created', time: Date.now(), type: 'system' }],
-        createdAt: Date.now(),
-        owner: CONFIG?.activeUserId || null
+        createdAt: Date.now(), owner: CONFIG?.activeUserId || null
     };
-    DB.unshift(p); persist();
-    loadEditor(id);
-    toast('Proposal created');
+}
+
+function createProp(tpl) {
+    if (typeof enforceLimit === 'function' && !enforceLimit('proposals')) return;
+    const p = _baseProp(uid(), tpl.title, tpl.sections, tpl.lineItems, tpl.paymentTerms);
+    DB.unshift(p); persist(); loadEditor(p.id); toast('Proposal created');
+}
+
+function _prepDup(src) {
+    const dup = JSON.parse(JSON.stringify(src));
+    dup.id = uid(); dup.title = src.title + ' (Copy)'; dup.number = _nextPropNum();
+    dup.status = 'draft'; dup.createdAt = Date.now(); dup.version = 1;
+    delete dup.shareToken; delete dup.sharedAt; delete dup.viewCount;
+    delete dup.lastViewedAt; delete dup.clientResponse; delete dup.versionHistory;
+    return dup;
 }
 
 function dupProp(id) {
     const src = DB.find(p => p.id === id); if (!src) return;
-    const dup = JSON.parse(JSON.stringify(src));
-    dup.id = uid();
-    dup.title = src.title + ' (Copy)';
-    const existingNums = DB.map(p => { const m = (p.number||'').match(/PROP-(\d+)/); return m ? parseInt(m[1]) : 0; });
-    dup.number = 'PROP-' + String((existingNums.length ? Math.max(...existingNums) : 0) + 1).padStart(3, '0');
-    dup.status = 'draft';
-    dup.createdAt = Date.now();
-    delete dup.shareToken; delete dup.sharedAt; delete dup.viewCount;
-    delete dup.lastViewedAt; delete dup.clientResponse; delete dup.versionHistory;
-    dup.version = 1;
+    const dup = _prepDup(src);
     dup.notes = [{ text: 'Duplicated from ' + src.number, time: Date.now(), type: 'system' }];
-    DB.unshift(dup); persist();
-    loadEditor(dup.id);
-    toast('Proposal duplicated');
+    DB.unshift(dup); persist(); loadEditor(dup.id); toast('Proposal duplicated');
 }
 
 // Phase 1.7: Duplicate with client swap
@@ -67,26 +65,13 @@ function dupPropWithClient(id) {
 function doDupWithClient(id, clientIdx) {
     document.getElementById('dupClientModal')?.remove();
     const src = DB.find(p => p.id === id); if (!src) return;
-    const dup = JSON.parse(JSON.stringify(src));
-    dup.id = uid();
-    dup.title = src.title + ' (Copy)';
-    const existingNums = DB.map(p => { const m = (p.number||'').match(/PROP-(\d+)/); return m ? parseInt(m[1]) : 0; });
-    dup.number = 'PROP-' + String((existingNums.length ? Math.max(...existingNums) : 0) + 1).padStart(3, '0');
-    dup.status = 'draft';
-    dup.createdAt = Date.now();
-    delete dup.shareToken; delete dup.sharedAt; delete dup.viewCount;
-    delete dup.lastViewedAt; delete dup.clientResponse; delete dup.versionHistory;
-    dup.version = 1;
+    const dup = _prepDup(src);
     if (clientIdx >= 0 && CLIENTS[clientIdx]) {
         const c = CLIENTS[clientIdx];
         dup.client = { name: c.name || '', contact: c.contact || '', email: c.email || '', phone: c.phone || '' };
         dup.notes = [{ text: 'Duplicated from ' + src.number + ' for ' + c.name, time: Date.now(), type: 'system' }];
-    } else {
-        dup.notes = [{ text: 'Duplicated from ' + src.number, time: Date.now(), type: 'system' }];
-    }
-    DB.unshift(dup); persist();
-    loadEditor(dup.id);
-    toast('Proposal duplicated');
+    } else { dup.notes = [{ text: 'Duplicated from ' + src.number, time: Date.now(), type: 'system' }]; }
+    DB.unshift(dup); persist(); loadEditor(dup.id); toast('Proposal duplicated');
 }
 
 function delProp(id) {
@@ -97,6 +82,19 @@ function delProp(id) {
         refreshSide();
         toast('Proposal deleted');
     }, { title: 'Delete Proposal', confirmText: 'Delete' });
+}
+
+function createPropFromPage(state) {
+    if (typeof enforceLimit === 'function' && !enforceLimit('proposals')) return;
+    const tpl = state.template?.startsWith('saved_')
+        ? safeGetStorage('pk_templates', [])[parseInt(state.template.replace('saved_', ''))] || TPLS.blank
+        : TPLS[state.template] || TPLS.blank;
+    const secs = (state.sections || []).filter(s => s.enabled).map(s => { const c = JSON.parse(JSON.stringify(s)); delete c.enabled; return c; });
+    const client = state.client && state.client.name ? JSON.parse(JSON.stringify(state.client)) : null;
+    const p = _baseProp(uid(), tpl.title, secs, state.lineItems, state.paymentTerms, client);
+    if (state.color) { CONFIG.color = state.color; saveConfig(); }
+    if (state.font && state.font !== CONFIG?.font) { CONFIG.font = state.font; saveConfig(); if (typeof applyFont === 'function') applyFont(state.font); }
+    DB.unshift(p); persist(); loadEditor(p.id); refreshSide(); toast('Proposal created');
 }
 
 function fromTpl(key) { closeNewModal(); createProp(TPLS[key] || TPLS.blank); }
@@ -273,9 +271,37 @@ function showCtx(e, id) {
     ctx.style.left = Math.min(e.clientX, window.innerWidth - 180) + 'px';
     ctx.style.top = Math.min(e.clientY, window.innerHeight - 160) + 'px';
     ctx.classList.add('show');
+    const items = ctx.querySelectorAll('[role="menuitem"]');
+    items.forEach(it => it.setAttribute('tabindex', '-1'));
+    if (items[0]) items[0].focus();
+    if (!ctx._kbNav) {
+        ctx.addEventListener('keydown', _ctxKeyHandler);
+        ctx._kbNav = true;
+    }
+    document.addEventListener('keydown', _ctxEscHandler);
+    document.addEventListener('mousedown', _ctxOutsideHandler);
 }
 
-function hideCtx() { const m = document.getElementById('ctxMenu'); if (m) m.classList.remove('show'); }
+function _ctxKeyHandler(e) {
+    const ctx = document.getElementById('ctxMenu');
+    if (!ctx) return;
+    const items = ctx.querySelectorAll('[role="menuitem"]:not([style*="display: none"])');
+    const idx = [...items].indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(idx + 1) % items.length]?.focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(idx - 1 + items.length) % items.length]?.focus(); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.activeElement?.click(); }
+    else if (e.key === 'Home') { e.preventDefault(); items[0]?.focus(); }
+    else if (e.key === 'End') { e.preventDefault(); items[items.length - 1]?.focus(); }
+}
+function _ctxEscHandler(e) { if (e.key === 'Escape') hideCtx(); }
+function _ctxOutsideHandler(e) { const m = document.getElementById('ctxMenu'); if (m && !m.contains(e.target)) hideCtx(); }
+
+function hideCtx() {
+    const m = document.getElementById('ctxMenu');
+    if (m) m.classList.remove('show');
+    document.removeEventListener('keydown', _ctxEscHandler);
+    document.removeEventListener('mousedown', _ctxOutsideHandler);
+}
 
 function ctxAction(action) {
     hideCtx();

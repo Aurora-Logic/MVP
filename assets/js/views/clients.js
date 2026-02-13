@@ -44,7 +44,7 @@ function renderClients() {
         const props = DB.filter(p => matchClient(p, c));
         let val = 0;
         props.forEach(p => {
-            val += (p.lineItems || []).reduce((a, it) => a + (it.qty || 0) * (it.rate || 0), 0);
+            val += proposalValue(p);
             if (p.status === 'accepted') wonProps++;
             if (p.status === 'accepted' || p.status === 'declined') decidedProps++;
         });
@@ -58,7 +58,7 @@ function renderClients() {
     const filtered = _clientFilter === 'all' ? clientData : _clientFilter === 'business' ? clientData.filter(d => d.isBiz) : clientData.filter(d => !d.isBiz);
 
     // Table rows
-    const rows = filtered.map(d => `<tr class="nt-row" onclick="showClientInsightFull(${d.i})">
+    const rows = filtered.map(d => `<tr class="nt-row" tabindex="0" onclick="showClientInsightFull(${d.i})" onkeydown="if(event.key==='Enter'){showClientInsightFull(${d.i})}">
       <td class="nt-cell"><div class="cl-cell-name"><div class="cc-avi" style="background:var(--blue-bg);color:var(--blue)">${d.ini}</div><div><div class="cc-name">${esc(d.displayName)}</div><div class="cc-email">${esc(d.email)}</div></div></div></td>
       <td class="nt-cell cl-cell-email">${esc(d.email)}</td>
       <td class="nt-cell">${d.props}</td>
@@ -74,7 +74,7 @@ function renderClients() {
     const cards = filtered.map(d => {
         const typeBadge = d.isBiz ? '<span class="cl-card-badge">Business</span>' : '<span class="cl-card-badge cl-card-badge-ind">Individual</span>';
         const lastActive = d.last ? timeAgo(d.last.updatedAt || d.last.createdAt) : 'No activity';
-        return `<div class="cl-card" onclick="showClientInsightFull(${d.i})">
+        return `<div class="cl-card" tabindex="0" role="button" onclick="showClientInsightFull(${d.i})" onkeydown="if(event.key==='Enter'){showClientInsightFull(${d.i})}">
       <div class="cl-card-head"><div class="cc-avi" style="background:var(--blue-bg);color:var(--blue)">${d.ini}</div>
         <div style="flex:1;min-width:0"><div class="cc-name">${esc(d.displayName)}</div><div class="cc-email">${esc(d.email)}</div></div>
         ${typeBadge}</div>
