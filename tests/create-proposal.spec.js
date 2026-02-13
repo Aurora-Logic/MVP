@@ -10,8 +10,9 @@ test.describe('Create Proposal', () => {
         await newBtn.click();
         await page.waitForTimeout(500);
 
-        const modal = page.locator('#newModal');
-        await expect(modal).toBeVisible();
+        // Modal ID changed from #newModal to #createDrawer
+        const drawer = page.locator('#createDrawer');
+        await expect(drawer).toBeVisible();
     });
 
     test('autosave persists title change', async ({ page }) => {
