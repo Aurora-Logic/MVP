@@ -208,12 +208,27 @@
                 <button class="btn-icon-outline" onclick="typeof showExportMenu==='function'&&showExportMenu(this)" data-tooltip="Export As" data-side="bottom"><i data-lucide="file-down"></i></button>
                 <button class="btn-icon-outline" onclick="doExport('invoice')" data-tooltip="Convert to Invoice" data-side="bottom"><i data-lucide="receipt"></i></button>
                 <button class="btn-icon-outline" onclick="typeof openDerivativesMenu==='function'&&openDerivativesMenu(this)" data-tooltip="Generate Document" data-side="bottom"><i data-lucide="file-plus-2"></i></button>
+                <button class="btn-icon-outline" id="pdfCustomizeBtn" onclick="togglePdfCustomizeDrawer()" data-tooltip="Customize PDF" data-side="bottom"><i data-lucide="palette"></i></button>
                 <button class="btn-icon-ghost" onclick="doExport('proposal')" data-tooltip="Download PDF" data-side="bottom"><i data-lucide="download"></i></button>
                 <button class="btn-icon-outline" onclick="closePreview()" data-tooltip="Close (Esc)" data-side="bottom"><i data-lucide="x"></i></button>
             </div>
         </div>
         <div class="prev-body">
             <div class="prev-doc" id="prevDoc"></div>
+        </div>
+    </div>
+
+    <!-- PDF Customize Drawer -->
+    <div class="pdf-customize-drawer" id="pdfCustomizeDrawer">
+        <div class="pdf-cust-header">
+            <div class="pdf-cust-title">
+                <i data-lucide="palette"></i>
+                <span>Customize PDF</span>
+            </div>
+            <button class="btn-sm-icon-ghost" onclick="togglePdfCustomizeDrawer()" data-tooltip="Close"><i data-lucide="x"></i></button>
+        </div>
+        <div class="pdf-cust-body" id="pdfCustomizeBody">
+            <!-- Content will be populated dynamically -->
         </div>
     </div>
 

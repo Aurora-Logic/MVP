@@ -3500,6 +3500,111 @@
   position: relative;
 }
 
+/* ════════ PDF CUSTOMIZE DRAWER ════════ */
+.pdf-customize-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  background: var(--background);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 9998;
+  transform: translateX(100%);
+  transition: transform 200ms ease-out;
+}
+
+.pdf-customize-drawer.show {
+  transform: translateX(0);
+}
+
+.pdf-cust-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+}
+
+.pdf-cust-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.pdf-cust-title i {
+  width: 18px;
+  height: 18px;
+  color: var(--muted-foreground);
+}
+
+.pdf-cust-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.pdf-cust-section {
+  margin-bottom: 24px;
+}
+
+.pdf-cust-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.pdf-cust-label i {
+  width: 14px;
+  height: 14px;
+}
+
+.pdf-cust-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pdf-cust-row label {
+  flex: 1;
+  font-size: 13px;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.pdf-cust-row input[type="text"] {
+  width: 100px !important;
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+}
+
+.pdf-color-hex {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  font-family: var(--mono);
+  min-width: 60px;
+}
+
+.pdf-cust-actions {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+}
+
 /* ════════ BULK EXPORT ════════ */
 
 /* Legacy bulk-check compat */

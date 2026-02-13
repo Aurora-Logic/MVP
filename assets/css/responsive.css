@@ -569,6 +569,11 @@
     font-size: 12px;
   }
 
+  /* PDF Customize Drawer */
+  .pdf-customize-drawer {
+    width: 100%;
+  }
+
   /* Command palette */
   .command {
     width: 95vw;

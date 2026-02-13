@@ -2,7 +2,7 @@
 // PDF CUSTOMIZER — Template Style Editor (Pro/Team)
 // ════════════════════════════════════════
 
-/* exported getPdfStyles, savePdfStyles, resetPdfStyles, renderPdfCustomizer, applyPdfStyles, previewPdfCustomization */
+/* exported getPdfStyles, savePdfStyles, resetPdfStyles, renderPdfCustomizer, applyPdfStyles, previewPdfCustomization, togglePdfCustomizeDrawer, renderPdfCustomizeDrawer */
 
 // Default PDF styles
 const DEFAULT_PDF_STYLES = {
@@ -334,4 +334,191 @@ function initPdfCustomizerSelects() {
             onChange: (val) => updatePdfStyle('headingFontFamily', val)
         });
     }
+}
+
+// ════════════════════════════════════════
+// DRAWER FUNCTIONS (Preview Panel Integration)
+// ════════════════════════════════════════
+
+function togglePdfCustomizeDrawer() {
+    const drawer = document.getElementById('pdfCustomizeDrawer');
+    const btn = document.getElementById('pdfCustomizeBtn');
+
+    if (!drawer) return;
+
+    const isOpen = drawer.classList.contains('show');
+
+    if (isOpen) {
+        drawer.classList.remove('show');
+        if (btn) btn.classList.remove('on');
+    } else {
+        // Check plan access
+        const hasPdfCustomization = typeof checkLimit === 'function' ? checkLimit('pdfCustomization').allowed : false;
+        if (!hasPdfCustomization) {
+            if (typeof showUpgradeModal === 'function') {
+                showUpgradeModal('pdfCustomization', checkLimit('pdfCustomization'));
+            }
+            return;
+        }
+
+        // Populate drawer content
+        renderPdfCustomizeDrawer();
+        drawer.classList.add('show');
+        if (btn) btn.classList.add('on');
+    }
+}
+
+function renderPdfCustomizeDrawer() {
+    const body = document.getElementById('pdfCustomizeBody');
+    if (!body) return;
+
+    const styles = getPdfStyles();
+
+    body.innerHTML = `
+        <!-- Colors Section -->
+        <div class="pdf-cust-section">
+            <div class="pdf-cust-label"><i data-lucide="palette"></i> Colors</div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Primary Color</label>
+                <input type="color" id="pdfPrimaryColor" value="${esc(styles.primaryColor)}" onchange="updatePdfStyleDrawer('primaryColor', this.value)" class="pdf-color-input">
+                <span class="pdf-color-hex">${styles.primaryColor}</span>
+            </div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Heading Color</label>
+                <input type="color" id="pdfHeadingColor" value="${esc(styles.headingColor)}" onchange="updatePdfStyleDrawer('headingColor', this.value)" class="pdf-color-input">
+                <span class="pdf-color-hex">${styles.headingColor}</span>
+            </div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Text Color</label>
+                <input type="color" id="pdfTextColor" value="${esc(styles.textColor)}" onchange="updatePdfStyleDrawer('textColor', this.value)" class="pdf-color-input">
+                <span class="pdf-color-hex">${styles.textColor}</span>
+            </div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Muted Text</label>
+                <input type="color" id="pdfMutedColor" value="${esc(styles.mutedColor)}" onchange="updatePdfStyleDrawer('mutedColor', this.value)" class="pdf-color-input">
+                <span class="pdf-color-hex">${styles.mutedColor}</span>
+            </div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Border Color</label>
+                <input type="color" id="pdfBorderColor" value="${esc(styles.borderColor)}" onchange="updatePdfStyleDrawer('borderColor', this.value)" class="pdf-color-input">
+                <span class="pdf-color-hex">${styles.borderColor}</span>
+            </div>
+        </div>
+
+        <!-- Typography Section -->
+        <div class="pdf-cust-section">
+            <div class="pdf-cust-label"><i data-lucide="type"></i> Typography</div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Font Family</label>
+                <div id="pdfFontFamilyDrawer"></div>
+            </div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Font Size</label>
+                <input type="text" id="pdfFontSize" value="${esc(styles.fontSize)}" oninput="updatePdfStyleDrawer('fontSize', this.value)" placeholder="13px">
+            </div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Heading Size</label>
+                <input type="text" id="pdfHeadingSize" value="${esc(styles.headingSize)}" oninput="updatePdfStyleDrawer('headingSize', this.value)" placeholder="24px">
+            </div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Line Height</label>
+                <input type="text" id="pdfLineHeight" value="${esc(styles.lineHeight)}" oninput="updatePdfStyleDrawer('lineHeight', this.value)" placeholder="1.6">
+            </div>
+        </div>
+
+        <!-- Spacing Section -->
+        <div class="pdf-cust-section">
+            <div class="pdf-cust-label"><i data-lucide="square"></i> Spacing</div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Border Width</label>
+                <input type="text" id="pdfBorderWidth" value="${esc(styles.borderWidth)}" oninput="updatePdfStyleDrawer('borderWidth', this.value)" placeholder="1px">
+            </div>
+
+            <div class="pdf-cust-row">
+                <label class="fl">Border Radius</label>
+                <input type="text" id="pdfBorderRadius" value="${esc(styles.borderRadius)}" oninput="updatePdfStyleDrawer('borderRadius', this.value)" placeholder="8px">
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="pdf-cust-actions">
+            <button class="btn-sm-outline" onclick="resetPdfStylesDrawer()"><i data-lucide="rotate-ccw"></i> Reset</button>
+        </div>
+    `;
+
+    // Initialize icon rendering
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // Initialize font selector
+    initPdfCustomizerDrawerSelects();
+}
+
+function initPdfCustomizerDrawerSelects() {
+    if (typeof csel !== 'function') return;
+
+    const styles = getPdfStyles();
+    const fonts = [
+        { value: 'Inter', label: 'Inter', desc: 'Modern sans-serif' },
+        { value: 'System', label: 'System Default', desc: 'SF Pro / Segoe UI' },
+        { value: 'Georgia', label: 'Georgia', desc: 'Classic serif' },
+        { value: 'Times New Roman', label: 'Times New Roman', desc: 'Traditional serif' },
+        { value: 'Arial', label: 'Arial', desc: 'Standard sans-serif' },
+        { value: 'Helvetica', label: 'Helvetica', desc: 'Clean sans-serif' },
+        { value: 'Verdana', label: 'Verdana', desc: 'Readable sans-serif' },
+        { value: 'Courier New', label: 'Courier New', desc: 'Monospace' }
+    ];
+
+    const fontFamilyEl = document.getElementById('pdfFontFamilyDrawer');
+
+    if (fontFamilyEl) {
+        csel(fontFamilyEl, {
+            value: styles.fontFamily,
+            items: fonts,
+            onChange: (val) => updatePdfStyleDrawer('fontFamily', val)
+        });
+    }
+}
+
+function updatePdfStyleDrawer(key, value) {
+    const styles = getPdfStyles();
+    styles[key] = value;
+
+    // Update hex display for color inputs
+    if (key.includes('Color') || key.includes('Bg')) {
+        const input = document.getElementById('pdf' + key.charAt(0).toUpperCase() + key.slice(1));
+        if (input && input.nextElementSibling && input.nextElementSibling.classList.contains('pdf-color-hex')) {
+            input.nextElementSibling.textContent = value;
+        }
+    }
+
+    savePdfStyles(styles);
+
+    // Auto-refresh preview if open
+    if (updatePdfStyleDrawer._previewTimer) clearTimeout(updatePdfStyleDrawer._previewTimer);
+    updatePdfStyleDrawer._previewTimer = setTimeout(() => {
+        if (typeof buildPreview === 'function') buildPreview();
+    }, 300);
+}
+
+function resetPdfStylesDrawer() {
+    if (!CONFIG) return;
+    CONFIG.pdfStyles = structuredClone(DEFAULT_PDF_STYLES);
+    saveConfig();
+    toast('PDF styles reset to default');
+    renderPdfCustomizeDrawer();
+
+    // Refresh preview
+    setTimeout(() => {
+        if (typeof buildPreview === 'function') buildPreview();
+    }, 100);
 }
