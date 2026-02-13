@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Aggressive cache control for HTML -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <base href="/">
     <title>ProposalKit — Professional Proposals in Minutes</title>
     <meta name="description" content="Create professional proposals with 13 PDF templates. Track payments, manage clients, and close deals faster. Free forever.">
@@ -32,21 +36,21 @@
     <!-- Lottie Player (for empty state animation) -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-wc@0.8.16/+esm"></script>
     <!-- Lucide Icons (vendored locally) -->
-    <script src="assets/js/vendor/lucide-0.460.0.js"></script>
+    <script src="assets/js/vendor/lucide-0.460.0.js?v=18"></script>
     <!-- Tailwind CSS v4 Browser CDN (pinned, SRI not practical for dynamic compilation) -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.0.0"></script>
     <!-- Supabase JS Client (vendored locally) -->
-    <script src="assets/js/vendor/supabase-2.49.1.js"></script>
+    <script src="assets/js/vendor/supabase-2.49.1.js?v=18"></script>
     <!-- Light mode only — no theme detection needed -->
     <!-- App CSS (modular) -->
-    <link rel="stylesheet" href="assets/css/variables.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/layout.css">
-    <link rel="stylesheet" href="assets/css/pages.css">
-    <link rel="stylesheet" href="assets/css/features.css">
-    <link rel="stylesheet" href="assets/css/pdf.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
-    <link rel="stylesheet" href="assets/css/print.css">
+    <link rel="stylesheet" href="assets/css/variables.css?v=18">
+    <link rel="stylesheet" href="assets/css/components.css?v=18">
+    <link rel="stylesheet" href="assets/css/layout.css?v=18">
+    <link rel="stylesheet" href="assets/css/pages.css?v=18">
+    <link rel="stylesheet" href="assets/css/features.css?v=18">
+    <link rel="stylesheet" href="assets/css/pdf.css?v=18">
+    <link rel="stylesheet" href="assets/css/responsive.css?v=18">
+    <link rel="stylesheet" href="assets/css/print.css?v=18">
 
 </head>
 
@@ -167,14 +171,15 @@
                     <i data-lucide="check" class="save-icon saved"></i>
                     <span class="save-text">Saved</span>
                 </span>
-                <div class="topbar-search" id="topSearch">
-                    <i data-lucide="search"></i>
-                    <input type="text" placeholder="Search proposals..." id="searchInput" oninput="filterList()"
-                        aria-label="Search proposals">
-                    <kbd class="kbd" style="cursor:pointer" onclick="openCommandPalette()"
-                        title="Open command palette">⌘K</kbd>
+                <div class="topbar-right" id="topRight">
+                    <div class="topbar-search" id="topSearch">
+                        <i data-lucide="search"></i>
+                        <input type="text" placeholder="Search proposals..." id="searchInput" oninput="filterList()"
+                            aria-label="Search proposals">
+                        <kbd class="kbd" style="cursor:pointer" onclick="openCommandPalette()"
+                            title="Open command palette">⌘K</kbd>
+                    </div>
                 </div>
-                <div class="topbar-right" id="topRight"></div>
             </div>
             <main class="body-scroll" id="bodyScroll" role="main"></main>
         </div>
@@ -184,32 +189,22 @@
     <div class="overlay" id="ov" onclick="closePreview()"></div>
     <div class="preview" id="prevPanel">
         <div class="prev-top">
-            <i data-lucide="eye" class="prev-top-icon"></i>
-            <span class="prev-top-t">Preview</span>
+            <div class="prev-top-label">
+                <i data-lucide="eye" class="prev-top-icon"></i>
+                <span class="prev-top-t">Preview</span>
+            </div>
             <div class="tpl-picker" id="tplPicker">
                 <button class="tpl-pick on" onclick="setDocTpl('modern',this)">Modern</button>
                 <button class="tpl-pick" onclick="setDocTpl('clean',this)">Clean</button>
                 <button class="tpl-pick" onclick="setDocTpl('minimal',this)">Minimal</button>
                 <button class="tpl-pick" onclick="setDocTpl('executive',this)">Executive</button>
-                <button class="tpl-pick" onclick="setDocTpl('stripe',this)">Stripe</button>
-                <button class="tpl-pick" onclick="setDocTpl('nord',this)">Nord</button>
-                <button class="tpl-pick" onclick="setDocTpl('bold',this)">Bold</button>
-                <button class="tpl-pick" onclick="setDocTpl('compact',this)">Compact</button>
-                <button class="tpl-pick" onclick="setDocTpl('sidebar',this)">Sidebar</button>
-                <button class="tpl-pick" onclick="setDocTpl('formal',this)">Formal</button>
-                <button class="tpl-pick" onclick="setDocTpl('american',this)">American</button>
-                <button class="tpl-pick" onclick="setDocTpl('classic',this)">Classic</button>
-                <button class="tpl-pick" onclick="setDocTpl('tabular',this)">Tabular</button>
             </div>
             <div class="prev-top-actions">
-                <button class="btn-sm-outline" onclick="typeof showExportMenu==='function'&&showExportMenu(this)"><i data-lucide="file-down"></i> Export As</button>
-                <button class="btn-sm-outline" onclick="doExport('invoice')"><i data-lucide="receipt"></i> As
-                    Invoice</button>
-                <button class="btn-sm-outline" onclick="typeof openDerivativesMenu==='function'&&openDerivativesMenu(this)"><i data-lucide="file-plus-2"></i> Generate</button>
-                <button class="btn-sm" onclick="doExport('proposal')"><i data-lucide="download"></i> Export
-                    PDF</button>
-                <button class="btn-icon-outline" onclick="closePreview()" data-tooltip="Close (Esc)" data-side="bottom"
-                    data-align="center"><i data-lucide="x"></i></button>
+                <button class="btn-icon-outline" onclick="typeof showExportMenu==='function'&&showExportMenu(this)" data-tooltip="Export As" data-side="bottom"><i data-lucide="file-down"></i></button>
+                <button class="btn-icon-outline" onclick="doExport('invoice')" data-tooltip="Convert to Invoice" data-side="bottom"><i data-lucide="receipt"></i></button>
+                <button class="btn-icon-outline" onclick="typeof openDerivativesMenu==='function'&&openDerivativesMenu(this)" data-tooltip="Generate Document" data-side="bottom"><i data-lucide="file-plus-2"></i></button>
+                <button class="btn-icon-ghost" onclick="doExport('proposal')" data-tooltip="Download PDF" data-side="bottom"><i data-lucide="download"></i></button>
+                <button class="btn-icon-outline" onclick="closePreview()" data-tooltip="Close (Esc)" data-side="bottom"><i data-lucide="x"></i></button>
             </div>
         </div>
         <div class="prev-body">
@@ -217,10 +212,7 @@
         </div>
     </div>
 
-    <!-- New Proposal Modal (content built dynamically by openNewModal) -->
-    <div class="modal-wrap" id="newModal" onclick="closeNewModal(event)" role="dialog" aria-modal="true" aria-label="New Proposal">
-        <div class="modal modal-lg" id="newModalInner" onclick="event.stopPropagation()"></div>
-    </div>
+    <!-- New Proposal Drawer (rendered dynamically by openCreateDrawer) -->
 
     <!-- Context Menu -->
     <div class="ctx" id="ctxMenu" role="menu" aria-label="Proposal actions">
@@ -254,99 +246,117 @@
     </div>
 
     <!-- QR Code generator (UPI payments, vendored locally) -->
-    <script src="assets/js/vendor/qrcode-1.4.4.min.js"></script>
+    <script src="assets/js/vendor/qrcode-1.4.4.min.js?v=18"></script>
 
     <!-- Core: Supabase + Auth + Sync (before store) -->
-    <script src="assets/js/core/supabase.js"></script>
-    <script src="assets/js/core/auth.js"></script>
-    <script src="assets/js/core/sync.js"></script>
+    <script src="assets/js/core/supabase.js?v=18"></script>
+    <script src="assets/js/core/auth.js?v=18"></script>
+    <script src="assets/js/core/sync.js?v=18"></script>
     <!-- Core: Foundation -->
-    <script src="assets/js/core/store.js"></script>
-    <script src="assets/js/core/utils.js"></script>
-    <script src="assets/js/core/custom-select.js"></script>
-    <script src="assets/js/core/theme.js"></script>
-    <script src="assets/js/core/variables.js"></script>
-    <script src="assets/js/core/modals.js"></script>
-    <script src="assets/js/core/autosave.js"></script>
-    <script src="assets/js/core/command.js"></script>
-    <script src="assets/js/core/shortcuts.js"></script>
-    <script src="assets/js/core/router.js"></script>
-    <script src="assets/js/core/completeness.js"></script>
-    <script src="assets/js/core/onboarding.js"></script>
-    <script src="assets/js/core/team.js"></script>
+    <script src="assets/js/core/store.js?v=18"></script>
+    <script src="assets/js/core/utils.js?v=18"></script>
+    <script src="assets/js/core/custom-select.js?v=18"></script>
+    <script src="assets/js/core/theme.js?v=18"></script>
+    <script src="assets/js/core/variables.js?v=18"></script>
+    <script src="assets/js/core/modals.js?v=18"></script>
+    <script src="assets/js/core/autosave.js?v=18"></script>
+    <script src="assets/js/core/command.js?v=18"></script>
+    <script src="assets/js/core/shortcuts.js?v=18"></script>
+    <script src="assets/js/core/router.js?v=18"></script>
+    <script src="assets/js/core/completeness.js?v=18"></script>
+    <script src="assets/js/core/onboarding.js?v=18"></script>
+    <script src="assets/js/core/team.js?v=18"></script>
     <!-- SaaS: Support widget, plan enforcement, announcements -->
-    <script src="assets/js/core/support.js"></script>
-    <script src="assets/js/core/plans.js"></script>
-    <script src="assets/js/core/announcements.js"></script>
+    <script src="assets/js/core/support.js?v=18"></script>
+    <script src="assets/js/core/plans.js?v=18"></script>
+    <script src="assets/js/core/announcements.js?v=18"></script>
     <!-- Tiptap Editor (locally bundled — replaces ESM CDN) -->
-    <script src="assets/js/vendor/tiptap.bundle.js"></script>
-    <script src="assets/js/editor/tiptap-menus.js"></script>
+    <script src="assets/js/vendor/tiptap.bundle.js?v=18"></script>
+    <script src="assets/js/editor/tiptap-menus.js?v=18"></script>
     <!-- Editor: Editor tabs & components -->
-    <script src="assets/js/editor/focus-mode.js"></script>
+    <script src="assets/js/editor/focus-mode.js?v=18"></script>
     <!-- Views: Main page views -->
-    <script src="assets/js/views/nav.js"></script>
-    <script src="assets/js/views/dashboard.js"></script>
-    <script src="assets/js/views/proposals.js"></script>
-    <script src="assets/js/views/kanban.js"></script>
-    <script src="assets/js/views/analytics.js"></script>
-    <script src="assets/js/views/analytics-breakdowns.js"></script>
+    <script src="assets/js/views/nav.js?v=18"></script>
+    <script src="assets/js/views/dashboard.js?v=18"></script>
+    <script src="assets/js/views/proposals.js?v=18"></script>
+    <script src="assets/js/views/kanban.js?v=18"></script>
+    <script src="assets/js/views/analytics.js?v=18"></script>
+    <script src="assets/js/views/analytics-breakdowns.js?v=18"></script>
     <!-- Editor: Main editor + all tabs -->
-    <script src="assets/js/editor/toc.js"></script>
-    <script src="assets/js/editor/editor.js"></script>
-    <script src="assets/js/editor/details.js"></script>
-    <script src="assets/js/editor/sections.js"></script>
-    <script src="assets/js/editor/ai-assistant.js"></script>
-    <script src="assets/js/editor/structured-sections.js"></script>
-    <script src="assets/js/editor/section-packs.js"></script>
-    <script src="assets/js/editor/pricing.js"></script>
-    <script src="assets/js/editor/tc-library.js"></script>
-    <script src="assets/js/editor/csv-import.js"></script>
-    <script src="assets/js/editor/packages.js"></script>
-    <script src="assets/js/editor/addons.js"></script>
-    <script src="assets/js/editor/payment-schedule.js"></script>
-    <script src="assets/js/editor/payments.js"></script>
-    <script src="assets/js/editor/notes.js"></script>
+    <script src="assets/js/editor/toc.js?v=18"></script>
+    <script src="assets/js/editor/editor.js?v=18"></script>
+    <script src="assets/js/editor/details.js?v=18"></script>
+    <script src="assets/js/editor/sections.js?v=18"></script>
+    <script src="assets/js/editor/ai-assistant.js?v=18"></script>
+    <script src="assets/js/editor/structured-sections.js?v=18"></script>
+    <script src="assets/js/editor/section-packs.js?v=18"></script>
+    <script src="assets/js/editor/pricing.js?v=18"></script>
+    <script src="assets/js/editor/tc-library.js?v=18"></script>
+    <script src="assets/js/editor/csv-import.js?v=18"></script>
+    <script src="assets/js/editor/packages.js?v=18"></script>
+    <script src="assets/js/editor/addons.js?v=18"></script>
+    <script src="assets/js/editor/payment-schedule.js?v=18"></script>
+    <script src="assets/js/editor/payments.js?v=18"></script>
+    <script src="assets/js/editor/notes.js?v=18"></script>
     <!-- Export: PDF, preview, sharing -->
-    <script src="assets/js/export/preview.js"></script>
-    <script src="assets/js/export/templates.js"></script>
-    <script src="assets/js/export/pdf-templates2.js"></script>
-    <script src="assets/js/export/export.js"></script>
-    <script src="assets/js/export/integrations.js"></script>
-    <script src="assets/js/export/derivatives.js"></script>
-    <script src="assets/js/export/diff-view.js"></script>
-    <script src="assets/js/export/email.js"></script>
-    <script src="assets/js/views/clients.js"></script>
-    <script src="assets/js/views/client-detail.js"></script>
-    <script src="assets/js/export/signature.js"></script>
-    <script src="assets/js/views/settings.js"></script>
-    <script src="assets/js/views/settings-templates.js"></script>
-    <script src="assets/js/views/profile.js"></script>
-    <script src="assets/js/export/tpl-data.js"></script>
-    <script src="assets/js/views/create-page.js"></script>
-    <script src="assets/js/views/create-preview.js"></script>
-    <script src="assets/js/export/sharing.js"></script>
-    <script src="assets/js/export/create.js"></script>
+    <script src="assets/js/export/preview.js?v=18"></script>
+    <script src="assets/js/export/templates.js?v=18"></script>
+    <script src="assets/js/export/pdf-templates2.js?v=18"></script>
+    <script src="assets/js/export/export.js?v=18"></script>
+    <script src="assets/js/export/integrations.js?v=18"></script>
+    <script src="assets/js/export/derivatives.js?v=18"></script>
+    <script src="assets/js/export/diff-view.js?v=18"></script>
+    <script src="assets/js/export/email.js?v=18"></script>
+    <script src="assets/js/views/clients.js?v=18"></script>
+    <script src="assets/js/views/client-detail.js?v=18"></script>
+    <script src="assets/js/export/signature.js?v=18"></script>
+    <script src="assets/js/views/settings.js?v=18"></script>
+    <script src="assets/js/views/settings-templates.js?v=18"></script>
+    <script src="assets/js/views/profile.js?v=18"></script>
+    <script src="assets/js/export/tpl-data.js?v=18"></script>
+    <script src="assets/js/views/create-page.js?v=18"></script>
+    <script src="assets/js/views/create-preview.js?v=18"></script>
+    <script src="assets/js/export/sharing.js?v=18"></script>
+    <script src="assets/js/export/create.js?v=18"></script>
     <!-- Boot: App initialization (always last) -->
-    <script src="assets/js/boot.js"></script>
+    <script src="assets/js/boot.js?v=18"></script>
     <script>
+        // Service Worker registration (paid plans only)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').then(reg => {
-                if (reg) reg.update();
-            }).catch(() => {});
+            setTimeout(function() {
+                var plan = typeof getCurrentPlan === 'function' ? getCurrentPlan() : 'free';
+                var hasOffline = plan === 'pro' || plan === 'team';
+                if (hasOffline) {
+                    navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                        if (reg) reg.update();
+                    }).catch(function() {});
+                } else {
+                    // Unregister SW for free users
+                    navigator.serviceWorker.getRegistration().then(function(reg) {
+                        if (reg) reg.unregister();
+                    }).catch(function() {});
+                }
+            }, 100);
         }
         // Offline / Online detection banner
         (function() {
             function showOfflineBanner() {
                 if (document.getElementById('offlineBanner')) return;
-                const b = document.createElement('div');
+                var plan = typeof getCurrentPlan === 'function' ? getCurrentPlan() : 'free';
+                var hasOffline = plan === 'pro' || plan === 'team';
+                var b = document.createElement('div');
                 b.id = 'offlineBanner';
                 b.setAttribute('role', 'alert');
-                b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#18181b;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px';
-                b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.17-2.65"/><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><line x1="2" y1="2" x2="22" y2="22"/></svg> You\'re offline — changes are saved locally and will sync when you reconnect';
+                b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:' + (hasOffline ? '#18181b' : '#FF3B30') + ';color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px';
+                if (hasOffline) {
+                    b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.17-2.65"/><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><line x1="2" y1="2" x2="22" y2="22"/></svg> You\'re offline — changes are saved locally and will sync when you reconnect';
+                } else {
+                    b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 0v8l4 4"/></svg> You\'re offline — <strong>Offline access is a Pro feature.</strong> <button onclick="if(typeof showUpgradeModal===\'function\')showUpgradeModal(\'offline\',{allowed:false,plan:\'free\'});else window.open(\'https://proposalkit.com/pricing\',\'_blank\')" style="background:none;border:1px solid #fff;color:#fff;padding:4px 12px;border-radius:9999px;margin-left:8px;cursor:pointer;font-size:12px;font-weight:500">Upgrade</button>';
+                }
                 document.body.appendChild(b);
             }
             function hideOfflineBanner() {
-                const b = document.getElementById('offlineBanner');
+                var b = document.getElementById('offlineBanner');
                 if (b) b.remove();
             }
             window.addEventListener('offline', showOfflineBanner);

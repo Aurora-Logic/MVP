@@ -126,6 +126,11 @@ function saveAsTemplate() {
 function doSaveAsTemplate() {
     const name = document.getElementById('saveTplName')?.value.trim();
     if (!name) { toast('Enter a template name', 'warning'); return; }
+    // Check template limit before saving
+    if (typeof enforceLimit === 'function' && !enforceLimit('templates')) {
+        document.getElementById('saveTplModal')?.remove();
+        return;
+    }
     const p = cur(); if (!p) return;
     const tpl = {
         title: name, category: 'saved', icon: 'bookmark',

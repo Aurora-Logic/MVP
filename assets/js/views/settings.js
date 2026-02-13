@@ -178,9 +178,24 @@ function saveSettings() {
     CONFIG.country = cselGetValue(document.getElementById('setCountry')) || CONFIG.country;
     CONFIG.address = v('setAddr', CONFIG.address);
     CONFIG.website = v('setWebsite', CONFIG.website);
-    CONFIG.font = cselGetValue(document.getElementById('setFont')) || CONFIG.font || 'System';
-    const wlEl = document.getElementById('setWhiteLabel');
-    if (wlEl) CONFIG.whiteLabel = wlEl.checked;
+    // Branding features (font, whiteLabel) require Pro/Team plan
+    const hasBranding = typeof checkLimit === 'function' ? checkLimit('branding').allowed : true;
+    const newFont = cselGetValue(document.getElementById('setFont')) || CONFIG.font || 'System';
+    if (newFont !== CONFIG.font && !hasBranding) {
+        if (typeof showUpgradeModal === 'function') showUpgradeModal('branding', checkLimit('branding'));
+    } else {
+        CONFIG.font = newFont;
+    }
+    const wlEl = /** @type {HTMLInputElement} */ (document.getElementById('setWhiteLabel'));
+    if (wlEl) {
+        const newWhiteLabel = wlEl.checked;
+        if (newWhiteLabel && !CONFIG.whiteLabel && !hasBranding) {
+            wlEl.checked = false;
+            if (typeof showUpgradeModal === 'function') showUpgradeModal('branding', checkLimit('branding'));
+        } else {
+            CONFIG.whiteLabel = newWhiteLabel;
+        }
+    }
     CONFIG.aiApiKey = v('setAiKey', CONFIG.aiApiKey);
     CONFIG.webhookUrl = v('setWebhookUrl', CONFIG.webhookUrl);
     const c = CONFIG.country;

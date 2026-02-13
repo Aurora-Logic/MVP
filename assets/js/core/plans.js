@@ -4,9 +4,9 @@
 /* exported checkLimit, enforceLimit, showUpgradeModal, getCurrentPlan, getPlanBadge, trackEvent, PLAN_LIMITS */
 
 const PLAN_LIMITS = {
-    free:  { proposals: 5, clients: 2, ai: false, team: 1, templates: 3, branding: false },
-    pro:   { proposals: Infinity, clients: Infinity, ai: true, team: 1, templates: Infinity, branding: true },
-    team:  { proposals: Infinity, clients: Infinity, ai: true, team: 10, templates: Infinity, branding: true }
+    free:  { proposals: 5, clients: 2, ai: false, team: 1, templates: 3, branding: false, offline: false },
+    pro:   { proposals: Infinity, clients: Infinity, ai: true, team: 1, templates: Infinity, branding: true, offline: true },
+    team:  { proposals: Infinity, clients: Infinity, ai: true, team: 10, templates: Infinity, branding: true, offline: true }
 };
 
 function getCurrentPlan() {
@@ -47,6 +47,9 @@ function checkLimit(feature) {
         case 'branding':
             result.allowed = limits.branding;
             break;
+        case 'offline':
+            result.allowed = limits.offline;
+            break;
         default:
             result.allowed = true;
     }
@@ -70,6 +73,17 @@ function showUpgradeModal(feature, check) {
     const featureLabel = feature.charAt(0).toUpperCase() + feature.slice(1);
     const planLabel = check.plan.charAt(0).toUpperCase() + check.plan.slice(1);
     const pct = check.max === Infinity || check.max === 0 ? 100 : Math.min(Math.round((check.current / check.max) * 100), 100);
+
+    // Detect Indian currency based on CONFIG or browser locale
+    const isIndian = (typeof CONFIG !== 'undefined' && CONFIG.currency === '₹') ||
+                     (typeof navigator !== 'undefined' && navigator.language === 'en-IN');
+    const proPriceUSD = '$12';
+    const teamPriceUSD = '$29';
+    const proPriceINR = '₹999';
+    const teamPriceINR = '₹2,499';
+    const proPrice = isIndian ? proPriceINR : proPriceUSD;
+    const teamPrice = isIndian ? teamPriceINR : teamPriceUSD;
+
     const rows = [
         ['Proposals', '5', 'Unlimited', 'Unlimited'],
         ['Clients', '2', 'Unlimited', 'Unlimited'],
@@ -77,7 +91,8 @@ function showUpgradeModal(feature, check) {
         ['Team Members', '1', '1', '10'],
         ['Templates', '3', 'Unlimited', 'Unlimited'],
         ['Custom Branding', '\u2014', '\u2713', '\u2713'],
-        ['Price', 'Free', '$12/mo', '$29/mo']
+        ['Offline Access', '\u2014', '\u2713', '\u2713'],
+        ['Price', 'Free', proPrice + '/mo', teamPrice + '/mo']
     ];
     let tableHtml = '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:16px">' +
         '<thead><tr><th style="text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);color:var(--muted-foreground)">Feature</th>' +
@@ -107,8 +122,9 @@ function showUpgradeModal(feature, check) {
         '<div style="height:6px;background:var(--muted);border-radius:9999px;overflow:hidden">' +
         '<div style="height:100%;width:' + pct + '%;background:' + (pct >= 100 ? 'var(--destructive)' : 'var(--primary)') + ';border-radius:9999px"></div></div></div>' +
         tableHtml +
-        '<div style="display:flex;justify-content:flex-end;margin-top:16px">' +
-        '<button class="btn btn-sm" onclick="this.closest(\'.modal-wrap\').remove()">Got it</button></div></div>';
+        '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">' +
+        '<button class="btn-sm-outline" onclick="this.closest(\'.modal-wrap\').remove()">Maybe Later</button>' +
+        '<button class="btn-sm" onclick="window.open(\'https://proposalkit.com/pricing\', \'_blank\');trackEvent(\'upgrade_clicked\', {from: \'' + feature + '\'})">Upgrade Now</button></div></div>';
     wrap.addEventListener('click', function(ev) { if (ev.target === wrap) wrap.remove(); });
     document.body.appendChild(wrap);
     requestAnimationFrame(function() { wrap.classList.add('show'); });

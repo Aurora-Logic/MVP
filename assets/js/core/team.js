@@ -174,6 +174,11 @@ function doAddMember() {
     const email = document.getElementById('newMemberEmail')?.value.trim();
     const role = (typeof cselGetValue === 'function' ? cselGetValue(document.getElementById('newMemberRole')) : document.getElementById('newMemberRole')?.value) || 'editor';
     if (!name) { toast('Name is required'); return; }
+    // Check team limit before adding
+    if (typeof enforceLimit === 'function' && !enforceLimit('team')) {
+        document.getElementById('addMemberModal')?.remove();
+        return;
+    }
     addTeamMember(name, email, role);
     document.getElementById('addMemberModal')?.remove();
     renderSettings();
