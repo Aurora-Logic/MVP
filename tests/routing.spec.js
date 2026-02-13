@@ -51,7 +51,9 @@ test.describe('Routing — Clean URLs', () => {
     });
 
     test('sidebar navigation updates URL to /proposals', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 720 });
         await seedAndBoot(page);
+        await page.waitForSelector('[data-nav="editor"]', { state: 'visible', timeout: 5000 });
         await page.locator('[data-nav="editor"]').click();
         await page.waitForTimeout(500);
         await expect(page).toHaveURL('/proposals');
@@ -59,7 +61,10 @@ test.describe('Routing — Clean URLs', () => {
     });
 
     test('sidebar navigation updates URL to /clients', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 720 });
         await seedAndBoot(page);
+        // Ensure sidebar is visible (not in mobile mode)
+        await page.waitForSelector('[data-nav="clients"]', { state: 'visible', timeout: 5000 });
         await page.locator('[data-nav="clients"]').click();
         await page.waitForTimeout(500);
         await expect(page).toHaveURL('/clients');
@@ -67,7 +72,9 @@ test.describe('Routing — Clean URLs', () => {
     });
 
     test('clicking proposal opens /proposals/:id', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 720 });
         await seedAndBoot(page, [testProp]);
+        await page.waitForSelector('[data-nav="editor"]', { state: 'visible', timeout: 5000 });
         await page.locator('[data-nav="editor"]').click();
         await page.waitForTimeout(500);
 
