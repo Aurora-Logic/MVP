@@ -4,6 +4,22 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.15.4 (build 20260213) — 2026-02-13
+
+### Style
+- Redesign customer detail page with dashboard-style accent gradient metric cards
+- 5 metrics: Total proposals, Accepted, Declined, Total value, Win rate
+- Add contact info section with icons: contact name, email, phone, address, GST
+- Type badge (Business/Individual) in header
+- Richer empty state for proposal history
+
+### Files Changed
+- `client-detail.js` — full redesign of showClientInsightFull with contact info, colored metrics, win rate
+- `pages.css` — add .ci-info-list, .ci-info-row styles
+- `boot.js` — version bump to 2.15.4
+
+---
+
 ## v2.15.3 (build 20260213) — 2026-02-13
 
 ### Fix

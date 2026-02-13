@@ -3459,6 +3459,21 @@
   margin-top: 2px;
 }
 
+.ci-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ci-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text3);
+}
+
 .ci-detail {
   font-size: 14px;
   color: var(--text4);
