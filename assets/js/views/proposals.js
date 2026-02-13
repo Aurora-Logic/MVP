@@ -185,13 +185,19 @@ function setFilter(f) {
   }
   renderProposals();
 }
+
+// PERFORMANCE FIX: Debounced search to prevent lag with large lists
+let _filterTimer = null;
 function filterList() {
-  const q = document.getElementById('searchInput')?.value?.trim() || '';
-  if (!CUR && q) {
-    document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
-    document.querySelector('[data-nav="editor"]')?.classList.add('on');
-    renderProposals();
-  } else if (!CUR) { renderProposals(); }
+  clearTimeout(_filterTimer);
+  _filterTimer = setTimeout(() => {
+    const q = document.getElementById('searchInput')?.value?.trim() || '';
+    if (!CUR && q) {
+      document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('on'));
+      document.querySelector('[data-nav="editor"]')?.classList.add('on');
+      renderProposals();
+    } else if (!CUR) { renderProposals(); }
+  }, 200); // 200ms debounce
 }
 
 let currentPage = 1;
