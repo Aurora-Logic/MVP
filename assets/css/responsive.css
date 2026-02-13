@@ -46,6 +46,8 @@
   .nl-meta { display: none; }
   .nl-date { display: none; }
 
+  .cl-detail-panel { width: 300px; }
+
   .preview {
     width: 100%;
   }
@@ -191,10 +193,31 @@
   .pg-nav { padding: 0 8px; min-width: 34px; }
   .pg-wrap { gap: 4px; padding: 12px 8px; }
 
-  /* Settings — sidebar hidden on mobile, content full width */
-  .sn-nav { display: none; }
-  .set-layout { min-height: auto; }
-  .set-content { padding-left: 0 !important; max-width: 100%; }
+  /* Settings modal — full screen on mobile */
+  .modal-settings {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    height: 100vh;
+  }
+  .modal-settings .set-layout { flex-direction: column; }
+  .modal-settings .sn-nav {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .modal-settings .sn-group { display: contents; }
+  .modal-settings .sn-group-label { display: none; }
+  .modal-settings .set-content { padding: 20px; max-width: 100%; }
+
+  /* Customer split — hide detail panel on mobile */
+  .cl-detail-panel { display: none !important; }
+  .cl-split { height: auto; }
 
   /* Filter tabs horizontal scroll */
   .filter-tabs {

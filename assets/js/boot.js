@@ -43,12 +43,13 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.14.2';
+const APP_VERSION = '2.15.0';
 const APP_BUILD = '20260213';
 const WHATS_NEW_ITEMS = [
-    { icon: 'layout-list', title: 'Notion-style Settings', desc: 'Settings now uses a sidebar navigation with grouped categories, just like Notion.' },
-    { icon: 'users', title: 'Customers Rebrand', desc: 'Clients renamed to Customers with filter tabs and toolbar search.' },
-    { icon: 'user-plus', title: 'Add Customer Modal', desc: 'New customer form now uses a sleek onboarding-style modal with sectioned fields.' }
+    { icon: 'settings', title: 'Settings Modal', desc: 'Settings now opens as a Notion-style modal overlay with sidebar navigation.' },
+    { icon: 'columns-2', title: 'Customer Split View', desc: 'Click any customer to see details in a side panel without leaving the list.' },
+    { icon: 'layout-grid', title: 'Card & Table Toggle', desc: 'Switch between table and card views on the Customers page.' },
+    { icon: 'type', title: 'System Font Stack', desc: 'Switched to native system fonts for faster rendering and a native feel.' }
 ];
 
 function checkWhatsNew() {

@@ -1,8 +1,8 @@
 // ════════════════════════════════════════
-// SETTINGS — Notion-style sidebar layout
+// SETTINGS — Modal overlay (Notion-style)
 // ════════════════════════════════════════
 
-/* exported exportData, importData, applyWhiteLabel, scrollToSection, setTab */
+/* exported openSettings, closeSettings, renderSettings, exportData, importData, applyWhiteLabel, scrollToSection, setTab */
 function getCountryTaxHtml() {
     const c = CONFIG?.country;
     if (c === 'IN') return `
@@ -42,20 +42,19 @@ function buildAccountCard() {
 
 function scrollToSection(id) {
     const key = id.replace('sec-', '');
-    const btn = document.querySelector(`.sn-item[data-key="${key}"]`);
-    if (btn) setTab(btn, key);
+    openSettings();
+    setTimeout(() => {
+        const btn = document.querySelector(`.sn-item[data-key="${key}"]`);
+        if (btn) setTab(btn, key);
+    }, 100);
 }
 
-function renderSettings() {
-    CUR = null;
-    document.getElementById('topTitle').textContent = 'Settings';
-    document.getElementById('topRight').innerHTML = '';
-    const body = document.getElementById('bodyScroll');
+function openSettings() {
+    const existing = document.getElementById('settingsModal');
+    if (existing) { existing.classList.add('show'); return; }
     const loggedIn = typeof isLoggedIn === 'function' && isLoggedIn();
     const hasTeam = typeof renderTeamSettings === 'function';
     const hasAi = typeof renderAiSettingsCard === 'function';
-
-    // Notion-style grouped nav
     let navHtml = '';
     if (loggedIn) navHtml += `<div class="sn-group"><div class="sn-group-label">Account</div>
         <button class="sn-item on" data-key="account" onclick="setTab(this,'account')"><i data-lucide="user-circle"></i> ${esc(CONFIG?.name || 'My account')}</button>
@@ -64,25 +63,33 @@ function renderSettings() {
     else navHtml += `<div class="sn-group"><div class="sn-group-label">Account</div>
         <button class="sn-item on" data-key="profile" onclick="setTab(this,'profile')"><i data-lucide="building-2"></i> Profile</button>
         <button class="sn-item" data-key="payments" onclick="setTab(this,'payments')"><i data-lucide="landmark"></i> Payments</button></div>`;
-
     navHtml += `<div class="sn-group"><div class="sn-group-label">Workspace</div>
         <button class="sn-item" data-key="email" onclick="setTab(this,'email')"><i data-lucide="mail"></i> Email</button>
         ${hasTeam ? '<button class="sn-item" data-key="team" onclick="setTab(this,\'team\')"><i data-lucide="users"></i> Team</button>' : ''}
         ${hasAi ? '<button class="sn-item" data-key="ai" onclick="setTab(this,\'ai\')"><i data-lucide="sparkles"></i> AI</button>' : ''}
         <button class="sn-item" data-key="branding" onclick="setTab(this,'branding')"><i data-lucide="palette"></i> Branding</button>
         <button class="sn-item" data-key="signature" onclick="setTab(this,'signature')"><i data-lucide="pen-tool"></i> Signature</button></div>`;
-
     navHtml += `<div class="sn-group"><div class="sn-group-label">Admin</div>
         <button class="sn-item" data-key="data" onclick="setTab(this,'data')"><i data-lucide="database"></i> Data</button></div>`;
-
     const defaultTab = loggedIn ? 'account' : 'profile';
-    body.innerHTML = `<div class="set-layout">
-      <nav class="sn-nav">${navHtml}</nav>
-      <div class="set-content" id="setPanel"></div>
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-wrap'; wrap.id = 'settingsModal';
+    wrap.onclick = (e) => { if (e.target === wrap) closeSettings(); };
+    wrap.innerHTML = `<div class="modal modal-settings" onclick="event.stopPropagation()">
+      <button class="modal-x" onclick="closeSettings()"><i data-lucide="x"></i></button>
+      <div class="set-layout">
+        <nav class="sn-nav">${navHtml}</nav>
+        <div class="set-content" id="setPanel"></div>
+      </div>
     </div>`;
+    document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
     lucide.createIcons();
     setTab(null, defaultTab);
 }
+
+function closeSettings() { document.getElementById('settingsModal')?.remove(); }
+function renderSettings() { openSettings(); }
 
 function setTab(btn, key) {
     document.querySelectorAll('.sn-item').forEach(t => t.classList.remove('on'));
@@ -132,7 +139,7 @@ function setTab(btn, key) {
             <div class="sec-header-actions">
               <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export</button>
               <button class="btn-sm-outline" onclick="importData()"><i data-lucide="upload"></i> Import</button>
-              <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear all</button>
+              <button class="btn-sm-destructive" onclick="confirmDialog('Delete all proposals? This cannot be undone.',()=>{DB=[];persist();closeSettings();renderDashboard();toast('All data cleared');},{title:'Clear All Data',confirmText:'Delete All'})"><i data-lucide="trash-2"></i> Clear all</button>
             </div>`
     };
     panel.innerHTML = (panels[key] || panels.profile)();
@@ -150,7 +157,7 @@ function setTab(btn, key) {
         csel(document.getElementById('setFont'), {
             value: CONFIG?.font || 'System',
             items: [
-                { value: 'System', label: 'System (SF Pro)', desc: 'Default' }, { value: 'Roboto', label: 'Roboto', desc: 'Standard' },
+                { value: 'System', label: 'System (Default)', desc: 'Default' }, { value: 'Roboto', label: 'Roboto', desc: 'Standard' },
                 { value: 'Lato', label: 'Lato', desc: 'Friendly' }, { value: 'Playfair Display', label: 'Playfair Display', desc: 'Elegant' },
                 { value: 'Merriweather', label: 'Merriweather', desc: 'Classic' }, { value: 'Courier Prime', label: 'Courier Prime', desc: 'Typewriter' }
             ],
@@ -264,7 +271,7 @@ function importData() {
                 if (Array.isArray(data.emailTemplates)) localStorage.setItem('pk_email_tpl', JSON.stringify(data.emailTemplates));
                 if (Array.isArray(data.proposalTemplates)) localStorage.setItem('pk_templates', JSON.stringify(data.proposalTemplates));
                 toast('Imported: ' + (counts.join(', ') || 'data'));
-                if (typeof renderSettings === 'function') renderSettings();
+                closeSettings(); openSettings();
             } catch (e) { toast('Invalid file — could not parse JSON', 'error'); }
         };
         reader.readAsText(file);

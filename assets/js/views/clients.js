@@ -2,7 +2,7 @@
 // CUSTOMER DATABASE
 // ════════════════════════════════════════
 
-/* exported INDIAN_STATES, SALUTATIONS, matchClient, openAddClient, initStateDropdown, saveClient, editClient, delClient, showClientPicker, pickClient, showClientInsight, buildClientHistory, createProposalForClient, filterClients, setClientFilter */
+/* exported INDIAN_STATES, SALUTATIONS, matchClient, openAddClient, initStateDropdown, saveClient, editClient, delClient, showClientPicker, pickClient, filterClients, setClientFilter, toggleClientView */
 
 const INDIAN_STATES = [
     { value: 'AN', label: 'Andaman & Nicobar' }, { value: 'AP', label: 'Andhra Pradesh' }, { value: 'AR', label: 'Arunachal Pradesh' },
@@ -18,6 +18,8 @@ const INDIAN_STATES = [
 ];
 const SALUTATIONS = ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.'];
 let _clientFilter = 'all';
+let _clientView = 'table';
+let _selectedClient = -1;
 
 function renderClients() {
     CUR = null;
@@ -28,21 +30,15 @@ function renderClients() {
         body.innerHTML = `<div class="empty" style="padding:60px 20px">
             <dotlottie-wc src="https://assets-v2.lottiefiles.com/a/421db1cc-118a-11ee-aed5-fb6b0052b9aa/1KyamM2lee.lottie" autoplay loop speed="0.8" style="width:200px;height:200px;margin:0 auto"></dotlottie-wc>
             <div class="empty-t">Build your customer database</div>
-            <div class="empty-d">Save customer details once, reuse on every proposal. No more retyping names and emails.</div>
+            <div class="empty-d">Save customer details once, reuse on every proposal.</div>
             <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
-                <button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add customer</button>
-            </div>
-            <div style="display:flex;gap:24px;justify-content:center;margin-top:32px;color:var(--text4);font-size:14px">
-                <span><i data-lucide="zap" style="width:14px;height:14px;vertical-align:-2px"></i> Auto-fill proposals</span>
-                <span><i data-lucide="bar-chart-3" style="width:14px;height:14px;vertical-align:-2px"></i> Track per-customer stats</span>
-                <span><i data-lucide="repeat" style="width:14px;height:14px;vertical-align:-2px"></i> Reuse across proposals</span>
+                <button class="btn-sm" onclick="openAddClient()"><i data-lucide="plus"></i> New</button>
             </div>
         </div>`;
         lucide.createIcons(); return;
     }
-    // Compute metrics + filter counts
-    let totalValue = 0, wonProps = 0, decidedProps = 0, bizCount = 0, indCount = 0;
     const cur = defaultCurrency();
+    let totalValue = 0, wonProps = 0, decidedProps = 0, bizCount = 0, indCount = 0;
     const clientData = CLIENTS.map((c, i) => {
         const isBiz = (c.customerType || 'business') === 'business';
         if (isBiz) bizCount++; else indCount++;
@@ -59,12 +55,10 @@ function renderClients() {
         const ini = displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
         return { c, i, displayName, ini, props: props.length, val, last, email: c.email || '', isBiz };
     });
-    const avgValue = CLIENTS.length ? totalValue / CLIENTS.length : 0;
-    const winRate = decidedProps > 0 ? Math.round(wonProps / decidedProps * 100) : 0;
-
-    // Apply filter
     const filtered = _clientFilter === 'all' ? clientData : _clientFilter === 'business' ? clientData.filter(d => d.isBiz) : clientData.filter(d => !d.isBiz);
-    const rows = filtered.map(d => `<tr class="nt-row" onclick="showClientInsight(${d.i})">
+
+    // Table rows
+    const rows = filtered.map(d => `<tr class="nt-row${_selectedClient === d.i ? ' on' : ''}" onclick="showClientDetail(${d.i})">
       <td class="nt-cell"><div class="cl-cell-name"><div class="cc-avi" style="background:var(--blue-bg);color:var(--blue)">${d.ini}</div><div><div class="cc-name">${esc(d.displayName)}</div><div class="cc-email">${esc(d.email)}</div></div></div></td>
       <td class="nt-cell cl-cell-email">${esc(d.email)}</td>
       <td class="nt-cell">${d.props}</td>
@@ -76,35 +70,61 @@ function renderClients() {
       </div></td>
     </tr>`).join('');
 
-    const ft = (key, label, count) => `<button class="filter-tab${_clientFilter === key ? ' on' : ''}${!count ? ' dimmed' : ''}" onclick="setClientFilter('${key}')">${label} <span class="fc">${count}</span></button>`;
+    // Card items
+    const cards = filtered.map(d => `<div class="cl-card${_selectedClient === d.i ? ' on' : ''}" onclick="showClientDetail(${d.i})">
+      <div class="cl-card-head"><div class="cc-avi" style="background:var(--blue-bg);color:var(--blue)">${d.ini}</div>
+        <div style="flex:1;min-width:0"><div class="cc-name">${esc(d.displayName)}</div><div class="cc-email">${esc(d.email)}</div></div></div>
+      <div class="cl-card-stats"><span><strong>${d.props}</strong> proposals</span><span class="mono"><strong>${fmtCur(d.val, cur)}</strong></span></div>
+    </div>`).join('');
 
-    body.innerHTML = `<div class="cl-container">
-      <div class="cl-metric-grid">
-        <div class="cl-metric-card"><div class="cl-metric-label">Total customers</div><div class="cl-metric-value">${CLIENTS.length}</div></div>
-        <div class="cl-metric-card"><div class="cl-metric-label">Total value</div><div class="cl-metric-value">${fmtCur(totalValue, cur)}</div></div>
-        <div class="cl-metric-card"><div class="cl-metric-label">Avg per customer</div><div class="cl-metric-value">${fmtCur(avgValue, cur)}</div></div>
-        <div class="cl-metric-card"><div class="cl-metric-label">Win rate</div><div class="cl-metric-value">${winRate}%</div></div>
-      </div>
-      <div class="cl-toolbar">
-        <div class="prop-filters" role="tablist">${ft('all', 'All', CLIENTS.length)}${ft('business', 'Business', bizCount)}${ft('individual', 'Individual', indCount)}</div>
-        <div class="cl-toolbar-right">
-          <div class="cl-search-wrap"><i data-lucide="search"></i><input type="text" class="cl-search" id="clientSearch" placeholder="Search customers..." oninput="filterClients()"></div>
-          <button class="btn-sm" onclick="openAddClient()"><i data-lucide="user-plus"></i> Add customer</button>
+    const ft = (key, label, count) => `<button class="filter-tab${_clientFilter === key ? ' on' : ''}${!count ? ' dimmed' : ''}" onclick="setClientFilter('${key}')">${label} <span class="fc">${count}</span></button>`;
+    const tv = (v, icon) => `<button class="btn-sm-icon-ghost${_clientView === v ? ' on' : ''}" onclick="toggleClientView('${v}')" data-tooltip="${v === 'table' ? 'Table' : 'Cards'}" data-side="bottom"><i data-lucide="${icon}"></i></button>`;
+
+    body.innerHTML = `<div class="cl-split">
+      <div class="cl-list-panel">
+        <div class="cl-toolbar">
+          <div class="prop-filters" role="tablist">${ft('all', 'All', CLIENTS.length)}${ft('business', 'Business', bizCount)}${ft('individual', 'Individual', indCount)}</div>
+          <div class="cl-toolbar-right">
+            <div class="cl-view-toggle">${tv('table', 'list')}${tv('card', 'layout-grid')}</div>
+            <div class="cl-search-wrap"><i data-lucide="search"></i><input type="text" class="cl-search" id="clientSearch" placeholder="Search..." oninput="filterClients()"></div>
+            <button class="btn-sm" onclick="openAddClient()"><i data-lucide="plus"></i> New</button>
+          </div>
+        </div>
+        <div id="clTableView" style="${_clientView !== 'table' ? 'display:none' : ''}">
+          <div class="nt-wrap"><table class="nt-table"><thead><tr class="nt-head">
+            <th class="nt-th">Customer</th><th class="nt-th cl-th-email">Email</th><th class="nt-th">Proposals</th><th class="nt-th nt-th-value">Value</th><th class="nt-th nt-th-date">Last active</th><th class="nt-th nt-th-actions"></th>
+          </tr></thead><tbody id="clientTable">${rows}</tbody></table></div>
+        </div>
+        <div id="clCardView" style="${_clientView !== 'card' ? 'display:none' : ''}">
+          <div class="cl-card-grid">${cards}</div>
         </div>
       </div>
-      <div class="nt-wrap"><table class="nt-table"><thead><tr class="nt-head">
-        <th class="nt-th">Customer</th><th class="nt-th cl-th-email">Email</th><th class="nt-th">Proposals</th><th class="nt-th nt-th-value">Value</th><th class="nt-th nt-th-date">Last active</th><th class="nt-th nt-th-actions"></th>
-      </tr></thead><tbody id="clientTable">${rows}</tbody></table></div>
+      <div class="cl-detail-panel" id="clDetail"></div>
     </div>`;
     lucide.createIcons();
+    if (_selectedClient >= 0 && CLIENTS[_selectedClient]) {
+        showClientDetail(_selectedClient);
+    }
 }
 
 function setClientFilter(f) { _clientFilter = f; renderClients(); }
+
+function toggleClientView(v) {
+    _clientView = v;
+    document.getElementById('clTableView').style.display = v === 'table' ? '' : 'none';
+    document.getElementById('clCardView').style.display = v === 'card' ? '' : 'none';
+    document.querySelectorAll('.cl-view-toggle button').forEach(b => b.classList.remove('on'));
+    document.querySelector(`.cl-view-toggle button[onclick*="${v}"]`)?.classList.add('on');
+    lucide.createIcons();
+}
 
 function filterClients() {
     const q = (document.getElementById('clientSearch')?.value || '').toLowerCase().trim();
     document.querySelectorAll('#clientTable .nt-row').forEach(row => {
         row.style.display = q && !row.textContent.toLowerCase().includes(q) ? 'none' : '';
+    });
+    document.querySelectorAll('.cl-card').forEach(card => {
+        card.style.display = q && !card.textContent.toLowerCase().includes(q) ? 'none' : '';
     });
 }
 
@@ -158,7 +178,7 @@ function openAddClient(idx) {
         <div class="fr"><div class="fg"><label class="fl">Pin code</label><input type="text" id="acPinCode" value="${esc(c.pinCode || '')}" maxlength="10"></div>
           <div class="fg"><label class="fl">GST number</label><input type="text" id="acGst" value="${esc(c.gstNumber || '')}" maxlength="15" placeholder="e.g. 22AAAAA0000A1Z5"></div></div>
       </div>
-      <button class="btn auth-submit" style="width:100%;margin-top:16px" onclick="saveClient(${isEdit ? idx : -1})">${isEdit ? 'Update customer' : 'Add customer'}</button>
+      <button class="btn auth-submit" style="width:100%;margin-top:16px" onclick="saveClient(${isEdit ? idx : -1})">${isEdit ? 'Update' : 'Add customer'}</button>
       <div style="text-align:center;margin-top:8px"><a href="#" style="font-size:14px;color:var(--text3);text-decoration:underline" onclick="document.getElementById('clientModal').remove();return false">Cancel</a></div>
     </div>`;
     document.body.appendChild(wrap);
@@ -228,7 +248,9 @@ function delClient(i) {
     const propCount = DB.filter(p => matchClient(p, c)).length;
     const msg = propCount > 0 ? `Delete ${clientName}? ${propCount} proposal(s) reference this customer.` : `Delete ${clientName}?`;
     confirmDialog(msg, () => {
-        CLIENTS.splice(i, 1); saveClients(); renderClients(); toast('Customer deleted');
+        CLIENTS.splice(i, 1); saveClients();
+        if (_selectedClient === i) _selectedClient = -1;
+        renderClients(); toast('Customer deleted');
     }, { title: 'Delete customer', confirmText: 'Delete' });
 }
 
@@ -257,92 +279,4 @@ function pickClient(i) {
     document.getElementById('fCPh').value = c.workPhone || c.mobile || c.phone || '';
     document.getElementById('cpModal')?.remove();
     dirty(); toast('Customer filled');
-}
-
-function showClientInsight(idx) {
-    const c = CLIENTS[idx]; if (!c) return;
-    const clientName = c.displayName || c.name || 'Unnamed';
-    const props = activeDB().filter(p => matchClient(p, c));
-    const accepted = props.filter(p => p.status === 'accepted');
-    const declined = props.filter(p => p.status === 'declined');
-    const totalVal = props.reduce((s, p) => s + (p.lineItems || []).reduce((a, it) => a + (it.qty || 0) * (it.rate || 0), 0), 0);
-    const closedTimes = accepted.filter(p => p.clientResponse?.respondedAt && p.createdAt)
-        .map(p => Math.round((p.clientResponse.respondedAt - p.createdAt) / 86400000));
-    const avgDays = closedTimes.length ? Math.round(closedTimes.reduce((a, b) => a + b, 0) / closedTimes.length) : 0;
-    const ini = clientName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    const addrParts = [c.street1, c.street2, c.city, c.state, c.pinCode].filter(Boolean);
-    const addr = addrParts.join(', ');
-    const cur = props[0]?.currency || defaultCurrency();
-    const body = document.getElementById('bodyScroll');
-    document.getElementById('topTitle').textContent = clientName;
-    document.getElementById('topRight').innerHTML = `<button class="btn-sm-outline" onclick="renderClients()"><i data-lucide="arrow-left"></i> Back</button>`;
-    body.innerHTML = `<div class="ci-container">
-      <div class="card ci-header-card">
-        <div class="ci-header">
-          <div class="ci-avi">${ini}</div>
-          <div class="ci-header-info">
-            <div class="ci-name">${esc(clientName)}</div>
-            <div class="ci-email">${esc(c.email || '')}${c.workPhone ? ' &middot; ' + esc(c.workPhone) : ''}</div>
-            ${c.companyName && c.customerType !== 'individual' ? `<div class="ci-detail">${esc(c.companyName)}</div>` : ''}
-            ${addr ? `<div class="ci-detail">${esc(addr)}</div>` : ''}
-            ${c.gstNumber ? `<div class="ci-detail">GST: ${esc(c.gstNumber)}</div>` : ''}
-          </div>
-          <div class="ci-header-actions">
-            <button class="btn-sm-outline" onclick="editClient(${idx})"><i data-lucide="pencil"></i> Edit</button>
-            <button class="btn-sm" onclick="createProposalForClient(${idx})"><i data-lucide="plus"></i> New proposal</button>
-          </div>
-        </div>
-      </div>
-      <div class="ci-metric-grid">
-        <div class="ci-mc ci-mc-total"><div class="ci-mc-label">Total proposals</div><div class="ci-mc-val">${props.length}</div></div>
-        <div class="ci-mc ci-mc-accepted"><div class="ci-mc-label">Accepted</div><div class="ci-mc-val" style="color:var(--green)">${accepted.length}</div></div>
-        <div class="ci-mc ci-mc-declined"><div class="ci-mc-label">Declined</div><div class="ci-mc-val" style="color:var(--red)">${declined.length}</div></div>
-        <div class="ci-mc ci-mc-value"><div class="ci-mc-label">Total value</div><div class="ci-mc-val">${fmtCur(totalVal, cur)}</div></div>
-        <div class="ci-mc ci-mc-response"><div class="ci-mc-label">Avg response</div><div class="ci-mc-val">${avgDays > 0 ? avgDays + 'd' : '\u2014'}</div></div>
-      </div>
-      <div class="ci-history-section">
-        <div class="ci-history-title">Proposal history</div>
-        ${buildClientHistory(props)}
-      </div>
-    </div>`;
-    lucide.createIcons();
-}
-
-function buildClientHistory(props) {
-    if (!props.length) return '<div class="empty" style="padding:30px"><div class="empty-t">No proposals yet</div><div class="empty-d">Create a proposal for this customer to see it here.</div></div>';
-    const sorted = [...props].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-    const rows = sorted.map(p => {
-        const val = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
-        const st = p.status;
-        const statusLabel = st.charAt(0).toUpperCase() + st.slice(1);
-        return `<tr class="nt-row" onclick="loadEditor('${escAttr(p.id)}')">
-            <td class="nt-cell"><span class="nt-title-text">${esc(p.title || 'Untitled')}</span></td>
-            <td class="nt-cell nt-cell-status"><span class="badge badge-${st}"><span class="badge-dot"></span> ${statusLabel}</span></td>
-            <td class="nt-cell nt-cell-value mono">${fmtCur(val, p.currency)}</td>
-            <td class="nt-cell nt-cell-date">${fmtDate(p.createdAt)}</td>
-        </tr>`;
-    }).join('');
-    return `<div class="nt-wrap"><table class="nt-table"><thead><tr class="nt-head">
-      <th class="nt-th">Title</th><th class="nt-th nt-th-status">Status</th><th class="nt-th nt-th-value">Value</th><th class="nt-th nt-th-date">Date</th>
-    </tr></thead><tbody>${rows}</tbody></table></div>`;
-}
-
-function createProposalForClient(idx) {
-    const c = CLIENTS[idx]; if (!c) return;
-    const id = uid(), num = nextPropNumber();
-    const today = new Date().toISOString().split('T')[0];
-    const valid = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
-    const clientName = c.displayName || c.companyName || c.name || '';
-    const contact = (c.salutation ? c.salutation + ' ' : '') + ((c.firstName || '') + ' ' + (c.lastName || '')).trim();
-    const addrParts = [c.street1, c.street2, c.city, c.state, c.pinCode].filter(Boolean);
-    const p = {
-        id, status: 'draft', title: 'Proposal for ' + clientName, number: num, date: today, validUntil: valid,
-        sender: { company: CONFIG?.company || '', email: CONFIG?.email || '', address: CONFIG?.address || '' },
-        client: { name: clientName, contact, email: c.email || '', phone: c.workPhone || c.mobile || '', address: addrParts.join(', '), gstNumber: c.gstNumber || '' },
-        sections: [], lineItems: [], currency: defaultCurrency(), paymentTerms: '', version: 1, coverPage: false,
-        packagesEnabled: false, packages: null, packageFeatures: [], addOns: [], paymentSchedule: [], paymentScheduleMode: 'percentage',
-        notes: [{ text: 'Proposal created for ' + clientName, time: Date.now(), type: 'system' }], createdAt: Date.now()
-    };
-    DB.unshift(p); persist(); loadEditor(id);
-    toast('Proposal created for ' + clientName);
 }

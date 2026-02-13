@@ -4,6 +4,33 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.15.0 (build 20260213) — 2026-02-13
+
+### Features
+- Settings opens as a Notion-style modal overlay with sidebar navigation + content panel
+- Customer split view: clicking a customer shows details in a right-side panel
+- Card and table view toggle on Customers page
+- "Add customer" button renamed to "New"
+
+### Style
+- System font stack: `ui-sans-serif, -apple-system, BlinkMacSystemFont, ...` replaces SF Pro references
+
+### Refactor
+- Extracted `client-detail.js` from `clients.js` to stay under 300-line limit
+
+### Files Changed
+- `assets/css/variables.css` — updated `--font` and `--font-text` to system font stack
+- `assets/js/views/settings.js` — converted to modal overlay (`openSettings()`/`closeSettings()`)
+- `assets/js/views/nav.js` — `goNav('settings')` opens modal, added to ESC handler
+- `assets/js/views/clients.js` — split view layout, card/table toggle, renamed button
+- `assets/js/views/client-detail.js` — **new file**: detail panel, full-page fallback, history, create for client
+- `assets/css/pages.css` — settings modal, split view, card view, detail panel styles
+- `assets/css/responsive.css` — mobile settings modal full-screen, detail panel hidden on mobile
+- `index.html` — added `client-detail.js` script tag
+- `assets/js/boot.js` — version bump, updated What's New
+
+---
+
 ## v2.14.2 (build 20260213) — 2026-02-13
 
 ### Style

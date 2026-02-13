@@ -46,7 +46,7 @@ function goNav(view) {
     else if (view === 'editor') { if (CUR) loadEditor(CUR); else renderProposals(); }
     else if (view === 'clients') renderClients();
     else if (view === 'profile') { if (typeof renderProfile === 'function') renderProfile(); else renderSettings(); }
-    else if (view === 'settings') renderSettings();
+    else if (view === 'settings') { openSettings(); return; }
 }
 
 function toggleMobileSidebar() {
@@ -116,7 +116,7 @@ function initKeyboardShortcuts() {
             const wnModal = document.getElementById('whatsNewModal');
             if (wnModal) { if (typeof dismissWhatsNew === 'function') dismissWhatsNew(); else wnModal.remove(); return; }
             // Dynamic modals (remove from DOM)
-            const dynamicModals = ['guideModal', 'feedbackModal', 'shortcutsModal', 'completenessModal', 'clientModal', 'cpModal', 'libModal', 'tcModal', 'tplModal', 'emailTplModal', 'shareModal', 'dupClientModal', 'confirmModal', 'csvModal'];
+            const dynamicModals = ['settingsModal', 'guideModal', 'feedbackModal', 'shortcutsModal', 'completenessModal', 'clientModal', 'cpModal', 'libModal', 'tcModal', 'tplModal', 'emailTplModal', 'shareModal', 'dupClientModal', 'confirmModal', 'csvModal'];
             for (const modalId of dynamicModals) {
                 const modal = document.getElementById(modalId);
                 if (modal) { modal.remove(); return; }
