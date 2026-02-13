@@ -68,8 +68,9 @@ function openSettings() {
         ${hasTeam ? '<button class="sn-item" data-key="team" onclick="setTab(this,\'team\')"><i data-lucide="users"></i> Team</button>' : ''}
         ${hasAi ? '<button class="sn-item" data-key="ai" onclick="setTab(this,\'ai\')"><i data-lucide="sparkles"></i> AI</button>' : ''}
         <button class="sn-item" data-key="branding" onclick="setTab(this,'branding')"><i data-lucide="palette"></i> Branding</button>
+        <button class="sn-item" data-key="pdfTemplate" onclick="setTab(this,'pdfTemplate')"><i data-lucide="file-type"></i> PDF Template</button>
         <button class="sn-item" data-key="signature" onclick="setTab(this,'signature')"><i data-lucide="pen-tool"></i> Signature</button></div>`;
-    navHtml += `<div class="sn-group"><div class="sn-group-label">Admin</div>
+    navHtml += `<div class="sn-group"><div class="sn-group-label">System</div>
         <button class="sn-item" data-key="data" onclick="setTab(this,'data')"><i data-lucide="database"></i> Data</button></div>`;
     const defaultTab = loggedIn ? 'account' : 'profile';
     const wrap = document.createElement('div');
@@ -130,6 +131,11 @@ function setTab(btn, key) {
             ${sep}${sh('White label')}
             <div class="fg"><label class="toggle-row"><input type="checkbox" id="setWhiteLabel" ${CONFIG?.whiteLabel ? 'checked' : ''} onchange="saveSettings();applyWhiteLabel()"><span class="toggle-label">Remove ProposalKit branding</span></label>
               <div class="fh">Replaces ProposalKit name with your company name everywhere</div></div>`,
+        pdfTemplate: () => {
+            const html = typeof renderPdfCustomizer === 'function' ? renderPdfCustomizer() : '<div class="empty"><div class="empty-t">PDF Customizer not loaded</div></div>';
+            setTimeout(() => { if (typeof initPdfCustomizerSelects === 'function') initPdfCustomizerSelects(); lucide.createIcons(); }, 50);
+            return html;
+        },
         signature: () => `${sh('Signature')}<div class="sig-wrap" id="sigWrap"><div id="sigDisplay"></div></div>`,
         data: () => `${sh('Data management')}
             <div class="fg"><label class="fl">Webhook URL</label>

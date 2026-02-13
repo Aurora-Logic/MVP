@@ -117,6 +117,12 @@ function buildPreview(mode) {
     if (p.clientResponse?.status === 'accepted' && (p.clientResponse.clientName || p.clientResponse.clientSignature)) {
         html += buildAcceptanceBlockHtml(p, bc);
     }
+
+    // Apply custom PDF styles (Pro/Team feature)
+    if (typeof applyPdfStyles === 'function') {
+        html = applyPdfStyles(html);
+    }
+
     document.getElementById('prevDoc').innerHTML = html;
 }
 

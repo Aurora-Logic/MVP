@@ -1,0 +1,254 @@
+// ════════════════════════════════════════
+// PDF CUSTOMIZER — Template Style Editor (Pro/Team)
+// ════════════════════════════════════════
+
+/* exported getPdfStyles, savePdfStyles, resetPdfStyles, renderPdfCustomizer, applyPdfStyles */
+
+// Default PDF styles
+const DEFAULT_PDF_STYLES = {
+    primaryColor: '#800020',      // Burgundy - main accent color
+    headingColor: '#09090b',      // Near black - h1, h2, h3
+    textColor: '#3f3f46',         // Dark gray - body text
+    mutedColor: '#71717a',        // Medium gray - secondary text
+    borderColor: '#e4e4e7',       // Light gray - borders, dividers
+    tableHeaderBg: '#fafafa',     // Very light gray - table headers
+    fontFamily: 'Inter',          // Main font
+    headingFontFamily: 'Inter',   // Heading font
+    fontSize: '13px',             // Base font size
+    headingSize: '24px',          // H1 size
+    lineHeight: '1.6',            // Body line height
+    borderWidth: '1px',           // Border thickness
+    borderRadius: '8px',          // Rounded corners
+    tableBorderColor: '#e4e4e7',  // Table borders
+    tableRowAltBg: '#f9fafb'      // Alternate row background
+};
+
+function getPdfStyles() {
+    if (!CONFIG) return DEFAULT_PDF_STYLES;
+    if (!CONFIG.pdfStyles) {
+        CONFIG.pdfStyles = structuredClone(DEFAULT_PDF_STYLES);
+        saveConfig();
+    }
+    return CONFIG.pdfStyles;
+}
+
+function savePdfStyles(styles) {
+    if (!CONFIG) return;
+    CONFIG.pdfStyles = styles;
+    saveConfig();
+    toast('PDF styles saved');
+}
+
+function resetPdfStyles() {
+    if (!CONFIG) return;
+    CONFIG.pdfStyles = structuredClone(DEFAULT_PDF_STYLES);
+    saveConfig();
+    toast('PDF styles reset to default');
+    renderPdfCustomizer();
+}
+
+// Apply PDF styles to preview (called from buildPreview)
+function applyPdfStyles(html) {
+    const styles = getPdfStyles();
+    // Replace hardcoded colors with custom styles
+    let styled = html
+        .replace(/#800020/g, styles.primaryColor)
+        .replace(/#09090b/g, styles.headingColor)
+        .replace(/#3f3f46/g, styles.textColor)
+        .replace(/#71717a/g, styles.mutedColor)
+        .replace(/#e4e4e7/g, styles.borderColor)
+        .replace(/#fafafa/g, styles.tableHeaderBg)
+        .replace(/font-family:Inter/g, `font-family:${styles.fontFamily}`)
+        .replace(/font-size:13px/g, `font-size:${styles.fontSize}`)
+        .replace(/font-size:24px/g, `font-size:${styles.headingSize}`)
+        .replace(/line-height:1\.6/g, `line-height:${styles.lineHeight}`)
+        .replace(/border:1px solid/g, `border:${styles.borderWidth} solid`)
+        .replace(/border-radius:8px/g, `border-radius:${styles.borderRadius}`);
+    return styled;
+}
+
+function renderPdfCustomizer() {
+    // Check plan access
+    const hasPdfCustomization = typeof checkLimit === 'function' ? checkLimit('pdfCustomization').allowed : false;
+
+    if (!hasPdfCustomization) {
+        return `<div class="card card-p" style="margin-bottom:14px">
+            <div class="card-head">
+                <div><div class="card-t">PDF Template Editor</div>
+                <div class="card-d">Customize PDF colors, fonts, and styling</div></div>
+                <span class="badge badge-draft" style="font-size:11px">Pro Feature</span>
+            </div>
+            <div style="padding:20px;text-align:center;color:var(--muted-foreground);background:var(--muted);border-radius:8px">
+                <i data-lucide="lock" style="width:32px;height:32px;margin-bottom:8px;opacity:0.5"></i>
+                <p style="margin:0 0 12px;font-size:13px;font-weight:500">PDF customization is a Pro feature</p>
+                <button class="btn-sm" onclick="if(typeof showUpgradeModal==='function')showUpgradeModal('pdfCustomization',{allowed:false,plan:'free'})">
+                    <i data-lucide="sparkles"></i> Upgrade to Pro
+                </button>
+            </div>
+        </div>`;
+    }
+
+    const styles = getPdfStyles();
+
+    return `<div class="card card-p" id="pdfCustomizerCard" style="margin-bottom:14px">
+        <div class="card-head">
+            <div><div class="card-t">PDF Template Editor</div>
+            <div class="card-d">Customize your PDF appearance</div></div>
+            <div style="display:flex;gap:8px">
+                <button class="btn-sm-outline" onclick="resetPdfStyles()"><i data-lucide="rotate-ccw"></i> Reset</button>
+                <button class="btn-sm" onclick="if(typeof openPreview==='function')openPreview()"><i data-lucide="eye"></i> Preview</button>
+            </div>
+        </div>
+
+        <div class="pdf-cust-grid">
+            <!-- Colors Section -->
+            <div class="pdf-cust-section">
+                <div class="pdf-cust-label"><i data-lucide="palette"></i> Colors</div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Primary Color</label>
+                    <input type="color" id="pdfPrimaryColor" value="${esc(styles.primaryColor)}" onchange="updatePdfStyle('primaryColor', this.value)" class="pdf-color-input">
+                    <span class="pdf-color-hex">${styles.primaryColor}</span>
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Heading Color</label>
+                    <input type="color" id="pdfHeadingColor" value="${esc(styles.headingColor)}" onchange="updatePdfStyle('headingColor', this.value)" class="pdf-color-input">
+                    <span class="pdf-color-hex">${styles.headingColor}</span>
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Text Color</label>
+                    <input type="color" id="pdfTextColor" value="${esc(styles.textColor)}" onchange="updatePdfStyle('textColor', this.value)" class="pdf-color-input">
+                    <span class="pdf-color-hex">${styles.textColor}</span>
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Muted Text</label>
+                    <input type="color" id="pdfMutedColor" value="${esc(styles.mutedColor)}" onchange="updatePdfStyle('mutedColor', this.value)" class="pdf-color-input">
+                    <span class="pdf-color-hex">${styles.mutedColor}</span>
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Border Color</label>
+                    <input type="color" id="pdfBorderColor" value="${esc(styles.borderColor)}" onchange="updatePdfStyle('borderColor', this.value)" class="pdf-color-input">
+                    <span class="pdf-color-hex">${styles.borderColor}</span>
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Table Header BG</label>
+                    <input type="color" id="pdfTableHeaderBg" value="${esc(styles.tableHeaderBg)}" onchange="updatePdfStyle('tableHeaderBg', this.value)" class="pdf-color-input">
+                    <span class="pdf-color-hex">${styles.tableHeaderBg}</span>
+                </div>
+            </div>
+
+            <!-- Typography Section -->
+            <div class="pdf-cust-section">
+                <div class="pdf-cust-label"><i data-lucide="type"></i> Typography</div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Font Family</label>
+                    <div id="pdfFontFamily"></div>
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Heading Font</label>
+                    <div id="pdfHeadingFont"></div>
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Font Size</label>
+                    <input type="text" id="pdfFontSize" value="${esc(styles.fontSize)}" oninput="updatePdfStyle('fontSize', this.value)" placeholder="13px" style="width:80px">
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Heading Size</label>
+                    <input type="text" id="pdfHeadingSize" value="${esc(styles.headingSize)}" oninput="updatePdfStyle('headingSize', this.value)" placeholder="24px" style="width:80px">
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Line Height</label>
+                    <input type="text" id="pdfLineHeight" value="${esc(styles.lineHeight)}" oninput="updatePdfStyle('lineHeight', this.value)" placeholder="1.6" style="width:80px">
+                </div>
+            </div>
+
+            <!-- Spacing & Borders Section -->
+            <div class="pdf-cust-section">
+                <div class="pdf-cust-label"><i data-lucide="square"></i> Spacing & Borders</div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Border Width</label>
+                    <input type="text" id="pdfBorderWidth" value="${esc(styles.borderWidth)}" oninput="updatePdfStyle('borderWidth', this.value)" placeholder="1px" style="width:80px">
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Border Radius</label>
+                    <input type="text" id="pdfBorderRadius" value="${esc(styles.borderRadius)}" oninput="updatePdfStyle('borderRadius', this.value)" placeholder="8px" style="width:80px">
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Table Border</label>
+                    <input type="color" id="pdfTableBorderColor" value="${esc(styles.tableBorderColor)}" onchange="updatePdfStyle('tableBorderColor', this.value)" class="pdf-color-input">
+                    <span class="pdf-color-hex">${styles.tableBorderColor}</span>
+                </div>
+
+                <div class="pdf-cust-row">
+                    <label class="fl">Alt Row BG</label>
+                    <input type="color" id="pdfTableRowAltBg" value="${esc(styles.tableRowAltBg)}" onchange="updatePdfStyle('tableRowAltBg', this.value)" class="pdf-color-input">
+                    <span class="pdf-color-hex">${styles.tableRowAltBg}</span>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+
+function updatePdfStyle(key, value) {
+    const styles = getPdfStyles();
+    styles[key] = value;
+
+    // Update hex display for color inputs
+    if (key.includes('Color') || key.includes('Bg')) {
+        const input = document.getElementById('pdf' + key.charAt(0).toUpperCase() + key.slice(1));
+        if (input && input.nextElementSibling) {
+            input.nextElementSibling.textContent = value;
+        }
+    }
+
+    savePdfStyles(styles);
+}
+
+// Initialize font selectors after rendering
+function initPdfCustomizerSelects() {
+    if (typeof csel !== 'function') return;
+
+    const styles = getPdfStyles();
+    const fonts = [
+        { value: 'Inter', label: 'Inter', desc: 'Modern sans-serif' },
+        { value: 'System', label: 'System Default', desc: 'SF Pro / Segoe UI' },
+        { value: 'Georgia', label: 'Georgia', desc: 'Classic serif' },
+        { value: 'Times New Roman', label: 'Times New Roman', desc: 'Traditional serif' },
+        { value: 'Arial', label: 'Arial', desc: 'Standard sans-serif' },
+        { value: 'Helvetica', label: 'Helvetica', desc: 'Clean sans-serif' },
+        { value: 'Verdana', label: 'Verdana', desc: 'Readable sans-serif' },
+        { value: 'Courier New', label: 'Courier New', desc: 'Monospace' }
+    ];
+
+    const fontFamilyEl = document.getElementById('pdfFontFamily');
+    const headingFontEl = document.getElementById('pdfHeadingFont');
+
+    if (fontFamilyEl) {
+        csel(fontFamilyEl, {
+            value: styles.fontFamily,
+            items: fonts,
+            onChange: (val) => updatePdfStyle('fontFamily', val)
+        });
+    }
+
+    if (headingFontEl) {
+        csel(headingFontEl, {
+            value: styles.headingFontFamily,
+            items: fonts,
+            onChange: (val) => updatePdfStyle('headingFontFamily', val)
+        });
+    }
+}

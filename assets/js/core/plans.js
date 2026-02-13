@@ -4,9 +4,9 @@
 /* exported checkLimit, enforceLimit, showUpgradeModal, getCurrentPlan, getPlanBadge, trackEvent, PLAN_LIMITS */
 
 const PLAN_LIMITS = {
-    free:  { proposals: 5, clients: 2, ai: false, team: 1, templates: 3, branding: false, offline: false },
-    pro:   { proposals: Infinity, clients: Infinity, ai: true, team: 1, templates: Infinity, branding: true, offline: true },
-    team:  { proposals: Infinity, clients: Infinity, ai: true, team: 10, templates: Infinity, branding: true, offline: true }
+    free:  { proposals: 5, clients: 2, ai: false, team: 1, templates: 3, branding: false, offline: false, pdfCustomization: false },
+    pro:   { proposals: Infinity, clients: Infinity, ai: true, team: 1, templates: Infinity, branding: true, offline: true, pdfCustomization: true },
+    team:  { proposals: Infinity, clients: Infinity, ai: true, team: 10, templates: Infinity, branding: true, offline: true, pdfCustomization: true }
 };
 
 function getCurrentPlan() {
@@ -50,6 +50,9 @@ function checkLimit(feature) {
         case 'offline':
             result.allowed = limits.offline;
             break;
+        case 'pdfCustomization':
+            result.allowed = limits.pdfCustomization;
+            break;
         default:
             result.allowed = true;
     }
@@ -91,6 +94,7 @@ function showUpgradeModal(feature, check) {
         ['Team Members', '1', '1', '10'],
         ['Templates', '3', 'Unlimited', 'Unlimited'],
         ['Custom Branding', '\u2014', '\u2713', '\u2713'],
+        ['PDF Customization', '\u2014', '\u2713', '\u2713'],
         ['Offline Access', '\u2014', '\u2713', '\u2713'],
         ['Price', 'Free', proPrice + '/mo', teamPrice + '/mo']
     ];
