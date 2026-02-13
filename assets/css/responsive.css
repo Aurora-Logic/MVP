@@ -46,8 +46,6 @@
   .nl-meta { display: none; }
   .nl-date { display: none; }
 
-  .cl-detail-panel { width: 300px; }
-
   .preview {
     width: 100%;
   }
@@ -214,10 +212,6 @@
   .modal-settings .sn-group { display: contents; }
   .modal-settings .sn-group-label { display: none; }
   .modal-settings .set-content { padding: 20px; max-width: 100%; }
-
-  /* Customer split — hide detail panel on mobile */
-  .cl-detail-panel { display: none !important; }
-  .cl-split { height: auto; }
 
   /* Filter tabs horizontal scroll */
   .filter-tabs {

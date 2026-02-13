@@ -19,7 +19,6 @@ const INDIAN_STATES = [
 const SALUTATIONS = ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.'];
 let _clientFilter = 'all';
 let _clientView = 'table';
-let _selectedClient = -1;
 
 function renderClients() {
     CUR = null;
@@ -53,12 +52,13 @@ function renderClients() {
         const last = props.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))[0];
         const displayName = c.displayName || c.companyName || ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || c.name || 'Unnamed';
         const ini = displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-        return { c, i, displayName, ini, props: props.length, val, last, email: c.email || '', isBiz };
+        const winRate = props.length ? Math.round(props.filter(p => p.status === 'accepted').length / props.length * 100) : 0;
+        return { c, i, displayName, ini, props: props.length, val, last, email: c.email || '', isBiz, winRate };
     });
     const filtered = _clientFilter === 'all' ? clientData : _clientFilter === 'business' ? clientData.filter(d => d.isBiz) : clientData.filter(d => !d.isBiz);
 
     // Table rows
-    const rows = filtered.map(d => `<tr class="nt-row${_selectedClient === d.i ? ' on' : ''}" onclick="showClientDetail(${d.i})">
+    const rows = filtered.map(d => `<tr class="nt-row" onclick="showClientInsightFull(${d.i})">
       <td class="nt-cell"><div class="cl-cell-name"><div class="cc-avi" style="background:var(--blue-bg);color:var(--blue)">${d.ini}</div><div><div class="cc-name">${esc(d.displayName)}</div><div class="cc-email">${esc(d.email)}</div></div></div></td>
       <td class="nt-cell cl-cell-email">${esc(d.email)}</td>
       <td class="nt-cell">${d.props}</td>
@@ -70,41 +70,45 @@ function renderClients() {
       </div></td>
     </tr>`).join('');
 
-    // Card items
-    const cards = filtered.map(d => `<div class="cl-card${_selectedClient === d.i ? ' on' : ''}" onclick="showClientDetail(${d.i})">
+    // Card items — richer with win rate, last active, type badge
+    const cards = filtered.map(d => {
+        const typeBadge = d.isBiz ? '<span class="cl-card-badge">Business</span>' : '<span class="cl-card-badge cl-card-badge-ind">Individual</span>';
+        const lastActive = d.last ? timeAgo(d.last.updatedAt || d.last.createdAt) : 'No activity';
+        return `<div class="cl-card" onclick="showClientInsightFull(${d.i})">
       <div class="cl-card-head"><div class="cc-avi" style="background:var(--blue-bg);color:var(--blue)">${d.ini}</div>
-        <div style="flex:1;min-width:0"><div class="cc-name">${esc(d.displayName)}</div><div class="cc-email">${esc(d.email)}</div></div></div>
-      <div class="cl-card-stats"><span><strong>${d.props}</strong> proposals</span><span class="mono"><strong>${fmtCur(d.val, cur)}</strong></span></div>
-    </div>`).join('');
+        <div style="flex:1;min-width:0"><div class="cc-name">${esc(d.displayName)}</div><div class="cc-email">${esc(d.email)}</div></div>
+        ${typeBadge}</div>
+      <div class="cl-card-body">
+        <div class="cl-card-stat"><span class="cl-card-stat-label">Proposals</span><span class="cl-card-stat-val">${d.props}</span></div>
+        <div class="cl-card-stat"><span class="cl-card-stat-label">Value</span><span class="cl-card-stat-val mono">${fmtCur(d.val, cur)}</span></div>
+        <div class="cl-card-stat"><span class="cl-card-stat-label">Win rate</span><span class="cl-card-stat-val">${d.winRate}%</span></div>
+      </div>
+      <div class="cl-card-foot"><i data-lucide="clock" style="width:12px;height:12px"></i> ${lastActive}</div>
+    </div>`;
+    }).join('');
 
     const ft = (key, label, count) => `<button class="filter-tab${_clientFilter === key ? ' on' : ''}${!count ? ' dimmed' : ''}" onclick="setClientFilter('${key}')">${label} <span class="fc">${count}</span></button>`;
     const tv = (v, icon) => `<button class="btn-sm-icon-ghost${_clientView === v ? ' on' : ''}" onclick="toggleClientView('${v}')" data-tooltip="${v === 'table' ? 'Table' : 'Cards'}" data-side="bottom"><i data-lucide="${icon}"></i></button>`;
 
-    body.innerHTML = `<div class="cl-split">
-      <div class="cl-list-panel">
-        <div class="cl-toolbar">
-          <div class="prop-filters" role="tablist">${ft('all', 'All', CLIENTS.length)}${ft('business', 'Business', bizCount)}${ft('individual', 'Individual', indCount)}</div>
-          <div class="cl-toolbar-right">
-            <div class="cl-view-toggle">${tv('table', 'list')}${tv('card', 'layout-grid')}</div>
-            <div class="cl-search-wrap"><i data-lucide="search"></i><input type="text" class="cl-search" id="clientSearch" placeholder="Search..." oninput="filterClients()"></div>
-            <button class="btn-sm" onclick="openAddClient()"><i data-lucide="plus"></i> New</button>
-          </div>
-        </div>
-        <div id="clTableView" style="${_clientView !== 'table' ? 'display:none' : ''}">
-          <div class="nt-wrap"><table class="nt-table"><thead><tr class="nt-head">
-            <th class="nt-th">Customer</th><th class="nt-th cl-th-email">Email</th><th class="nt-th">Proposals</th><th class="nt-th nt-th-value">Value</th><th class="nt-th nt-th-date">Last active</th><th class="nt-th nt-th-actions"></th>
-          </tr></thead><tbody id="clientTable">${rows}</tbody></table></div>
-        </div>
-        <div id="clCardView" style="${_clientView !== 'card' ? 'display:none' : ''}">
-          <div class="cl-card-grid">${cards}</div>
+    body.innerHTML = `<div class="cl-container">
+      <div class="cl-toolbar">
+        <div class="prop-filters" role="tablist">${ft('all', 'All', CLIENTS.length)}${ft('business', 'Business', bizCount)}${ft('individual', 'Individual', indCount)}</div>
+        <div class="cl-toolbar-right">
+          <div class="cl-view-toggle">${tv('table', 'list')}${tv('card', 'layout-grid')}</div>
+          <div class="cl-search-wrap"><i data-lucide="search"></i><input type="text" class="cl-search" id="clientSearch" placeholder="Search..." oninput="filterClients()"></div>
+          <button class="btn-sm" onclick="openAddClient()"><i data-lucide="plus"></i> New</button>
         </div>
       </div>
-      <div class="cl-detail-panel" id="clDetail"></div>
+      <div id="clTableView" style="${_clientView !== 'table' ? 'display:none' : ''}">
+        <div class="nt-wrap"><table class="nt-table"><thead><tr class="nt-head">
+          <th class="nt-th">Customer</th><th class="nt-th cl-th-email">Email</th><th class="nt-th">Proposals</th><th class="nt-th nt-th-value">Value</th><th class="nt-th nt-th-date">Last active</th><th class="nt-th nt-th-actions"></th>
+        </tr></thead><tbody id="clientTable">${rows}</tbody></table></div>
+      </div>
+      <div id="clCardView" style="${_clientView !== 'card' ? 'display:none' : ''}">
+        <div class="cl-card-grid">${cards}</div>
+      </div>
     </div>`;
     lucide.createIcons();
-    if (_selectedClient >= 0 && CLIENTS[_selectedClient]) {
-        showClientDetail(_selectedClient);
-    }
 }
 
 function setClientFilter(f) { _clientFilter = f; renderClients(); }
@@ -142,14 +146,16 @@ function openAddClient(idx) {
     const salOpts = SALUTATIONS.map(s => `<option value="${s}"${c.salutation === s ? ' selected' : ''}>${s}</option>`).join('');
     const isBiz = (c.customerType || 'business') === 'business';
     wrap.innerHTML = `<div class="modal acm-modal" onclick="event.stopPropagation()">
-      <div class="auth-header" style="text-align:center;margin-bottom:20px">
-        <div class="auth-title">${isEdit ? 'Edit' : 'New'} customer</div>
-        <div class="auth-desc">Complete customer details for proposals and invoices</div>
+      <div style="text-align:center;margin-bottom:16px">
+        <div class="modal-t">${isEdit ? 'Edit' : 'New'} customer</div>
+        <div class="modal-d" style="margin-bottom:0">Complete customer details for proposals and invoices</div>
       </div>
       <div class="acm-body">
-        <div class="acm-type-toggle" style="display:flex;justify-content:center;margin-bottom:16px">
-          <button class="filter-tab${isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=business]').checked=true;document.getElementById('acCompanyRow').style.display=''">Business</button>
-          <button class="filter-tab${!isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=individual]').checked=true;document.getElementById('acCompanyRow').style.display='none'">Individual</button>
+        <div style="display:flex;justify-content:center;margin-bottom:16px">
+          <div class="acm-type-toggle">
+            <button class="filter-tab${isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=business]').checked=true;document.getElementById('acCompanyRow').style.display=''">Business</button>
+            <button class="filter-tab${!isBiz ? ' on' : ''}" type="button" onclick="this.parentElement.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('on'));this.classList.add('on');document.querySelector('input[name=acType][value=individual]').checked=true;document.getElementById('acCompanyRow').style.display='none'">Individual</button>
+          </div>
           <input type="radio" name="acType" value="business" ${isBiz ? 'checked' : ''} style="display:none">
           <input type="radio" name="acType" value="individual" ${!isBiz ? 'checked' : ''} style="display:none">
         </div>
@@ -178,8 +184,10 @@ function openAddClient(idx) {
         <div class="fr"><div class="fg"><label class="fl">Pin code</label><input type="text" id="acPinCode" value="${esc(c.pinCode || '')}" maxlength="10"></div>
           <div class="fg"><label class="fl">GST number</label><input type="text" id="acGst" value="${esc(c.gstNumber || '')}" maxlength="15" placeholder="e.g. 22AAAAA0000A1Z5"></div></div>
       </div>
-      <button class="btn auth-submit" style="width:100%;margin-top:16px" onclick="saveClient(${isEdit ? idx : -1})">${isEdit ? 'Update' : 'Add customer'}</button>
-      <div style="text-align:center;margin-top:8px"><a href="#" style="font-size:14px;color:var(--text3);text-decoration:underline" onclick="document.getElementById('clientModal').remove();return false">Cancel</a></div>
+      <div class="modal-foot" style="margin-top:16px">
+        <button class="btn-sm-ghost" onclick="document.getElementById('clientModal').remove()">Cancel</button>
+        <button class="btn-sm" onclick="saveClient(${isEdit ? idx : -1})">${isEdit ? 'Update' : 'Add customer'}</button>
+      </div>
     </div>`;
     document.body.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('show'));
@@ -249,7 +257,6 @@ function delClient(i) {
     const msg = propCount > 0 ? `Delete ${clientName}? ${propCount} proposal(s) reference this customer.` : `Delete ${clientName}?`;
     confirmDialog(msg, () => {
         CLIENTS.splice(i, 1); saveClients();
-        if (_selectedClient === i) _selectedClient = -1;
         renderClients(); toast('Customer deleted');
     }, { title: 'Delete customer', confirmText: 'Delete' });
 }

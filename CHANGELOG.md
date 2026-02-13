@@ -4,6 +4,29 @@ All notable changes to ProposalKit are documented here.
 
 ---
 
+## v2.15.1 (build 20260213) — 2026-02-13
+
+### Fix
+- Remove split view layout, revert to click-to-open full-page customer detail
+- Fix add customer modal: correct button classes (was using auth-submit), proper header styling
+
+### Style
+- Richer card view: type badge (Business/Individual), win rate %, last active timestamp
+- New card body with 3-column stats grid
+
+### Refactor
+- Remove dead split panel code (showClientDetail, _selectedClient, .cl-split/.cl-detail-panel CSS)
+- Clean up responsive.css: remove split view breakpoint rules
+
+### Files Changed
+- `clients.js` — remove split view, richer card HTML, fix modal classes
+- `client-detail.js` — remove showClientDetail, update exports
+- `pages.css` — replace split view CSS with .cl-container, add card badge/body/stat/foot styles
+- `responsive.css` — remove .cl-detail-panel and .cl-split rules
+- `boot.js` — version bump to 2.15.1
+
+---
+
 ## v2.15.0 (build 20260213) — 2026-02-13
 
 ### Features

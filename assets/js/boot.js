@@ -43,7 +43,7 @@ function bootApp() {
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL
 // ════════════════════════════════════════
-const APP_VERSION = '2.15.0';
+const APP_VERSION = '2.15.1';
 const APP_BUILD = '20260213';
 const WHATS_NEW_ITEMS = [
     { icon: 'settings', title: 'Settings Modal', desc: 'Settings now opens as a Notion-style modal overlay with sidebar navigation.' },

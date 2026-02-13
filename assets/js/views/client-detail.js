@@ -1,53 +1,8 @@
 // ════════════════════════════════════════
-// CUSTOMER DETAIL — Split panel + history
+// CUSTOMER DETAIL — Full-page insight + history
 // ════════════════════════════════════════
 
-/* exported showClientDetail, buildClientHistory, createProposalForClient */
-
-function showClientDetail(idx) {
-    _selectedClient = idx;
-    const panel = document.getElementById('clDetail');
-    const c = CLIENTS[idx]; if (!c) return;
-    // Highlight active row/card
-    document.querySelectorAll('.nt-row.on, .cl-card.on').forEach(el => el.classList.remove('on'));
-    const row = document.querySelectorAll('#clientTable .nt-row')[idx];
-    if (row) row.classList.add('on');
-    const card = document.querySelectorAll('.cl-card')[idx];
-    if (card) card.classList.add('on');
-    // If no panel (mobile), fall back to full-page insight
-    if (!panel) { showClientInsightFull(idx); return; }
-    const clientName = c.displayName || c.name || 'Unnamed';
-    const ini = clientName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    const props = activeDB().filter(p => matchClient(p, c));
-    const accepted = props.filter(p => p.status === 'accepted');
-    const totalVal = props.reduce((s, p) => s + (p.lineItems || []).reduce((a, it) => a + (it.qty || 0) * (it.rate || 0), 0), 0);
-    const cur = props[0]?.currency || defaultCurrency();
-    const addrParts = [c.street1, c.street2, c.city, c.state, c.pinCode].filter(Boolean);
-    const addr = addrParts.join(', ');
-    const sorted = [...props].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 5);
-    const historyHtml = sorted.length ? sorted.map(p => {
-        const val = (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0);
-        const st = p.status; const dot = `<span class="badge-dot" style="background:var(--status-${st})"></span>`;
-        return `<div class="cld-history-item" onclick="loadEditor('${escAttr(p.id)}')">${dot}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.title || 'Untitled')}</span><span class="mono" style="font-size:12px;color:var(--text3)">${fmtCur(val, p.currency)}</span></div>`;
-    }).join('') : '<div style="font-size:12px;color:var(--text4);padding:8px 0">No proposals yet</div>';
-    panel.innerHTML = `<div class="cld-header">
-        <div class="cld-avi">${ini}</div>
-        <div><div class="cld-name">${esc(clientName)}</div><div class="cld-email">${esc(c.email || '')}</div>
-        ${addr ? `<div class="cld-email">${esc(addr)}</div>` : ''}</div>
-      </div>
-      <div class="cld-actions">
-        <button class="btn-sm" onclick="createProposalForClient(${idx})"><i data-lucide="plus"></i> New proposal</button>
-        <button class="btn-sm-outline" onclick="editClient(${idx})"><i data-lucide="pencil"></i> Edit</button>
-      </div>
-      <div class="cld-metrics">
-        <div class="cld-metric"><div class="cld-metric-label">Proposals</div><div class="cld-metric-value">${props.length}</div></div>
-        <div class="cld-metric"><div class="cld-metric-label">Accepted</div><div class="cld-metric-value" style="color:var(--green)">${accepted.length}</div></div>
-        <div class="cld-metric"><div class="cld-metric-label">Value</div><div class="cld-metric-value">${fmtCur(totalVal, cur)}</div></div>
-      </div>
-      <div class="cld-history-title">Recent activity</div>${historyHtml}`;
-    panel.classList.add('show');
-    lucide.createIcons();
-}
+/* exported showClientInsightFull, buildClientHistory, createProposalForClient */
 
 function showClientInsightFull(idx) {
     const c = CLIENTS[idx]; if (!c) return;
