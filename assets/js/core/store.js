@@ -18,6 +18,31 @@ let CLIENTS;
 try { DB = JSON.parse(localStorage.getItem('pk_db') || '[]'); } catch (e) { DB = []; console.error('pk_db corrupted, reset to empty:', e); }
 try { CONFIG = JSON.parse(localStorage.getItem('pk_config') || 'null'); } catch (e) { CONFIG = null; console.error('pk_config corrupted, reset:', e); }
 try { CLIENTS = JSON.parse(localStorage.getItem('pk_clients') || '[]'); } catch (e) { CLIENTS = []; console.error('pk_clients corrupted, reset:', e); }
+
+// Schema versioning — run migrations sequentially on startup
+const SCHEMA_VERSION = 1;
+(function migrateSchema() {
+    const stored = parseInt(localStorage.getItem('pk_schema') || '0');
+    if (stored >= SCHEMA_VERSION) return;
+    // Migration 1: ensure every proposal has required fields with safe defaults
+    if (stored < 1) {
+        DB.forEach(p => {
+            if (!p.id) return;
+            if (!p.sender) p.sender = { company: '', email: '', address: '' };
+            if (!p.client) p.client = { name: '', contact: '', email: '', phone: '' };
+            if (!p.lineItems) p.lineItems = [];
+            if (!p.sections) p.sections = [];
+            if (typeof p.discount !== 'number') p.discount = 0;
+            if (typeof p.taxRate !== 'number') p.taxRate = 0;
+            if (!p.status) p.status = 'draft';
+            if (!p.createdAt) p.createdAt = p.updatedAt || Date.now();
+        });
+        try { localStorage.setItem('pk_db', JSON.stringify(DB)); } catch (e) { /* persist will handle */ }
+    }
+    // Future migrations: if (stored < 2) { ... }
+    localStorage.setItem('pk_schema', String(SCHEMA_VERSION));
+})();
+
 /* eslint-disable prefer-const -- These are reassigned in other files */
 let CUR = null;
 let saveTimer = null;

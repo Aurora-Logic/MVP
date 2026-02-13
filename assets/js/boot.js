@@ -53,6 +53,10 @@ lucide.createIcons = function(opts) {
     _origCreateIcons(opts);
     patchAriaLabels();
 };
+/** Scope icon creation to a container — avoids full-DOM rescan */
+function lucideScope(el) {
+    if (el) lucide.createIcons({ nodes: [el] });
+}
 
 // ════════════════════════════════════════
 // WHAT'S NEW MODAL

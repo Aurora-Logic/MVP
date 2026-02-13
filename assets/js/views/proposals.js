@@ -38,7 +38,7 @@ function renderPropTable(list) {
             <button class="btn-sm" onclick="openNewModal()"><i data-lucide="plus"></i> New proposal</button>
         </div>
     </div>`;
-    lucide.createIcons();
+    if (typeof lucideScope === 'function') lucideScope(wrap); else lucide.createIcons();
     return;
   }
 
@@ -101,7 +101,7 @@ function renderPropTable(list) {
   } else {
     wrap.innerHTML = `<div class="nl-wrap">${rows}</div>`;
   }
-  lucide.createIcons();
+  if (typeof lucideScope === 'function') lucideScope(wrap); else lucide.createIcons();
 }
 
 function doQuickExport(id) { CUR = id; doExport('proposal'); }
@@ -127,7 +127,7 @@ function showStatusMenu(event, id) {
   dropdown.style.left = Math.min(event.clientX, window.innerWidth - 160) + 'px';
   dropdown.style.top = Math.min(event.clientY, window.innerHeight - 200) + 'px';
   document.body.appendChild(dropdown);
-  lucide.createIcons();
+  if (typeof lucideScope === 'function') lucideScope(dropdown); else lucide.createIcons();
   const close = () => { dropdown.remove(); document.removeEventListener('click', close); };
   setTimeout(() => document.addEventListener('click', close), 10);
 }
@@ -202,7 +202,7 @@ function showSortMenu(event) {
   dd.style.top = (rect.bottom + 4) + 'px';
   dd.style.right = (window.innerWidth - rect.right) + 'px';
   document.body.appendChild(dd);
-  lucide.createIcons();
+  if (typeof lucideScope === 'function') lucideScope(dd); else lucide.createIcons();
   const close = (e) => { if (!dd.contains(e.target) && e.target !== btn) { dd.remove(); document.removeEventListener('click', close); } };
   setTimeout(() => document.addEventListener('click', close), 10);
 }
@@ -224,7 +224,7 @@ function renderProposals() {
 
   if (total === 0 && currentFilter === 'all') {
     body.innerHTML = `<div class="first-run"><div class="fr-center"><dotlottie-wc src="https://assets-v2.lottiefiles.com/a/e5ad4708-1153-11ee-99af-8b4501471254/KY6YhwKCDP.lottie" autoplay loop speed="0.8" style="width:240px;height:240px;margin:0 auto"></dotlottie-wc><div class="fr-title">Create your first proposal</div><div class="fr-desc">Build professional proposals in minutes.<br>Pick a template or start from scratch.</div><div class="fr-actions"><button class="btn fr-btn-primary" onclick="openNewModal()"><i data-lucide="plus"></i> New proposal</button><button class="btn-outline fr-btn-outline" onclick="fromTpl('web')"><i data-lucide="sparkles"></i> Start from template</button></div></div></div>`;
-    lucide.createIcons();
+    if (typeof lucideScope === 'function') lucideScope(body); else lucide.createIcons();
     return;
   }
 
@@ -290,7 +290,7 @@ function renderProposals() {
       requestAnimationFrame(() => { renderPropTable(paginated); });
     } else { renderPropTable(paginated); }
   }
-  lucide.createIcons();
+  if (typeof lucideScope === 'function') lucideScope(body); else lucide.createIcons();
 }
 
 function goPage(page) { if (page < 1) return; currentPage = page; renderProposals(); }

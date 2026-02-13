@@ -250,7 +250,7 @@ function renderDashboard() {
           <div class="fr-pill"><i data-lucide="users"></i> Client CRM</div>
         </div>
       </div>`;
-    lucide.createIcons();
+    if (typeof lucideScope === 'function') lucideScope(body); else lucide.createIcons();
     return;
   }
 
@@ -271,7 +271,7 @@ function renderDashboard() {
         ${active.length >= 2 ? buildStatusChart(active) : ''}
       </div>
     </div>`;
-  lucide.createIcons();
+  if (typeof lucideScope === 'function') lucideScope(body); else lucide.createIcons();
   if (typeof drawAreaChart === 'function') {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       drawAreaChart();
