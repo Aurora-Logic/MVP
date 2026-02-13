@@ -2,7 +2,23 @@
 // UTILS — DatePicker + helpers
 // ════════════════════════════════════════
 
-/* exported autoResizeTextarea, initDatePickers */
+/* exported autoResizeTextarea, initDatePickers, sanitizeHtml */
+
+// SECURITY FIX: Global HTML sanitization using DOMPurify
+function sanitizeHtml(dirty) {
+    if (!dirty || typeof dirty !== 'string') return '';
+    if (typeof DOMPurify === 'undefined') {
+        console.warn('[Security] DOMPurify not loaded, using basic escaping');
+        return esc(dirty);
+    }
+    // Strict config: only allow safe HTML tags
+    return DOMPurify.sanitize(dirty, {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'div', 'span'],
+        ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style'],
+        ALLOW_DATA_ATTR: false
+    });
+}
+
 class DatePicker {
     constructor(input) {
         this.input = input;

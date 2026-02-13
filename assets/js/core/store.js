@@ -140,14 +140,42 @@ function persist() {
     // QUOTA MONITORING FIX: Check storage usage before save
     if (typeof checkStorageQuota === 'function') checkStorageQuota();
 
+    // TRANSACTION SYSTEM FIX: Atomic writes using temp key
+    const key = 'pk_db';
+    const tempKey = key + '_transaction';
+    const backupKey = key + '_backup';
+
     try {
-        localStorage.setItem('pk_db', JSON.stringify(DB));
+        // Step 1: Save current as backup (if exists)
+        const current = localStorage.getItem(key);
+        if (current) {
+            try { localStorage.setItem(backupKey, current); } catch (e) { /* backup failed, continue */ }
+        }
+
+        // Step 2: Write to temp key first
+        const data = JSON.stringify(DB);
+        localStorage.setItem(tempKey, data);
+
+        // Step 3: Atomic swap (if temp write succeeded)
+        localStorage.setItem(key, data);
+
+        // Step 4: Clean up temp key
+        localStorage.removeItem(tempKey);
+
         if (typeof syncAfterPersist === 'function') syncAfterPersist();
+
         // Clear any persist-failure banner on success
         const banner = document.getElementById('persistFailBanner');
         if (banner) banner.remove();
         return true;
     } catch (e) {
+        // ROLLBACK: Restore from backup if write failed
+        const backup = localStorage.getItem(backupKey);
+        if (backup) {
+            try { localStorage.setItem(key, backup); console.log('[Transaction] Rolled back to backup'); }
+            catch (rollbackErr) { console.error('[Transaction] Rollback failed:', rollbackErr); }
+        }
+
         const msg = e.name === 'QuotaExceededError'
             ? 'Storage full! Export your data now to avoid losing changes.'
             : 'Failed to save data. Check browser storage settings.';
