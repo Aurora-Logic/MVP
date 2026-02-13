@@ -172,6 +172,18 @@ function dirty() {
     }, 350);
 }
 
+// Flush pending save on page unload to prevent data loss
+window.addEventListener('beforeunload', () => {
+    if (saveTimer) {
+        clearTimeout(saveTimer);
+        const p = cur();
+        if (p) {
+            p.updatedAt = Date.now();
+            persist();
+        }
+    }
+});
+
 // Undo/Redo
 function undo() {
     if (!undoStack.length) return;

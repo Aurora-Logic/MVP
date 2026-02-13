@@ -79,6 +79,13 @@ function stripHtml(html) {
     return div.textContent || '';
 }
 
+// Sanitize CSV cell to prevent formula injection (=, +, -, @, tab, CR)
+function csvSafe(val) {
+    let s = String(val).replace(/"/g, '""').replace(/\n/g, ' ');
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return s;
+}
+
 function exportCsv() {
     const p = cur(); if (!p) return;
     const t = calcTotals(p);
@@ -86,7 +93,7 @@ function exportCsv() {
     (p.lineItems || []).forEach(i => {
         if (!i.desc) return;
         const amt = (i.qty || 0) * (i.rate || 0);
-        csv += `"${(i.desc || '').replace(/"/g, '""').replace(/\n/g, ' ')}",${i.qty || 0},${i.rate || 0},${amt}\n`;
+        csv += `"${csvSafe(i.desc)}",${i.qty || 0},${i.rate || 0},${amt}\n`;
     });
     csv += `\n"Subtotal",,,"${t.subtotal}"\n`;
     if (t.disc) csv += `"Discount",,,"${t.disc}"\n`;
@@ -131,13 +138,16 @@ function sendWebhook() {
         },
         timestamp: new Date().toISOString()
     };
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
     fetch(url, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload), signal: ctrl.signal
     }).then(r => {
+        clearTimeout(timer);
         if (r.ok) toast('Webhook sent');
         else toast('Webhook failed: ' + r.status, 'error');
-    }).catch(e => toast('Webhook error: ' + e.message, 'error'));
+    }).catch(e => { clearTimeout(timer); toast('Webhook error: ' + (e.name === 'AbortError' ? 'Timed out' : e.message), 'error'); });
 }
 
 function showExportMenu(btnEl) {
