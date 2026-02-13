@@ -4,7 +4,7 @@
 /* exported submitNpsScore, closeNpsPrompt */
 
 // Global error boundary
-/* exported APP_BUILD, clearAppCache, showUpdateToast */
+/* exported APP_BUILD, clearAppCache, showUpdateToast, getCacheMetrics */
 window.onerror = function(msg, src, line, col, err) {
     const info = `${msg} at ${src}:${line}:${col}`;
     console.error('[ProposalKit Error]', info, err);
@@ -17,9 +17,37 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 // ════════════════════════════════════════
-// MANUAL CACHE CLEAR UTILITY
+// SERVICE WORKER UTILITIES
 // ════════════════════════════════════════
-// Call clearAppCache() from console or add button to force clear all caches
+
+// Get cache performance metrics
+function getCacheMetrics() {
+    if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+        console.log('[Metrics] Service worker not active');
+        return Promise.resolve(null);
+    }
+
+    return new Promise((resolve) => {
+        const channel = new MessageChannel();
+        channel.port1.onmessage = (e) => {
+            const m = e.data;
+            console.table({
+                'Cache Hits': m.cacheHits,
+                'Cache Misses': m.cacheMisses,
+                'Network Success': m.networkSuccess,
+                'Network Failures': m.networkFail,
+                'Cache Hit Ratio': ((m.cacheHits / (m.cacheHits + m.cacheMisses)) * 100).toFixed(1) + '%'
+            });
+            resolve(e.data);
+        };
+        navigator.serviceWorker.controller.postMessage(
+            { type: 'GET_METRICS' },
+            [channel.port2]
+        );
+    });
+}
+
+// Manual cache clear utility
 function clearAppCache() {
     console.log('[Cache] Clearing all caches and service worker...');
     if ('caches' in window) {
