@@ -213,7 +213,7 @@ function showUpgradeModal(feature, check) {
         '<p style="font-size:11px;color:var(--muted-foreground);margin:0">Try Pro free for 7 days. No credit card required.</p></div>' +
         '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">' +
         '<button class="btn-sm-outline" onclick="this.closest(\'.modal-wrap\').remove()">Maybe Later</button>' +
-        '<button class="btn-sm" onclick="window.open(\'https://proposalkit.com/pricing\', \'_blank\');trackEvent(\'upgrade_clicked\', {from: \'' + feature + '\'})">Start Free Trial</button></div></div>';
+        '<button class="btn-sm" onclick="startFreeTrial(\'' + feature + '\');this.closest(\'.modal-wrap\').remove()">Start Free Trial</button></div></div>';
     wrap.addEventListener('click', function(ev) { if (ev.target === wrap) wrap.remove(); });
     document.body.appendChild(wrap);
     requestAnimationFrame(function() { wrap.classList.add('show'); });
@@ -232,4 +232,40 @@ function trackEvent(event, meta) {
         userId: (typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '' });
     while (events.length > 10000) events.shift();
     try { localStorage.setItem('pk_analytics', JSON.stringify(events)); } catch (e) { /* full */ }
+}
+
+/* exported startFreeTrial */
+function startFreeTrial(fromFeature) {
+    // Activate 7-day free trial for Pro plan
+    const trialStart = Date.now();
+    const trialEnd = trialStart + (7 * 24 * 60 * 60 * 1000); // 7 days from now
+
+    // Create or update subscription with trial
+    const subscription = {
+        plan: 'pro',
+        status: 'trialing',
+        trial_start: new Date(trialStart).toISOString(),
+        trial_end: new Date(trialEnd).toISOString(),
+        created_at: new Date().toISOString()
+    };
+
+    try {
+        localStorage.setItem('pk_subscription', JSON.stringify(subscription));
+        trackEvent('trial_started', { from: fromFeature, plan: 'pro' });
+
+        // Show success toast
+        if (typeof toast === 'function') {
+            toast('🎉 Pro trial activated! Enjoy 7 days of unlimited features.', 'success');
+        }
+
+        // Refresh the page to apply new plan limits
+        setTimeout(() => {
+            if (typeof location !== 'undefined') location.reload();
+        }, 1500);
+    } catch (e) {
+        console.error('[Plans] Failed to activate trial:', e);
+        if (typeof toast === 'function') {
+            toast('Failed to activate trial. Please try again.', 'error');
+        }
+    }
 }
