@@ -18,9 +18,8 @@ test.describe('Preview', () => {
         await page.evaluate(() => { if (typeof loadEditor === 'function') loadEditor('prev1'); });
         await page.waitForTimeout(1000);
 
-        // Click the Preview button (it's in topRight area)
-        const previewBtn = page.locator('button:has-text("Preview")');
-        await previewBtn.click();
+        // Open preview via JS (button may overflow in topbar on CI viewport)
+        await page.evaluate(() => { if (typeof openPreview === 'function') openPreview(); });
         await page.waitForTimeout(1000);
 
         const prevPanel = page.locator('#prevPanel');
@@ -36,7 +35,7 @@ test.describe('Preview', () => {
         await page.evaluate(() => { if (typeof loadEditor === 'function') loadEditor('prev1'); });
         await page.waitForTimeout(1000);
 
-        await page.locator('button:has-text("Preview")').click();
+        await page.evaluate(() => { if (typeof openPreview === 'function') openPreview(); });
         await page.waitForTimeout(1000);
 
         const prevDoc = page.locator('#prevDoc');

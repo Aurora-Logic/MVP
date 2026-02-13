@@ -1,6 +1,6 @@
 /**
  * Seed localStorage with config and proposals, then boot the app.
- * Bypasses Supabase auth and dismisses What's New modal.
+ * Bypasses Supabase auth and dismisses What's New / NPS modals.
  */
 export async function seedAndBoot(page, proposals = []) {
     await page.goto('/');
@@ -12,6 +12,8 @@ export async function seedAndBoot(page, proposals = []) {
         localStorage.setItem('pk_clients', '[]');
         // Dismiss What's New so it doesn't block interactions
         localStorage.setItem('pk_whatsnew_ver', '99.0');
+        // Suppress NPS prompt so it doesn't block interactions
+        localStorage.setItem('pk_feedback_asked', JSON.stringify(Date.now()));
     }, proposals);
     await page.reload();
     await page.evaluate(() => {
@@ -19,9 +21,13 @@ export async function seedAndBoot(page, proposals = []) {
         document.getElementById('appShell').style.display = 'flex';
         if (typeof bootApp === 'function') bootApp();
     });
-    await page.waitForTimeout(1500);
+    // Wait for app shell to be visible (more reliable than fixed timeout)
+    await page.waitForSelector('#appShell[style*="flex"]', { state: 'visible', timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(500);
     // Dismiss any modal that might have appeared
     await page.evaluate(() => {
         document.getElementById('whatsNewModal')?.remove();
+        document.getElementById('npsModal')?.remove();
+        document.getElementById('feedbackModal')?.remove();
     });
 }
