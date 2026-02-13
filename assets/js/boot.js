@@ -4,7 +4,7 @@
 /* exported submitNpsScore, closeNpsPrompt */
 
 // Global error boundary
-/* exported APP_BUILD */
+/* exported APP_BUILD, clearAppCache, showUpdateToast */
 window.onerror = function(msg, src, line, col, err) {
     const info = `${msg} at ${src}:${line}:${col}`;
     console.error('[ProposalKit Error]', info, err);
@@ -15,6 +15,81 @@ window.addEventListener('unhandledrejection', function(e) {
     console.error('[ProposalKit Unhandled Promise]', e.reason);
     if (typeof toast === 'function') toast('Something went wrong. Please refresh.', 'error');
 });
+
+// ════════════════════════════════════════
+// MANUAL CACHE CLEAR UTILITY
+// ════════════════════════════════════════
+// Call clearAppCache() from console or add button to force clear all caches
+function clearAppCache() {
+    console.log('[Cache] Clearing all caches and service worker...');
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            return Promise.all(
+                names.map(function(name) {
+                    console.log('[Cache] Deleting cache:', name);
+                    return caches.delete(name);
+                })
+            );
+        }).then(function() {
+            console.log('[Cache] All caches cleared');
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration().then(function(reg) {
+                    if (reg) {
+                        reg.unregister().then(function() {
+                            console.log('[Cache] Service worker unregistered');
+                            console.log('[Cache] Reloading page...');
+                            window.location.reload(true);
+                        });
+                    } else {
+                        console.log('[Cache] No service worker found');
+                        console.log('[Cache] Reloading page...');
+                        window.location.reload(true);
+                    }
+                });
+            } else {
+                console.log('[Cache] Reloading page...');
+                window.location.reload(true);
+            }
+        }).catch(function(err) {
+            console.error('[Cache] Error clearing caches:', err);
+            if (typeof toast === 'function') toast('Error clearing cache. Try refreshing manually.', 'error');
+        });
+    } else {
+        console.log('[Cache] Cache API not supported');
+        window.location.reload(true);
+    }
+}
+
+// ════════════════════════════════════════
+// SERVICE WORKER UPDATE NOTIFICATION
+// ════════════════════════════════════════
+function showUpdateToast() {
+    // Only show once per session
+    if (sessionStorage.getItem('pk_update_shown')) return;
+    sessionStorage.setItem('pk_update_shown', '1');
+
+    // Create persistent toast with reload button
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-info';
+    toast.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 16px;max-width:400px';
+    toast.innerHTML = `
+        <i data-lucide="sparkles" style="width:20px;height:20px;flex-shrink:0"></i>
+        <div style="flex:1">
+            <div style="font-weight:600;margin-bottom:2px">Update available</div>
+            <div style="font-size:13px;opacity:0.9">A new version of ProposalKit is ready</div>
+        </div>
+        <button class="btn-sm" onclick="window.location.reload()" style="flex-shrink:0">
+            <i data-lucide="refresh-cw"></i> Reload
+        </button>`;
+
+    const container = document.getElementById('toastContainer');
+    if (container) {
+        container.appendChild(toast);
+        lucide.createIcons();
+        // Auto-remove after 30 seconds if not clicked
+        setTimeout(() => toast.remove(), 30000);
+    }
+}
 
 function initApp() {
     if (typeof initAuth === 'function') {
@@ -32,17 +107,36 @@ function initApp() {
 }
 
 function bootApp() {
-    initSidebarState();
-    if (typeof initTeam === 'function') initTeam();
-    refreshSide();
-    handleRoute();
-    initKeyboardShortcuts();
-    if (typeof checkAnnouncements === 'function') checkAnnouncements();
-    if (typeof trackEvent === 'function') trackEvent('app_open');
-    lucide.createIcons();
-    patchAriaLabels();
-    checkWhatsNew();
-    checkNpsPrompt();
+    console.log('[Boot] Starting app initialization...');
+    try {
+        initSidebarState();
+        if (typeof initTeam === 'function') initTeam();
+        refreshSide();
+        console.log('[Boot] Handling initial route:', window.location.pathname);
+        handleRoute();
+        initKeyboardShortcuts();
+        if (typeof checkAnnouncements === 'function') checkAnnouncements();
+        if (typeof trackEvent === 'function') trackEvent('app_open');
+        lucide.createIcons();
+        patchAriaLabels();
+        checkWhatsNew();
+        checkNpsPrompt();
+        console.log('[Boot] App initialized successfully');
+    } catch (err) {
+        console.error('[Boot] Initialization failed:', err);
+        // Show error UI instead of blank screen
+        const body = document.getElementById('bodyScroll');
+        if (body) {
+            body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;padding:32px">
+                <div style="max-width:440px;text-align:center;background:#fff;padding:48px 32px;border-radius:16px;border:1px solid #e4e4e7">
+                    <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+                    <div style="font-size:20px;font-weight:700;margin-bottom:8px">Something went wrong</div>
+                    <div style="font-size:14px;color:#71717a;line-height:1.5;margin-bottom:16px">${err.message || 'App failed to initialize'}</div>
+                    <button class="btn" onclick="window.location.reload()">Reload app</button>
+                    <button class="btn-outline" onclick="clearAppCache()" style="margin-top:8px">Clear cache & reload</button>
+                </div></div>`;
+        }
+    }
 }
 
 // Auto-derive aria-label from data-tooltip for icon-only buttons missing accessible names

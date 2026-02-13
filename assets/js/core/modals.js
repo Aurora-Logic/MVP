@@ -23,7 +23,8 @@ function releaseFocus(modal) {
 }
 
 function openNewModal() {
-    navigate('/proposals/new');
+    if (typeof openCreateDrawer === 'function') openCreateDrawer();
+    else navigate('/proposals/new'); // Fallback
 }
 
 function pickNewModalColor(c) {

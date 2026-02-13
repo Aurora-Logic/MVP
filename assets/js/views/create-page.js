@@ -1,10 +1,11 @@
 // ════════════════════════════════════════
-// CREATE PAGE — Full-page proposal creation
+// CREATE DRAWER — Slide-out proposal creation
 // ════════════════════════════════════════
 
-/* exported renderCreatePage, selectTemplate, toggleCreateSection, setCreateClientMode, selectCreateClient, updateNewClientField, doCreateProposal, setCreateCat, toggleAllCreateSections, pickCreateColor, searchCreateClients */
+/* exported openCreateDrawer, closeCreateDrawer, renderCreatePage, setDrawerStep, selectTemplate, setCreateClientMode, selectCreateClient, updateNewClientField, doCreateProposal, setCreateCat, searchCreateClients */
 
 let _createState = {
+    step: 1, // 1=Template, 2=Client, 3=Review
     template: 'blank',
     sections: [],
     lineItems: [],
@@ -26,14 +27,18 @@ const _CREATE_TPL_DESC = {
     pack_consulting: '8 sections for consulting', pack_freelancer: '8 sections for freelancers'
 };
 
-function renderCreatePage() {
-    console.log('[CREATE PAGE] Rendering create page...');
+function openCreateDrawer(clientIdx = null) {
+    // Reset state
+    _createState.step = 1;
+    _createState.template = 'blank';
+    _createState.clientMode = 'skip';
+    _createState.client = null;
+    _createState.clientSearch = '';
+    _createState.category = 'all';
     _createState.font = CONFIG?.font || 'System';
     _createState.color = CONFIG?.color || (typeof COLORS !== 'undefined' ? COLORS[0] : '#800020');
 
-    // Check if navigated from client detail with ?client=IDX
-    const qs = new URLSearchParams(window.location.search);
-    const clientIdx = qs.get('client');
+    // Pre-fill client if provided
     if (clientIdx !== null && CLIENTS[parseInt(clientIdx)]) {
         const c = CLIENTS[parseInt(clientIdx)];
         _createState.clientMode = 'existing';
@@ -43,6 +48,7 @@ function renderCreatePage() {
             email: c.email || '',
             phone: c.workPhone || c.mobile || c.phone || ''
         };
+        _createState.step = 2; // Start on client step
     }
 
     // Set initial template sections
@@ -51,99 +57,163 @@ function renderCreatePage() {
     _createState.lineItems = tpl.lineItems || [];
     _createState.paymentTerms = tpl.paymentTerms || '';
 
-    const body = document.getElementById('bodyScroll');
-    body.className = 'body-scroll'; body.style.padding = '0';
-    body.innerHTML = `<div class="create-page"><div class="create-left" id="createLeft">${_buildCreateHeader()}${_buildTemplateSection()}${_buildClientSection()}${_buildSectionsChecklist()}${_buildAppearanceSection()}${_buildCreateFooter()}</div><div class="create-right" id="createRight"><div class="create-preview-frame"><div class="create-preview-label">Preview</div><div class="create-preview-scroll"><div class="create-preview-doc prev-doc" id="createPreviewDoc"><div style="padding:40px;color:var(--text4);text-align:center">Select a template to see preview</div></div></div></div></div></div>`;
+    // Create drawer
+    const existing = document.getElementById('createDrawer');
+    if (existing) existing.remove();
 
-    const fontEl = document.getElementById('createFontSelect');
-    if (fontEl) csel(fontEl, { value: _createState.font, items: [
-        { value: 'System', label: 'System (SF Pro)', desc: 'Default' }, { value: 'Roboto', label: 'Roboto', desc: 'Standard' },
-        { value: 'Lato', label: 'Lato', desc: 'Friendly' }, { value: 'Playfair Display', label: 'Playfair Display', desc: 'Elegant' },
-        { value: 'Merriweather', label: 'Merriweather', desc: 'Classic' }, { value: 'Courier Prime', label: 'Courier Prime', desc: 'Typewriter' }
-    ], onChange: (val) => { _createState.font = val; _schedulePreview(); } });
+    const overlay = document.createElement('div');
+    overlay.className = 'drawer-overlay';
+    overlay.id = 'createDrawer';
+    overlay.onclick = (e) => { if (e.target === overlay) closeCreateDrawer(); };
 
-    if (typeof lucideScope === 'function') lucideScope(body);
+    overlay.innerHTML = `
+        <div class="drawer" onclick="event.stopPropagation()">
+            <div class="drawer-header">
+                <div class="drawer-title">New Proposal</div>
+                <button class="btn-sm-icon-ghost" onclick="closeCreateDrawer()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="drawer-body" id="drawerBody"></div>
+            <div class="drawer-footer" id="drawerFooter"></div>
+        </div>`;
+
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('show'));
+
+    _renderDrawerContent();
+    if (typeof lucideScope === 'function') lucideScope(overlay);
     else lucide.createIcons();
-
-    // Build initial preview
-    _schedulePreview();
 }
 
-function _buildCreateHeader() {
-    return '<div class="create-header"><button class="btn-sm-icon-ghost" onclick="history.back()" data-tooltip="Back"><i data-lucide="arrow-left"></i></button><div class="create-title">New Proposal</div></div>';
+function closeCreateDrawer() {
+    const drawer = document.getElementById('createDrawer');
+    if (drawer) {
+        drawer.classList.remove('show');
+        setTimeout(() => drawer.remove(), 200);
+    }
 }
 
-function _buildTemplateSection() {
+function renderCreatePage() {
+    // Legacy compatibility — redirect to drawer
+    const qs = new URLSearchParams(window.location.search);
+    const clientIdx = qs.get('client');
+    openCreateDrawer(clientIdx);
+    // Navigate back to previous route
+    history.back();
+}
+
+function _renderDrawerContent() {
+    const body = document.getElementById('drawerBody');
+    const footer = document.getElementById('drawerFooter');
+    if (!body || !footer) return;
+
+    // Steps indicator
+    const steps = [
+        { num: 1, label: 'Template' },
+        { num: 2, label: 'Client' },
+        { num: 3, label: 'Review' }
+    ];
+    const stepsHtml = steps.map(s => {
+        const classes = ['drawer-step'];
+        if (s.num === _createState.step) classes.push('active');
+        if (s.num < _createState.step) classes.push('completed');
+        return `<div class="${classes.join(' ')}"><div class="drawer-step-num">${s.num < _createState.step ? '<i data-lucide="check" style="width:14px;height:14px"></i>' : s.num}</div><span class="drawer-step-label">${s.label}</span></div>`;
+    }).join('');
+
+    // Render content based on step
+    let content = '';
+    if (_createState.step === 1) content = _buildTemplateStep();
+    else if (_createState.step === 2) content = _buildClientStep();
+    else if (_createState.step === 3) content = _buildReviewStep();
+
+    body.innerHTML = `<div class="drawer-steps">${stepsHtml}</div>${content}`;
+
+    // Render footer buttons
+    const backBtn = _createState.step > 1 ? '<button class="btn-sm-outline" onclick="setDrawerStep(' + (_createState.step - 1) + ')"><i data-lucide="arrow-left"></i> Back</button>' : '';
+    const nextBtn = _createState.step < 3 ? '<button class="btn-sm" onclick="setDrawerStep(' + (_createState.step + 1) + ')">Next <i data-lucide="arrow-right"></i></button>' : '<button class="btn" onclick="doCreateProposal()"><i data-lucide="plus"></i> Create Proposal</button>';
+    footer.innerHTML = backBtn + nextBtn;
+
+    if (typeof lucideScope === 'function') lucideScope(document.getElementById('createDrawer'));
+    else lucide.createIcons();
+}
+
+function setDrawerStep(step) {
+    _createState.step = Math.max(1, Math.min(3, step));
+    _renderDrawerContent();
+}
+
+function _buildTemplateStep() {
     const curCat = _createState.category;
-    const tabs = TPL_CATEGORIES.map(c => `<button class="filter-tab${c.key === curCat ? ' on' : ''}" onclick="setCreateCat('${c.key}')"><i data-lucide="${c.icon}"></i> ${c.label}</button>`).join('');
+    const tabs = TPL_CATEGORIES.slice(0, 4).map(c => `<button class="filter-tab${c.key === curCat ? ' on' : ''}" onclick="setCreateCat('${c.key}')"><i data-lucide="${c.icon}"></i> ${c.label}</button>`).join('');
+
     let cards = '';
     if (curCat === 'saved') {
         const saved = safeGetStorage('pk_templates', []);
         if (!saved.length) cards = '<div class="empty empty-sm"><div class="empty-t">No saved templates</div><div class="empty-d">Save a proposal as a template from the editor.</div></div>';
-        else cards = saved.map((t, i) => _tplCard('saved_' + i, t.title, 'bookmark', '', (t.sections || []).length + ' sections, ' + (t.lineItems || []).length + ' items')).join('');
+        else cards = saved.map((t, i) => _drawerTplCard('saved_' + i, t.title, 'bookmark', (t.sections || []).length + ' sections')).join('');
     } else {
-        cards = Object.entries(TPLS).filter(([, v]) => curCat === 'all' || v.category === curCat).map(([key, t]) => {
+        cards = Object.entries(TPLS).filter(([, v]) => curCat === 'all' || v.category === curCat).slice(0, 8).map(([key, t]) => {
             const desc = t.desc || _CREATE_TPL_DESC[key] || '';
-            const secs = (t.sections || []).length, items = (t.lineItems || []).length;
-            const badge = t.countryLabel ? `<span class="tpl-badge">${esc(t.countryLabel)}</span>` : '';
-            return _tplCard(key, t.title.replace(' Proposal', '') + badge, t.icon || 'file', '', esc(desc) + (secs ? ' \u00b7 ' + secs + 's' : '') + (items ? ', ' + items + ' items' : ''));
+            const secs = (t.sections || []).length;
+            return _drawerTplCard(key, t.title.replace(' Proposal', ''), t.icon || 'file', esc(desc.split('.')[0]) + (secs ? ' · ' + secs + ' sections' : ''));
         }).join('');
     }
-    return `<div class="create-section"><div class="create-section-label"><i data-lucide="layout-template"></i> Template</div><div class="create-tpl-tabs">${tabs}</div><div class="create-tpl-grid" id="createTplGrid">${cards}</div></div>`;
+
+    return `<div class="drawer-section"><div class="drawer-section-label"><i data-lucide="layout-template"></i> Choose Template</div><div class="create-tpl-tabs" style="margin-bottom:16px">${tabs}</div><div class="drawer-tpl-grid">${cards}</div></div>`;
 }
 
-function _tplCard(key, name, icon, badge, meta) {
+function _drawerTplCard(key, name, icon, meta) {
     const sel = _createState.template === key ? ' selected' : '';
-    return `<div class="create-tpl-card${sel}" onclick="selectTemplate('${key}')"><div class="create-tpl-ic"><i data-lucide="${icon}"></i></div><div class="create-tpl-info"><div class="create-tpl-name">${name.includes('<') ? name : esc(name)}</div><div class="create-tpl-meta">${meta}</div></div></div>`;
+    return `<div class="drawer-tpl-card${sel}" onclick="selectTemplate('${key}')"><div class="drawer-tpl-ic"><i data-lucide="${icon}"></i></div><div class="drawer-tpl-info"><div class="drawer-tpl-name">${esc(name)}</div><div class="drawer-tpl-meta">${meta}</div></div></div>`;
 }
 
-function _buildClientSection() {
+function _buildClientStep() {
     const mode = _createState.clientMode;
-    const modeButtons = [['existing', 'Pick existing', 'users'], ['new', 'New client', 'user-plus'], ['skip', 'Skip', 'arrow-right']].map(([k, l, ic]) =>
-        `<button class="filter-tab${k === mode ? ' on' : ''}" onclick="setCreateClientMode('${k}')"><i data-lucide="${ic}"></i> ${l}</button>`).join('');
+    const modeButtons = [
+        ['existing', 'Existing', 'users'],
+        ['new', 'New', 'user-plus'],
+        ['skip', 'Skip', 'arrow-right']
+    ].map(([k, l, ic]) => `<button class="filter-tab${k === mode ? ' on' : ''}" onclick="setCreateClientMode('${k}')"><i data-lucide="${ic}"></i> ${l}</button>`).join('');
+
     let content = '';
     if (mode === 'existing') {
-        if (!CLIENTS.length) { content = '<div class="create-client-empty">No saved clients. Add one in the Customers tab or use "New client".</div>'; }
-        else {
+        if (!CLIENTS.length) {
+            content = '<div class="drawer-client-empty">No saved clients. Add one in the Customers tab or use "New".</div>';
+        } else {
             const q = (_createState.clientSearch || '').toLowerCase();
             const filtered = q ? CLIENTS.filter(c => (c.name || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q) || (c.displayName || '').toLowerCase().includes(q)) : CLIENTS;
-            content = `<input type="text" class="create-client-search" placeholder="Search clients\u2026" value="${esc(_createState.clientSearch)}" oninput="searchCreateClients(this.value)">`;
-            if (_createState.client) content += `<div class="create-client-selected"><span>${esc(_createState.client.name)}</span><span class="create-client-email">${esc(_createState.client.email)}</span><button class="btn-sm-icon-ghost" onclick="selectCreateClient(-1)" data-tooltip="Remove"><i data-lucide="x"></i></button></div>`;
-            else content += `<div class="create-client-list" id="createClientList">${filtered.map((c, i) => `<div class="create-client-item" onclick="selectCreateClient(${i})"><span class="create-client-item-name">${esc(c.displayName || c.companyName || c.name || '')}</span><span class="create-client-item-email">${esc(c.email || '')}</span></div>`).join('')}</div>`;
+            if (_createState.client) {
+                content = `<div class="drawer-client-selected"><span>${esc(_createState.client.name)}</span><button class="btn-sm-icon-ghost" onclick="selectCreateClient(-1)"><i data-lucide="x"></i></button></div>`;
+            } else {
+                content = `<input type="text" class="drawer-client-search" placeholder="Search clients…" value="${esc(_createState.clientSearch)}" oninput="searchCreateClients(this.value)"><div class="drawer-client-list">${filtered.slice(0, 10).map((c, i) => `<div class="drawer-client-item" onclick="selectCreateClient(${i})"><span class="drawer-client-item-name">${esc(c.displayName || c.companyName || c.name || '')}</span><span class="drawer-client-item-email">${esc(c.email || '')}</span></div>`).join('')}</div>`;
+            }
         }
     } else if (mode === 'new') {
         const cl = _createState.client || {};
-        content = `<div class="create-client-form"><div class="create-client-row"><input type="text" placeholder="Company or client name" value="${esc(cl.name || '')}" oninput="updateNewClientField('name', this.value)"></div><div class="create-client-row"><input type="email" placeholder="Email address" value="${esc(cl.email || '')}" oninput="updateNewClientField('email', this.value)"></div><div class="create-client-row"><input type="tel" placeholder="Phone number" value="${esc(cl.phone || '')}" oninput="updateNewClientField('phone', this.value)"></div></div>`;
-    } else { content = '<div class="create-client-skip">You can add client info later in the editor.</div>'; }
-    return `<div class="create-section"><div class="create-section-label"><i data-lucide="user"></i> Client</div><div class="create-client-modes">${modeButtons}</div><div id="createClientContent">${content}</div></div>`;
+        content = `<div class="drawer-client-form"><input type="text" placeholder="Company or client name" value="${esc(cl.name || '')}" oninput="updateNewClientField('name', this.value)"><input type="email" placeholder="Email address" value="${esc(cl.email || '')}" oninput="updateNewClientField('email', this.value)"><input type="tel" placeholder="Phone number" value="${esc(cl.phone || '')}" oninput="updateNewClientField('phone', this.value)"></div>`;
+    } else {
+        content = '<div class="drawer-client-skip">You can add client details later in the proposal editor.</div>';
+    }
+
+    return `<div class="drawer-section"><div class="drawer-section-label"><i data-lucide="user"></i> Client Details</div><div class="drawer-client-modes">${modeButtons}</div>${content}</div>`;
 }
 
-function _buildSectionsChecklist() {
-    const secs = _createState.sections;
-    if (!secs.length) return `<div class="create-section" id="createSecSection"><div class="create-section-label"><i data-lucide="list-checks"></i> Sections <span class="cnt">0</span></div><div class="create-sec-empty">Select a template with sections to customize.</div></div>`;
-    const enabledCount = secs.filter(s => s.enabled).length;
-    const allOn = enabledCount === secs.length;
-    const items = secs.map((s, i) => {
-        const preview = (s.content || '').replace(/<[^>]*>/g, '').slice(0, 80);
-        return `<label class="create-sec-item"><input type="checkbox" ${s.enabled ? 'checked' : ''} onchange="toggleCreateSection(${i})"><div class="create-sec-content"><div class="create-sec-title">${esc(s.title || 'Untitled')}</div>${preview ? `<div class="create-sec-preview">${esc(preview)}${(s.content || '').length > 80 ? '\u2026' : ''}</div>` : ''}</div></label>`;
-    }).join('');
-    return `<div class="create-section" id="createSecSection"><div class="create-section-label"><i data-lucide="list-checks"></i> Sections <span class="cnt">${enabledCount}</span><button class="create-sec-toggle" onclick="toggleAllCreateSections()">${allOn ? 'Deselect all' : 'Select all'}</button></div><div class="create-sec-list">${items}</div></div>`;
+function _buildReviewStep() {
+    const tpl = _createState.template.startsWith('saved_')
+        ? safeGetStorage('pk_templates', [])[parseInt(_createState.template.replace('saved_', ''))]
+        : TPLS[_createState.template];
+    const tplName = tpl?.title || 'Blank';
+    const clientName = _createState.client?.name || 'Not set';
+    const sectionCount = _createState.sections?.filter(s => s.enabled).length || 0;
+
+    return `<div class="drawer-section"><div class="drawer-section-label"><i data-lucide="check-circle"></i> Review & Create</div><div style="display:flex;flex-direction:column;gap:16px"><div class="card" style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong style="font-size:14px">Template</strong><button class="btn-sm-ghost" onclick="setDrawerStep(1)" style="font-size:12px">Edit</button></div><div style="color:var(--muted-foreground);font-size:14px">${esc(tplName)}</div></div><div class="card" style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong style="font-size:14px">Client</strong><button class="btn-sm-ghost" onclick="setDrawerStep(2)" style="font-size:12px">Edit</button></div><div style="color:var(--muted-foreground);font-size:14px">${esc(clientName)}</div></div><div class="card" style="padding:16px"><div style="margin-bottom:8px"><strong style="font-size:14px">Content</strong></div><div style="color:var(--muted-foreground);font-size:14px">${sectionCount} section${sectionCount !== 1 ? 's' : ''} · ${(_createState.lineItems || []).length} line item${(_createState.lineItems || []).length !== 1 ? 's' : ''}</div></div></div></div>`;
 }
 
-function _buildAppearanceSection() {
-    const swatches = COLORS.map(c => `<div class="nm-swatch${c === _createState.color ? ' on' : ''}" style="background:${c}" onclick="pickCreateColor('${c}')"></div>`).join('');
-    return `<div class="create-section"><div class="create-section-label"><i data-lucide="paintbrush"></i> Appearance</div><div class="create-appear-row"><div class="create-appear-col"><label class="fl" style="margin-bottom:6px">Font</label><div id="createFontSelect"></div></div><div class="create-appear-col"><label class="fl" style="margin-bottom:6px">Brand Color</label><div class="nm-swatches">${swatches}</div></div></div></div>`;
-}
-
-function _buildCreateFooter() {
-    return '<div class="create-footer"><button class="btn create-btn" onclick="doCreateProposal()"><i data-lucide="plus"></i> Create Proposal</button></div>';
-}
 
 // ── Actions ──
 
 function setCreateCat(cat) {
     _createState.category = cat;
-    _rerenderSection('template');
+    _renderDrawerContent();
 }
 
 function selectTemplate(key) {
@@ -153,72 +223,51 @@ function selectTemplate(key) {
     _createState.sections = (tpl.sections || []).map(s => ({ ...s, enabled: true }));
     _createState.lineItems = tpl.lineItems || [];
     _createState.paymentTerms = tpl.paymentTerms || '';
-    _rerenderSection('template'); _rerenderSection('sections'); _schedulePreview();
-}
-
-function toggleCreateSection(idx) {
-    if (_createState.sections[idx]) { _createState.sections[idx].enabled = !_createState.sections[idx].enabled; _schedulePreview(); }
-}
-
-function toggleAllCreateSections() {
-    const allOn = _createState.sections.every(s => s.enabled);
-    _createState.sections.forEach(s => { s.enabled = !allOn; });
-    _rerenderSection('sections'); _schedulePreview();
+    _renderDrawerContent();
 }
 
 function setCreateClientMode(mode) {
-    _createState.clientMode = mode; _createState.clientSearch = '';
+    _createState.clientMode = mode;
+    _createState.clientSearch = '';
     _createState.client = mode === 'new' ? { name: '', contact: '', email: '', phone: '' } : null;
-    _rerenderSection('client'); _schedulePreview();
+    _renderDrawerContent();
 }
 
 function selectCreateClient(idx) {
-    if (idx < 0) { _createState.client = null; }
-    else {
-        const c = CLIENTS[idx]; if (!c) return;
-        _createState.client = { name: c.displayName || c.companyName || c.name || '', contact: ((c.salutation || '') + ' ' + ((c.firstName || '') + ' ' + (c.lastName || '')).trim()).trim() || c.contact || '', email: c.email || '', phone: c.workPhone || c.mobile || c.phone || '' };
+    if (idx < 0) {
+        _createState.client = null;
+    } else {
+        const c = CLIENTS[idx];
+        if (!c) return;
+        _createState.client = {
+            name: c.displayName || c.companyName || c.name || '',
+            contact: ((c.salutation || '') + ' ' + ((c.firstName || '') + ' ' + (c.lastName || '')).trim()).trim() || c.contact || '',
+            email: c.email || '',
+            phone: c.workPhone || c.mobile || c.phone || ''
+        };
     }
-    _rerenderSection('client'); _schedulePreview();
+    _renderDrawerContent();
 }
 
-function searchCreateClients(q) { _createState.clientSearch = q; _rerenderSection('client'); }
+function searchCreateClients(q) {
+    _createState.clientSearch = q;
+    _renderDrawerContent();
+}
 
 function updateNewClientField(field, val) {
     if (!_createState.client) _createState.client = { name: '', contact: '', email: '', phone: '' };
-    _createState.client[field] = val; _schedulePreview();
-}
-
-function pickCreateColor(c) {
-    _createState.color = c;
-    document.querySelectorAll('.create-page .nm-swatch').forEach(s => s.classList.toggle('on', s.style.background === c));
-    _schedulePreview();
+    _createState.client[field] = val;
 }
 
 function doCreateProposal() {
-    if (typeof createPropFromPage === 'function') createPropFromPage(_createState);
-    else createProp(TPLS[_createState.template] || TPLS.blank);
+    if (typeof createPropFromPage === 'function') {
+        createPropFromPage(_createState);
+    } else {
+        const tpl = _createState.template.startsWith('saved_')
+            ? safeGetStorage('pk_templates', [])[parseInt(_createState.template.replace('saved_', ''))]
+            : TPLS[_createState.template];
+        createProp(tpl || TPLS.blank);
+    }
+    closeCreateDrawer();
 }
 
-// ── Internal helpers ──
-
-function _rerenderSection(which) {
-    const builders = { template: _buildTemplateSection, client: _buildClientSection, sections: _buildSectionsChecklist };
-    const fn = builders[which]; if (!fn) return;
-    let target;
-    if (which === 'sections') target = document.getElementById('createSecSection');
-    else { const idx = which === 'template' ? 0 : 1; target = document.querySelectorAll('#createLeft > .create-section')[idx]; }
-    if (!target) return;
-    const tmp = document.createElement('div');
-    tmp.innerHTML = fn();
-    target.replaceWith(tmp.firstElementChild);
-    const left = document.getElementById('createLeft');
-    if (typeof lucideScope === 'function') lucideScope(left); else lucide.createIcons();
-}
-
-let _createPreviewTimer = null;
-function _schedulePreview() {
-    clearTimeout(_createPreviewTimer);
-    _createPreviewTimer = setTimeout(() => {
-        if (typeof buildCreatePreview === 'function') buildCreatePreview(_createState);
-    }, 300);
-}

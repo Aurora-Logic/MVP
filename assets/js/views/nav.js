@@ -98,11 +98,9 @@ function initKeyboardShortcuts() {
             // Command palette
             const cmdDialog = document.getElementById('cmdDialog');
             if (cmdDialog && cmdDialog.open) { closeCommandPalette(); return; }
-            const persistentModals = ['newModal'];
-            for (const modalId of persistentModals) {
-                const modal = document.getElementById(modalId);
-                if (modal && modal.classList.contains('show')) { modal.classList.remove('show'); return; }
-            }
+            // Create drawer
+            const createDrawer = document.getElementById('createDrawer');
+            if (createDrawer && createDrawer.classList.contains('show')) { closeCreateDrawer(); return; }
             // What's New modal — must save seen state before removing
             const wnModal = document.getElementById('whatsNewModal');
             if (wnModal) { if (typeof dismissWhatsNew === 'function') dismissWhatsNew(); else wnModal.remove(); return; }
@@ -325,7 +323,6 @@ function toggleUserMenu() {
         </div>
         <div class="side-user-menu-sep"></div>
         <button class="side-user-menu-item" onclick="goNav('settings');document.querySelector('.side-user-menu')?.remove()"><i data-lucide="settings"></i>Settings</button>
-        ${typeof isAdmin === 'function' && isAdmin() ? '<button class="side-user-menu-item" onclick="window.open(\'/admin\',\'_blank\');document.querySelector(\'.side-user-menu\')?.remove()"><i data-lucide="shield"></i>Admin Panel</button>' : ''}
         ${teamHtml}
         <div class="side-user-menu-sep"></div>
         <button class="side-user-menu-item" onclick="logoutApp()"><i data-lucide="log-out"></i>Log out</button>`;

@@ -142,31 +142,29 @@ function loadEditor(id) {
 
     document.getElementById('topRight').innerHTML = `
     <div class="tabs" id="edTabs" role="tablist" aria-label="Editor tabs">
-      <button class="tab on" role="tab" aria-selected="true" onclick="edTab(this,'details')">Details</button>
-      <button class="tab" role="tab" aria-selected="false" onclick="edTab(this,'sections')">Sections</button>
-      <button class="tab" role="tab" aria-selected="false" onclick="edTab(this,'pricing')">Pricing</button>
-      <button class="tab" role="tab" aria-selected="false" onclick="edTab(this,'notes')">Notes</button>
+      <button class="tab on" role="tab" aria-selected="true" onclick="edTab(this,'details')"><i data-lucide="file-text"></i> Details</button>
+      <button class="tab" role="tab" aria-selected="false" onclick="edTab(this,'sections')"><i data-lucide="layers"></i> Sections</button>
+      <button class="tab" role="tab" aria-selected="false" onclick="edTab(this,'pricing')"><i data-lucide="receipt"></i> Pricing</button>
+      <button class="tab" role="tab" aria-selected="false" onclick="edTab(this,'notes')"><i data-lucide="sticky-note"></i> Notes</button>
     </div>
-    <button class="btn-sm-outline" onclick="openPreview()" data-tooltip="Preview (⌘P)" data-side="bottom"><i data-lucide="eye"></i> Preview</button>
-    <button class="btn-sm-outline" onclick="shareProposal()"><i data-lucide="share-2"></i> Share</button>
-    <button class="btn-sm-outline" onclick="saveAsTemplate()"><i data-lucide="bookmark-plus"></i> Template</button>
+    <button class="btn-sm-outline" onclick="openPreview()" data-tooltip="Preview (⌘P)" data-side="bottom"><i data-lucide="eye"></i></button>
+    <button class="btn-sm-outline" onclick="shareProposal()" data-tooltip="Share" data-side="bottom"><i data-lucide="share-2"></i></button>
     <button class="btn-sm" onclick="doExport('proposal')" data-tooltip="Export PDF (⌘E)" data-side="bottom"><i data-lucide="download"></i> Export</button>
   `;
 
     const body = document.getElementById('bodyScroll');
     body.innerHTML = `
     <div class="prop-stats">
-      <div class="ps-item"><i data-lucide="clock"></i> Created ${daysSince}d ago</div>
-      <div class="ps-sep"></div>
-      <div class="ps-item" id="statDaysLeft"><i data-lucide="timer"></i> <strong>${daysLeft}</strong></div>
-      <div class="ps-sep"></div>
-      <div class="ps-item" id="statValue"><i data-lucide="banknote"></i> <strong>${fmtCur(val, p.currency)}</strong></div>
-      <div class="ps-sep"></div>
-      <div class="ps-item" id="statSections"><i data-lucide="layers"></i> <span id="secCountVal">${(p.sections || []).length}</span> sections</div>
-      <div class="ps-sep"></div>
-      ${p.clientResponse?.status === 'accepted' && p.clientResponse.clientName ? `<div class="ps-item ps-accepted"><i data-lucide="pen-line"></i> Signed by ${esc(p.clientResponse.clientName)}</div><div class="ps-sep"></div>` : ''}
-      ${buildCompletenessHtml(p)}
-      <div class="ps-right">
+      <div class="ps-grid">
+        <div class="ps-item" id="statValue"><i data-lucide="banknote"></i> <strong>${fmtCur(val, p.currency)}</strong></div>
+        <div class="ps-sep"></div>
+        <div class="ps-item" id="statDaysLeft"><i data-lucide="timer"></i> <strong>${daysLeft}</strong></div>
+        <div class="ps-sep"></div>
+        <div class="ps-item" id="statSections"><i data-lucide="layers"></i> <span id="secCountVal">${(p.sections || []).length}</span> sections</div>
+        ${p.clientResponse?.status === 'accepted' && p.clientResponse.clientName ? `<div class="ps-sep"></div><div class="ps-item ps-accepted"><i data-lucide="check-circle"></i> Signed by ${esc(p.clientResponse.clientName)}</div>` : ''}
+        ${buildCompletenessHtml(p) ? `<div class="ps-sep"></div>${buildCompletenessHtml(p)}` : ''}
+      </div>
+      <div class="ps-actions">
         <button class="btn-sm-icon-ghost" onclick="typeof undo==='function'&&undo()" data-tooltip="Undo (⌘Z)" data-side="bottom"><i data-lucide="undo-2"></i></button>
         <button class="btn-sm-icon-ghost" onclick="typeof redo==='function'&&redo()" data-tooltip="Redo (⌘⇧Z)" data-side="bottom"><i data-lucide="redo-2"></i></button>
         <span class="ver-badge">v${p.version || 1}</span>

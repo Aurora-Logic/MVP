@@ -77,5 +77,6 @@ function buildClientHistory(props) {
 }
 
 function createProposalForClient(idx) {
-    navigate('/proposals/new?client=' + idx);
+    if (typeof openCreateDrawer === 'function') openCreateDrawer(idx);
+    else navigate('/proposals/new?client=' + idx);
 }

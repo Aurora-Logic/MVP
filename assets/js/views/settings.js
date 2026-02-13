@@ -141,6 +141,9 @@ function setTab(btn, key) {
             <div class="fg"><label class="fl">Webhook URL</label>
               <input type="url" id="setWebhookUrl" value="${esc(CONFIG?.webhookUrl || '')}" placeholder="https://..." oninput="saveSettings()">
               <div class="fh">POST proposal data to this URL on export</div></div>
+            ${sep}<div class="set-section-title">Cache</div>
+            <div style="margin-bottom:16px"><button class="btn-sm-outline" onclick="if(typeof clearAppCache==='function'){clearAppCache()}else{toast('Cache clear not available','error')}"><i data-lucide="refresh-cw"></i> Clear cache & reload</button>
+              <div class="fh" style="margin-top:8px">Fix blank screens or stale content by clearing cached files</div></div>
             ${sep}<div class="set-section-title" style="color:var(--red)">Danger zone</div>
             <div class="sec-header-actions">
               <button class="btn-sm-outline" onclick="exportData()"><i data-lucide="download"></i> Export</button>

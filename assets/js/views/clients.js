@@ -20,10 +20,32 @@ const SALUTATIONS = ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.'];
 let _clientFilter = 'all';
 let _clientView = 'table';
 
+function ensureSearchExists() {
+    let search = document.getElementById('topSearch');
+    if (!search) {
+        const topRight = document.getElementById('topRight');
+        search = document.createElement('div');
+        search.className = 'topbar-search';
+        search.id = 'topSearch';
+        search.innerHTML = '<i data-lucide="search"></i>' +
+            '<input type="text" placeholder="Search proposals..." id="searchInput" oninput="filterList()" aria-label="Search proposals">' +
+            '<kbd class="kbd" style="cursor:pointer" onclick="openCommandPalette()" title="Open command palette">⌘K</kbd>';
+        topRight.appendChild(search);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    return search;
+}
+
 function renderClients() {
     CUR = null;
     document.getElementById('topTitle').textContent = 'Customers';
-    document.getElementById('topRight').innerHTML = '';
+    // Ensure search exists and show it
+    const topSearch = ensureSearchExists();
+    topSearch.style.display = 'flex';
+    const topRight = document.getElementById('topRight');
+    Array.from(topRight.children).forEach(child => {
+        if (child.id !== 'topSearch') child.remove();
+    });
     const body = document.getElementById('bodyScroll');
     if (!CLIENTS.length) {
         body.innerHTML = `<div class="empty" style="padding:60px 20px">

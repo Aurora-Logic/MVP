@@ -27,6 +27,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+    <!-- Preconnect to CDN origins (reduce DNS/TLS latency) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://plausible.io">
     <!-- Analytics (Plausible — no cookies, GDPR compliant) -->
     <script defer data-domain="proposalkit.vercel.app" src="https://plausible.io/js/script.js"></script>
     <!-- JetBrains Mono for code (SF Pro / Helvetica Neue are system fonts) -->
@@ -326,6 +331,9 @@
         (function() {
             if (!('serviceWorker' in navigator)) return;
 
+            // Service worker update notification flag
+            var updateAvailable = false;
+
             function checkAndManageServiceWorker() {
                 // Read subscription from localStorage directly (before app loads)
                 var sub = null;
@@ -345,8 +353,40 @@
                 if (hasOffline) {
                     // Register service worker for paid users
                     navigator.serviceWorker.register('/sw.js').then(function(reg) {
-                        if (reg) reg.update();
-                    }).catch(function() {});
+                        if (!reg) return;
+
+                        // Check for updates every 60 seconds when page is visible
+                        setInterval(function() {
+                            if (!document.hidden) reg.update();
+                        }, 60000);
+
+                        // Detect when new SW is installing
+                        reg.addEventListener('updatefound', function() {
+                            var newWorker = reg.installing;
+                            if (!newWorker) return;
+
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New SW installed, tell it to skip waiting
+                                    updateAvailable = true;
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                }
+                            });
+                        });
+                    }).catch(function(err) {
+                        console.error('[SW] Registration failed:', err);
+                    });
+
+                    // Listen for update ready message from SW
+                    navigator.serviceWorker.addEventListener('message', function(e) {
+                        if (e.data && e.data.type === 'SW_UPDATED') {
+                            console.log('[SW] Update ready, version:', e.data.version);
+                            // Show toast notification (will be implemented in boot.js)
+                            if (typeof showUpdateToast === 'function') {
+                                showUpdateToast();
+                            }
+                        }
+                    });
                 } else {
                     // Immediately unregister SW for free users and clear all caches
                     navigator.serviceWorker.getRegistration().then(function(reg) {
@@ -355,7 +395,10 @@
                                 // Clear all caches after unregistering
                                 if ('caches' in window) {
                                     caches.keys().then(function(names) {
-                                        names.forEach(function(name) { caches.delete(name); });
+                                        names.forEach(function(name) {
+                                            console.log('[SW] Clearing cache:', name);
+                                            caches.delete(name);
+                                        });
                                     });
                                 }
                             });

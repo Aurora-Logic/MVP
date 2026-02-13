@@ -52,6 +52,8 @@ async function aiRequest(prompt, content) {
 }
 
 function showAiPanel(sectionIdx) {
+    // Check if AI is available in current plan
+    if (typeof enforceLimit === 'function' && !enforceLimit('ai')) return;
     document.getElementById('aiPanel')?.remove();
     const panel = document.createElement('div');
     panel.id = 'aiPanel';

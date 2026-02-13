@@ -263,6 +263,12 @@ function renderColorSwatches(containerId, selected) {
 function handleLogo(input) {
     const file = input.files[0];
     if (!file) return;
+    // Check branding access for existing users (not during onboarding)
+    const isOnboarding = document.getElementById('obModal')?.style.display !== 'none';
+    if (!isOnboarding && typeof enforceLimit === 'function' && !enforceLimit('branding')) {
+        input.value = '';
+        return;
+    }
     const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
     if (!validTypes.includes(file.type)) { toast('Please upload a valid image (PNG, JPG, SVG, WebP)', 'error'); input.value = ''; return; }
     if (file.size > 2 * 1024 * 1024) { toast('Image must be under 2MB', 'error'); input.value = ''; return; }

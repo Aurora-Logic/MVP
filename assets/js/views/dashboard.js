@@ -4,6 +4,22 @@
 
 /* exported dismissExpiry, toggleSort, sortProposals */
 
+function ensureSearchExists() {
+    let search = document.getElementById('topSearch');
+    if (!search) {
+        const topRight = document.getElementById('topRight');
+        search = document.createElement('div');
+        search.className = 'topbar-search';
+        search.id = 'topSearch';
+        search.innerHTML = '<i data-lucide="search"></i>' +
+            '<input type="text" placeholder="Search proposals..." id="searchInput" oninput="filterList()" aria-label="Search proposals">' +
+            '<kbd class="kbd" style="cursor:pointer" onclick="openCommandPalette()" title="Open command palette">⌘K</kbd>';
+        topRight.appendChild(search);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    return search;
+}
+
 function buildMetricCards(active, c) {
     const totalValue = active.reduce((a, p) =>
         a + (p.lineItems || []).reduce((s, i) => s + (i.qty || 0) * (i.rate || 0), 0), 0);
@@ -211,9 +227,14 @@ function renderDashboard() {
   CUR = null;
   if (typeof hideTOC === 'function') hideTOC();
   document.getElementById('topTitle').textContent = 'Dashboard';
-  const topSearch = document.getElementById('topSearch');
-  if (topSearch) topSearch.style.display = '';
-  document.getElementById('topRight').innerHTML = '';
+  // Ensure search exists and show it
+  const topSearch = ensureSearchExists();
+  topSearch.style.display = 'flex';
+  // Clear topRight but preserve search
+  const topRight = document.getElementById('topRight');
+  Array.from(topRight.children).forEach(child => {
+    if (child.id !== 'topSearch') child.remove();
+  });
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   let changed = false;

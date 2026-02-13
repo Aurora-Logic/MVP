@@ -122,13 +122,6 @@ function safeGetStorage(key, fallback) {
     catch (e) { console.warn('Corrupted ' + key + ', resetting'); return fallback; }
 }
 
-/** Check admin feature flag — defaults to true (enabled) if not set */
-function isFeatureEnabled(flag) {
-    const cfg = safeGetStorage('pk_admin_config', {});
-    const flags = cfg.flags || {};
-    return flags[flag] !== false;
-}
-
 /** Stable device identifier — falls back when no userId is set */
 function getDeviceId() {
     if (CONFIG?.activeUserId) return CONFIG.activeUserId;
@@ -187,7 +180,7 @@ window.addEventListener('storage', (e) => {
         try { CLIENTS = JSON.parse(e.newValue); } catch (err) { /* ignore */ }
     }
     if (e.key === 'pk_subscription' && e.newValue) {
-        // Plan changed from admin — getCurrentPlan() will pick it up on next call
+        // Plan changed — getCurrentPlan() will pick it up on next call
     }
     if (e.key === 'pk_announcements') {
         if (typeof checkAnnouncements === 'function') checkAnnouncements();

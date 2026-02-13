@@ -745,42 +745,44 @@
 .comp-score-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 16px 0;
+  gap: 16px;
+  margin: 20px 0;
 }
 
 .comp-score-val {
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 36px;
+  font-weight: 700;
+  min-width: 80px;
 }
 
 .comp-progress-wrap {
   flex: 1;
-  height: 6px;
+  height: 8px;
   background: var(--muted);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .comp-progress-fill {
   height: 100%;
-  border-radius: 3px;
-  transition: width .3s;
+  border-radius: 4px;
+  transition: width 0.3s ease-out;
 }
 
 .comp-group-label {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  color: var(--text4);
-  margin: 10px 0 4px;
+  letter-spacing: 0.5px;
+  color: var(--muted-foreground);
+  margin: 16px 0 8px;
 }
 
 .comp-check-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 0;
+  padding: 8px 0;
   font-size: 14px;
 }
 
@@ -796,31 +798,37 @@
 .comp-check-pts {
   font-size: 14px;
   font-weight: 600;
+  min-width: 50px;
+  text-align: right;
 }
 
 .comp-quick-wins {
-  padding: 10px;
+  padding: 12px;
   background: var(--muted);
-  border-radius: 8px;
+  border-radius: var(--r);
   font-size: 14px;
-  color: var(--text3);
+  line-height: 1.5;
+  color: var(--muted-foreground);
 }
 
 .comp-quick-wins strong {
-  color: var(--text);
+  color: var(--foreground);
+  font-weight: 600;
 }
 
 .comp-all-good {
-  padding: 10px;
-  background: var(--green-bg);
-  border-radius: 8px;
+  padding: 12px;
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+  border-radius: var(--r);
   font-size: 14px;
   color: var(--green);
   font-weight: 500;
 }
 
 .comp-checks-list {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 /* Score badge inline */
