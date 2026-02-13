@@ -106,6 +106,7 @@ export default [
                 showLoading: 'readonly',
                 hideLoading: 'readonly',
                 confirmDialog: 'readonly',
+                inputDialog: 'readonly',
 
                 // ── core/shortcuts.js ──
                 openShortcutsPanel: 'readonly',
@@ -578,8 +579,18 @@ export default [
                 clearBulkSelection: 'readonly',
                 bulkExport: 'readonly',
 
+                // ── views/create-page.js ──
+                openCreateDrawer: 'readonly',
+                closeCreateDrawer: 'readonly',
+                renderCreatePage: 'readonly',
+                updateCreatePreview: 'readonly',
+                setCreateTemplate: 'readonly',
+                setCreateClientField: 'readonly',
+                doCreateProposal: 'readonly',
+
                 // ── export/create.js ──
                 createProp: 'readonly',
+                createPropFromPage: 'readonly',
                 dupProp: 'readonly',
                 dupPropWithClient: 'readonly',
                 doDupWithClient: 'readonly',
