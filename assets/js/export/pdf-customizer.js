@@ -2,7 +2,7 @@
 // PDF CUSTOMIZER — Template Style Editor (Pro/Team)
 // ════════════════════════════════════════
 
-/* exported getPdfStyles, savePdfStyles, resetPdfStyles, renderPdfCustomizer, applyPdfStyles */
+/* exported getPdfStyles, savePdfStyles, resetPdfStyles, renderPdfCustomizer, applyPdfStyles, previewPdfCustomization */
 
 // Default PDF styles
 const DEFAULT_PDF_STYLES = {
@@ -67,6 +67,79 @@ function applyPdfStyles(html) {
     return styled;
 }
 
+// Generate sample proposal for preview
+function generateSampleProposal() {
+    const sampleId = 'pdf-preview-sample';
+    return {
+        id: sampleId,
+        title: 'Website Redesign Project',
+        number: 'PROP-2024-001',
+        status: 'draft',
+        date: new Date().toISOString().split('T')[0],
+        validUntil: new Date(Date.now() + 30*86400000).toISOString().split('T')[0],
+        currency: CONFIG?.currency || '₹',
+        sender: {
+            company: CONFIG?.company || 'Your Company',
+            email: CONFIG?.email || 'hello@company.com',
+            address: CONFIG?.address || '123 Business Street, City, Country'
+        },
+        client: {
+            name: 'Acme Corporation',
+            contact: 'John Smith',
+            email: 'john@acme.com',
+            phone: '+1 234 567 8900',
+            address: '456 Client Avenue, Metro City'
+        },
+        lineItems: [
+            { desc: 'UI/UX Design', detail: 'Complete redesign of website interface', qty: 1, rate: 50000 },
+            { desc: 'Frontend Development', detail: 'React-based responsive implementation', qty: 1, rate: 75000 },
+            { desc: 'Backend Integration', detail: 'API development and database setup', qty: 1, rate: 60000 }
+        ],
+        sections: [
+            { title: 'Project Overview', content: '<p>This proposal outlines our approach to redesigning your company website with a modern, user-friendly interface.</p>' },
+            { title: 'Deliverables', content: '<ul><li>Responsive web design</li><li>Mobile-optimized interface</li><li>Performance optimization</li></ul>' }
+        ],
+        discount: 0,
+        taxRate: 18,
+        coverPage: false,
+        version: 1
+    };
+}
+
+function previewPdfCustomization() {
+    // Save current proposal ID
+    const originalCUR = typeof CUR !== 'undefined' ? CUR : null;
+
+    // Generate and set sample proposal
+    const sample = generateSampleProposal();
+
+    // Temporarily add to DB if buildPreview needs it
+    const existingIndex = DB.findIndex(p => p.id === sample.id);
+    if (existingIndex >= 0) {
+        DB[existingIndex] = sample;
+    } else {
+        DB.push(sample);
+    }
+
+    // Set as current
+    if (typeof window !== 'undefined') window.CUR = sample.id;
+
+    // Open preview
+    if (typeof openPreview === 'function') {
+        openPreview();
+    }
+
+    // Restore original after preview opens
+    setTimeout(() => {
+        // Remove sample from DB
+        const idx = DB.findIndex(p => p.id === sample.id);
+        if (idx >= 0) DB.splice(idx, 1);
+
+        // Restore original CUR
+        if (typeof window !== 'undefined') window.CUR = originalCUR;
+    }, 100);
+}
+
 function renderPdfCustomizer() {
     // Check plan access
     const hasPdfCustomization = typeof checkLimit === 'function' ? checkLimit('pdfCustomization').allowed : false;
@@ -96,7 +169,7 @@ function renderPdfCustomizer() {
             <div class="card-d">Customize your PDF appearance</div></div>
             <div style="display:flex;gap:8px">
                 <button class="btn-sm-outline" onclick="resetPdfStyles()"><i data-lucide="rotate-ccw"></i> Reset</button>
-                <button class="btn-sm" onclick="if(typeof openPreview==='function')openPreview()"><i data-lucide="eye"></i> Preview</button>
+                <button class="btn-sm" onclick="previewPdfCustomization()"><i data-lucide="eye"></i> Preview Changes</button>
             </div>
         </div>
 
@@ -215,6 +288,16 @@ function updatePdfStyle(key, value) {
     }
 
     savePdfStyles(styles);
+
+    // Auto-refresh preview if open
+    const prevPanel = document.getElementById('prevPanel');
+    if (prevPanel && prevPanel.classList.contains('show')) {
+        // Debounce preview updates (don't rebuild on every keystroke)
+        if (updatePdfStyle._previewTimer) clearTimeout(updatePdfStyle._previewTimer);
+        updatePdfStyle._previewTimer = setTimeout(() => {
+            if (typeof buildPreview === 'function') buildPreview();
+        }, 300);
+    }
 }
 
 // Initialize font selectors after rendering
