@@ -2,7 +2,7 @@
 // STORE — Data Layer (no dependencies)
 // ════════════════════════════════════════
 
-/* exported saveTimer, ctxTarget, currentFilter, currentSort, lastSaveTime, saveIndicatorTimer, docTemplate, sectionEditors, paymentTermsEditor, focusMode, viewMode, undoStack, redoStack, MAX_UNDO, saveConfig, saveClients, uid, activeDB, safeGetStorage, escAttr, safeLsSet, sanitizeHtml, sanitizeDataUrl, isValidId, validateTaxId, fmtCur, fmtNum, fmtDate, timeAgo, rgbToHex, defaultCurrency, proposalValue, capitalize, nextPropNumber, taxLabel, COLORS, COLOR_NAMES, logoutApp */
+/* exported saveTimer, ctxTarget, currentFilter, currentSort, lastSaveTime, saveIndicatorTimer, docTemplate, sectionEditors, paymentTermsEditor, focusMode, viewMode, undoStack, redoStack, MAX_UNDO, saveConfig, saveClients, uid, activeDB, safeGetStorage, escAttr, safeLsSet, sanitizeHtml, sanitizeDataUrl, isValidId, validateTaxId, fmtCur, fmtNum, fmtDate, timeAgo, rgbToHex, defaultCurrency, proposalValue, capitalize, nextPropNumber, taxLabel, STATUS_ICONS, statusIcon, COLORS, COLOR_NAMES, logoutApp */
 /** @typedef {{ desc: string, detail?: string, qty: number, rate: number }} LineItem */
 /** @typedef {{ title: string, content?: string, type?: string, testimonial?: Object, caseStudy?: Object }} Section */
 /** @typedef {{ id: string, title: string, number: string, status: string, date: string, validUntil: string, currency: string, sender: {company: string, email: string, address: string}, client: {name: string, contact: string, email: string, phone: string, address?: string, gstNumber?: string}, lineItems: LineItem[], sections: Section[], discount: number, taxRate: number, coverPage?: boolean, shareToken?: string, version?: number, versionHistory?: Object[], createdAt: number, updatedAt: number, archived?: boolean, clientResponse?: Object, paymentTerms?: string, addOns?: Object[], paymentSchedule?: Object[], packages?: Object[], packagesEnabled?: boolean, lastEditedBy?: string }} Proposal */
@@ -288,6 +288,10 @@ function taxLabel() {
     if (c === 'CH') return 'VAT';
     return 'Tax';
 }
+
+// Status icon map — accessible alternative to color-only dots (WCAG)
+const STATUS_ICONS = { draft: 'pencil', sent: 'send', accepted: 'check', declined: 'x', expired: 'clock', archived: 'archive' };
+function statusIcon(st) { return STATUS_ICONS[st] || 'circle'; }
 
 const COLORS = ['#800020', '#2563eb', '#7c3aed', '#dc2626', '#d97706', '#16a34a', '#0891b2', '#be185d'];
 const COLOR_NAMES = { '#800020': '#5c0017', '#2563eb': '#1e40af', '#7c3aed': '#5b21b6', '#dc2626': '#991b1b', '#d97706': '#92400e', '#16a34a': '#166534', '#0891b2': '#155e75', '#be185d': '#9d174d' };

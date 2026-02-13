@@ -42,7 +42,7 @@ function renderPayments(p) {
         <div class="card-head">
             <div><div class="card-t">Payments received</div><div class="card-d">Record actual payments from client</div></div>
             <div style="display:flex;gap:8px;align-items:center">
-                <span class="badge badge-${statusCls[pt.status]}"><span class="badge-dot"></span> ${statusLabels[pt.status]}</span>
+                <span class="badge badge-${statusCls[pt.status]}"><i data-lucide="${statusIcon(statusCls[pt.status])}" style="width:12px;height:12px"></i> ${statusLabels[pt.status]}</span>
                 <button class="btn-sm-outline" onclick="addPayment()"><i data-lucide="plus"></i> Record</button>
             </div>
         </div>
@@ -128,7 +128,7 @@ function paymentStatusBadge(p) {
     const pt = paymentTotals(p);
     const cls = { unpaid: 'declined', partial: 'expired', paid: 'accepted' };
     const labels = { unpaid: 'Unpaid', partial: 'Partial', paid: 'Paid' };
-    return `<span class="badge badge-${cls[pt.status]}" style="font-size:10px;padding:2px 8px"><span class="badge-dot"></span> ${labels[pt.status]}</span>`;
+    return `<span class="badge badge-${cls[pt.status]}" style="font-size:10px;padding:2px 8px"><i data-lucide="${statusIcon(cls[pt.status])}" style="width:10px;height:10px"></i> ${labels[pt.status]}</span>`;
 }
 
 function buildPaymentsReceiptHtml(p, c, bc) {

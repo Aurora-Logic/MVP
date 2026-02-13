@@ -67,7 +67,7 @@ function buildClientHistory(props) {
         const st = p.status, statusLabel = st.charAt(0).toUpperCase() + st.slice(1);
         return `<tr class="nt-row" onclick="loadEditor('${escAttr(p.id)}')">
             <td class="nt-cell"><span class="nt-title-text">${esc(p.title || 'Untitled')}</span></td>
-            <td class="nt-cell nt-cell-status"><span class="badge badge-${st}"><span class="badge-dot"></span> ${statusLabel}</span></td>
+            <td class="nt-cell nt-cell-status"><span class="badge badge-${st}"><i data-lucide="${statusIcon(st)}" style="width:12px;height:12px"></i> ${statusLabel}</span></td>
             <td class="nt-cell nt-cell-value mono">${fmtCur(val, p.currency)}</td>
             <td class="nt-cell nt-cell-date">${fmtDate(p.createdAt)}</td></tr>`;
     }).join('');

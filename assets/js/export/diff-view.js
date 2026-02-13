@@ -72,7 +72,7 @@ function renderSnapshotHtml(s) {
     const t = calcTotals(s);
     let h = `<div class="diff-head">
         <strong>${esc(s.title || 'Untitled')}</strong>
-        <span class="badge badge-${s.status || 'draft'}"><span class="badge-dot"></span> ${(s.status || 'draft').charAt(0).toUpperCase() + (s.status || 'draft').slice(1)}</span>
+        <span class="badge badge-${s.status || 'draft'}"><i data-lucide="${statusIcon(s.status || 'draft')}" style="width:12px;height:12px"></i> ${(s.status || 'draft').charAt(0).toUpperCase() + (s.status || 'draft').slice(1)}</span>
     </div>`;
     h += `<div class="diff-meta">v${s.version || 1} | ${fmtDate(s.date)} | ${esc(s.client?.name || 'No client')}</div>`;
     // Sections

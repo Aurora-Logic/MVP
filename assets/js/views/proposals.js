@@ -50,13 +50,14 @@ function renderPropTable(list) {
     const smartDate = getSmartDate(p);
     const st = isArchived ? 'archived' : p.status;
     const statusLabel = st.charAt(0).toUpperCase() + st.slice(1);
+    const stIcon = statusIcon(st);
 
     if (viewMode === 'table') {
       return `<tr class="nt-row" onclick="loadEditor('${pid}')" oncontextmenu="showCtx(event,'${pid}')">
         <td class="nt-cell nt-cell-check">${!isArchived ? `<label class="bulk-check-wrap" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-input" data-id="${pid}" onchange="toggleBulkCheck('${pid}', this)"><span class="bulk-check-pill"></span></label>` : ''}</td>
         <td class="nt-cell nt-cell-title"><span class="nt-title-text">${esc(p.title || 'Untitled')}</span></td>
         <td class="nt-cell nt-cell-client"><span class="nt-client-text">${esc(p.client?.name || '\u2014')}</span></td>
-        <td class="nt-cell nt-cell-status"><span class="badge badge-${st} badge-click" onclick="event.stopPropagation();showStatusMenu(event,'${pid}')"><span class="badge-dot"></span> ${statusLabel}</span></td>
+        <td class="nt-cell nt-cell-status"><span class="badge badge-${st} badge-click" onclick="event.stopPropagation();showStatusMenu(event,'${pid}')"><i data-lucide="${stIcon}" style="width:12px;height:12px"></i> ${statusLabel}</span></td>
         <td class="nt-cell nt-cell-value mono">${fmtCur(val, p.currency)}</td>
         <td class="nt-cell nt-cell-date">${smartDate}</td>
         <td class="nt-cell nt-cell-actions"><div class="prop-actions">${isArchived ? `
@@ -74,7 +75,7 @@ function renderPropTable(list) {
       <i data-lucide="file-text" class="nl-icon"></i>
       <span class="nl-title">${esc(p.title || 'Untitled')}</span>
       <span class="nl-meta">${esc(p.client?.name || '')}</span>
-      <span class="badge badge-${st} badge-sm"><span class="badge-dot"></span> ${statusLabel}</span>
+      <span class="badge badge-${st} badge-sm"><i data-lucide="${stIcon}" style="width:12px;height:12px"></i> ${statusLabel}</span>
       <span class="nl-value mono">${fmtCur(val, p.currency)}</span>
       <span class="nl-date">${smartDate}</span>
       <div class="prop-actions">${isArchived ? `
