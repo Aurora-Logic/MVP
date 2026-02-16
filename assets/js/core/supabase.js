@@ -11,7 +11,7 @@ let sbSession = null;
 
 function initSupabase() {
     if (typeof window.supabase === 'undefined' || !window.supabase.createClient) {
-        console.warn('Supabase SDK not loaded — running in offline mode');
+        if (CONFIG?.debug) console.warn('Supabase SDK not loaded — running in offline mode');
         return null;
     }
     try {
@@ -26,7 +26,7 @@ function initSupabase() {
         });
         return sbClient;
     } catch (e) {
-        console.error('Supabase init failed:', e);
+        if (CONFIG?.debug) console.error('Supabase init failed:', e);
         return null;
     }
 }
@@ -57,7 +57,7 @@ async function refreshToken() {
     if (!sb()) return null;
     try {
         const { data, error } = await sb().auth.refreshSession();
-        if (error) { console.warn('Token refresh failed:', error.message); return null; }
+        if (error) { if (CONFIG?.debug) console.warn('Token refresh failed:', error.message); return null; }
         sbSession = data?.session || null;
         return sbSession;
     } catch (e) { return null; }
@@ -144,7 +144,7 @@ async function isAdmin() {
         if (error) throw error;
         return data?.role === 'admin' || data?.role === 'superadmin';
     } catch (e) {
-        console.error('[Admin] Permission check failed:', e);
+        if (CONFIG?.debug) console.error('[Admin] Permission check failed:', e);
         return false;
     }
 }
@@ -184,13 +184,13 @@ async function getUserSubscription() {
             .single();
 
         if (error) {
-            console.log('[Subscription] No active subscription');
+            if (CONFIG?.debug) console.log('[Subscription] No active subscription');
             return null;
         }
 
         return data;
     } catch (e) {
-        console.error('[Subscription] Fetch failed:', e);
+        if (CONFIG?.debug) console.error('[Subscription] Fetch failed:', e);
         return null;
     }
 }
@@ -224,7 +224,7 @@ async function incrementProposalCount() {
     try {
         await sb().rpc('increment_proposal_count', { p_user_id: user.id });
     } catch (e) {
-        console.error('[Subscription] Failed to increment count:', e);
+        if (CONFIG?.debug) console.error('[Subscription] Failed to increment count:', e);
     }
 }
 

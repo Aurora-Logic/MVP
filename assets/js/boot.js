@@ -23,7 +23,7 @@ window.addEventListener('unhandledrejection', function(e) {
 // Get cache performance metrics
 function getCacheMetrics() {
     if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
-        console.log('[Metrics] Service worker not active');
+        if (CONFIG?.debug) console.log('[Metrics] Service worker not active');
         return Promise.resolve(null);
     }
 
@@ -49,33 +49,33 @@ function getCacheMetrics() {
 
 // Manual cache clear utility
 function clearAppCache() {
-    console.log('[Cache] Clearing all caches and service worker...');
+    if (CONFIG?.debug) console.log('[Cache] Clearing all caches and service worker...');
     if ('caches' in window) {
         caches.keys().then(function(names) {
             return Promise.all(
                 names.map(function(name) {
-                    console.log('[Cache] Deleting cache:', name);
+                    if (CONFIG?.debug) console.log('[Cache] Deleting cache:', name);
                     return caches.delete(name);
                 })
             );
         }).then(function() {
-            console.log('[Cache] All caches cleared');
+            if (CONFIG?.debug) console.log('[Cache] All caches cleared');
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistration().then(function(reg) {
                     if (reg) {
                         reg.unregister().then(function() {
-                            console.log('[Cache] Service worker unregistered');
-                            console.log('[Cache] Reloading page...');
+                            if (CONFIG?.debug) console.log('[Cache] Service worker unregistered');
+                            if (CONFIG?.debug) console.log('[Cache] Reloading page...');
                             window.location.reload(true);
                         });
                     } else {
-                        console.log('[Cache] No service worker found');
-                        console.log('[Cache] Reloading page...');
+                        if (CONFIG?.debug) console.log('[Cache] No service worker found');
+                        if (CONFIG?.debug) console.log('[Cache] Reloading page...');
                         window.location.reload(true);
                     }
                 });
             } else {
-                console.log('[Cache] Reloading page...');
+                if (CONFIG?.debug) console.log('[Cache] Reloading page...');
                 window.location.reload(true);
             }
         }).catch(function(err) {
@@ -83,7 +83,7 @@ function clearAppCache() {
             if (typeof toast === 'function') toast('Error clearing cache. Try refreshing manually.', 'error');
         });
     } else {
-        console.log('[Cache] Cache API not supported');
+        if (CONFIG?.debug) console.log('[Cache] Cache API not supported');
         window.location.reload(true);
     }
 }
@@ -119,23 +119,30 @@ function showUpdateToast() {
     }
 }
 
-function initApp() {
+async function initApp() {
     if (typeof initAuth === 'function') {
-        initAuth();
+        await initAuth();
     } else {
         // Offline fallback (Supabase CDN not loaded)
         if (CONFIG) {
             document.getElementById('onboard').classList.add('hide');
             document.getElementById('appShell').style.display = 'flex';
-            bootApp();
+            await bootApp();
         } else {
             renderOnboarding();
         }
     }
 }
 
-function bootApp() {
-    console.log('[Boot] Starting app initialization...');
+async function bootApp() {
+    // CRITICAL: Wait for DOM to be ready before proceeding
+    if (document.readyState === 'loading') {
+        await new Promise(resolve => {
+            document.addEventListener('DOMContentLoaded', resolve);
+        });
+    }
+
+    if (CONFIG?.debug) console.log('[Boot] Starting app initialization...');
     try {
         // SECURITY FIX: Enforce plan limits and monitor storage
         if (typeof enforceFreePlanLimits === 'function') enforceFreePlanLimits();
@@ -154,7 +161,7 @@ function bootApp() {
                     hasOffline: hasOffline
                 });
                 if (!hasOffline) {
-                    console.log('[Boot] Free plan: SW will be unregistered for offline gating');
+                    if (CONFIG?.debug) console.log('[Boot] Free plan: SW will be unregistered for offline gating');
                 }
             }
         }
@@ -162,7 +169,7 @@ function bootApp() {
         initSidebarState();
         if (typeof initTeam === 'function') initTeam();
         refreshSide();
-        console.log('[Boot] Handling initial route:', window.location.pathname);
+        if (CONFIG?.debug) console.log('[Boot] Handling initial route:', window.location.pathname);
         handleRoute();
         initKeyboardShortcuts();
         if (typeof checkAnnouncements === 'function') checkAnnouncements();
@@ -172,9 +179,9 @@ function bootApp() {
         patchAriaLabels();
         checkWhatsNew();
         checkNpsPrompt();
-        console.log('[Boot] App initialized successfully');
+        if (CONFIG?.debug) console.log('[Boot] App initialized successfully');
     } catch (err) {
-        console.error('[Boot] Initialization failed:', err);
+        if (CONFIG?.debug) console.error('[Boot] Initialization failed:', err);
         // Show error UI instead of blank screen
         const body = document.getElementById('bodyScroll');
         if (body) {

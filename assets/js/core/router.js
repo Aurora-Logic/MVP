@@ -79,7 +79,7 @@ function buildUrl(basePath, params) {
 }
 
 // ── Handle current URL — render correct view ──
-function handleRoute() {
+async function handleRoute() {
     const pathname = window.location.pathname;
     const result = matchRoute(pathname);
 
@@ -91,6 +91,36 @@ function handleRoute() {
     const view = route.view;
     const an = typeof appName === 'function' ? appName() : 'ProposalKit';
     const titles = { dashboard: 'Dashboard', proposals: 'Proposals', create: 'New Proposal', clients: 'Customers', settings: 'Settings', profile: 'My Profile', pricing: 'Pricing', 'my-tickets': 'My Tickets', admin: 'Admin Panel' };
+
+    // AUTH GUARD: Protected routes require authentication
+    const protectedRoutes = ['dashboard', 'proposals', 'editor', 'create', 'clients', 'profile', 'settings', 'my-tickets', 'admin'];
+    const isProtected = protectedRoutes.includes(view);
+
+    if (isProtected) {
+        // Check if user is authenticated
+        const hasSession = typeof sbSession !== 'undefined' && sbSession !== null;
+        const hasConfig = typeof CONFIG !== 'undefined' && CONFIG !== null;
+
+        // If no session and no local config, redirect to login
+        if (!hasSession && !hasConfig) {
+            if (typeof renderAuthScreen === 'function') {
+                renderAuthScreen();
+            } else {
+                window.location.href = '/';
+            }
+            return;
+        }
+
+        // ADMIN-ONLY: Check admin access for admin panel
+        if (view === 'admin') {
+            const checkAdmin = typeof isAdmin === 'function' ? await isAdmin() : false;
+            if (!checkAdmin) {
+                render404(pathname);
+                if (typeof toast === 'function') toast('Access denied: Admin privileges required', 'error');
+                return;
+            }
+        }
+    }
 
     // Update document title
     document.title = (titles[view] || an) + ' — ' + an;
@@ -142,9 +172,9 @@ function handleRoute() {
             if (typeof renderProfile === 'function') renderProfile();
             else if (typeof openSettings === 'function') openSettings();
         } else if (view === 'create') {
-            console.log('[ROUTER] Navigating to create page, renderCreatePage available:', typeof renderCreatePage);
+            if (CONFIG?.debug) console.log('[ROUTER] Navigating to create page, renderCreatePage available:', typeof renderCreatePage);
             if (typeof renderCreatePage === 'function') renderCreatePage();
-            else console.error('[ROUTER] renderCreatePage function not found!');
+            else if (CONFIG?.debug) console.error('[ROUTER] renderCreatePage function not found!');
         } else if (view === 'settings') {
             if (typeof openSettings === 'function') openSettings();
         } else if (view === 'pricing') {

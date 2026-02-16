@@ -28,60 +28,65 @@ const _CREATE_TPL_DESC = {
 };
 
 function openCreateDrawer(clientIdx = null) {
-    // Reset state
-    _createState.step = 1;
-    _createState.template = 'blank';
-    _createState.clientMode = 'skip';
-    _createState.client = null;
-    _createState.clientSearch = '';
-    _createState.category = 'all';
-    _createState.font = CONFIG?.font || 'System';
-    _createState.color = CONFIG?.color || (typeof COLORS !== 'undefined' ? COLORS[0] : '#800020');
+    try {
+        // Reset state
+        _createState.step = 1;
+        _createState.template = 'blank';
+        _createState.clientMode = 'skip';
+        _createState.client = null;
+        _createState.clientSearch = '';
+        _createState.category = 'all';
+        _createState.font = CONFIG?.font || 'System';
+        _createState.color = CONFIG?.color || (typeof COLORS !== 'undefined' ? COLORS[0] : '#800020');
 
-    // Pre-fill client if provided
-    if (clientIdx !== null && CLIENTS[parseInt(clientIdx)]) {
-        const c = CLIENTS[parseInt(clientIdx)];
-        _createState.clientMode = 'existing';
-        _createState.client = {
-            name: c.displayName || c.companyName || c.name || '',
-            contact: ((c.salutation || '') + ' ' + ((c.firstName || '') + ' ' + (c.lastName || '')).trim()).trim() || c.contact || '',
-            email: c.email || '',
-            phone: c.workPhone || c.mobile || c.phone || ''
-        };
-        _createState.step = 2; // Start on client step
+        // Pre-fill client if provided
+        if (clientIdx !== null && CLIENTS[parseInt(clientIdx)]) {
+            const c = CLIENTS[parseInt(clientIdx)];
+            _createState.clientMode = 'existing';
+            _createState.client = {
+                name: c.displayName || c.companyName || c.name || '',
+                contact: ((c.salutation || '') + ' ' + ((c.firstName || '') + ' ' + (c.lastName || '')).trim()).trim() || c.contact || '',
+                email: c.email || '',
+                phone: c.workPhone || c.mobile || c.phone || ''
+            };
+            _createState.step = 2; // Start on client step
+        }
+
+        // Set initial template sections
+        const tpl = TPLS[_createState.template] || TPLS.blank;
+        _createState.sections = (tpl.sections || []).map(s => ({ ...s, enabled: true }));
+        _createState.lineItems = tpl.lineItems || [];
+        _createState.paymentTerms = tpl.paymentTerms || '';
+
+        // Create drawer
+        const existing = document.getElementById('createDrawer');
+        if (existing) existing.remove();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'drawer-overlay';
+        overlay.id = 'createDrawer';
+        overlay.onclick = (e) => { if (e.target === overlay) closeCreateDrawer(); };
+
+        overlay.innerHTML = `
+            <div class="drawer" onclick="event.stopPropagation()">
+                <div class="drawer-header">
+                    <div class="drawer-title">New Proposal</div>
+                    <button class="btn-sm-icon-ghost" onclick="closeCreateDrawer()"><i data-lucide="x"></i></button>
+                </div>
+                <div class="drawer-body" id="drawerBody"></div>
+                <div class="drawer-footer" id="drawerFooter"></div>
+            </div>`;
+
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+
+        _renderDrawerContent();
+        if (typeof lucideScope === 'function') lucideScope(overlay);
+        else lucide.createIcons();
+    } catch (error) {
+        if (CONFIG?.debug) console.error('[CreateDrawer] Failed to open:', error);
+        if (typeof toast === 'function') toast('Failed to open creation drawer. Please try again.', 'error');
     }
-
-    // Set initial template sections
-    const tpl = TPLS[_createState.template] || TPLS.blank;
-    _createState.sections = (tpl.sections || []).map(s => ({ ...s, enabled: true }));
-    _createState.lineItems = tpl.lineItems || [];
-    _createState.paymentTerms = tpl.paymentTerms || '';
-
-    // Create drawer
-    const existing = document.getElementById('createDrawer');
-    if (existing) existing.remove();
-
-    const overlay = document.createElement('div');
-    overlay.className = 'drawer-overlay';
-    overlay.id = 'createDrawer';
-    overlay.onclick = (e) => { if (e.target === overlay) closeCreateDrawer(); };
-
-    overlay.innerHTML = `
-        <div class="drawer" onclick="event.stopPropagation()">
-            <div class="drawer-header">
-                <div class="drawer-title">New Proposal</div>
-                <button class="btn-sm-icon-ghost" onclick="closeCreateDrawer()"><i data-lucide="x"></i></button>
-            </div>
-            <div class="drawer-body" id="drawerBody"></div>
-            <div class="drawer-footer" id="drawerFooter"></div>
-        </div>`;
-
-    document.body.appendChild(overlay);
-    requestAnimationFrame(() => overlay.classList.add('show'));
-
-    _renderDrawerContent();
-    if (typeof lucideScope === 'function') lucideScope(overlay);
-    else lucide.createIcons();
 }
 
 function closeCreateDrawer() {
@@ -93,47 +98,58 @@ function closeCreateDrawer() {
 }
 
 function renderCreatePage() {
-    // Legacy compatibility — redirect to drawer
-    const qs = new URLSearchParams(window.location.search);
-    const clientIdx = qs.get('client');
-    openCreateDrawer(clientIdx);
-    // Navigate back to previous route
-    history.back();
+    try {
+        // Legacy compatibility — redirect to drawer
+        const qs = new URLSearchParams(window.location.search);
+        const clientIdx = qs.get('client');
+        openCreateDrawer(clientIdx);
+        // Navigate back to previous route
+        history.back();
+    } catch (error) {
+        if (CONFIG?.debug) console.error('[CreatePage] Failed to render:', error);
+        if (typeof toast === 'function') toast('Failed to load create page. Please try again.', 'error');
+        if (typeof navigate === 'function') navigate('/proposals');
+    }
 }
 
 function _renderDrawerContent() {
-    const body = document.getElementById('drawerBody');
-    const footer = document.getElementById('drawerFooter');
-    if (!body || !footer) return;
+    try {
+        const body = document.getElementById('drawerBody');
+        const footer = document.getElementById('drawerFooter');
+        if (!body || !footer) return;
 
-    // Steps indicator
-    const steps = [
-        { num: 1, label: 'Template' },
-        { num: 2, label: 'Client' },
-        { num: 3, label: 'Review' }
-    ];
-    const stepsHtml = steps.map(s => {
-        const classes = ['drawer-step'];
-        if (s.num === _createState.step) classes.push('active');
-        if (s.num < _createState.step) classes.push('completed');
-        return `<div class="${classes.join(' ')}"><div class="drawer-step-num">${s.num < _createState.step ? '<i data-lucide="check" style="width:14px;height:14px"></i>' : s.num}</div><span class="drawer-step-label">${s.label}</span></div>`;
-    }).join('');
+        // Steps indicator
+        const steps = [
+            { num: 1, label: 'Template' },
+            { num: 2, label: 'Client' },
+            { num: 3, label: 'Review' }
+        ];
+        const stepsHtml = steps.map(s => {
+            const classes = ['drawer-step'];
+            if (s.num === _createState.step) classes.push('active');
+            if (s.num < _createState.step) classes.push('completed');
+            return `<div class="${classes.join(' ')}"><div class="drawer-step-num">${s.num < _createState.step ? '<i data-lucide="check" style="width:14px;height:14px"></i>' : s.num}</div><span class="drawer-step-label">${s.label}</span></div>`;
+        }).join('');
 
-    // Render content based on step
-    let content = '';
-    if (_createState.step === 1) content = _buildTemplateStep();
-    else if (_createState.step === 2) content = _buildClientStep();
-    else if (_createState.step === 3) content = _buildReviewStep();
+        // Render content based on step
+        let content = '';
+        if (_createState.step === 1) content = _buildTemplateStep();
+        else if (_createState.step === 2) content = _buildClientStep();
+        else if (_createState.step === 3) content = _buildReviewStep();
 
-    body.innerHTML = `<div class="drawer-steps">${stepsHtml}</div>${content}`;
+        body.innerHTML = `<div class="drawer-steps">${stepsHtml}</div>${content}`;
 
-    // Render footer buttons
-    const backBtn = _createState.step > 1 ? '<button class="btn-sm-outline" onclick="setDrawerStep(' + (_createState.step - 1) + ')"><i data-lucide="arrow-left"></i> Back</button>' : '';
-    const nextBtn = _createState.step < 3 ? '<button class="btn-sm" onclick="setDrawerStep(' + (_createState.step + 1) + ')">Next <i data-lucide="arrow-right"></i></button>' : '<button class="btn" onclick="doCreateProposal()"><i data-lucide="plus"></i> Create Proposal</button>';
-    footer.innerHTML = backBtn + nextBtn;
+        // Render footer buttons
+        const backBtn = _createState.step > 1 ? '<button class="btn-sm-outline" onclick="setDrawerStep(' + (_createState.step - 1) + ')"><i data-lucide="arrow-left"></i> Back</button>' : '';
+        const nextBtn = _createState.step < 3 ? '<button class="btn-sm" onclick="setDrawerStep(' + (_createState.step + 1) + ')">Next <i data-lucide="arrow-right"></i></button>' : '<button class="btn" onclick="doCreateProposal()"><i data-lucide="plus"></i> Create Proposal</button>';
+        footer.innerHTML = backBtn + nextBtn;
 
-    if (typeof lucideScope === 'function') lucideScope(document.getElementById('createDrawer'));
-    else lucide.createIcons();
+        if (typeof lucideScope === 'function') lucideScope(document.getElementById('createDrawer'));
+        else lucide.createIcons();
+    } catch (error) {
+        if (CONFIG?.debug) console.error('[CreateDrawer] Failed to render content:', error);
+        if (typeof toast === 'function') toast('Failed to render drawer content', 'error');
+    }
 }
 
 function setDrawerStep(step) {
@@ -260,43 +276,50 @@ function updateNewClientField(field, val) {
 }
 
 async function doCreateProposal() {
-    // Check usage limits
-    if (typeof canCreateProposal === 'function') {
-        const limitsCheck = await canCreateProposal();
-        if (!limitsCheck.allowed) {
-            const limit = limitsCheck.limit;
-            const current = limitsCheck.current;
+    try {
+        // Check usage limits
+        if (typeof canCreateProposal === 'function') {
+            const limitsCheck = await canCreateProposal();
+            if (!limitsCheck.allowed) {
+                const limit = limitsCheck.limit;
+                const current = limitsCheck.current;
 
-            confirmDialog(
-                `You've reached your proposal limit (${current}/${limit}). Upgrade to create more proposals.`,
-                () => {
-                    // Navigate to pricing/upgrade
-                    closeCreateDrawer();
-                    navigate('/pricing');
-                },
-                {
-                    confirmText: 'Upgrade Plan',
-                    cancelText: 'Cancel',
-                    type: 'warning'
-                }
-            );
-            return;
+                confirmDialog(
+                    `You've reached your proposal limit (${current}/${limit}). Upgrade to create more proposals.`,
+                    () => {
+                        // Navigate to pricing/upgrade
+                        closeCreateDrawer();
+                        navigate('/pricing');
+                    },
+                    {
+                        confirmText: 'Upgrade Plan',
+                        cancelText: 'Cancel',
+                        type: 'warning'
+                    }
+                );
+                return;
+            }
         }
-    }
 
-    if (typeof createPropFromPage === 'function') {
-        createPropFromPage(_createState);
-    } else {
-        const tpl = _createState.template.startsWith('saved_')
-            ? safeGetStorage('pk_templates', [])[parseInt(_createState.template.replace('saved_', ''))]
-            : TPLS[_createState.template];
-        createProp(tpl || TPLS.blank);
-    }
-    closeCreateDrawer();
+        if (typeof createPropFromPage === 'function') {
+            createPropFromPage(_createState);
+        } else {
+            const tpl = _createState.template.startsWith('saved_')
+                ? safeGetStorage('pk_templates', [])[parseInt(_createState.template.replace('saved_', ''))]
+                : TPLS[_createState.template];
+            createProp(tpl || TPLS.blank);
+        }
+        closeCreateDrawer();
 
-    // Increment proposal count (async, fire-and-forget)
-    if (typeof incrementProposalCount === 'function') {
-        incrementProposalCount().catch(err => console.error('Failed to increment count:', err));
+        // Increment proposal count (async, fire-and-forget)
+        if (typeof incrementProposalCount === 'function') {
+            incrementProposalCount().catch(err => {
+                if (CONFIG?.debug) console.error('Failed to increment count:', err);
+            });
+        }
+    } catch (error) {
+        if (CONFIG?.debug) console.error('[CreateProposal] Failed to create proposal:', error);
+        if (typeof toast === 'function') toast('Failed to create proposal. Please try again.', 'error');
     }
 }
 

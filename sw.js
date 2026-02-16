@@ -1,10 +1,10 @@
 // ════════════════════════════════════════
-// SERVICE WORKER v25 — Production-Grade Caching
+// SERVICE WORKER v26 — Production-Grade Caching
 // ════════════════════════════════════════
 // Strategy: Network-first with smart fallback + performance tracking
 
-const CACHE_NAME = 'proposalkit-v25';
-const CACHE_VERSION = 25;
+const CACHE_NAME = 'proposalkit-v26';
+const CACHE_VERSION = 26;
 const MAX_CACHE_SIZE = 50; // Maximum items in runtime cache
 const MAX_CACHE_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
 

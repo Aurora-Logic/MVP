@@ -263,6 +263,30 @@ function showOAuthRetryScreen() {
     }
 }
 
+function showConnectionError() {
+    showAuthSplit();
+    const el = authTarget();
+    if (!el) return;
+
+    el.innerHTML = `
+        <div class="auth-form" style="text-align:center">
+            <div style="font-size:48px;margin-bottom:16px">&#128683;</div>
+            <div class="auth-title" style="margin-bottom:8px">Connection Failed</div>
+            <div class="auth-desc" style="margin-bottom:24px">
+                Unable to connect to authentication service. Please check your internet connection and try again.
+            </div>
+            <button class="btn" onclick="location.reload()" style="margin-bottom:12px">
+                Retry Connection
+            </button>
+            <div class="auth-offline" style="margin-top:16px">
+                <button class="btn-outline auth-offline-btn" onclick="skipAuth()">
+                    <i data-lucide="wifi-off" style="width:16px;height:16px"></i> Continue offline
+                </button>
+            </div>
+        </div>`;
+    lucide.createIcons();
+}
+
 function offlineBoot() {
     if (CONFIG) {
         hideAuthSplit();
@@ -439,6 +463,23 @@ async function doLogin() {
     if (!identifier) { showAuthError('Please enter your email or phone number'); return; }
     if (!pass || pass.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
 
+    // Rate limiting check
+    const rateCheck = checkRateLimit('login');
+    if (!rateCheck.allowed) {
+        showAuthError(rateCheck.message);
+        return;
+    }
+
+    // Validate phone format if not email
+    const isEmail = identifier.includes('@');
+    if (!isEmail) {
+        const phoneCheck = validatePhone(identifier);
+        if (!phoneCheck.valid) {
+            showAuthError(phoneCheck.error);
+            return;
+        }
+    }
+
     showAuthError('');
     setAuthLoading(true);
 
@@ -482,6 +523,13 @@ async function doSignup() {
     if (!name) { showAuthError('Please enter your name'); return; }
     if (!email) { showAuthError('Please enter your email'); return; }
     if (!pass || pass.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
+
+    // Rate limiting check
+    const rateCheck = checkRateLimit('signup');
+    if (!rateCheck.allowed) {
+        showAuthError(rateCheck.message);
+        return;
+    }
 
     showAuthError('');
     setAuthLoading(true);
@@ -577,6 +625,12 @@ async function doFigmaLogin() {
 async function doPasswordReset() {
     const email = document.getElementById('authEmail')?.value?.trim();
     if (!email) { showAuthError('Please enter your email'); return; }
+
+    if (!sb()) {
+        showAuthError('Authentication service unavailable. Please check your connection and try again.');
+        return;
+    }
+
     showAuthError('');
     setAuthLoading(true);
     try {
