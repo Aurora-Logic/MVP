@@ -145,6 +145,10 @@ export default [
                 spSendReply: 'readonly',
                 hasUnreadTickets: 'readonly',
 
+                // ── core/tickets-queue.js ──
+                queueTicketLocally: 'readonly',
+                syncTicketQueue: 'readonly',
+
                 // ── core/plans.js ──
                 PLAN_LIMITS: 'readonly',
                 enforceLimit: 'readonly',
@@ -235,15 +239,41 @@ export default [
                 getUserPlan: 'readonly',
                 syncStatus: 'writable',
                 setSyncStatus: 'readonly',
+                isAdmin: 'readonly',
+                getAdminRole: 'readonly',
+                getUserSubscription: 'readonly',
+                canCreateProposal: 'readonly',
+                incrementProposalCount: 'readonly',
+                createRazorpaySubscription: 'readonly',
+                cancelRazorpaySubscription: 'readonly',
+                submitTicket: 'readonly',
+                getUserTickets: 'readonly',
+                addTicketMessage: 'readonly',
+                fetchAllUsers: 'readonly',
+                fetchUserById: 'readonly',
+                updateUserProfile: 'readonly',
+                updateSubscription: 'readonly',
+                grantFreeSubscription: 'readonly',
+                fetchTickets: 'readonly',
+                updateTicket: 'readonly',
+                addAdminReply: 'readonly',
+                bulkAssignTickets: 'readonly',
+                fetchAnalytics: 'readonly',
+                createAnnouncement: 'readonly',
+                getActiveAnnouncements: 'readonly',
+                logAdminAction: 'readonly',
+                queueEmail: 'readonly',
 
                 // ── core/auth.js ──
                 authMode: 'writable',
                 initAuth: 'readonly',
                 showOAuthRetryScreen: 'readonly',
+                showConnectionError: 'readonly',
                 offlineBoot: 'readonly',
                 onSignedIn: 'readonly',
                 pullAndBoot: 'readonly',
                 renderAuthScreen: 'readonly',
+                showLoginModal: 'readonly',
                 getLoginHtml: 'readonly',
                 getSignupHtml: 'readonly',
                 getResetHtml: 'readonly',
@@ -252,6 +282,8 @@ export default [
                 doLogin: 'readonly',
                 doSignup: 'readonly',
                 doGoogleLogin: 'readonly',
+                doGithubLogin: 'readonly',
+                doFigmaLogin: 'readonly',
                 doPasswordReset: 'readonly',
                 skipAuth: 'readonly',
                 doLogout: 'readonly',
@@ -352,6 +384,38 @@ export default [
 
                 // ── views/profile.js ──
                 renderProfile: 'readonly',
+
+                // ── views/pricing.js ──
+                renderPricing: 'readonly',
+                buildPricingCards: 'readonly',
+                updatePricingCards: 'readonly',
+                startCheckout: 'readonly',
+                startFree: 'readonly',
+
+                // ── views/help.js ──
+                initHelpButton: 'readonly',
+                showHelpModal: 'readonly',
+                submitHelpTicket: 'readonly',
+
+                // ── views/my-tickets.js ──
+                renderMyTickets: 'readonly',
+
+                // ── views/admin.js ──
+                renderAdmin: 'readonly',
+                setAdminTab: 'readonly',
+                refreshAdminData: 'readonly',
+                refreshAdminUI: 'readonly',
+
+                // ── views/admin-users.js ──
+                renderAdminUsers: 'readonly',
+                refreshAdminUsersUI: 'readonly',
+
+                // ── views/admin-tickets.js ──
+                renderAdminTickets: 'readonly',
+                refreshAdminTicketsUI: 'readonly',
+
+                // ── views/admin-analytics.js ──
+                renderAdminAnalytics: 'readonly',
 
                 // ── views/analytics.js ──
                 analyticsFilter: 'writable',
@@ -661,6 +725,18 @@ export default [
                 renderSnapshotHtml: 'readonly',
                 computeChanges: 'readonly',
 
+                // ── core/admin-sync.js ──
+                syncAdminData: 'readonly',
+                initAdminRealtime: 'readonly',
+                initAdminSync: 'readonly',
+                getCachedAnalytics: 'readonly',
+                getCachedUsers: 'readonly',
+                getCachedTickets: 'readonly',
+
+                // ── core/sidebar.js ──
+                refreshSide: 'readonly',
+                updateRecentList: 'readonly',
+
                 // ── boot.js ──
                 initApp: 'readonly',
                 bootApp: 'readonly',
@@ -676,6 +752,11 @@ export default [
                 showNpsPrompt: 'readonly',
                 submitNpsScore: 'readonly',
                 closeNpsPrompt: 'readonly',
+                getCacheMetrics: 'readonly',
+                clearAppCache: 'readonly',
+                showUpdateModal: 'readonly',
+                dismissUpdateModal: 'readonly',
+                applyUpdate: 'readonly',
             },
         },
         rules: {
