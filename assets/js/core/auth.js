@@ -263,7 +263,7 @@ function showOAuthRetryScreen() {
     }
 }
 
-function showConnectionError() {
+function _showConnectionError() {
     showAuthSplit();
     const el = authTarget();
     if (!el) return;

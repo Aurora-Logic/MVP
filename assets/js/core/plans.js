@@ -120,7 +120,7 @@ function enforceFreePlanLimits() {
     // Check clients count
     if (typeof CLIENTS !== 'undefined' && Array.isArray(CLIENTS)) {
         if (CLIENTS.length > limits.clients) {
-            const excess = CLIENTS.length - limits.clients;
+            const _excess = CLIENTS.length - limits.clients;
             console.warn('[Plan Enforcement] Free user has', CLIENTS.length, 'clients, limit is', limits.clients);
 
             // Show warning but don't delete clients (too destructive)

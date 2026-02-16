@@ -132,7 +132,7 @@ async function showTicketDetailUser(ticketId) {
     lucide.createIcons();
 }
 
-async function sendTicketReply(ticketId) {
+async function _sendTicketReply(ticketId) {
     const text = document.getElementById('ticketReplyText').value.trim();
     if (!text) {
         toast('Please enter a message', 'warning');

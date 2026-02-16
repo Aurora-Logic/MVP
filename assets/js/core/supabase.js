@@ -129,7 +129,7 @@ function setSyncStatus(status) {
 // ADMIN — Permission Checks
 // ════════════════════════════════════════
 
-async function isAdmin() {
+async function _isAdmin() {
     if (!sb() || !isLoggedIn()) return false;
     const user = await getUser();
     if (!user) return false;
@@ -149,7 +149,7 @@ async function isAdmin() {
     }
 }
 
-async function getAdminRole() {
+async function _getAdminRole() {
     if (!sb() || !isLoggedIn()) return null;
     const user = await getUser();
     if (!user) return null;
@@ -195,7 +195,7 @@ async function getUserSubscription() {
     }
 }
 
-async function canCreateProposal() {
+async function _canCreateProposal() {
     const sub = await getUserSubscription();
 
     if (!sub) {
@@ -216,7 +216,7 @@ async function canCreateProposal() {
     };
 }
 
-async function incrementProposalCount() {
+async function _incrementProposalCount() {
     if (!sb() || !isLoggedIn()) return;
     const user = await getUser();
     if (!user) return;
@@ -228,7 +228,7 @@ async function incrementProposalCount() {
     }
 }
 
-async function createRazorpaySubscription(plan, interval) {
+async function _createRazorpaySubscription(plan, interval) {
     if (!sb()) return null;
     const user = await getUser();
     if (!user) return null;
@@ -290,7 +290,7 @@ async function createRazorpaySubscription(plan, interval) {
     }
 }
 
-async function cancelRazorpaySubscription() {
+async function _cancelRazorpaySubscription() {
     if (!sb()) return null;
     const user = await getUser();
     if (!user) return null;
@@ -323,7 +323,7 @@ async function cancelRazorpaySubscription() {
 // TICKETS — User Functions
 // ════════════════════════════════════════
 
-async function submitTicket(ticketData) {
+async function _submitTicket(ticketData) {
     if (!sb()) {
         // Fallback: queue locally
         return queueTicketLocally(ticketData);
@@ -372,7 +372,7 @@ async function submitTicket(ticketData) {
     }
 }
 
-async function getUserTickets() {
+async function _getUserTickets() {
     if (!sb() || !isLoggedIn()) return [];
     const user = await getUser();
     if (!user) return [];
@@ -392,7 +392,7 @@ async function getUserTickets() {
     }
 }
 
-async function addTicketMessage(ticketId, message) {
+async function _addTicketMessage(ticketId, message) {
     if (!sb()) return false;
 
     try {
@@ -433,7 +433,7 @@ async function addTicketMessage(ticketId, message) {
 // ADMIN — Data Management Functions
 // ════════════════════════════════════════
 
-async function fetchAllUsers(filters = {}) {
+async function _fetchAllUsers(filters = {}) {
     if (!sb()) return { data: null, error: 'Supabase not initialized' };
 
     try {
@@ -464,7 +464,7 @@ async function fetchAllUsers(filters = {}) {
     }
 }
 
-async function fetchUserById(userId) {
+async function _fetchUserById(userId) {
     if (!sb()) return null;
 
     try {
@@ -485,7 +485,7 @@ async function fetchUserById(userId) {
     }
 }
 
-async function updateUserProfile(userId, updates) {
+async function _updateUserProfile(userId, updates) {
     if (!sb()) return { error: 'Supabase not initialized' };
 
     try {
@@ -507,7 +507,7 @@ async function updateUserProfile(userId, updates) {
     }
 }
 
-async function updateSubscription(userId, updates) {
+async function _updateSubscription(userId, updates) {
     if (!sb()) return { error: 'Supabase not initialized' };
 
     try {
@@ -532,7 +532,7 @@ async function updateSubscription(userId, updates) {
     }
 }
 
-async function grantFreeSubscription(userId, plan, durationDays, reason) {
+async function _grantFreeSubscription(userId, plan, durationDays, reason) {
     if (!sb()) return { error: 'Supabase not initialized' };
 
     try {
@@ -554,7 +554,7 @@ async function grantFreeSubscription(userId, plan, durationDays, reason) {
     }
 }
 
-async function fetchTickets(filters = {}) {
+async function _fetchTickets(filters = {}) {
     if (!sb()) return { data: null, error: 'Supabase not initialized' };
 
     try {
@@ -590,7 +590,7 @@ async function fetchTickets(filters = {}) {
     }
 }
 
-async function updateTicket(ticketId, updates) {
+async function _updateTicket(ticketId, updates) {
     if (!sb()) return { error: 'Supabase not initialized' };
 
     try {
@@ -615,7 +615,7 @@ async function updateTicket(ticketId, updates) {
     }
 }
 
-async function addAdminReply(ticketId, message) {
+async function _addAdminReply(ticketId, message) {
     if (!sb()) return { error: 'Supabase not initialized' };
 
     try {
@@ -666,7 +666,7 @@ async function addAdminReply(ticketId, message) {
     }
 }
 
-async function bulkAssignTickets(ticketIds, assignedTo) {
+async function _bulkAssignTickets(ticketIds, assignedTo) {
     if (!sb()) return { error: 'Supabase not initialized' };
 
     try {
@@ -689,7 +689,7 @@ async function bulkAssignTickets(ticketIds, assignedTo) {
     }
 }
 
-async function fetchAnalytics() {
+async function _fetchAnalytics() {
     if (!sb()) return null;
 
     try {
@@ -760,7 +760,7 @@ async function fetchAnalytics() {
     }
 }
 
-async function createAnnouncement(announcement) {
+async function _createAnnouncement(announcement) {
     if (!sb()) return { error: 'Supabase not initialized' };
 
     try {
@@ -787,7 +787,7 @@ async function createAnnouncement(announcement) {
     }
 }
 
-async function getActiveAnnouncements() {
+async function _getActiveAnnouncements() {
     if (!sb()) return [];
 
     try {

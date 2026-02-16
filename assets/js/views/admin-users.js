@@ -193,7 +193,7 @@ function grantSubscriptionModal(userId) {
     lucide.createIcons();
 }
 
-async function submitGrantSubscription(e, userId) {
+async function _submitGrantSubscription(e, userId) {
     e.preventDefault();
 
     const plan = document.getElementById('grantPlan').value;
@@ -214,7 +214,7 @@ async function submitGrantSubscription(e, userId) {
     }
 }
 
-function editUserModal(userId) {
+function _editUserModal(userId) {
     // Placeholder for user profile editing
     toast('User editing coming soon', 'info');
 }

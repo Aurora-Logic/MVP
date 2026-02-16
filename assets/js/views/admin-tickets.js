@@ -169,7 +169,7 @@ async function showAdminTicketDetail(ticketId) {
     lucide.createIcons();
 }
 
-async function updateTicketStatus(ticketId, status) {
+async function _updateTicketStatus(ticketId, status) {
     if (!status) return;
 
     const updates = status === 'resolved' ? { status, resolved_at: new Date().toISOString() } : { status };
@@ -183,7 +183,7 @@ async function updateTicketStatus(ticketId, status) {
     }
 }
 
-async function updateTicketPriority(ticketId, priority) {
+async function _updateTicketPriority(ticketId, priority) {
     if (!priority) return;
 
     const result = await updateTicket(ticketId, { priority });
@@ -195,7 +195,7 @@ async function updateTicketPriority(ticketId, priority) {
     }
 }
 
-async function sendAdminReply(ticketId) {
+async function _sendAdminReply(ticketId) {
     const text = document.getElementById('adminReplyText').value.trim();
     if (!text) {
         toast('Please enter a message', 'warning');
@@ -211,7 +211,7 @@ async function sendAdminReply(ticketId) {
     }
 }
 
-function filterTickets() {
+function _filterTickets() {
     const statusFilter = document.getElementById('ticketStatusFilter')?.value.toLowerCase();
     const priorityFilter = document.getElementById('ticketPriorityFilter')?.value.toLowerCase();
 

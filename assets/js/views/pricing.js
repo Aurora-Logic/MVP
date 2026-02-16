@@ -140,7 +140,7 @@ async function startCheckout(plan, interval) {
     await createRazorpaySubscription(plan, interval);
 }
 
-function startFree() {
+function _startFree() {
     if (!isLoggedIn()) {
         if (typeof showLoginModal === 'function') showLoginModal();
     } else {

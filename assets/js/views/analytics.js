@@ -75,7 +75,7 @@ function buildAreaChart(proposals) {
     </div>`;
 }
 
-function drawAreaChart() {
+function _drawAreaChart() {
     const cv = document.getElementById('anAreaCanvas');
     if (!cv || !_areaChartData) return;
     const data = _areaChartData;
@@ -184,7 +184,7 @@ function drawAreaChart() {
     series.reverse().forEach(s => drawArea(s.vals, s.color, s.alpha));
 }
 
-function buildDonutChart(proposals) {
+function _buildDonutChart(proposals) {
     const draft = proposals.filter(p => p.status === 'draft').length;
     const sent = proposals.filter(p => p.status === 'sent').length;
     const accepted = proposals.filter(p => p.status === 'accepted').length;

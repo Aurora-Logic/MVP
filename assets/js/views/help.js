@@ -97,7 +97,7 @@ function showHelpModal() {
     document.getElementById('helpSubject').focus();
 }
 
-async function submitHelpTicket(e) {
+async function _submitHelpTicket(e) {
     e.preventDefault();
 
     const subject = document.getElementById('helpSubject').value.trim();

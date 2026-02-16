@@ -3,7 +3,7 @@
 // ════════════════════════════════════════
 
 /* exported goNav, toggleMobileSidebar, toggleSidebar, initSidebarState, initKeyboardShortcuts, openFeedbackModal, setFbTab, selectFbType, submitFeedback, openGuide */
-function destroyAllEditors() {
+function _destroyAllEditors() {
     // Destroy section editors
     if (typeof sectionEditors === 'object' && sectionEditors) {
         Object.values(sectionEditors).forEach(e => {

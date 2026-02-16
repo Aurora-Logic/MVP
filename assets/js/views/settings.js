@@ -340,6 +340,6 @@ function applyWhiteLabel() {
     refreshSide();
 }
 
-function appName() {
+function _appName() {
     return CONFIG?.whiteLabel && CONFIG?.company ? CONFIG.company : 'ProposalKit';
 }

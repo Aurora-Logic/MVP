@@ -137,7 +137,7 @@ function buildResumeBar() {
   </div>`;
 }
 
-function buildAlertsSection(active) {
+function _buildAlertsSection(active) {
   const expiryHtml = buildExpiryBanner();
   const duesHtml = typeof buildDuesBanner === 'function'
     ? buildDuesBanner(active) : '';
@@ -145,7 +145,7 @@ function buildAlertsSection(active) {
   return `<div class="dash-alerts">${expiryHtml}${duesHtml}</div>`;
 }
 
-function buildSideMetrics(active) {
+function _buildSideMetrics(active) {
   if (active.length < 2 || typeof computeAnalytics !== 'function') return '';
   const stats = computeAnalytics(active);
   const c = active[0]?.currency || defaultCurrency();
@@ -157,7 +157,7 @@ function buildSideMetrics(active) {
   </div>`;
 }
 
-function buildActivityFeed() {
+function _buildActivityFeed() {
   const recents = activeDB()
     .filter(p => p.updatedAt || p.createdAt)
     .sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))

@@ -199,39 +199,95 @@ function applyUpdate() {
 
 async function initApp() {
     try {
+        console.log('[Boot] initApp started');
+        console.log('[Boot] CONFIG:', CONFIG);
+        console.log('[Boot] initAuth available:', typeof initAuth === 'function');
+        console.log('[Boot] renderOnboarding available:', typeof renderOnboarding === 'function');
+
         if (typeof initAuth === 'function') {
+            console.log('[Boot] Calling initAuth...');
             await initAuth();
         } else {
+            console.log('[Boot] No initAuth, checking CONFIG...');
             // Offline fallback (Supabase CDN not loaded)
             if (CONFIG) {
+                console.log('[Boot] CONFIG exists, starting app...');
                 document.getElementById('onboard')?.classList.add('hide');
                 const shell = document.getElementById('appShell');
-                if (shell) shell.style.display = 'flex';
+                if (shell) {
+                    shell.style.display = 'flex';
+                    console.log('[Boot] App shell shown');
+                }
                 await bootApp();
             } else {
+                console.log('[Boot] No CONFIG, showing onboarding...');
                 if (typeof renderOnboarding === 'function') {
                     renderOnboarding();
                 } else {
-                    console.error('[Boot] renderOnboarding not defined');
+                    console.error('[Boot] renderOnboarding not defined - CRITICAL');
+                    // Show a manual recovery option
+                    showRecoveryScreen('Setup Required', 'Please complete the onboarding process.');
                 }
             }
         }
     } catch (err) {
         console.error('[Boot] initApp failed:', err);
-        // Show error UI
-        const body = document.getElementById('bodyScroll') || document.body;
-        if (body) {
-            body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;padding:32px">
-                <div style="max-width:440px;text-align:center;background:#fff;padding:48px 32px;border-radius:16px;border:1px solid #e4e4e7">
-                    <div style="font-size:48px;margin-bottom:16px">⚠️</div>
-                    <div style="font-size:20px;font-weight:700;margin-bottom:8px">Initialization Error</div>
-                    <div style="font-size:14px;color:#71717a;line-height:1.5;margin-bottom:16px">${err.message || 'Failed to initialize app'}</div>
-                    <button class="btn" onclick="localStorage.clear();sessionStorage.clear();window.location.reload()">Clear Data & Reload</button>
-                    <button class="btn-outline" onclick="window.location.reload()" style="margin-top:8px">Just Reload</button>
-                </div></div>`;
-        }
+        console.error('[Boot] Stack:', err?.stack);
+        showRecoveryScreen('Initialization Error', err.message || 'Failed to initialize app');
     }
 }
+
+function showRecoveryScreen(title, message) {
+    const body = document.getElementById('bodyScroll') || document.getElementById('onboard') || document.body;
+    if (body) {
+        body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:32px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)">
+            <div style="max-width:440px;text-align:center;background:#fff;padding:48px 32px;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+                <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+                <div style="font-size:20px;font-weight:700;margin-bottom:8px;color:#18181b">${title}</div>
+                <div style="font-size:14px;color:#71717a;line-height:1.5;margin-bottom:24px">${message}</div>
+                <button class="btn" onclick="window.hardReset()" style="display:inline-block;padding:12px 24px;background:#18181b;color:#fff;border:none;border-radius:9999px;font-size:14px;font-weight:600;cursor:pointer;margin:4px">Clear All Data & Reset</button>
+                <br>
+                <button class="btn-outline" onclick="window.location.href='/recovery.html'" style="display:inline-block;padding:12px 24px;background:#fff;color:#18181b;border:1px solid #e4e4e7;border-radius:9999px;font-size:14px;font-weight:600;cursor:pointer;margin:4px">Diagnostics</button>
+                <button class="btn-outline" onclick="window.location.reload()" style="display:inline-block;padding:12px 24px;background:#fff;color:#18181b;border:1px solid #e4e4e7;border-radius:9999px;font-size:14px;font-weight:600;cursor:pointer;margin:4px">Just Reload</button>
+            </div></div>`;
+    }
+}
+
+// Global hard reset function
+window.hardReset = function() {
+    console.log('[Recovery] Hard reset initiated');
+    try {
+        localStorage.clear();
+        sessionStorage.clear();
+        console.log('[Recovery] Storage cleared');
+
+        // Clear service worker and cache
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+                console.log('[Recovery] Service workers unregistered');
+            });
+        }
+
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                for (let name of names) {
+                    caches.delete(name);
+                }
+                console.log('[Recovery] Caches cleared');
+            });
+        }
+
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 500);
+    } catch (e) {
+        console.error('[Recovery] Hard reset failed:', e);
+        window.location.reload(true);
+    }
+};
 
 async function bootApp() {
     // CRITICAL: Wait for DOM to be ready before proceeding
@@ -309,7 +365,7 @@ lucide.createIcons = function(opts) {
     patchAriaLabels();
 };
 /** Scope icon creation to a container — avoids full-DOM rescan */
-function lucideScope(el) {
+function _lucideScope(el) {
     if (el) lucide.createIcons({ nodes: [el] });
 }
 
@@ -411,6 +467,31 @@ function closeNpsPrompt() {
     document.getElementById('npsModal')?.remove();
     try { localStorage.setItem('pk_feedback_asked', JSON.stringify(Date.now())); } catch (e) { /* full */ }
 }
+
+// Auto-recovery timeout: if app doesn't load within 10 seconds, show recovery
+let _initTimeout = setTimeout(() => {
+    console.error('[Boot] App initialization timeout - showing recovery');
+    showRecoveryScreen(
+        'App Loading Timeout',
+        'The app is taking too long to load. This usually means corrupted data or a cache issue.'
+    );
+}, 10000);
+
+// Clear timeout if app loads successfully
+window.addEventListener('load', () => {
+    clearTimeout(_initTimeout);
+});
+
+// Emergency recovery: Press Ctrl+Shift+R (or Cmd+Shift+R on Mac)
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        console.log('[Recovery] Emergency reset triggered by keyboard shortcut');
+        if (confirm('⚠️ This will clear all data and reset the app.\n\nContinue?')) {
+            window.hardReset();
+        }
+    }
+});
 
 // Start the app
 initApp();
