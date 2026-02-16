@@ -32,7 +32,7 @@ window.addEventListener('unhandledrejection', function(e) {
 // Get cache performance metrics
 function getCacheMetrics() {
     if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
-        if (CONFIG?.debug) console.log('[Metrics] Service worker not active');
+        if (CONFIG?.debug) console.warn('[Metrics] Service worker not active');
         return Promise.resolve(null);
     }
 
@@ -60,33 +60,33 @@ function getCacheMetrics() {
 
 // Manual cache clear utility
 function clearAppCache() {
-    if (CONFIG?.debug) console.log('[Cache] Clearing all caches and service worker...');
+    if (CONFIG?.debug) console.warn('[Cache] Clearing all caches and service worker...');
     if ('caches' in window) {
         caches.keys().then(function(names) {
             return Promise.all(
                 names.map(function(name) {
-                    if (CONFIG?.debug) console.log('[Cache] Deleting cache:', name);
+                    if (CONFIG?.debug) console.warn('[Cache] Deleting cache:', name);
                     return caches.delete(name);
                 })
             );
         }).then(function() {
-            if (CONFIG?.debug) console.log('[Cache] All caches cleared');
+            if (CONFIG?.debug) console.warn('[Cache] All caches cleared');
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistration().then(function(reg) {
                     if (reg) {
                         reg.unregister().then(function() {
-                            if (CONFIG?.debug) console.log('[Cache] Service worker unregistered');
-                            if (CONFIG?.debug) console.log('[Cache] Reloading page...');
+                            if (CONFIG?.debug) console.warn('[Cache] Service worker unregistered');
+                            if (CONFIG?.debug) console.warn('[Cache] Reloading page...');
                             window.location.reload(true);
                         });
                     } else {
-                        if (CONFIG?.debug) console.log('[Cache] No service worker found');
-                        if (CONFIG?.debug) console.log('[Cache] Reloading page...');
+                        if (CONFIG?.debug) console.warn('[Cache] No service worker found');
+                        if (CONFIG?.debug) console.warn('[Cache] Reloading page...');
                         window.location.reload(true);
                     }
                 });
             } else {
-                if (CONFIG?.debug) console.log('[Cache] Reloading page...');
+                if (CONFIG?.debug) console.warn('[Cache] Reloading page...');
                 window.location.reload(true);
             }
         }).catch(function(err) {
@@ -94,7 +94,7 @@ function clearAppCache() {
             if (typeof toast === 'function') toast('Error clearing cache. Try refreshing manually.', 'error');
         });
     } else {
-        if (CONFIG?.debug) console.log('[Cache] Cache API not supported');
+        if (CONFIG?.debug) console.warn('[Cache] Cache API not supported');
         window.location.reload(true);
     }
 }
@@ -109,7 +109,7 @@ function showUpdateModal() {
 
     // If user already saw this version update, don't show again
     if (lastSeenVersion === currentVersion) {
-        if (CONFIG?.debug) console.log('[Update] Already shown modal for version:', currentVersion);
+        if (CONFIG?.debug) console.warn('[Update] Already shown modal for version:', currentVersion);
         return;
     }
 
@@ -241,7 +241,7 @@ async function bootApp() {
         });
     }
 
-    if (CONFIG?.debug) console.log('[Boot] Starting app initialization...');
+    if (CONFIG?.debug) console.warn('[Boot] Starting app initialization...');
     try {
         // SECURITY FIX: Enforce plan limits and monitor storage
         if (typeof enforceFreePlanLimits === 'function') enforceFreePlanLimits();
@@ -260,7 +260,7 @@ async function bootApp() {
                     hasOffline: hasOffline
                 });
                 if (!hasOffline) {
-                    if (CONFIG?.debug) console.log('[Boot] Free plan: SW will be unregistered for offline gating');
+                    if (CONFIG?.debug) console.warn('[Boot] Free plan: SW will be unregistered for offline gating');
                 }
             }
         }
@@ -268,7 +268,7 @@ async function bootApp() {
         initSidebarState();
         if (typeof initTeam === 'function') initTeam();
         refreshSide();
-        if (CONFIG?.debug) console.log('[Boot] Handling initial route:', window.location.pathname);
+        if (CONFIG?.debug) console.warn('[Boot] Handling initial route:', window.location.pathname);
         handleRoute();
         initKeyboardShortcuts();
         if (typeof checkAnnouncements === 'function') checkAnnouncements();
@@ -278,7 +278,7 @@ async function bootApp() {
         patchAriaLabels();
         checkWhatsNew();
         checkNpsPrompt();
-        if (CONFIG?.debug) console.log('[Boot] App initialized successfully');
+        if (CONFIG?.debug) console.warn('[Boot] App initialized successfully');
     } catch (err) {
         if (CONFIG?.debug) console.error('[Boot] Initialization failed:', err);
         // Show error UI instead of blank screen

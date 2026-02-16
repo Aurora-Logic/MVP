@@ -298,7 +298,7 @@ function delClient(i) {
         });
         if (propCount > 0) {
             persist(); // Save proposals with cleaned references
-            console.log('[Data Integrity] Cleaned', propCount, 'orphaned proposal references');
+            console.warn('[Data Integrity] Cleaned', propCount, 'orphaned proposal references');
         }
         CLIENTS.splice(i, 1);
         saveClients();

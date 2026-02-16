@@ -5,7 +5,7 @@
 /* exported buildCreatePreview */
 
 function buildCreatePreview(state) {
-    console.log('[CREATE PREVIEW] Building preview...', state);
+    console.warn('[CREATE PREVIEW] Building preview...', state);
     try {
     const doc = document.getElementById('createPreviewDoc');
     if (!doc) return;

@@ -9,7 +9,7 @@ let currentAdminTab = 'dashboard';
 async function renderAdmin() {
     try {
         // Permission check
-        console.log('[Admin] Checking admin permissions...');
+        console.warn('[Admin] Checking admin permissions...');
         const isAdminUser = await isAdmin();
         if (!isAdminUser) {
             console.warn('[Admin] Access denied - not an admin user');
@@ -18,7 +18,7 @@ async function renderAdmin() {
             return;
         }
 
-        console.log('[Admin] Admin access granted');
+        console.warn('[Admin] Admin access granted');
         CUR = null;
         if (typeof hideTOC === 'function') hideTOC();
 
@@ -72,7 +72,7 @@ async function renderAdmin() {
         lucide.createIcons();
 
         // Initialize admin sync
-        console.log('[Admin] Initializing admin sync...');
+        console.warn('[Admin] Initializing admin sync...');
         const initialized = await initAdminSync();
 
         if (!initialized) {
@@ -91,7 +91,7 @@ async function renderAdmin() {
             return;
         }
 
-        console.log('[Admin] Admin sync initialized successfully');
+        console.warn('[Admin] Admin sync initialized successfully');
         // Set initial tab
         setAdminTab(tab);
     } catch (error) {

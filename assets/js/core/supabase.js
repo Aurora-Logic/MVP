@@ -184,7 +184,7 @@ async function getUserSubscription() {
             .single();
 
         if (error) {
-            if (CONFIG?.debug) console.log('[Subscription] No active subscription');
+            if (CONFIG?.debug) console.warn('[Subscription] No active subscription');
             return null;
         }
 
@@ -255,7 +255,7 @@ async function createRazorpaySubscription(plan, interval) {
                 description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} plan - ${interval}`,
                 customer_id: data.customer_id,
                 handler: function (response) {
-                    if (CONFIG?.debug) console.log('[Razorpay] Payment successful:', response);
+                    if (CONFIG?.debug) console.warn('[Razorpay] Payment successful:', response);
                     toast('Subscription activated!', 'success');
                     setTimeout(() => window.location.reload(), 1500);
                     resolve(response);

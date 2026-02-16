@@ -37,14 +37,14 @@ function queueTicketLocally(ticket) {
 
 async function syncTicketQueue() {
     if (!navigator.onLine || !sb()) {
-        if (CONFIG?.debug) console.log('[Tickets] Cannot sync — offline or no Supabase');
+        if (CONFIG?.debug) console.warn('[Tickets] Cannot sync — offline or no Supabase');
         return;
     }
 
     const queue = getTicketQueue();
     if (!queue.length) return;
 
-    console.log('[Tickets] Syncing queue:', queue.length, 'items');
+    console.warn('[Tickets] Syncing queue:', queue.length, 'items');
 
     const synced = [];
     const failed = [];
@@ -72,14 +72,14 @@ async function syncTicketQueue() {
     saveTicketQueue(failed);
 
     if (synced.length > 0) {
-        if (CONFIG?.debug) console.log('[Tickets] Synced:', synced.length);
+        if (CONFIG?.debug) console.warn('[Tickets] Synced:', synced.length);
         toast(`${synced.length} ticket(s) synced`, 'success');
     }
 }
 
 // Auto-sync on online event
 window.addEventListener('online', () => {
-    console.log('[Tickets] Back online — syncing queue');
+    console.warn('[Tickets] Back online — syncing queue');
     setTimeout(() => syncTicketQueue(), 2000);
 });
 

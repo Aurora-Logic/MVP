@@ -172,7 +172,7 @@ async function handleRoute() {
             if (typeof renderProfile === 'function') renderProfile();
             else if (typeof openSettings === 'function') openSettings();
         } else if (view === 'create') {
-            if (CONFIG?.debug) console.log('[ROUTER] Navigating to create page, renderCreatePage available:', typeof renderCreatePage);
+            if (CONFIG?.debug) console.warn('[ROUTER] Navigating to create page, renderCreatePage available:', typeof renderCreatePage);
             if (typeof renderCreatePage === 'function') renderCreatePage();
             else if (CONFIG?.debug) console.error('[ROUTER] renderCreatePage function not found!');
         } else if (view === 'settings') {

@@ -175,7 +175,7 @@ function persist() {
         // ROLLBACK: Restore from backup if write failed
         const backup = localStorage.getItem(backupKey);
         if (backup) {
-            try { localStorage.setItem(key, backup); console.log('[Transaction] Rolled back to backup'); }
+            try { localStorage.setItem(key, backup); console.warn('[Transaction] Rolled back to backup'); }
             catch (rollbackErr) { console.error('[Transaction] Rollback failed:', rollbackErr); }
         }
 
@@ -222,7 +222,7 @@ function checkStorageQuota() {
 
         // Log usage for debugging
         if (usagePercent >= 50) {
-            console.log('[Storage] Usage:', Math.round(usagePercent) + '%', '(' + totalMB.toFixed(2) + 'MB)');
+            console.warn('[Storage] Usage:', Math.round(usagePercent) + '%', '(' + totalMB.toFixed(2) + 'MB)');
         }
     } catch (e) {
         console.warn('[Storage] Quota check failed:', e);

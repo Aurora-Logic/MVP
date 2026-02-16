@@ -19,7 +19,7 @@ function initErrorTracking() {
 
     if (!hasSentry && !hasWebhook) {
         // No tracking configured - just log locally
-        console.log('[ErrorTracking] Not configured - errors will log to console only');
+        console.warn('[ErrorTracking] Not configured - errors will log to console only');
         return;
     }
 
@@ -68,7 +68,7 @@ function initErrorTracking() {
         if (hasWebhook) sendToWebhook(errorData);
     });
 
-    console.log('[ErrorTracking] Initialized ✓', { hasSentry, hasWebhook });
+    console.warn('[ErrorTracking] Initialized ✓', { hasSentry, hasWebhook });
 }
 
 /**

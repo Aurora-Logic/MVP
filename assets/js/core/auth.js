@@ -456,7 +456,7 @@ function setAuthLoading(loading) {
 }
 
 async function doLogin() {
-    if (CONFIG?.debug) console.log('[Auth] doLogin() called');
+    if (CONFIG?.debug) console.warn('[Auth] doLogin() called');
     const identifier = document.getElementById('authEmailOrPhone')?.value?.trim();
     const pass = document.getElementById('authPass')?.value;
 
@@ -506,7 +506,7 @@ async function doLogin() {
         }
 
         sbSession = data.session;
-        if (CONFIG?.debug) console.log('[Auth] Login successful');
+        if (CONFIG?.debug) console.warn('[Auth] Login successful');
         // onAuthStateChange will handle the rest
     } catch (e) {
         if (CONFIG?.debug) console.error('[Auth] Login exception:', e);
@@ -674,7 +674,7 @@ async function doLogout() {
         localStorage.removeItem(key);
         sessionStorage.removeItem(key);
     });
-    if (CONFIG?.debug) console.log('[Security] All sensitive data cleared on logout');
+    if (CONFIG?.debug) console.warn('[Security] All sensitive data cleared on logout');
 
     // MULTI-TAB SYNC FIX: Notify other tabs of logout
     localStorage.setItem('pk_logout_signal', Date.now().toString());
@@ -686,7 +686,7 @@ async function doLogout() {
 // MULTI-TAB SYNC FIX: Listen for logout in other tabs
 window.addEventListener('storage', (e) => {
     if (e.key === 'pk_logout_signal' && e.newValue) {
-        if (CONFIG?.debug) console.log('[Security] Logout detected in another tab');
+        if (CONFIG?.debug) console.warn('[Security] Logout detected in another tab');
         // Force reload to clear all state and show auth screen
         window.location.href = window.location.origin;
     }
