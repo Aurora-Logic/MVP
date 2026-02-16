@@ -66,7 +66,8 @@ try {
 } catch (e) {
     DB = [];
     console.error('pk_db corrupted, reset to empty:', e);
-    if (typeof toast === 'function') toast('⚠️ Proposal data corrupted - starting fresh', 'error');
+    // Defer toast until DOM ready (toast not available during module load)
+    setTimeout(() => { if (typeof toast === 'function') toast('⚠️ Proposal data corrupted - starting fresh', 'error'); }, 100);
 }
 try {
     CONFIG = JSON.parse(localStorage.getItem('pk_config') || 'null');
@@ -79,7 +80,8 @@ try {
 } catch (e) {
     CONFIG = null;
     console.error('pk_config corrupted, reset:', e);
-    if (typeof toast === 'function') toast('⚠️ Settings corrupted - please reconfigure', 'error');
+    // Defer toast until DOM ready (toast not available during module load)
+    setTimeout(() => { if (typeof toast === 'function') toast('⚠️ Settings corrupted - please reconfigure', 'error'); }, 100);
 }
 try {
     CLIENTS = JSON.parse(localStorage.getItem('pk_clients') || '[]');
@@ -88,7 +90,8 @@ try {
 } catch (e) {
     CLIENTS = [];
     console.error('pk_clients corrupted, reset:', e);
-    if (typeof toast === 'function') toast('⚠️ Client data corrupted - starting fresh', 'error');
+    // Defer toast until DOM ready (toast not available during module load)
+    setTimeout(() => { if (typeof toast === 'function') toast('⚠️ Client data corrupted - starting fresh', 'error'); }, 100);
 }
 
 // Schema versioning — run migrations sequentially on startup
