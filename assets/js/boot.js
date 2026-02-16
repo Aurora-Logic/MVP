@@ -189,16 +189,37 @@ function applyUpdate() {
 }
 
 async function initApp() {
-    if (typeof initAuth === 'function') {
-        await initAuth();
-    } else {
-        // Offline fallback (Supabase CDN not loaded)
-        if (CONFIG) {
-            document.getElementById('onboard').classList.add('hide');
-            document.getElementById('appShell').style.display = 'flex';
-            await bootApp();
+    try {
+        if (typeof initAuth === 'function') {
+            await initAuth();
         } else {
-            renderOnboarding();
+            // Offline fallback (Supabase CDN not loaded)
+            if (CONFIG) {
+                document.getElementById('onboard')?.classList.add('hide');
+                const shell = document.getElementById('appShell');
+                if (shell) shell.style.display = 'flex';
+                await bootApp();
+            } else {
+                if (typeof renderOnboarding === 'function') {
+                    renderOnboarding();
+                } else {
+                    console.error('[Boot] renderOnboarding not defined');
+                }
+            }
+        }
+    } catch (err) {
+        console.error('[Boot] initApp failed:', err);
+        // Show error UI
+        const body = document.getElementById('bodyScroll') || document.body;
+        if (body) {
+            body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;padding:32px">
+                <div style="max-width:440px;text-align:center;background:#fff;padding:48px 32px;border-radius:16px;border:1px solid #e4e4e7">
+                    <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+                    <div style="font-size:20px;font-weight:700;margin-bottom:8px">Initialization Error</div>
+                    <div style="font-size:14px;color:#71717a;line-height:1.5;margin-bottom:16px">${err.message || 'Failed to initialize app'}</div>
+                    <button class="btn" onclick="localStorage.clear();sessionStorage.clear();window.location.reload()">Clear Data & Reload</button>
+                    <button class="btn-outline" onclick="window.location.reload()" style="margin-top:8px">Just Reload</button>
+                </div></div>`;
         }
     }
 }
