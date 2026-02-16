@@ -37,7 +37,7 @@ function queueTicketLocally(ticket) {
 
 async function syncTicketQueue() {
     if (!navigator.onLine || !sb()) {
-        console.log('[Tickets] Cannot sync — offline or no Supabase');
+        if (CONFIG?.debug) console.log('[Tickets] Cannot sync — offline or no Supabase');
         return;
     }
 
@@ -57,7 +57,7 @@ async function syncTicketQueue() {
             } else {
                 ticket._attempts = (ticket._attempts || 0) + 1;
                 if (ticket._attempts >= MAX_RETRY_ATTEMPTS) {
-                    console.error('[Tickets] Max retries exceeded:', ticket.id);
+                    if (CONFIG?.debug) console.error('[Tickets] Max retries exceeded:', ticket.id);
                 }
                 failed.push(ticket);
             }
@@ -72,7 +72,7 @@ async function syncTicketQueue() {
     saveTicketQueue(failed);
 
     if (synced.length > 0) {
-        console.log('[Tickets] Synced:', synced.length);
+        if (CONFIG?.debug) console.log('[Tickets] Synced:', synced.length);
         toast(`${synced.length} ticket(s) synced`, 'success');
     }
 }

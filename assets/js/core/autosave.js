@@ -136,7 +136,7 @@ function dirty() {
                     try {
                         content = sectionEditors[editorKey].getHTML();
                     } catch (err) {
-                        console.warn('Error saving section ' + i, err);
+                        if (CONFIG?.debug) console.warn('Error saving section ' + i, err);
                     }
                 }
 

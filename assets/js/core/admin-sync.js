@@ -17,11 +17,11 @@ let adminCache = {
 async function initAdminSync() {
     const isAdminUser = await isAdmin();
     if (!isAdminUser) {
-        console.warn('[Admin] Not an admin user');
+        if (CONFIG?.debug) console.warn('[Admin] Not an admin user');
         return false;
     }
 
-    console.log('[Admin] Initializing sync');
+    if (CONFIG?.debug) console.log('[Admin] Initializing sync');
     await refreshAdminData();
     subscribeAdminRealtime();
     return true;
@@ -32,11 +32,11 @@ async function refreshAdminData(force = false) {
 
     // Use cache if fresh (unless forced)
     if (!force && (now - adminCacheTimestamp) < ADMIN_CACHE_TTL) {
-        console.log('[Admin] Using cached data');
+        if (CONFIG?.debug) console.log('[Admin] Using cached data');
         return adminCache;
     }
 
-    console.log('[Admin] Fetching fresh data');
+    if (CONFIG?.debug) console.log('[Admin] Fetching fresh data');
 
     try {
         // Fetch in parallel
@@ -66,7 +66,7 @@ async function refreshAdminData(force = false) {
 
         return adminCache;
     } catch (e) {
-        console.error('[Admin] Data refresh failed:', e);
+        if (CONFIG?.debug) console.error('[Admin] Data refresh failed:', e);
         toast('Failed to load admin data', 'error');
         return adminCache; // Return stale cache
     }
@@ -74,7 +74,7 @@ async function refreshAdminData(force = false) {
 
 function subscribeAdminRealtime() {
     if (!sb()) {
-        console.warn('[Admin] Supabase not available for realtime');
+        if (CONFIG?.debug) console.warn('[Admin] Supabase not available for realtime');
         return;
     }
 
@@ -83,7 +83,7 @@ function subscribeAdminRealtime() {
         sb().removeChannel(adminRealtimeChannel);
     }
 
-    console.log('[Admin] Subscribing to realtime updates');
+    if (CONFIG?.debug) console.log('[Admin] Subscribing to realtime updates');
 
     adminRealtimeChannel = sb()
         .channel('admin-realtime')
@@ -92,7 +92,7 @@ function subscribeAdminRealtime() {
             'postgres_changes',
             { event: 'INSERT', schema: 'public', table: 'tickets' },
             (payload) => {
-                console.log('[Admin] New ticket:', payload.new.id);
+                if (CONFIG?.debug) console.log('[Admin] New ticket:', payload.new.id);
                 adminCache.tickets.unshift(payload.new);
 
                 // Update UI if admin panel is open
@@ -108,7 +108,7 @@ function subscribeAdminRealtime() {
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'tickets' },
             (payload) => {
-                console.log('[Admin] Ticket updated:', payload.new.id);
+                if (CONFIG?.debug) console.log('[Admin] Ticket updated:', payload.new.id);
                 const idx = adminCache.tickets.findIndex(t => t.id === payload.new.id);
                 if (idx >= 0) {
                     adminCache.tickets[idx] = payload.new;
@@ -124,7 +124,7 @@ function subscribeAdminRealtime() {
             'postgres_changes',
             { event: 'INSERT', schema: 'public', table: 'subscriptions' },
             (payload) => {
-                console.log('[Admin] New subscription:', payload.new.user_id);
+                if (CONFIG?.debug) console.log('[Admin] New subscription:', payload.new.user_id);
                 toast('New user subscription', 'info');
                 refreshAdminData(true); // Force refresh users
             }
@@ -134,7 +134,7 @@ function subscribeAdminRealtime() {
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'subscriptions' },
             (payload) => {
-                console.log('[Admin] Subscription updated:', payload.new.user_id);
+                if (CONFIG?.debug) console.log('[Admin] Subscription updated:', payload.new.user_id);
                 refreshAdminData(true);
             }
         )
@@ -150,7 +150,7 @@ function subscribeAdminRealtime() {
 
 function unsubscribeAdminRealtime() {
     if (adminRealtimeChannel) {
-        console.log('[Admin] Unsubscribing from realtime');
+        if (CONFIG?.debug) console.log('[Admin] Unsubscribing from realtime');
         sb().removeChannel(adminRealtimeChannel);
         adminRealtimeChannel = null;
     }
