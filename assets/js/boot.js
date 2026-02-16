@@ -8,12 +8,21 @@
 window.onerror = function(msg, src, line, col, err) {
     const info = `${msg} at ${src}:${line}:${col}`;
     console.error('[ProposalKit Error]', info, err);
-    if (typeof toast === 'function') toast('Something went wrong. Please refresh.', 'error');
+    console.error('Stack:', err?.stack);
+    // Show detailed error in development
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const errorMsg = isDev ? `Error: ${msg} at line ${line}` : 'Something went wrong. Please refresh.';
+    setTimeout(() => {
+        if (typeof toast === 'function') toast(errorMsg, 'error');
+    }, 100);
     return false;
 };
 window.addEventListener('unhandledrejection', function(e) {
     console.error('[ProposalKit Unhandled Promise]', e.reason);
-    if (typeof toast === 'function') toast('Something went wrong. Please refresh.', 'error');
+    console.error('Promise stack:', e.reason?.stack);
+    setTimeout(() => {
+        if (typeof toast === 'function') toast('Something went wrong. Please refresh.', 'error');
+    }, 100);
 });
 
 // ════════════════════════════════════════
