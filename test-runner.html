@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProposalKit - Interactive Test Runner</title>
+    <script src="assets/js/vendor/supabase-2.49.1.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #18181b; margin-bottom: 10px; }
+        .subtitle { color: #71717a; margin-bottom: 30px; }
+
+        .test-category {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-category h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #18181b;
+        }
+
+        .test-item {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #e4e4e7;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .test-item.pending { background: #f4f4f5; }
+        .test-item.running { background: #dbeafe; border-color: #3b82f6; }
+        .test-item.pass { background: #dcfce7; border-color: #22c55e; }
+        .test-item.fail { background: #fee2e2; border-color: #ef4444; }
+
+        .test-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .test-status.pending { background: #d4d4d8; color: #71717a; }
+        .test-status.running { background: #3b82f6; color: white; }
+        .test-status.pass { background: #22c55e; color: white; }
+        .test-status.fail { background: #ef4444; color: white; }
+
+        .test-name { flex: 1; font-size: 14px; color: #18181b; }
+        .test-error {
+            margin-top: 8px;
+            padding: 8px;
+            background: #fef2f2;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #991b1b;
+            font-family: 'Courier New', monospace;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #18181b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #3f3f46; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .summary-value.total { color: #18181b; }
+        .summary-value.pass { color: #22c55e; }
+        .summary-value.fail { color: #ef4444; }
+        .summary-value.pending { color: #71717a; }
+        .summary-label {
+            font-size: 12px;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .manual-test {
+            background: #fef9c3;
+            border: 1px solid #fbbf24;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .manual-test strong { color: #92400e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 ProposalKit Test Runner</h1>
+        <div class="subtitle">Automated testing suite for authentication and core functionality</div>
+
+        <div class="summary" id="summary">
+            <div class="summary-item">
+                <div class="summary-value total" id="totalTests">0</div>
+                <div class="summary-label">Total Tests</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value pass" id="passedTests">0</div>
+                <div class="summary-label">Passed</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value fail" id="failedTests">0</div>
+                <div class="summary-label">Failed</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value pending" id="pendingTests">0</div>
+                <div class="summary-label">Pending</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="runAllTests()" id="runBtn">▶ Run All Tests</button>
+            <button onclick="runAutomatedOnly()">▶ Run Automated Only</button>
+            <button onclick="resetTests()">↻ Reset</button>
+            <button onclick="exportResults()">⬇ Export Results</button>
+        </div>
+
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://fhttdaouzyfvfegvrpil.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZodHRkYW91enlmdmZlZ3ZycGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3MzQ1NzIsImV4cCI6MjA4NjMxMDU3Mn0.wUrvbM2Jaeuta90XJZCSgyeL7DqE3T3upwWe9wRaZLA';
+        let supabaseClient = null;
+
+        const testSuite = {
+            'System Checks': [
+                { name: 'Supabase SDK loaded', test: () => typeof window.supabase === 'object', automated: true },
+                { name: 'Supabase client can initialize', test: async () => {
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    return supabaseClient !== null;
+                }, automated: true },
+                { name: 'Can connect to Supabase', test: async () => {
+                    const { data, error } = await supabaseClient.auth.getSession();
+                    return !error;
+                }, automated: true },
+                { name: 'Internet connection active', test: () => navigator.onLine, automated: true }
+            ],
+
+            'Core Functions': [
+                { name: 'doLogin function exists', test: () => typeof window.doLogin === 'function', automated: true },
+                { name: 'doSignup function exists', test: () => typeof window.doSignup === 'function', automated: true },
+                { name: 'doGoogleLogin function exists', test: () => typeof window.doGoogleLogin === 'function', automated: true },
+                { name: 'doGithubLogin function exists', test: () => typeof window.doGithubLogin === 'function', automated: true },
+                { name: 'doFigmaLogin function exists', test: () => typeof window.doFigmaLogin === 'function', automated: true },
+                { name: 'handleRoute function exists', test: () => typeof window.handleRoute === 'function', automated: true },
+                { name: 'refreshSide function exists', test: () => typeof window.refreshSide === 'function', automated: true },
+                { name: 'isAdmin function exists', test: () => typeof window.isAdmin === 'function', automated: true }
+            ],
+
+            'Database Schema': [
+                { name: 'profiles table exists', test: async () => {
+                    const { data, error } = await supabaseClient.from('profiles').select('*').limit(0);
+                    return !error;
+                }, automated: true },
+                { name: 'profiles has role column', test: async () => {
+                    const { data, error } = await supabaseClient.from('profiles').select('role').limit(0);
+                    return !error;
+                }, automated: true },
+                { name: 'profiles has plan column', test: async () => {
+                    const { data, error } = await supabaseClient.from('profiles').select('plan').limit(0);
+                    return !error;
+                }, automated: true }
+            ],
+
+            'DOM Elements': [
+                { name: 'authContent element exists', test: () => document.getElementById('authContent') !== null, automated: false },
+                { name: 'bodyScroll element exists', test: () => document.getElementById('bodyScroll') !== null, automated: false },
+                { name: 'Login form renders', test: () => {
+                    const email = document.getElementById('authEmailOrPhone');
+                    const pass = document.getElementById('authPass');
+                    return email !== null && pass !== null;
+                }, automated: false },
+                { name: 'OAuth buttons render', test: () => {
+                    const btns = document.querySelectorAll('.auth-google-btn, .auth-github-btn, .auth-figma-btn');
+                    return btns.length === 3;
+                }, automated: false }
+            ],
+
+            'Manual Tests': [
+                { name: 'Email signup works', manual: 'Try signing up with a new email address', automated: false },
+                { name: 'Email login works', manual: 'Try logging in with email + password', automated: false },
+                { name: 'Google OAuth works', manual: 'Click Google button and complete OAuth flow', automated: false },
+                { name: 'GitHub OAuth works', manual: 'Click GitHub button and complete OAuth flow', automated: false },
+                { name: 'Figma OAuth works', manual: 'Click Figma button and complete OAuth flow', automated: false },
+                { name: 'Admin panel accessible', manual: 'Login as admin user and check for "Admin Panel" button', automated: false },
+                { name: 'Logout works', manual: 'Click logout and verify redirect to login page', automated: false },
+                { name: 'Session persists on refresh', manual: 'Login, then refresh page - should stay logged in', automated: false }
+            ]
+        };
+
+        let testResults = {};
+
+        function initTests() {
+            const container = document.getElementById('testResults');
+            container.innerHTML = '';
+
+            let totalCount = 0;
+
+            Object.keys(testSuite).forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'test-category';
+                categoryDiv.innerHTML = `<h2>${category}</h2>`;
+
+                testSuite[category].forEach((test, idx) => {
+                    const testId = `${category}-${idx}`;
+                    totalCount++;
+
+                    testResults[testId] = {
+                        status: 'pending',
+                        error: null,
+                        ...test
+                    };
+
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'test-item pending';
+                    testDiv.id = testId;
+
+                    if (test.manual) {
+                        testDiv.innerHTML = `
+                            <div class="test-status pending">⊙</div>
+                            <div class="test-name">${test.name}</div>
+                        `;
+                        const manualDiv = document.createElement('div');
+                        manualDiv.className = 'manual-test';
+                        manualDiv.innerHTML = `<strong>Manual Test:</strong> ${test.manual}`;
+                        testDiv.appendChild(manualDiv);
+                    } else {
+                        testDiv.innerHTML = `
+                            <div class="test-status pending">⊙</div>
+                            <div class="test-name">${test.name}</div>
+                        `;
+                    }
+
+                    categoryDiv.appendChild(testDiv);
+                });
+
+                container.appendChild(categoryDiv);
+            });
+
+            document.getElementById('totalTests').textContent = totalCount;
+            document.getElementById('pendingTests').textContent = totalCount;
+            document.getElementById('passedTests').textContent = '0';
+            document.getElementById('failedTests').textContent = '0';
+        }
+
+        async function runTest(testId) {
+            const test = testResults[testId];
+            if (test.manual) return; // Skip manual tests
+
+            const testDiv = document.getElementById(testId);
+            testDiv.className = 'test-item running';
+            testDiv.querySelector('.test-status').className = 'test-status running';
+            testDiv.querySelector('.test-status').textContent = '⟳';
+
+            test.status = 'running';
+            updateSummary();
+
+            try {
+                const result = test.test ? await test.test() : false;
+
+                if (result) {
+                    test.status = 'pass';
+                    testDiv.className = 'test-item pass';
+                    testDiv.querySelector('.test-status').className = 'test-status pass';
+                    testDiv.querySelector('.test-status').textContent = '✓';
+                } else {
+                    test.status = 'fail';
+                    test.error = 'Test returned false';
+                    testDiv.className = 'test-item fail';
+                    testDiv.querySelector('.test-status').className = 'test-status fail';
+                    testDiv.querySelector('.test-status').textContent = '✗';
+
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'test-error';
+                    errorDiv.textContent = test.error;
+                    testDiv.appendChild(errorDiv);
+                }
+            } catch (error) {
+                test.status = 'fail';
+                test.error = error.message;
+                testDiv.className = 'test-item fail';
+                testDiv.querySelector('.test-status').className = 'test-status fail';
+                testDiv.querySelector('.test-status').textContent = '✗';
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'test-error';
+                errorDiv.textContent = error.message;
+                testDiv.appendChild(errorDiv);
+            }
+
+            updateSummary();
+        }
+
+        async function runAllTests() {
+            document.getElementById('runBtn').disabled = true;
+
+            for (const testId of Object.keys(testResults)) {
+                await runTest(testId);
+                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between tests
+            }
+
+            document.getElementById('runBtn').disabled = false;
+
+            // Show completion alert
+            const passed = Object.values(testResults).filter(t => t.status === 'pass').length;
+            const failed = Object.values(testResults).filter(t => t.status === 'fail').length;
+            alert(`Tests complete!\n✅ Passed: ${passed}\n❌ Failed: ${failed}`);
+        }
+
+        async function runAutomatedOnly() {
+            document.getElementById('runBtn').disabled = true;
+
+            for (const testId of Object.keys(testResults)) {
+                if (testResults[testId].automated) {
+                    await runTest(testId);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+
+            document.getElementById('runBtn').disabled = false;
+        }
+
+        function updateSummary() {
+            const total = Object.keys(testResults).length;
+            const passed = Object.values(testResults).filter(t => t.status === 'pass').length;
+            const failed = Object.values(testResults).filter(t => t.status === 'fail').length;
+            const pending = Object.values(testResults).filter(t => t.status === 'pending').length;
+
+            document.getElementById('totalTests').textContent = total;
+            document.getElementById('passedTests').textContent = passed;
+            document.getElementById('failedTests').textContent = failed;
+            document.getElementById('pendingTests').textContent = pending;
+        }
+
+        function resetTests() {
+            initTests();
+        }
+
+        function exportResults() {
+            const results = {
+                timestamp: new Date().toISOString(),
+                summary: {
+                    total: Object.keys(testResults).length,
+                    passed: Object.values(testResults).filter(t => t.status === 'pass').length,
+                    failed: Object.values(testResults).filter(t => t.status === 'fail').length,
+                    pending: Object.values(testResults).filter(t => t.status === 'pending').length
+                },
+                tests: Object.keys(testResults).map(id => ({
+                    name: testResults[id].name,
+                    status: testResults[id].status,
+                    error: testResults[id].error
+                }))
+            };
+
+            const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `test-results-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initTests);
+    </script>
+</body>
+</html>

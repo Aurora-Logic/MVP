@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProposalKit - Login Test</title>
+    <script src="assets/js/vendor/supabase-2.49.1.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 { color: #18181b; margin-bottom: 10px; font-size: 24px; }
+        h2 { color: #52525b; margin: 30px 0 15px; font-size: 18px; border-bottom: 2px solid #e4e4e7; padding-bottom: 8px; }
+        .status { padding: 12px; border-radius: 8px; margin: 10px 0; font-size: 14px; }
+        .status.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .status.error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .status.info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .status.warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        button {
+            background: #18181b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 5px 5px 0;
+        }
+        button:hover { background: #3f3f46; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d4d4d8;
+            border-radius: 6px;
+            font-size: 14px;
+            margin: 8px 0;
+        }
+        .form-group { margin: 15px 0; }
+        label { display: block; font-weight: 500; margin-bottom: 5px; color: #3f3f46; }
+        code {
+            background: #f4f4f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        pre {
+            background: #f4f4f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 ProposalKit Login Debugger</h1>
+        <p style="color: #71717a; margin-bottom: 20px;">Test your Supabase connection and create admin account</p>
+
+        <!-- Status Checks -->
+        <h2>1. System Status</h2>
+        <div id="systemStatus">Checking...</div>
+        <button onclick="runSystemChecks()">Re-check System</button>
+
+        <!-- Connection Test -->
+        <h2>2. Test Supabase Connection</h2>
+        <div id="connectionStatus"></div>
+        <button onclick="testConnection()">Test Connection</button>
+
+        <!-- Create Account -->
+        <h2>3. Create Admin Account</h2>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="signupEmail" value="virag@deltasystem.in" placeholder="virag@deltasystem.in">
+        </div>
+        <div class="form-group">
+            <label>Password (min 6 characters)</label>
+            <input type="password" id="signupPassword" placeholder="Enter a strong password">
+        </div>
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="signupName" value="Virag" placeholder="Your name">
+        </div>
+        <div id="signupStatus"></div>
+        <button onclick="createAccount()">Create Account</button>
+
+        <!-- Login Test -->
+        <h2>4. Test Login</h2>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" value="virag@deltasystem.in" placeholder="virag@deltasystem.in">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Your password">
+        </div>
+        <div id="loginStatus"></div>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="getCurrentUser()">Check Current User</button>
+        <button onclick="logout()">Logout</button>
+
+        <!-- Grant Admin -->
+        <h2>5. Grant Admin Role (SQL)</h2>
+        <p style="color: #71717a; font-size: 14px; margin-bottom: 10px;">Copy and run this SQL in Supabase Dashboard → SQL Editor:</p>
+        <pre id="adminSQL">UPDATE profiles
+SET role = 'admin'
+WHERE email = 'virag@deltasystem.in';
+
+-- Verify
+SELECT id, email, role, created_at
+FROM profiles
+WHERE email = 'virag@deltasystem.in';</pre>
+        <button onclick="copySQL()">Copy SQL</button>
+
+        <!-- Debug Info -->
+        <h2>6. Debug Information</h2>
+        <div id="debugInfo"></div>
+        <button onclick="showDebugInfo()">Show Debug Info</button>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://fhttdaouzyfvfegvrpil.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZodHRkYW91enlmdmZlZ3ZycGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3MzQ1NzIsImV4cCI6MjA4NjMxMDU3Mn0.wUrvbM2Jaeuta90XJZCSgyeL7DqE3T3upwWe9wRaZLA';
+        let supabaseClient = null;
+
+        function showStatus(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function initSupabase() {
+            if (!window.supabase) {
+                showStatus('systemStatus', '❌ Supabase SDK not loaded. Check that assets/js/vendor/supabase-2.49.1.js exists.', 'error');
+                return false;
+            }
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                return true;
+            } catch (e) {
+                showStatus('systemStatus', `❌ Failed to initialize Supabase: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        function runSystemChecks() {
+            let html = '';
+
+            // Check 1: Supabase SDK
+            if (typeof window.supabase !== 'undefined') {
+                html += '<div class="status success">✅ Supabase SDK loaded</div>';
+            } else {
+                html += '<div class="status error">❌ Supabase SDK not loaded</div>';
+            }
+
+            // Check 2: Initialize client
+            if (initSupabase()) {
+                html += '<div class="status success">✅ Supabase client initialized</div>';
+            } else {
+                html += '<div class="status error">❌ Supabase client failed to initialize</div>';
+            }
+
+            // Check 3: Online status
+            if (navigator.onLine) {
+                html += '<div class="status success">✅ Internet connection active</div>';
+            } else {
+                html += '<div class="status warning">⚠️ You appear to be offline</div>';
+            }
+
+            document.getElementById('systemStatus').innerHTML = html;
+        }
+
+        async function testConnection() {
+            showStatus('connectionStatus', '🔄 Testing connection...', 'info');
+
+            if (!supabaseClient) {
+                showStatus('connectionStatus', '❌ Supabase client not initialized. Run system checks first.', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient.auth.getSession();
+
+                if (error) {
+                    showStatus('connectionStatus', `❌ Connection error: ${error.message}`, 'error');
+                    return;
+                }
+
+                if (data.session) {
+                    showStatus('connectionStatus', `✅ Connected! Logged in as: ${data.session.user.email}`, 'success');
+                } else {
+                    showStatus('connectionStatus', '✅ Connection successful! Not logged in yet.', 'success');
+                }
+            } catch (e) {
+                showStatus('connectionStatus', `❌ Connection failed: ${e.message}`, 'error');
+            }
+        }
+
+        async function createAccount() {
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const name = document.getElementById('signupName').value.trim();
+
+            if (!email) {
+                showStatus('signupStatus', '❌ Please enter an email', 'error');
+                return;
+            }
+
+            if (!password || password.length < 6) {
+                showStatus('signupStatus', '❌ Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            if (!name) {
+                showStatus('signupStatus', '❌ Please enter your name', 'error');
+                return;
+            }
+
+            showStatus('signupStatus', '🔄 Creating account...', 'info');
+
+            if (!supabaseClient) initSupabase();
+
+            try {
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: name,
+                            name: name
+                        }
+                    }
+                });
+
+                if (error) {
+                    showStatus('signupStatus', `❌ Signup failed: ${error.message}`, 'error');
+                    return;
+                }
+
+                if (data.user && !data.session) {
+                    // Email confirmation required
+                    showStatus('signupStatus', `📧 Account created! Check your email (${email}) for confirmation link.`, 'warning');
+                } else {
+                    // Auto-confirmed or logged in
+                    showStatus('signupStatus', `✅ Account created successfully! User ID: ${data.user.id}`, 'success');
+
+                    // Update SQL with actual user ID
+                    document.getElementById('adminSQL').textContent = `-- Grant admin role to ${email}\nUPDATE profiles\nSET role = 'admin'\nWHERE email = '${email}';\n\n-- OR use user ID directly:\nUPDATE profiles\nSET role = 'admin'\nWHERE id = '${data.user.id}';\n\n-- Verify\nSELECT id, email, role, created_at\nFROM profiles\nWHERE email = '${email}';`;
+                }
+            } catch (e) {
+                showStatus('signupStatus', `❌ Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showStatus('loginStatus', '❌ Please enter email and password', 'error');
+                return;
+            }
+
+            showStatus('loginStatus', '🔄 Logging in...', 'info');
+
+            if (!supabaseClient) initSupabase();
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) {
+                    showStatus('loginStatus', `❌ Login failed: ${error.message}`, 'error');
+                    return;
+                }
+
+                showStatus('loginStatus', `✅ Login successful! Welcome ${data.user.email}`, 'success');
+
+                // Check profile and role
+                try {
+                    const { data: profile, error: profileError } = await supabaseClient
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', data.user.id)
+                        .single();
+
+                    if (profileError) {
+                        showStatus('loginStatus', `✅ Logged in as ${data.user.email}<br>⚠️ Profile check failed: ${profileError.message}`, 'warning');
+                    } else {
+                        const role = profile?.role || 'user';
+                        const roleIcon = role === 'admin' ? '👑' : '👤';
+                        showStatus('loginStatus', `✅ Logged in as ${data.user.email}<br>${roleIcon} Role: ${role}`, 'success');
+                    }
+                } catch (e) {
+                    console.error('Profile check error:', e);
+                }
+            } catch (e) {
+                showStatus('loginStatus', `❌ Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function getCurrentUser() {
+            if (!supabaseClient) initSupabase();
+
+            showStatus('loginStatus', '🔄 Checking current user...', 'info');
+
+            try {
+                const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+                if (error) {
+                    showStatus('loginStatus', `❌ Error: ${error.message}`, 'error');
+                    return;
+                }
+
+                if (!user) {
+                    showStatus('loginStatus', 'ℹ️ Not logged in', 'info');
+                    return;
+                }
+
+                showStatus('loginStatus', `✅ Current user: ${user.email}<br>User ID: ${user.id}`, 'success');
+            } catch (e) {
+                showStatus('loginStatus', `❌ Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function logout() {
+            if (!supabaseClient) initSupabase();
+
+            try {
+                await supabaseClient.auth.signOut();
+                showStatus('loginStatus', '✅ Logged out successfully', 'success');
+            } catch (e) {
+                showStatus('loginStatus', `❌ Logout error: ${e.message}`, 'error');
+            }
+        }
+
+        function copySQL() {
+            const sql = document.getElementById('adminSQL').textContent;
+            navigator.clipboard.writeText(sql).then(() => {
+                alert('✅ SQL copied to clipboard!\n\nNow:\n1. Go to Supabase Dashboard\n2. Open SQL Editor\n3. Paste and run this SQL');
+            }).catch(err => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+
+        function showDebugInfo() {
+            const info = {
+                'Supabase SDK': typeof window.supabase,
+                'Client initialized': !!supabaseClient,
+                'Online': navigator.onLine,
+                'Page URL': window.location.href,
+                'User agent': navigator.userAgent,
+                'Local storage keys': Object.keys(localStorage).filter(k => k.startsWith('pk_')),
+                'Supabase URL': SUPABASE_URL,
+                'Key (first 20 chars)': SUPABASE_ANON_KEY.substring(0, 20) + '...'
+            };
+
+            const html = '<pre>' + JSON.stringify(info, null, 2) + '</pre>';
+            document.getElementById('debugInfo').innerHTML = html;
+        }
+
+        // Auto-run system checks on load
+        window.addEventListener('load', () => {
+            runSystemChecks();
+            testConnection();
+        });
+    </script>
+</body>
+</html>

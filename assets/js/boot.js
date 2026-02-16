@@ -167,6 +167,7 @@ function bootApp() {
         initKeyboardShortcuts();
         if (typeof checkAnnouncements === 'function') checkAnnouncements();
         if (typeof trackEvent === 'function') trackEvent('app_open');
+        if (typeof initHelpButton === 'function') initHelpButton();
         lucide.createIcons();
         patchAriaLabels();
         checkWhatsNew();

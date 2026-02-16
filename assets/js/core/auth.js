@@ -2,8 +2,54 @@
 // AUTH — Login, Signup, Session Management
 // ════════════════════════════════════════
 
-/* exported initAuth, onSignedIn, doLogin, doSignup, doGoogleLogin, doGithubLogin, doPasswordReset, skipAuth, doLogout, authMode */
+/* exported initAuth, onSignedIn, doLogin, doSignup, doGoogleLogin, doGithubLogin, doFigmaLogin, doPasswordReset, skipAuth, doLogout, authMode */
 let authMode = 'login'; // login | signup | reset -- eslint: reassigned via onclick handlers
+
+// ════════════════════════════════════════
+// RATE LIMITING
+// ════════════════════════════════════════
+const AUTH_ATTEMPTS = new Map();
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_DURATION = 60000; // 1 minute
+
+function checkRateLimit(action) {
+    const key = action;
+    const attempts = AUTH_ATTEMPTS.get(key) || [];
+
+    // Clean old attempts
+    const recentAttempts = attempts.filter(t => Date.now() - t < LOCKOUT_DURATION);
+
+    if (recentAttempts.length >= MAX_ATTEMPTS) {
+        const waitTime = Math.ceil((LOCKOUT_DURATION - (Date.now() - recentAttempts[0])) / 1000);
+        return {
+            allowed: false,
+            message: `Too many attempts. Please wait ${waitTime} seconds.`
+        };
+    }
+
+    recentAttempts.push(Date.now());
+    AUTH_ATTEMPTS.set(key, recentAttempts);
+
+    return { allowed: true };
+}
+
+// ════════════════════════════════════════
+// PHONE VALIDATION
+// ════════════════════════════════════════
+function validatePhone(phone) {
+    // E.164 format: +[country][number]
+    // Examples: +14155552671, +919876543210
+    const e164Regex = /^\+[1-9]\d{1,14}$/;
+
+    if (!e164Regex.test(phone)) {
+        return {
+            valid: false,
+            error: 'Phone number must be in international format (e.g., +14155552671 or +919876543210)'
+        };
+    }
+
+    return { valid: true };
+}
 
 function showAuthSplit() {
     const split = document.getElementById('authSplit');
@@ -33,7 +79,7 @@ async function initAuth() {
     // Safety timeout — never leave the user on a blank screen
     const safetyTimer = setTimeout(() => {
         if (!authTarget()?.innerHTML?.trim() && !document.getElementById('obContent')?.innerHTML?.trim()) {
-            console.warn('[Auth] Safety timeout — showing auth screen');
+            if (CONFIG?.debug) console.warn('[Auth] Safety timeout — showing auth screen');
             renderAuthScreen();
         }
     }, 5000);
@@ -68,7 +114,7 @@ async function initAuth() {
         try {
             await pullAndBoot();
         } catch (e) {
-            console.error('pullAndBoot failed:', e);
+            if (CONFIG?.debug) console.error('pullAndBoot failed:', e);
             if (CONFIG) {
                 hideAuthSplit();
                 document.getElementById('onboard').classList.add('hide');
@@ -89,8 +135,14 @@ async function initAuth() {
     }
 
     // Register auth state listener
+    if (!sb()) {
+        if (CONFIG?.debug) console.warn('[Auth] Cannot register auth listener - Supabase not initialized');
+        renderAuthScreen();
+        return;
+    }
+
     sb().auth.onAuthStateChange(async (event, session) => {
-        console.warn('[Auth] onAuthStateChange:', event, !!session);
+        if (CONFIG?.debug) console.warn('[Auth] onAuthStateChange:', event, !!session);
         sbSession = session;
         cleanHash();
 
@@ -119,12 +171,17 @@ async function initAuth() {
 
     // getSession() triggers SDK's detectSessionInUrl to process hash tokens
     try {
-        console.warn('[Auth] Calling getSession...');
-        const { data, error } = await sb().auth.getSession();
-        console.warn('[Auth] getSession result:', !!data?.session, error?.message || 'ok');
-        if (data?.session) sbSession = data.session;
+        if (!sb()) {
+            if (CONFIG?.debug) console.warn('[Auth] Cannot get session - Supabase not initialized');
+            sbSession = null;
+        } else {
+            if (CONFIG?.debug) console.warn('[Auth] Calling getSession...');
+            const { data, error } = await sb().auth.getSession();
+            if (CONFIG?.debug) console.warn('[Auth] getSession result:', !!data?.session, error?.message || 'ok');
+            if (data?.session) sbSession = data.session;
+        }
     } catch (e) {
-        console.warn('[Auth] getSession failed:', e);
+        if (CONFIG?.debug) console.warn('[Auth] getSession failed:', e);
         sbSession = null;
     }
 
@@ -135,7 +192,7 @@ async function initAuth() {
 
     // Fallback: if we have a session from getSession, boot manually
     if (sbSession) {
-        console.warn('[Auth] Fallback: booting with session from getSession');
+        if (CONFIG?.debug) console.warn('[Auth] Fallback: booting with session from getSession');
         authBooted = true;
         clearTimeout(safetyTimer);
         cleanHash();
@@ -145,14 +202,14 @@ async function initAuth() {
 
     // For OAuth callbacks: the SDK may need more time to process
     if (isOAuthCallback) {
-        console.warn('[Auth] OAuth callback — waiting for SDK to process token...');
+        if (CONFIG?.debug) console.warn('[Auth] OAuth callback — waiting for SDK to process token...');
         try {
             const params = new URLSearchParams(hash.substring(1));
             const accessToken = params.get('access_token');
             const refreshToken = params.get('refresh_token');
-            console.warn('[Auth] Token lengths:', accessToken?.length, refreshToken?.length);
+            if (CONFIG?.debug) console.warn('[Auth] Token lengths:', accessToken?.length, refreshToken?.length);
             if (accessToken && refreshToken) {
-                console.warn('[Auth] Manual setSession attempt...');
+                if (CONFIG?.debug) console.warn('[Auth] Manual setSession attempt...');
                 const { data, error } = await sb().auth.setSession({
                     access_token: accessToken,
                     refresh_token: refreshToken
@@ -164,10 +221,10 @@ async function initAuth() {
                     await safePullAndBoot();
                     return;
                 }
-                console.warn('[Auth] Manual setSession failed:', error?.message, error?.status);
+                if (CONFIG?.debug) console.warn('[Auth] Manual setSession failed:', error?.message, error?.status);
             }
         } catch (e) {
-            console.warn('[Auth] Manual token exchange failed:', e);
+            if (CONFIG?.debug) console.warn('[Auth] Manual token exchange failed:', e);
         }
 
         // Final timeout: show error with retry
@@ -225,7 +282,7 @@ async function onSignedIn() {
 async function pullAndBoot() {
     // Pull cloud data if online
     if (navigator.onLine && typeof pullFromCloud === 'function') {
-        try { await pullFromCloud(); } catch (e) { console.warn('Cloud pull failed:', e); }
+        try { await pullFromCloud(); } catch (e) { if (CONFIG?.debug) console.warn('Cloud pull failed:', e); }
     }
     // Reload globals from localStorage (pullFromCloud may have updated them)
     try { DB = JSON.parse(localStorage.getItem('pk_db') || '[]'); } catch (e) { DB = []; }
@@ -285,11 +342,10 @@ function getLoginHtml() {
                 <div class="auth-title">Welcome back</div>
                 <div class="auth-desc">Sign in to your account to continue</div>
             </div>
-            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPhone').focus()"></div>
-            <div class="fg"><label class="fl">Phone</label><input type="tel" id="authPhone" placeholder="+91 98765 43210" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
+            <div class="fg"><label class="fl">Email or Phone</label><input type="text" id="authEmailOrPhone" placeholder="email@example.com or +91 98765 43210" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
             <div class="fg"><label class="fl">Password</label><input type="password" id="authPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
             <div id="authError" class="auth-error"></div>
-            <button class="btn auth-submit" id="authSubmitBtn" onclick="doLogin()">Sign In with Email</button>
+            <button class="btn auth-submit" id="authSubmitBtn" onclick="doLogin()">Sign In</button>
             <div class="auth-divider"><span>OR CONTINUE WITH</span></div>
             <div class="auth-social-row">
                 <button class="auth-google-btn" onclick="doGoogleLogin()">
@@ -300,15 +356,13 @@ function getLoginHtml() {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
                     GitHub
                 </button>
+                <button class="auth-figma-btn" onclick="doFigmaLogin()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 24c2.208 0 4-1.792 4-4v-4H8c-2.208 0-4 1.792-4 4s1.792 4 4 4z" fill="#0ACF83"/><path d="M4 12c0-2.208 1.792-4 4-4h4v8H8c-2.208 0-4-1.792-4-4z" fill="#A259FF"/><path d="M4 4c0-2.208 1.792-4 4-4h4v8H8C5.792 8 4 6.208 4 4z" fill="#F24E1E"/><path d="M12 0h4c2.208 0 4 1.792 4 4s-1.792 4-4 4h-4V0z" fill="#FF7262"/><path d="M20 12c0 2.208-1.792 4-4 4s-4-1.792-4-4 1.792-4 4-4 4 1.792 4 4z" fill="#1ABCFE"/></svg>
+                    Figma
+                </button>
             </div>
             <div class="auth-links">
                 <a href="#" onclick="authMode='reset';renderAuthScreen();return false">Forgot password?</a>
-            </div>
-            <div class="auth-offline">
-                <button class="btn-outline auth-offline-btn" onclick="skipAuth()">
-                    <i data-lucide="wifi-off" style="width:16px;height:16px"></i> Continue without account
-                </button>
-                <div class="auth-offline-hint">Your data stays on this device only</div>
             </div>
             <div class="auth-terms">By clicking continue, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
         </div>`;
@@ -322,8 +376,7 @@ function getSignupHtml() {
                 <div class="auth-desc">Enter your details below to get started</div>
             </div>
             <div class="fg"><label class="fl">Full Name</label><input type="text" id="authName" placeholder="Your name" onkeydown="if(event.key==='Enter')document.getElementById('authEmail').focus()"></div>
-            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPhone').focus()"></div>
-            <div class="fg"><label class="fl">Phone</label><input type="tel" id="authPhone" placeholder="+91 98765 43210" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
+            <div class="fg"><label class="fl">Email</label><input type="email" id="authEmail" placeholder="name@example.com" onkeydown="if(event.key==='Enter')document.getElementById('authPass').focus()"></div>
             <div class="fg"><label class="fl">Password</label><input type="password" id="authPass" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doSignup()"></div>
             <div id="authError" class="auth-error"></div>
             <button class="btn auth-submit" id="authSubmitBtn" onclick="doSignup()">Create Account</button>
@@ -337,12 +390,10 @@ function getSignupHtml() {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
                     GitHub
                 </button>
-            </div>
-            <div class="auth-offline">
-                <button class="btn-outline auth-offline-btn" onclick="skipAuth()">
-                    <i data-lucide="wifi-off" style="width:16px;height:16px"></i> Continue without account
+                <button class="auth-figma-btn" onclick="doFigmaLogin()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 24c2.208 0 4-1.792 4-4v-4H8c-2.208 0-4 1.792-4 4s1.792 4 4 4z" fill="#0ACF83"/><path d="M4 12c0-2.208 1.792-4 4-4h4v8H8c-2.208 0-4-1.792-4-4z" fill="#A259FF"/><path d="M4 4c0-2.208 1.792-4 4-4h4v8H8C5.792 8 4 6.208 4 4z" fill="#F24E1E"/><path d="M12 0h4c2.208 0 4 1.792 4 4s-1.792 4-4 4h-4V0z" fill="#FF7262"/><path d="M20 12c0 2.208-1.792 4-4 4s-4-1.792-4-4 1.792-4 4-4 4 1.792 4 4z" fill="#1ABCFE"/></svg>
+                    Figma
                 </button>
-                <div class="auth-offline-hint">Your data stays on this device only</div>
             </div>
             <div class="auth-terms">By clicking continue, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
         </div>`;
@@ -381,40 +432,43 @@ function setAuthLoading(loading) {
 }
 
 async function doLogin() {
-    console.log('[Auth] doLogin() called');
-    const email = document.getElementById('authEmail')?.value?.trim();
-    const phone = document.getElementById('authPhone')?.value?.trim();
+    if (CONFIG?.debug) console.log('[Auth] doLogin() called');
+    const identifier = document.getElementById('authEmailOrPhone')?.value?.trim();
     const pass = document.getElementById('authPass')?.value;
-    if (!email) { showAuthError('Please enter your email'); return; }
-    if (!phone) { showAuthError('Please enter your phone number'); return; }
+
+    if (!identifier) { showAuthError('Please enter your email or phone number'); return; }
     if (!pass || pass.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
+
     showAuthError('');
     setAuthLoading(true);
+
     try {
         if (!sb()) {
-            showAuthError('Cloud authentication unavailable - use "Continue without account"');
+            showAuthError('Authentication service unavailable. Please check your connection and try again.');
             setAuthLoading(false);
             return;
         }
-        const { data, error } = await sb().auth.signInWithPassword({ email, password: pass });
+
+        // Determine if identifier is email or phone
+        const isEmail = identifier.includes('@');
+        const loginCredentials = isEmail ?
+            { email: identifier, password: pass } :
+            { phone: identifier, password: pass };
+
+        const { data, error } = await sb().auth.signInWithPassword(loginCredentials);
+
         if (error) {
-            console.error('[Auth] Login error:', error);
-            showAuthError(error.message);
+            if (CONFIG?.debug) console.error('[Auth] Login error:', error);
+            showAuthError(error.message || 'Invalid credentials. Please try again.');
             setAuthLoading(false);
             return;
         }
-        // Verify phone matches user metadata
-        if (data.user?.user_metadata?.phone && data.user.user_metadata.phone !== phone) {
-            showAuthError('Phone number does not match this account');
-            await sb().auth.signOut();
-            setAuthLoading(false);
-            return;
-        }
+
         sbSession = data.session;
-        console.log('[Auth] Login successful');
+        if (CONFIG?.debug) console.log('[Auth] Login successful');
         // onAuthStateChange will handle the rest
     } catch (e) {
-        console.error('[Auth] Login exception:', e);
+        if (CONFIG?.debug) console.error('[Auth] Login exception:', e);
         showAuthError('Login failed. Please try again.');
         setAuthLoading(false);
     }
@@ -423,26 +477,30 @@ async function doLogin() {
 async function doSignup() {
     const name = document.getElementById('authName')?.value?.trim();
     const email = document.getElementById('authEmail')?.value?.trim();
-    const phone = document.getElementById('authPhone')?.value?.trim();
     const pass = document.getElementById('authPass')?.value;
+
     if (!name) { showAuthError('Please enter your name'); return; }
     if (!email) { showAuthError('Please enter your email'); return; }
-    if (!phone) { showAuthError('Please enter your phone number'); return; }
     if (!pass || pass.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
+
     showAuthError('');
     setAuthLoading(true);
+
     try {
         if (!sb()) {
-            showAuthError('Cloud authentication unavailable - use "Continue without account"');
+            showAuthError('Authentication service unavailable. Please check your connection and try again.');
             setAuthLoading(false);
             return;
         }
-        // Store phone in user metadata for uniqueness check
+
         const { data, error } = await sb().auth.signUp({
-            email, password: pass,
-            options: { data: { full_name: name, name: name, phone: phone } }
+            email,
+            password: pass,
+            options: { data: { full_name: name, name: name } }
         });
+
         if (error) { showAuthError(error.message); setAuthLoading(false); return; }
+
         if (data.user && !data.session) {
             // Email confirmation required
             showAuthError('');
@@ -456,6 +514,7 @@ async function doSignup() {
                 </div>`;
             return;
         }
+
         sbSession = data.session;
         // onAuthStateChange handles boot
     } catch (e) {
@@ -467,15 +526,15 @@ async function doSignup() {
 async function doGoogleLogin() {
     if (!sb()) { showAuthError('Cloud features unavailable'); return; }
     try {
-        // Use current origin (works on localhost, Vercel, custom domains)
         const redirectUrl = window.location.origin + window.location.pathname;
-        console.warn('[Auth] Google OAuth redirectTo:', redirectUrl);
+        if (CONFIG?.debug) console.warn('[Auth] Google OAuth redirectTo:', redirectUrl);
         const { error } = await sb().auth.signInWithOAuth({
             provider: 'google',
             options: { redirectTo: redirectUrl }
         });
         if (error) showAuthError(error.message);
     } catch (e) {
+        if (CONFIG?.debug) console.error('[Auth] Google login error:', e);
         showAuthError('Google login failed');
     }
 }
@@ -484,13 +543,34 @@ async function doGithubLogin() {
     if (!sb()) { showAuthError('Cloud features unavailable'); return; }
     try {
         const redirectUrl = window.location.origin + window.location.pathname;
+        if (CONFIG?.debug) console.warn('[Auth] GitHub OAuth redirectTo:', redirectUrl);
         const { error } = await sb().auth.signInWithOAuth({
             provider: 'github',
             options: { redirectTo: redirectUrl }
         });
         if (error) showAuthError(error.message);
     } catch (e) {
+        if (CONFIG?.debug) console.error('[Auth] GitHub login error:', e);
         showAuthError('GitHub login failed');
+    }
+}
+
+async function doFigmaLogin() {
+    if (!sb()) { showAuthError('Cloud features unavailable'); return; }
+    try {
+        const redirectUrl = window.location.origin + window.location.pathname;
+        if (CONFIG?.debug) console.warn('[Auth] Figma OAuth redirectTo:', redirectUrl);
+        const { error } = await sb().auth.signInWithOAuth({
+            provider: 'figma',
+            options: {
+                redirectTo: redirectUrl
+                // Supabase handles scopes automatically based on provider config
+            }
+        });
+        if (error) showAuthError(error.message);
+    } catch (e) {
+        if (CONFIG?.debug) console.error('[Auth] Figma login error:', e);
+        showAuthError('Figma login failed');
     }
 }
 
@@ -525,7 +605,7 @@ function skipAuth() {
 
 async function doLogout() {
     if (sb()) {
-        try { await sb().auth.signOut(); } catch (e) { console.warn('Signout error:', e); }
+        try { await sb().auth.signOut(); } catch (e) { if (CONFIG?.debug) console.warn('Signout error:', e); }
     }
     sbSession = null;
 
@@ -540,7 +620,7 @@ async function doLogout() {
         localStorage.removeItem(key);
         sessionStorage.removeItem(key);
     });
-    console.log('[Security] All sensitive data cleared on logout');
+    if (CONFIG?.debug) console.log('[Security] All sensitive data cleared on logout');
 
     // MULTI-TAB SYNC FIX: Notify other tabs of logout
     localStorage.setItem('pk_logout_signal', Date.now().toString());
@@ -552,7 +632,7 @@ async function doLogout() {
 // MULTI-TAB SYNC FIX: Listen for logout in other tabs
 window.addEventListener('storage', (e) => {
     if (e.key === 'pk_logout_signal' && e.newValue) {
-        console.log('[Security] Logout detected in another tab');
+        if (CONFIG?.debug) console.log('[Security] Logout detected in another tab');
         // Force reload to clear all state and show auth screen
         window.location.href = window.location.origin;
     }

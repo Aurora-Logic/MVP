@@ -226,7 +226,7 @@ function unarchiveProp(id) {
     toast('Proposal restored');
 }
 
-function refreshSide() {
+async function refreshSide() {
     const active = activeDB();
     document.getElementById('propCnt').textContent = active.length;
     const cntEl = document.getElementById('clientCnt');
@@ -255,6 +255,23 @@ function refreshSide() {
     if (userName) userName.textContent = CONFIG.name || 'User';
     if (userEmail) userEmail.textContent = CONFIG.email || 'Settings';
     if (userAvatar) userAvatar.textContent = (CONFIG.name || 'U').charAt(0).toUpperCase();
+    // Add admin button if user is admin
+    if (typeof isAdmin === 'function') {
+        const isAdminUser = await isAdmin();
+        const existingAdminBtn = document.querySelector('[data-nav="admin"]');
+        const clientsBtn = document.querySelector('[data-nav="clients"]');
+        if (isAdminUser && !existingAdminBtn && clientsBtn) {
+            const adminBtn = document.createElement('button');
+            adminBtn.className = 'side-btn';
+            adminBtn.setAttribute('data-nav', 'admin');
+            adminBtn.onclick = () => navigate('/admin');
+            adminBtn.innerHTML = '<i data-lucide="shield-check"></i><span>Admin</span>';
+            clientsBtn.parentNode.insertBefore(adminBtn, clientsBtn.nextSibling);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        } else if (!isAdminUser && existingAdminBtn) {
+            existingAdminBtn.remove();
+        }
+    }
     // Rebuild recent list
     const list = document.getElementById('recentList');
     list.innerHTML = '';

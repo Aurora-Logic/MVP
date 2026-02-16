@@ -259,7 +259,31 @@ function updateNewClientField(field, val) {
     _createState.client[field] = val;
 }
 
-function doCreateProposal() {
+async function doCreateProposal() {
+    // Check usage limits
+    if (typeof canCreateProposal === 'function') {
+        const limitsCheck = await canCreateProposal();
+        if (!limitsCheck.allowed) {
+            const limit = limitsCheck.limit;
+            const current = limitsCheck.current;
+
+            confirmDialog(
+                `You've reached your proposal limit (${current}/${limit}). Upgrade to create more proposals.`,
+                () => {
+                    // Navigate to pricing/upgrade
+                    closeCreateDrawer();
+                    navigate('/pricing');
+                },
+                {
+                    confirmText: 'Upgrade Plan',
+                    cancelText: 'Cancel',
+                    type: 'warning'
+                }
+            );
+            return;
+        }
+    }
+
     if (typeof createPropFromPage === 'function') {
         createPropFromPage(_createState);
     } else {
@@ -269,5 +293,10 @@ function doCreateProposal() {
         createProp(tpl || TPLS.blank);
     }
     closeCreateDrawer();
+
+    // Increment proposal count (async, fire-and-forget)
+    if (typeof incrementProposalCount === 'function') {
+        incrementProposalCount().catch(err => console.error('Failed to increment count:', err));
+    }
 }
 
