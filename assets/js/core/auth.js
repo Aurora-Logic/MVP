@@ -119,7 +119,7 @@ async function initAuth() {
                 hideAuthSplit();
                 document.getElementById('onboard').classList.add('hide');
                 document.getElementById('appShell').style.display = 'flex';
-                bootApp();
+                await bootApp();
                 if (typeof toast === 'function') toast('Cloud sync failed — working offline', 'error');
             } else {
                 showAuthSplit();
@@ -287,12 +287,12 @@ function showConnectionError() {
     lucide.createIcons();
 }
 
-function offlineBoot() {
+async function offlineBoot() {
     if (CONFIG) {
         hideAuthSplit();
         document.getElementById('onboard').classList.add('hide');
         document.getElementById('appShell').style.display = 'flex';
-        bootApp();
+        await bootApp();
     } else {
         showAuthSplit();
         renderOnboarding();
@@ -317,7 +317,7 @@ async function pullAndBoot() {
         hideAuthSplit();
         document.getElementById('onboard').classList.add('hide');
         document.getElementById('appShell').style.display = 'flex';
-        bootApp();
+        await bootApp();
     } else {
         showAuthSplit();
         renderOnboarding();
