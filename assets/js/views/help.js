@@ -129,7 +129,7 @@ async function submitHelpTicket(e) {
         document.querySelector('.modal-wrap').remove();
 
         confirmDialog(
-            'Your support ticket has been submitted. We'll respond via email within 24 hours.',
+            'Your support ticket has been submitted. We\'ll respond via email within 24 hours.',
             () => {
                 // Navigate to My Tickets
                 if (typeof renderMyTickets === 'function') {

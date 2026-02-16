@@ -160,11 +160,11 @@ function buildFAQ() {
     const faqs = [
         {
             q: 'Can I cancel anytime?',
-            a: 'Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period.'
+            a: 'Yes, you can cancel your subscription at any time. You\'ll continue to have access until the end of your billing period.'
         },
         {
             q: 'Do you offer refunds?',
-            a: 'We offer a 14-day money-back guarantee. If you're not satisfied, contact us for a full refund.'
+            a: 'We offer a 14-day money-back guarantee. If you\'re not satisfied, contact us for a full refund.'
         },
         {
             q: 'What payment methods do you accept?',
