@@ -4,7 +4,7 @@
 /* exported submitNpsScore, closeNpsPrompt */
 
 // Global error boundary
-/* exported APP_BUILD, clearAppCache, showUpdateToast, getCacheMetrics */
+/* exported APP_BUILD, clearAppCache, showUpdateModal, getCacheMetrics */
 window.onerror = function(msg, src, line, col, err) {
     const info = `${msg} at ${src}:${line}:${col}`;
     console.error('[ProposalKit Error]', info, err);
@@ -93,32 +93,99 @@ function clearAppCache() {
 // ════════════════════════════════════════
 // SERVICE WORKER UPDATE NOTIFICATION
 // ════════════════════════════════════════
-function showUpdateToast() {
-    // Only show once per session
-    if (sessionStorage.getItem('pk_update_shown')) return;
-    sessionStorage.setItem('pk_update_shown', '1');
+function showUpdateModal() {
+    // Track last seen version to show modal only for new versions
+    const lastSeenVersion = localStorage.getItem('pk_last_version');
+    const currentVersion = APP_VERSION + '_' + APP_BUILD;
 
-    // Create persistent toast with reload button
-    const toast = document.createElement('div');
-    toast.className = 'toast toast-info';
-    toast.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 16px;max-width:400px';
-    toast.innerHTML = `
-        <i data-lucide="sparkles" style="width:20px;height:20px;flex-shrink:0"></i>
-        <div style="flex:1">
-            <div style="font-weight:600;margin-bottom:2px">Update available</div>
-            <div style="font-size:13px;opacity:0.9">A new version of ProposalKit is ready</div>
-        </div>
-        <button class="btn-sm" onclick="window.location.reload()" style="flex-shrink:0">
-            <i data-lucide="refresh-cw"></i> Reload
-        </button>`;
-
-    const container = document.getElementById('toastContainer');
-    if (container) {
-        container.appendChild(toast);
-        lucide.createIcons();
-        // Auto-remove after 30 seconds if not clicked
-        setTimeout(() => toast.remove(), 30000);
+    // If user already saw this version update, don't show again
+    if (lastSeenVersion === currentVersion) {
+        if (CONFIG?.debug) console.log('[Update] Already shown modal for version:', currentVersion);
+        return;
     }
+
+    // Create update modal
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-wrap';
+    wrap.id = 'updateModal';
+    wrap.onclick = (e) => { if (e.target === wrap) dismissUpdateModal(); };
+
+    wrap.innerHTML = `
+        <div class="modal" style="max-width:420px" onclick="event.stopPropagation()">
+            <div style="text-align:center;margin-bottom:20px">
+                <div style="width:64px;height:64px;margin:0 auto 16px;background:linear-gradient(135deg,var(--primary),#0ea5e9);border-radius:50%;display:flex;align-items:center;justify-content:center">
+                    <i data-lucide="sparkles" style="width:32px;height:32px;color:white;stroke-width:2"></i>
+                </div>
+                <div class="modal-t" style="font-size:20px;margin-bottom:8px">Update Available</div>
+                <div class="modal-d" style="font-size:14px;color:var(--muted-foreground)">
+                    A new version of ${typeof appName === 'function' ? appName() : 'ProposalKit'} is ready.<br>
+                    Version <strong>${APP_VERSION}</strong> • Build ${APP_BUILD}
+                </div>
+            </div>
+
+            <div style="background:var(--muted);padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:13px;line-height:1.6">
+                <div style="display:flex;gap:8px;margin-bottom:8px">
+                    <i data-lucide="shield-check" style="width:16px;height:16px;color:var(--primary);flex-shrink:0;margin-top:2px"></i>
+                    <div>Security improvements and bug fixes</div>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <i data-lucide="zap" style="width:16px;height:16px;color:var(--primary);flex-shrink:0;margin-top:2px"></i>
+                    <div>Performance optimizations</div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px">
+                <button class="btn-outline" onclick="dismissUpdateModal()" style="flex:1">
+                    Later
+                </button>
+                <button class="btn" onclick="applyUpdate()" style="flex:2">
+                    <i data-lucide="refresh-cw"></i> Update Now
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('show'));
+    lucide.createIcons();
+}
+
+function dismissUpdateModal() {
+    // Mark this version as seen so we don't show modal again
+    const currentVersion = APP_VERSION + '_' + APP_BUILD;
+    try {
+        localStorage.setItem('pk_last_version', currentVersion);
+    } catch (e) {
+        // Storage full, ignore
+    }
+    document.getElementById('updateModal')?.remove();
+}
+
+function applyUpdate() {
+    // Show loading state
+    const modal = document.querySelector('#updateModal .modal');
+    if (modal) {
+        modal.innerHTML = `
+            <div style="text-align:center;padding:40px 20px">
+                <div style="width:48px;height:48px;margin:0 auto 16px;border:3px solid var(--primary);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+                <div style="font-size:16px;font-weight:600;margin-bottom:4px">Updating...</div>
+                <div style="font-size:13px;color:var(--muted-foreground)">Please wait a moment</div>
+            </div>
+        `;
+    }
+
+    // Mark version as seen
+    const currentVersion = APP_VERSION + '_' + APP_BUILD;
+    try {
+        localStorage.setItem('pk_last_version', currentVersion);
+    } catch (e) {
+        // Storage full, ignore
+    }
+
+    // Clear all caches and reload with proper cache management
+    setTimeout(() => {
+        clearAppCache();
+    }, 500);
 }
 
 async function initApp() {

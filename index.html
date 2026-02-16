@@ -413,9 +413,9 @@
                     navigator.serviceWorker.addEventListener('message', function(e) {
                         if (e.data && e.data.type === 'SW_UPDATED') {
                             console.log('[SW] Update ready, version:', e.data.version);
-                            // Show toast notification (will be implemented in boot.js)
-                            if (typeof showUpdateToast === 'function') {
-                                showUpdateToast();
+                            // Show update modal (implemented in boot.js)
+                            if (typeof showUpdateModal === 'function') {
+                                showUpdateModal();
                             }
                         }
                     });
