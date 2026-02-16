@@ -80,16 +80,32 @@ async function initAuth() {
         return;
     }
 
-    // Safety timeout — never leave the user on a blank screen
+    // AGGRESSIVE safety timeout — never leave the user on a blank screen
     let authBooted = false;
+
+    // Friendly message updates
+    setTimeout(() => {
+        const msg = document.getElementById('loadMessage');
+        if (msg && !authBooted) msg.textContent = 'Almost ready...';
+    }, 1500);
+
     const safetyTimer = setTimeout(() => {
-        console.warn('[Auth] Safety timeout triggered, authBooted:', authBooted);
+        console.warn('[Auth] Safety timeout triggered (3s), authBooted:', authBooted);
         if (!authBooted) {
-            console.warn('[Auth] Forcing auth screen render');
+            console.warn('[Auth] FORCING auth screen render NOW');
             authBooted = true;
+            // Update message before hiding
+            const msg = document.getElementById('loadMessage');
+            if (msg) msg.textContent = 'Ready!';
+            // Hide loader
+            const loader = document.getElementById('bootLoader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 300);
+            }
             renderAuthScreen();
         }
-    }, 5000);
+    }, 3000); // Reduced from 5s to 3s
 
     // Detect OAuth callback (hash contains access_token from Google redirect)
     const hash = window.location.hash;

@@ -198,16 +198,34 @@ function applyUpdate() {
     }, 500);
 }
 
+// Update loading message for user
+function updateLoadMessage(msg) {
+    const el = document.getElementById('loadMessage');
+    if (el) el.textContent = msg;
+}
+
 async function initApp() {
     try {
+        updateLoadMessage('Starting up...');
         console.warn('[Boot] initApp started');
         console.warn('[Boot] CONFIG:', CONFIG);
         console.warn('[Boot] initAuth available:', typeof initAuth === 'function');
         console.warn('[Boot] renderOnboarding available:', typeof renderOnboarding === 'function');
 
         if (typeof initAuth === 'function') {
+            updateLoadMessage('Loading workspace...');
             console.warn('[Boot] Calling initAuth...');
             await initAuth();
+            // If initAuth completes, hide loader
+            console.warn('[Boot] initAuth completed');
+            updateLoadMessage('Ready!');
+            setTimeout(() => {
+                const loader = document.getElementById('bootLoader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 300);
+                }
+            }, 200);
         } else {
             console.warn('[Boot] No initAuth, checking CONFIG...');
             // Offline fallback (Supabase CDN not loaded)

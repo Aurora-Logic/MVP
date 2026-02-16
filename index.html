@@ -78,33 +78,22 @@
     </noscript>
 
     <!-- ═══ LOADING SCREEN ═══ -->
-    <div id="bootLoader" style="position:fixed;inset:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity 0.5s">
-        <div style="text-align:center">
-            <!-- Animated logo pulse -->
-            <div style="position:relative;width:80px;height:80px;margin:0 auto 24px">
-                <div style="position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:20px;animation:pulse 2s ease-in-out infinite"></div>
-                <div style="position:absolute;inset:8px;background:rgba(255,255,255,0.2);border-radius:16px;animation:pulse 2s ease-in-out 0.3s infinite"></div>
-                <div style="position:absolute;inset:16px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#667eea">P</div>
-            </div>
-            <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:8px">ProposalKit</div>
-            <div style="font-size:13px;color:rgba(255,255,255,0.8)">Loading your workspace...</div>
-            <!-- Progress dots -->
-            <div style="display:flex;gap:6px;justify-content:center;margin-top:20px">
-                <div style="width:8px;height:8px;background:rgba(255,255,255,0.6);border-radius:50%;animation:dotPulse 1.4s ease-in-out infinite"></div>
-                <div style="width:8px;height:8px;background:rgba(255,255,255,0.6);border-radius:50%;animation:dotPulse 1.4s ease-in-out 0.2s infinite"></div>
-                <div style="width:8px;height:8px;background:rgba(255,255,255,0.6);border-radius:50%;animation:dotPulse 1.4s ease-in-out 0.4s infinite"></div>
-            </div>
+    <div id="bootLoader" style="position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:99999;transition:opacity 0.5s;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif">
+        <!-- Burgundy gradient spinner -->
+        <div style="position:relative;width:28px;height:28px">
+            <div style="position:absolute;inset:0;border:3px solid #f5e6eb;border-radius:50%"></div>
+            <div style="position:absolute;inset:0;border:3px solid transparent;border-top-color:#8B1538;border-right-color:#A0244D;border-radius:50%;animation:spin 1s linear infinite"></div>
         </div>
+        <!-- Gradient text message -->
+        <div id="loadMessage" style="font-size:13px;background:linear-gradient(135deg,#8B1538 0%,#A0244D 50%,#C23B5A 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:500;letter-spacing:0.01em;animation:fadeIn 0.3s ease-in">Starting up...</div>
     </div>
     <style>
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes dotPulse {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.2); opacity: 1; }
-        }
+    </style>
+    <style>
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
