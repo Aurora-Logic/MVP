@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProposalKit Recovery</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card {
+            background: white;
+            padding: 48px 32px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 480px;
+            text-align: center;
+        }
+        h1 { font-size: 24px; margin: 0 0 8px; color: #18181b; }
+        p { color: #71717a; font-size: 14px; line-height: 1.6; margin: 0 0 24px; }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #18181b;
+            color: white;
+            border: none;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 4px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn-outline {
+            background: white;
+            color: #18181b;
+            border: 1px solid #e4e4e7;
+        }
+        .status {
+            background: #f4f4f5;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 24px 0;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            color: #52525b;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .icon { font-size: 48px; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">🔧</div>
+        <h1>ProposalKit Recovery</h1>
+        <p>Use this page to diagnose and fix app loading issues. This will check your localStorage and help recover from errors.</p>
+
+        <div class="status" id="status">Ready to diagnose...</div>
+
+        <button class="btn" onclick="diagnose()">🔍 Diagnose</button>
+        <button class="btn btn-outline" onclick="fixCorruption()">🛠️ Fix Corruption</button>
+        <button class="btn btn-outline" onclick="clearAll()">🗑️ Clear All Data</button>
+        <br>
+        <a href="/" class="btn btn-outline" style="margin-top:16px">← Back to App</a>
+    </div>
+
+    <script>
+        const log = (msg) => {
+            const status = document.getElementById('status');
+            status.innerHTML += msg + '<br>';
+            status.scrollTop = status.scrollHeight;
+        };
+
+        function diagnose() {
+            document.getElementById('status').innerHTML = '';
+            log('🔍 Starting diagnosis...<br>');
+
+            // Check localStorage quota
+            try {
+                const used = JSON.stringify(localStorage).length;
+                const usedMB = (used / (1024 * 1024)).toFixed(2);
+                log(`✓ localStorage size: ${usedMB} MB`);
+            } catch (e) {
+                log(`❌ Cannot read localStorage: ${e.message}`);
+            }
+
+            // Check each storage key
+            const keys = ['pk_db', 'pk_config', 'pk_clients', 'pk_email_tpl', 'pk_seclib', 'pk_tclib'];
+            keys.forEach(key => {
+                try {
+                    const value = localStorage.getItem(key);
+                    if (value) {
+                        const parsed = JSON.parse(value);
+                        const size = (value.length / 1024).toFixed(1);
+                        log(`✓ ${key}: ${size} KB, type: ${Array.isArray(parsed) ? 'array' : typeof parsed}`);
+                    } else {
+                        log(`ℹ ${key}: (empty)`);
+                    }
+                } catch (e) {
+                    log(`❌ ${key}: CORRUPTED - ${e.message}`);
+                }
+            });
+
+            log('<br>✅ Diagnosis complete');
+        }
+
+        function fixCorruption() {
+            document.getElementById('status').innerHTML = '';
+            log('🛠️ Fixing corrupted data...<br>');
+
+            const keys = ['pk_db', 'pk_config', 'pk_clients', 'pk_email_tpl', 'pk_seclib', 'pk_tclib'];
+            let fixed = 0;
+
+            keys.forEach(key => {
+                try {
+                    const value = localStorage.getItem(key);
+                    if (value) {
+                        JSON.parse(value); // Test if parseable
+                        log(`✓ ${key}: OK`);
+                    }
+                } catch (e) {
+                    // Corrupted - reset to safe default
+                    const isArray = key.includes('db') || key.includes('clients') || key.includes('lib');
+                    const safeDefault = isArray ? '[]' : 'null';
+                    localStorage.setItem(key, safeDefault);
+                    log(`🔧 ${key}: FIXED (reset to ${safeDefault})`);
+                    fixed++;
+                }
+            });
+
+            if (fixed > 0) {
+                log(`<br>✅ Fixed ${fixed} corrupted key(s). Reload the app now.`);
+            } else {
+                log(`<br>✅ No corruption found. Data is healthy.`);
+            }
+        }
+
+        function clearAll() {
+            if (!confirm('⚠️ This will delete ALL your proposals, clients, and settings.\n\nAre you absolutely sure?')) return;
+
+            document.getElementById('status').innerHTML = '';
+            log('🗑️ Clearing all data...<br>');
+
+            localStorage.clear();
+            sessionStorage.clear();
+
+            log('✅ All data cleared');
+            log('<br>You can now reload the app with a fresh start.');
+        }
+
+        // Auto-diagnose on load
+        setTimeout(diagnose, 500);
+    </script>
+</body>
+</html>

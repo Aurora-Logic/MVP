@@ -42,7 +42,7 @@ function pushUndo() {
 }
 
 let _viewerWarned = false;
-let _saveQueue = Promise.resolve(); // RACE CONDITION FIX: Sequential save queue
+const _saveQueue = Promise.resolve(); // RACE CONDITION FIX: Sequential save queue
 
 /** Debounced autosave — collects all editor data and persists to localStorage */
 function dirty() {

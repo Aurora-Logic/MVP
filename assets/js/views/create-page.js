@@ -4,7 +4,7 @@
 
 /* exported openCreateDrawer, closeCreateDrawer, renderCreatePage, setDrawerStep, selectTemplate, setCreateClientMode, selectCreateClient, updateNewClientField, doCreateProposal, setCreateCat, searchCreateClients */
 
-let _createState = {
+const _createState = {
     step: 1, // 1=Template, 2=Client, 3=Review
     template: 'blank',
     sections: [],

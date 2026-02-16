@@ -155,7 +155,7 @@ function showUpgradeModal(feature, check) {
     const pct = check.max === Infinity ? 100 : Math.min(Math.round((currentVal / maxVal) * 100), 100);
 
     // Detect Indian currency based on CONFIG.country
-    const isIndian = (typeof CONFIG !== 'undefined' && CONFIG.country === 'IN');
+    const isIndian = (CONFIG?.country === 'IN');
     const proPriceUSD = '$12';
     const teamPriceUSD = '$29';
     const proPriceINR = '₹999';

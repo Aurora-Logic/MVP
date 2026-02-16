@@ -9,7 +9,7 @@ function checkAnnouncements() {
     const announcements = typeof safeGetStorage === 'function' ? safeGetStorage('pk_announcements', []) : [];
     if (!announcements.length) return;
     const now = Date.now();
-    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '');
+    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((CONFIG?.activeUserId) || '');
     const plan = typeof getCurrentPlan === 'function' ? getCurrentPlan() : 'free';
     const active = [];
     for (let i = 0; i < announcements.length; i++) {
@@ -58,7 +58,7 @@ function _annShowBanner(ann) {
 
 function dismissAnnouncement(id) {
     if (!id) return;
-    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '');
+    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((CONFIG?.activeUserId) || '');
     const announcements = typeof safeGetStorage === 'function' ? safeGetStorage('pk_announcements', []) : [];
     for (let i = 0; i < announcements.length; i++) {
         if (announcements[i].id === id) {

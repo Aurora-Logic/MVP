@@ -6,8 +6,8 @@
 
 function hasUnreadTickets() {
     const tickets = typeof safeGetStorage === 'function' ? safeGetStorage('pk_tickets', []) : [];
-    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '');
-    const email = (typeof CONFIG !== 'undefined' && CONFIG.email) || '';
+    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((CONFIG?.activeUserId) || '');
+    const email = (CONFIG?.email) || '';
     for (let i = 0; i < tickets.length; i++) {
         const t = tickets[i];
         if (t.userId !== userId && t.userEmail !== email) continue;
@@ -26,8 +26,8 @@ function hasUnreadTickets() {
 function loadMyTickets(container) {
     if (!container) return;
     const tickets = typeof safeGetStorage === 'function' ? safeGetStorage('pk_tickets', []) : [];
-    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || '');
-    const email = (typeof CONFIG !== 'undefined' && CONFIG.email) || '';
+    const userId = typeof getDeviceId === 'function' ? getDeviceId() : ((CONFIG?.activeUserId) || '');
+    const email = (CONFIG?.email) || '';
     const mine = tickets.filter(t => t.userId === userId || t.userEmail === email);
     mine.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     if (!mine.length) {
@@ -109,9 +109,9 @@ function submitNewTicket() {
         id: 'tk_' + Date.now().toString(36) + Array.from(crypto.getRandomValues(new Uint8Array(4)), b => b.toString(16).padStart(2, '0')).join(''),
         subject: subj.value.trim(), category: cat ? (typeof cselGetValue === 'function' ? cselGetValue(cat) : cat.value) || 'general' : 'general', status: 'open',
         priority: 'medium',
-        userId: typeof getDeviceId === 'function' ? getDeviceId() : ((typeof CONFIG !== 'undefined' && CONFIG.activeUserId) || ''),
-        userEmail: (typeof CONFIG !== 'undefined' && CONFIG.email) || '',
-        userName: (typeof CONFIG !== 'undefined' && CONFIG.name) || '',
+        userId: typeof getDeviceId === 'function' ? getDeviceId() : ((CONFIG?.activeUserId) || ''),
+        userEmail: (CONFIG?.email) || '',
+        userName: (CONFIG?.name) || '',
         createdAt: Date.now(), updatedAt: Date.now(), resolvedAt: null,
         messages: [{ id: Date.now().toString(36), from: 'user', text: desc.value.trim(), ts: Date.now() }],
         internalNotes: [], assignedTo: ''
