@@ -223,7 +223,7 @@ function refreshAdminUI() {
     setAdminTab(currentAdminTab);
 }
 
-function refreshAdminTicketsUI() {
+function _refreshAdminTicketsUI() {
     if (currentAdminTab === 'tickets' || currentAdminTab === 'dashboard') {
         refreshAdminUI();
     }

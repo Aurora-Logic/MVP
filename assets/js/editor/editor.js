@@ -147,7 +147,7 @@ function loadEditor(id) {
     // Calc stats for bar
     const t = (typeof calcTotals === 'function') ? calcTotals(p) : { grand: (p.lineItems || []).reduce((a, i) => a + (i.qty || 0) * (i.rate || 0), 0) };
     const val = t.grand;
-    const daysSince = p.createdAt ? Math.floor((Date.now() - p.createdAt) / 86400000) : 0;
+    const _daysSince = p.createdAt ? Math.floor((Date.now() - p.createdAt) / 86400000) : 0;
     let daysLeft = '—';
     if (p.validUntil) {
         const d = Math.ceil((new Date(p.validUntil) - new Date()) / 86400000);

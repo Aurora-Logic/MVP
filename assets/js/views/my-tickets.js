@@ -78,7 +78,7 @@ function buildTicketRow(ticket) {
     `;
 }
 
-async function showTicketDetailUser(ticketId) {
+async function _showTicketDetailUser(ticketId) {
     // Fetch fresh ticket data
     const tickets = await getUserTickets();
     const ticket = tickets.find(t => t.id === ticketId);

@@ -2,7 +2,7 @@
 // NAVIGATION + MOBILE + KEYBOARD
 // ════════════════════════════════════════
 
-/* exported goNav, toggleMobileSidebar, toggleSidebar, initSidebarState, initKeyboardShortcuts, openFeedbackModal, setFbTab, selectFbType, submitFeedback, openGuide */
+/* exported goNav, toggleMobileSidebar, toggleSidebar, toggleUserMenu, initSidebarState, initKeyboardShortcuts, openFeedbackModal, setFbTab, selectFbType, submitFeedback, openGuide */
 function _destroyAllEditors() {
     // Destroy section editors
     if (typeof sectionEditors === 'object' && sectionEditors) {

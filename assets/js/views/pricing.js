@@ -126,7 +126,7 @@ function buildPricingCards(interval) {
     }).join('');
 }
 
-async function startCheckout(plan, interval) {
+async function _startCheckout(plan, interval) {
     if (!isLoggedIn()) {
         toast('Please sign in to subscribe', 'warning');
         // Show login modal

@@ -70,16 +70,23 @@ function authTarget() {
 }
 
 async function initAuth() {
+    console.warn('[Auth] initAuth called');
     initSupabase();
+    console.warn('[Auth] Supabase initialized:', !!sb());
+
     if (!sb()) {
+        console.warn('[Auth] No Supabase client, calling offlineBoot()');
         offlineBoot();
         return;
     }
 
     // Safety timeout — never leave the user on a blank screen
+    let authBooted = false;
     const safetyTimer = setTimeout(() => {
-        if (!authTarget()?.innerHTML?.trim() && !document.getElementById('obContent')?.innerHTML?.trim()) {
-            if (CONFIG?.debug) console.warn('[Auth] Safety timeout — showing auth screen');
+        console.warn('[Auth] Safety timeout triggered, authBooted:', authBooted);
+        if (!authBooted) {
+            console.warn('[Auth] Forcing auth screen render');
+            authBooted = true;
             renderAuthScreen();
         }
     }, 5000);
@@ -107,11 +114,10 @@ async function initAuth() {
         }
     }
 
-    // Use a promise-based approach to handle the session resolution
-    let authBooted = false;
-
+    // safePullAndBoot helper - handles successful auth and data pull
     async function safePullAndBoot() {
         try {
+            console.warn('[Auth] safePullAndBoot called');
             await pullAndBoot();
         } catch (e) {
             if (CONFIG?.debug) console.error('pullAndBoot failed:', e);
@@ -141,12 +147,14 @@ async function initAuth() {
         return;
     }
 
+    console.warn('[Auth] Registering onAuthStateChange listener');
     sb().auth.onAuthStateChange(async (event, session) => {
-        if (CONFIG?.debug) console.warn('[Auth] onAuthStateChange:', event, !!session);
+        console.warn('[Auth] onAuthStateChange event:', event, 'session:', !!session, 'authBooted:', authBooted);
         sbSession = session;
         cleanHash();
 
         if (event === 'SIGNED_OUT') {
+            console.warn('[Auth] SIGNED_OUT event');
             sbSession = null;
             if (authBooted) {
                 // Reset URL to root so refresh doesn't land on a protected route
@@ -159,15 +167,21 @@ async function initAuth() {
         }
 
         if (session && !authBooted) {
+            console.warn('[Auth] Session exists, booting app');
             authBooted = true;
             clearTimeout(safetyTimer);
             await safePullAndBoot();
         } else if (event === 'INITIAL_SESSION' && !session && !authBooted && !isOAuthCallback) {
+            console.warn('[Auth] INITIAL_SESSION with no session, showing auth screen');
             authBooted = true;
             clearTimeout(safetyTimer);
             renderAuthScreen();
+        } else {
+            console.warn('[Auth] Unhandled auth state:', event, 'authBooted:', authBooted);
         }
     });
+
+    console.warn('[Auth] Auth listener registered, waiting for INITIAL_SESSION event...');
 
     // getSession() triggers SDK's detectSessionInUrl to process hash tokens
     try {

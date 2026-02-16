@@ -59,7 +59,7 @@ function renderClients() {
         lucide.createIcons(); return;
     }
     const cur = defaultCurrency();
-    let totalValue = 0, wonProps = 0, decidedProps = 0, bizCount = 0, indCount = 0;
+    let _totalValue = 0, _wonProps = 0, _decidedProps = 0, bizCount = 0, indCount = 0;
     const clientData = CLIENTS.map((c, i) => {
         const isBiz = (c.customerType || 'business') === 'business';
         if (isBiz) bizCount++; else indCount++;
@@ -67,10 +67,10 @@ function renderClients() {
         let val = 0;
         props.forEach(p => {
             val += proposalValue(p);
-            if (p.status === 'accepted') wonProps++;
-            if (p.status === 'accepted' || p.status === 'declined') decidedProps++;
+            if (p.status === 'accepted') _wonProps++;
+            if (p.status === 'accepted' || p.status === 'declined') _decidedProps++;
         });
-        totalValue += val;
+        _totalValue += val;
         const last = props.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))[0];
         const displayName = c.displayName || c.companyName || ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || c.name || 'Unnamed';
         const ini = displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();

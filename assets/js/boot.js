@@ -4,7 +4,7 @@
 /* exported submitNpsScore, closeNpsPrompt */
 
 // Global error boundary
-/* exported APP_BUILD, clearAppCache, showUpdateModal, getCacheMetrics */
+/* exported APP_BUILD, clearAppCache, showUpdateModal, getCacheMetrics, applyUpdate, dismissUpdateModal */
 window.onerror = function(msg, src, line, col, err) {
     const info = `${msg} at ${src}:${line}:${col}`;
     console.error('[ProposalKit Error]', info, err);
@@ -41,13 +41,14 @@ function getCacheMetrics() {
         channel.port1.onmessage = (e) => {
             const m = e.data;
             if (CONFIG?.debug) {
-                console.table({
+                const metrics = {
                     'Cache Hits': m.cacheHits,
                     'Cache Misses': m.cacheMisses,
                     'Network Success': m.networkSuccess,
                     'Network Failures': m.networkFail,
                     'Cache Hit Ratio': ((m.cacheHits / (m.cacheHits + m.cacheMisses)) * 100).toFixed(1) + '%'
-                });
+                };
+                console.warn('[Metrics]', metrics);
             }
             resolve(e.data);
         };
@@ -199,28 +200,28 @@ function applyUpdate() {
 
 async function initApp() {
     try {
-        console.log('[Boot] initApp started');
-        console.log('[Boot] CONFIG:', CONFIG);
-        console.log('[Boot] initAuth available:', typeof initAuth === 'function');
-        console.log('[Boot] renderOnboarding available:', typeof renderOnboarding === 'function');
+        console.warn('[Boot] initApp started');
+        console.warn('[Boot] CONFIG:', CONFIG);
+        console.warn('[Boot] initAuth available:', typeof initAuth === 'function');
+        console.warn('[Boot] renderOnboarding available:', typeof renderOnboarding === 'function');
 
         if (typeof initAuth === 'function') {
-            console.log('[Boot] Calling initAuth...');
+            console.warn('[Boot] Calling initAuth...');
             await initAuth();
         } else {
-            console.log('[Boot] No initAuth, checking CONFIG...');
+            console.warn('[Boot] No initAuth, checking CONFIG...');
             // Offline fallback (Supabase CDN not loaded)
             if (CONFIG) {
-                console.log('[Boot] CONFIG exists, starting app...');
+                console.warn('[Boot] CONFIG exists, starting app...');
                 document.getElementById('onboard')?.classList.add('hide');
                 const shell = document.getElementById('appShell');
                 if (shell) {
                     shell.style.display = 'flex';
-                    console.log('[Boot] App shell shown');
+                    console.warn('[Boot] App shell shown');
                 }
                 await bootApp();
             } else {
-                console.log('[Boot] No CONFIG, showing onboarding...');
+                console.warn('[Boot] No CONFIG, showing onboarding...');
                 if (typeof renderOnboarding === 'function') {
                     renderOnboarding();
                 } else {
@@ -255,28 +256,28 @@ function showRecoveryScreen(title, message) {
 
 // Global hard reset function
 window.hardReset = function() {
-    console.log('[Recovery] Hard reset initiated');
+    console.warn('[Recovery] Hard reset initiated');
     try {
         localStorage.clear();
         sessionStorage.clear();
-        console.log('[Recovery] Storage cleared');
+        console.warn('[Recovery] Storage cleared');
 
         // Clear service worker and cache
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for (let registration of registrations) {
+                for (const registration of registrations) {
                     registration.unregister();
                 }
-                console.log('[Recovery] Service workers unregistered');
+                console.warn('[Recovery] Service workers unregistered');
             });
         }
 
         if ('caches' in window) {
             caches.keys().then(function(names) {
-                for (let name of names) {
+                for (const name of names) {
                     caches.delete(name);
                 }
-                console.log('[Recovery] Caches cleared');
+                console.warn('[Recovery] Caches cleared');
             });
         }
 
@@ -469,7 +470,7 @@ function closeNpsPrompt() {
 }
 
 // Auto-recovery timeout: if app doesn't load within 10 seconds, show recovery
-let _initTimeout = setTimeout(() => {
+const _initTimeout = setTimeout(() => {
     console.error('[Boot] App initialization timeout - showing recovery');
     showRecoveryScreen(
         'App Loading Timeout',
@@ -486,7 +487,7 @@ window.addEventListener('load', () => {
 document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
         e.preventDefault();
-        console.log('[Recovery] Emergency reset triggered by keyboard shortcut');
+        console.warn('[Recovery] Emergency reset triggered by keyboard shortcut');
         if (confirm('⚠️ This will clear all data and reset the app.\n\nContinue?')) {
             window.hardReset();
         }

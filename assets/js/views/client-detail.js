@@ -10,7 +10,7 @@ function showClientInsightFull(idx) {
     const props = activeDB().filter(p => matchClient(p, c));
     const accepted = props.filter(p => p.status === 'accepted');
     const declined = props.filter(p => p.status === 'declined');
-    const pending = props.filter(p => p.status === 'sent');
+    const _pending = props.filter(p => p.status === 'sent');
     const totalVal = props.reduce((s, p) => s + (p.lineItems || []).reduce((a, it) => a + (it.qty || 0) * (it.rate || 0), 0), 0);
     const ini = clientName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     const cur = props[0]?.currency || defaultCurrency();
