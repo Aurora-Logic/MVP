@@ -31,13 +31,15 @@ function getCacheMetrics() {
         const channel = new MessageChannel();
         channel.port1.onmessage = (e) => {
             const m = e.data;
-            console.table({
-                'Cache Hits': m.cacheHits,
-                'Cache Misses': m.cacheMisses,
-                'Network Success': m.networkSuccess,
-                'Network Failures': m.networkFail,
-                'Cache Hit Ratio': ((m.cacheHits / (m.cacheHits + m.cacheMisses)) * 100).toFixed(1) + '%'
-            });
+            if (CONFIG?.debug) {
+                console.table({
+                    'Cache Hits': m.cacheHits,
+                    'Cache Misses': m.cacheMisses,
+                    'Network Success': m.networkSuccess,
+                    'Network Failures': m.networkFail,
+                    'Cache Hit Ratio': ((m.cacheHits / (m.cacheHits + m.cacheMisses)) * 100).toFixed(1) + '%'
+                });
+            }
             resolve(e.data);
         };
         navigator.serviceWorker.controller.postMessage(

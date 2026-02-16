@@ -255,7 +255,7 @@ async function createRazorpaySubscription(plan, interval) {
                 description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} plan - ${interval}`,
                 customer_id: data.customer_id,
                 handler: function (response) {
-                    console.log('[Razorpay] Payment successful:', response);
+                    if (CONFIG?.debug) console.log('[Razorpay] Payment successful:', response);
                     toast('Subscription activated!', 'success');
                     setTimeout(() => window.location.reload(), 1500);
                     resolve(response);
@@ -284,7 +284,7 @@ async function createRazorpaySubscription(plan, interval) {
             rzp.open();
         });
     } catch (e) {
-        console.error('[Razorpay] Subscription creation failed:', e);
+        if (CONFIG?.debug) console.error('[Razorpay] Subscription creation failed:', e);
         toast('Failed to start checkout', 'error');
         return null;
     }
@@ -313,7 +313,7 @@ async function cancelRazorpaySubscription() {
         toast('Subscription will be cancelled at period end', 'success');
         return data;
     } catch (e) {
-        console.error('[Razorpay] Cancellation failed:', e);
+        if (CONFIG?.debug) console.error('[Razorpay] Cancellation failed:', e);
         toast('Failed to cancel subscription', 'error');
         return null;
     }
@@ -366,7 +366,7 @@ async function submitTicket(ticketData) {
         toast('Ticket submitted successfully', 'success');
         return data;
     } catch (e) {
-        console.error('[Tickets] Submit failed:', e);
+        if (CONFIG?.debug) console.error('[Tickets] Submit failed:', e);
         // Queue locally as fallback
         return queueTicketLocally(ticketData);
     }
@@ -387,7 +387,7 @@ async function getUserTickets() {
         if (error) throw error;
         return data || [];
     } catch (e) {
-        console.error('[Tickets] Fetch failed:', e);
+        if (CONFIG?.debug) console.error('[Tickets] Fetch failed:', e);
         return [];
     }
 }
@@ -423,7 +423,7 @@ async function addTicketMessage(ticketId, message) {
         toast('Message sent', 'success');
         return true;
     } catch (e) {
-        console.error('[Tickets] Add message failed:', e);
+        if (CONFIG?.debug) console.error('[Tickets] Add message failed:', e);
         toast('Failed to send message', 'error');
         return false;
     }
@@ -480,7 +480,7 @@ async function fetchUserById(userId) {
         if (error) throw error;
         return data;
     } catch (e) {
-        console.error('[Admin] Fetch user failed:', e);
+        if (CONFIG?.debug) console.error('[Admin] Fetch user failed:', e);
         return null;
     }
 }
@@ -548,7 +548,7 @@ async function grantFreeSubscription(userId, plan, durationDays, reason) {
         toast('Free subscription granted', 'success');
         return { data, error: null };
     } catch (e) {
-        console.error('[Admin] Grant subscription failed:', e);
+        if (CONFIG?.debug) console.error('[Admin] Grant subscription failed:', e);
         toast('Failed to grant subscription', 'error');
         return { data: null, error: e.message };
     }
@@ -660,7 +660,7 @@ async function addAdminReply(ticketId, message) {
         toast('Reply sent', 'success');
         return { error: null };
     } catch (e) {
-        console.error('[Admin] Add reply failed:', e);
+        if (CONFIG?.debug) console.error('[Admin] Add reply failed:', e);
         toast('Failed to send reply', 'error');
         return { error: e.message };
     }
@@ -683,7 +683,7 @@ async function bulkAssignTickets(ticketIds, assignedTo) {
         toast(`${ticketIds.length} tickets assigned`, 'success');
         return { data, error: null };
     } catch (e) {
-        console.error('[Admin] Bulk assign failed:', e);
+        if (CONFIG?.debug) console.error('[Admin] Bulk assign failed:', e);
         toast('Failed to assign tickets', 'error');
         return { error: e.message };
     }
@@ -755,7 +755,7 @@ async function fetchAnalytics() {
             avgResolutionTimeHours: avgResolutionTime.toFixed(1)
         };
     } catch (e) {
-        console.error('[Analytics] Computation failed:', e);
+        if (CONFIG?.debug) console.error('[Analytics] Computation failed:', e);
         return null;
     }
 }
@@ -781,7 +781,7 @@ async function createAnnouncement(announcement) {
         toast('Announcement created', 'success');
         return { data, error: null };
     } catch (e) {
-        console.error('[Admin] Create announcement failed:', e);
+        if (CONFIG?.debug) console.error('[Admin] Create announcement failed:', e);
         toast('Failed to create announcement', 'error');
         return { error: e.message };
     }
@@ -802,7 +802,7 @@ async function getActiveAnnouncements() {
         if (error) throw error;
         return data || [];
     } catch (e) {
-        console.error('[Announcements] Fetch failed:', e);
+        if (CONFIG?.debug) console.error('[Announcements] Fetch failed:', e);
         return [];
     }
 }
@@ -820,7 +820,7 @@ async function logAdminAction(action, resourceType, resourceId, details) {
             changes: details
         });
     } catch (e) {
-        console.error('[Audit] Log failed:', e);
+        if (CONFIG?.debug) console.error('[Audit] Log failed:', e);
     }
 }
 
@@ -836,7 +836,7 @@ async function queueEmail(toEmail, template, templateData) {
             template_data: templateData
         });
     } catch (e) {
-        console.error('[Email] Queue failed:', e);
+        if (CONFIG?.debug) console.error('[Email] Queue failed:', e);
     }
 }
 
