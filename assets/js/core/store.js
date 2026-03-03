@@ -316,9 +316,6 @@ window.addEventListener('storage', (e) => {
     if (e.key === 'pk_clients' && e.newValue) {
         try { CLIENTS = JSON.parse(e.newValue); } catch (err) { /* ignore */ }
     }
-    if (e.key === 'pk_subscription' && e.newValue) {
-        // Plan changed — getCurrentPlan() will pick it up on next call
-    }
     if (e.key === 'pk_announcements') {
         if (typeof checkAnnouncements === 'function') checkAnnouncements();
     }

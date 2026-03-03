@@ -33,15 +33,6 @@ function getPdfStyles() {
 }
 
 function savePdfStyles(styles) {
-    // PLAN GATING: PDF customizer is Pro/Team only
-    if (typeof getCurrentPlan === 'function') {
-        const plan = getCurrentPlan();
-        if (plan === 'free') {
-            toast('PDF customization requires Pro or Team plan', 'error');
-            return;
-        }
-    }
-
     if (!CONFIG) return;
     CONFIG.pdfStyles = styles;
     saveConfig();
@@ -49,15 +40,6 @@ function savePdfStyles(styles) {
 }
 
 function resetPdfStyles() {
-    // PLAN GATING: PDF customizer is Pro/Team only
-    if (typeof getCurrentPlan === 'function') {
-        const plan = getCurrentPlan();
-        if (plan === 'free') {
-            toast('PDF customization requires Pro or Team plan', 'error');
-            return;
-        }
-    }
-
     if (!CONFIG) return;
     CONFIG.pdfStyles = structuredClone(DEFAULT_PDF_STYLES);
     saveConfig();
@@ -159,26 +141,6 @@ function previewPdfCustomization() {
 }
 
 function renderPdfCustomizer() {
-    // Check plan access
-    const hasPdfCustomization = typeof checkLimit === 'function' ? checkLimit('pdfCustomization').allowed : false;
-
-    if (!hasPdfCustomization) {
-        return `<div class="card card-p" style="margin-bottom:14px">
-            <div class="card-head">
-                <div><div class="card-t">PDF Template Editor</div>
-                <div class="card-d">Customize PDF colors, fonts, and styling</div></div>
-                <span class="badge badge-draft" style="font-size:11px">Pro Feature</span>
-            </div>
-            <div style="padding:20px;text-align:center;color:var(--muted-foreground);background:var(--muted);border-radius:8px">
-                <i data-lucide="lock" style="width:32px;height:32px;margin-bottom:8px;opacity:0.5"></i>
-                <p style="margin:0 0 12px;font-size:13px;font-weight:500">PDF customization is a Pro feature</p>
-                <button class="btn-sm" onclick="if(typeof showUpgradeModal==='function')showUpgradeModal('pdfCustomization',{allowed:false,plan:'free'})">
-                    <i data-lucide="sparkles"></i> Upgrade to Pro
-                </button>
-            </div>
-        </div>`;
-    }
-
     const styles = getPdfStyles();
 
     return `<div class="card card-p" id="pdfCustomizerCard" style="margin-bottom:14px">
@@ -371,15 +333,6 @@ function togglePdfCustomizeDrawer() {
         drawer.classList.remove('show');
         if (btn) btn.classList.remove('on');
     } else {
-        // Check plan access
-        const hasPdfCustomization = typeof checkLimit === 'function' ? checkLimit('pdfCustomization').allowed : false;
-        if (!hasPdfCustomization) {
-            if (typeof showUpgradeModal === 'function') {
-                showUpgradeModal('pdfCustomization', checkLimit('pdfCustomization'));
-            }
-            return;
-        }
-
         // Populate drawer content
         renderPdfCustomizeDrawer();
         drawer.classList.add('show');

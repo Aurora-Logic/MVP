@@ -268,7 +268,6 @@ function saveClient(idx) {
     };
     if (idx >= 0) { c.id = CLIENTS[idx].id; CLIENTS[idx] = c; }
     else {
-        if (typeof enforceLimit === 'function' && !enforceLimit('clients')) return;
         c.id = uid(); CLIENTS.push(c);
     }
     saveClients(); document.getElementById('clientModal')?.remove();

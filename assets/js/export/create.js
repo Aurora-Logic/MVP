@@ -27,7 +27,6 @@ function _baseProp(id, title, sections, lineItems, paymentTerms, client) {
 }
 
 function createProp(tpl) {
-    if (typeof enforceLimit === 'function' && !enforceLimit('proposals')) return;
     const p = _baseProp(uid(), tpl.title, tpl.sections, tpl.lineItems, tpl.paymentTerms);
     DB.unshift(p); persist(); loadEditor(p.id); toast('Proposal created');
 }
@@ -95,7 +94,6 @@ function delProp(id) {
 }
 
 function createPropFromPage(state) {
-    if (typeof enforceLimit === 'function' && !enforceLimit('proposals')) return;
     const tpl = state.template?.startsWith('saved_')
         ? safeGetStorage('pk_templates', [])[parseInt(state.template.replace('saved_', ''))] || TPLS.blank
         : TPLS[state.template] || TPLS.blank;
@@ -136,11 +134,6 @@ function saveAsTemplate() {
 function doSaveAsTemplate() {
     const name = document.getElementById('saveTplName')?.value.trim();
     if (!name) { toast('Enter a template name', 'warning'); return; }
-    // Check template limit before saving
-    if (typeof enforceLimit === 'function' && !enforceLimit('templates')) {
-        document.getElementById('saveTplModal')?.remove();
-        return;
-    }
     const p = cur(); if (!p) return;
     const tpl = {
         title: name, category: 'saved', icon: 'bookmark',

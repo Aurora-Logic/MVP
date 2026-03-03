@@ -5465,6 +5465,21 @@
   margin-top: 8px;
 }
 
+.auth-skip {
+  text-align: center;
+  margin-top: 16px;
+}
+.auth-skip-btn {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted-foreground) !important;
+}
+.auth-skip-btn:hover {
+  color: var(--foreground) !important;
+}
+
 .auth-terms {
   text-align: center;
   font-size: 14px;
@@ -5996,192 +6011,6 @@
 /* ════════════════════════════════════════════════════════════════════════
    PRICING PAGE
    ════════════════════════════════════════════════════════════════════════ */
-
-.pricing-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 48px 24px;
-}
-
-.pricing-header {
-  text-align: center;
-  margin-bottom: 64px;
-}
-
-.pricing-header h1 {
-  font-size: 48px;
-  font-weight: 800;
-  margin-bottom: 12px;
-  color: var(--foreground);
-}
-
-.pricing-header > p {
-  font-size: 20px;
-  color: var(--text3);
-}
-
-.billing-toggle {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 32px;
-}
-
-.billing-toggle-btn {
-  padding: 10px 20px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text3);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.billing-toggle-btn:hover {
-  background: var(--muted);
-}
-
-.billing-toggle-btn.active {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border-color: var(--primary);
-}
-
-.discount-badge {
-  background: var(--status-won);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-left: 4px;
-}
-
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-  margin-bottom: 64px;
-}
-
-.pricing-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-  position: relative;
-  transition: all 0.2s;
-}
-
-.pricing-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--sh3);
-}
-
-.pricing-card-popular {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 1px var(--primary);
-}
-
-.popular-badge {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--primary);
-  color: var(--primary-foreground);
-  padding: 4px 12px;
-  border-radius: var(--r-pill);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.pricing-card-header {
-  margin-bottom: 24px;
-}
-
-.pricing-card-header h3 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 16px;
-}
-
-.pricing-price {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-}
-
-.price-amount {
-  font-size: 48px;
-  font-weight: 800;
-  color: var(--foreground);
-}
-
-.price-period {
-  font-size: 14px;
-  color: var(--text3);
-}
-
-.pricing-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 32px;
-}
-
-.pricing-features li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  font-size: 14px;
-  color: var(--text2);
-}
-
-.pricing-features li i {
-  width: 20px;
-  height: 20px;
-  color: var(--status-won);
-}
-
-.pricing-faq {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.pricing-faq h3 {
-  text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 32px;
-}
-
-.faq-item {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-
-.faq-item summary {
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--foreground);
-  list-style: none;
-}
-
-.faq-item summary::-webkit-details-marker {
-  display: none;
-}
-
-.faq-item p {
-  margin-top: 12px;
-  color: var(--text3);
-  line-height: 1.6;
-}
 
 /* ════════════════════════════════════════════════════════════════════════
    HELP & SUPPORT

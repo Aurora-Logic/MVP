@@ -14,7 +14,6 @@ const ROUTES = [
     { path: '/clients',      view: 'clients' },
     { path: '/profile',      view: 'profile' },
     { path: '/settings',     view: 'settings' },
-    { path: '/pricing',      view: 'pricing' },
     { path: '/my-tickets',   view: 'my-tickets' },
     { path: '/admin',        view: 'admin' }
 ];
@@ -90,7 +89,7 @@ async function handleRoute() {
     const { route, params } = result;
     const view = route.view;
     const an = typeof appName === 'function' ? appName() : 'ProposalKit';
-    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', create: 'New Proposal', clients: 'Customers', settings: 'Settings', profile: 'My Profile', pricing: 'Pricing', 'my-tickets': 'My Tickets', admin: 'Admin Panel' };
+    const titles = { dashboard: 'Dashboard', proposals: 'Proposals', create: 'New Proposal', clients: 'Customers', settings: 'Settings', profile: 'My Profile', 'my-tickets': 'My Tickets', admin: 'Admin Panel' };
 
     // AUTH GUARD: Protected routes require authentication
     const protectedRoutes = ['dashboard', 'proposals', 'editor', 'create', 'clients', 'profile', 'settings', 'my-tickets', 'admin'];
@@ -177,8 +176,6 @@ async function handleRoute() {
             else if (CONFIG?.debug) console.error('[ROUTER] renderCreatePage function not found!');
         } else if (view === 'settings') {
             if (typeof openSettings === 'function') openSettings();
-        } else if (view === 'pricing') {
-            if (typeof renderPricing === 'function') renderPricing();
         } else if (view === 'my-tickets') {
             if (typeof renderMyTickets === 'function') renderMyTickets();
         } else if (view === 'admin') {

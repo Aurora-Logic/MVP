@@ -241,11 +241,6 @@ export default [
                 setSyncStatus: 'readonly',
                 isAdmin: 'readonly',
                 getAdminRole: 'readonly',
-                getUserSubscription: 'readonly',
-                canCreateProposal: 'readonly',
-                incrementProposalCount: 'readonly',
-                createRazorpaySubscription: 'readonly',
-                cancelRazorpaySubscription: 'readonly',
                 submitTicket: 'readonly',
                 getUserTickets: 'readonly',
                 addTicketMessage: 'readonly',
@@ -384,13 +379,6 @@ export default [
 
                 // ── views/profile.js ──
                 renderProfile: 'readonly',
-
-                // ── views/pricing.js ──
-                renderPricing: 'readonly',
-                buildPricingCards: 'readonly',
-                updatePricingCards: 'readonly',
-                startCheckout: 'readonly',
-                startFree: 'readonly',
 
                 // ── views/help.js ──
                 initHelpButton: 'readonly',

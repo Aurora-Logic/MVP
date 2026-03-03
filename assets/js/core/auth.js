@@ -97,7 +97,7 @@ async function initAuth() {
             // Update message before hiding
             const msg = document.getElementById('loadMessage');
             if (msg) msg.textContent = 'Ready!';
-            // Hide loader
+            // Hide loader with fade effect
             const loader = document.getElementById('bootLoader');
             if (loader) {
                 loader.style.opacity = '0';
@@ -113,6 +113,12 @@ async function initAuth() {
     const hasOAuthError = hash && (hash.includes('error=') || hash.includes('error_description='));
 
     if (hasOAuthError) {
+        // Hide loader and show error
+        const loader = document.getElementById('bootLoader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 300);
+        }
         showAuthSplit();
         const el = authTarget();
         if (el) {
@@ -123,6 +129,12 @@ async function initAuth() {
     }
 
     if (isOAuthCallback) {
+        // Hide loader while OAuth processes
+        const loader = document.getElementById('bootLoader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 300);
+        }
         showAuthSplit();
         const el = authTarget();
         if (el) {
@@ -419,6 +431,7 @@ function getLoginHtml() {
                 <a href="#" onclick="authMode='reset';renderAuthScreen();return false">Forgot password?</a>
             </div>
             <div class="auth-terms">By clicking continue, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+            <div class="auth-skip"><button class="btn-ghost auth-skip-btn" onclick="skipAuth()"><i data-lucide="arrow-right" style="width:14px;height:14px"></i> Continue without an account</button></div>
         </div>`;
 }
 
@@ -450,6 +463,7 @@ function getSignupHtml() {
                 </button>
             </div>
             <div class="auth-terms">By clicking continue, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+            <div class="auth-skip"><button class="btn-ghost auth-skip-btn" onclick="skipAuth()"><i data-lucide="arrow-right" style="width:14px;height:14px"></i> Continue without an account</button></div>
         </div>`;
 }
 
@@ -697,7 +711,7 @@ async function doLogout() {
     const keysToRemove = [
         'pk_db', 'pk_config', 'pk_clients', 'pk_email_tpl',
         'pk_seclib', 'pk_tclib', 'pk_templates', 'pk_dismissed',
-        'pk_subscription', 'pk_analytics', 'pk_feedback',
+        'pk_analytics', 'pk_feedback',
         'pk_client_responses', 'pk_csrf'
     ];
     keysToRemove.forEach(key => {

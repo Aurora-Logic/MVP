@@ -204,6 +204,15 @@ function updateLoadMessage(msg) {
     if (el) el.textContent = msg;
 }
 
+// Hide the boot loader with fade effect
+function hideBootLoader() {
+    const loader = document.getElementById('bootLoader');
+    if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => loader.remove(), 300);
+    }
+}
+
 async function initApp() {
     try {
         updateLoadMessage('Starting up...');
@@ -220,17 +229,15 @@ async function initApp() {
             console.warn('[Boot] initAuth completed');
             updateLoadMessage('Ready!');
             setTimeout(() => {
-                const loader = document.getElementById('bootLoader');
-                if (loader) {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.remove(), 300);
-                }
+                hideBootLoader();
             }, 200);
         } else {
             console.warn('[Boot] No initAuth, checking CONFIG...');
             // Offline fallback (Supabase CDN not loaded)
             if (CONFIG) {
                 console.warn('[Boot] CONFIG exists, starting app...');
+                updateLoadMessage('Ready!');
+                setTimeout(() => hideBootLoader(), 200);
                 document.getElementById('onboard')?.classList.add('hide');
                 const shell = document.getElementById('appShell');
                 if (shell) {
@@ -240,6 +247,8 @@ async function initApp() {
                 await bootApp();
             } else {
                 console.warn('[Boot] No CONFIG, showing onboarding...');
+                updateLoadMessage('Ready!');
+                setTimeout(() => hideBootLoader(), 200);
                 if (typeof renderOnboarding === 'function') {
                     renderOnboarding();
                 } else {
@@ -318,27 +327,10 @@ async function bootApp() {
 
     if (CONFIG?.debug) console.warn('[Boot] Starting app initialization...');
     try {
-        // SECURITY FIX: Enforce plan limits and monitor storage
-        if (typeof enforceFreePlanLimits === 'function') enforceFreePlanLimits();
         if (typeof checkStorageQuota === 'function') checkStorageQuota();
 
         // ERROR TRACKING: Initialize production error monitoring
         if (typeof initErrorTracking === 'function') initErrorTracking();
-
-        // PLAN GATING: Check offline access for free users
-        if (typeof getCurrentPlan === 'function' && typeof PLAN_LIMITS !== 'undefined') {
-            const plan = getCurrentPlan();
-            const hasOffline = PLAN_LIMITS[plan]?.offlineAccess || false;
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'CHECK_PLAN',
-                    hasOffline: hasOffline
-                });
-                if (!hasOffline) {
-                    if (CONFIG?.debug) console.warn('[Boot] Free plan: SW will be unregistered for offline gating');
-                }
-            }
-        }
 
         initSidebarState();
         if (typeof initTeam === 'function') initTeam();

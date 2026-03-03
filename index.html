@@ -48,8 +48,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.0.0"></script>
     <!-- Supabase JS Client (vendored locally) -->
     <script src="assets/js/vendor/supabase-2.49.1.js?v=18"></script>
-    <!-- Razorpay Checkout -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <!-- Light mode only — no theme detection needed -->
     <!-- App CSS (modular) -->
     <link rel="stylesheet" href="assets/css/variables.css?v=18">
@@ -371,7 +369,6 @@
     <!-- Phase 7: Admin & Subscription Features -->
     <script src="assets/js/core/tickets-queue.js?v=19"></script>
     <script src="assets/js/core/admin-sync.js?v=19"></script>
-    <script src="assets/js/views/pricing.js?v=19"></script>
     <script src="assets/js/views/help.js?v=19"></script>
     <script src="assets/js/views/my-tickets.js?v=19"></script>
     <script src="assets/js/views/admin.js?v=19"></script>
@@ -381,120 +378,33 @@
     <!-- Boot: App initialization (always last) -->
     <script src="assets/js/boot.js?v=19"></script>
     <script>
-        // Service Worker registration (paid plans only)
+        // Service Worker registration (open source — all users get offline)
         (function() {
             if (!('serviceWorker' in navigator)) return;
 
-            // Service worker update notification flag
-            var updateAvailable = false;
+            navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                if (!reg) return;
 
-            function checkAndManageServiceWorker() {
-                // Read subscription from localStorage directly (before app loads)
-                var sub = null;
-                try {
-                    var stored = localStorage.getItem('pk_subscription');
-                    sub = stored ? JSON.parse(stored) : null;
-                } catch (e) { sub = null; }
+                setInterval(function() {
+                    if (!document.hidden) reg.update();
+                }, 60000);
 
-                var plan = 'free';
-                if (sub && sub.plan && sub.status !== 'cancelled') {
-                    var validPlans = ['free', 'pro', 'team'];
-                    plan = validPlans.includes(sub.plan) ? sub.plan : 'free';
-                }
-
-                var hasOffline = plan === 'pro' || plan === 'team';
-
-                if (hasOffline) {
-                    // Register service worker for paid users
-                    navigator.serviceWorker.register('/sw.js').then(function(reg) {
-                        if (!reg) return;
-
-                        // Check for updates every 60 seconds when page is visible
-                        setInterval(function() {
-                            if (!document.hidden) reg.update();
-                        }, 60000);
-
-                        // Detect when new SW is installing
-                        reg.addEventListener('updatefound', function() {
-                            var newWorker = reg.installing;
-                            if (!newWorker) return;
-
-                            newWorker.addEventListener('statechange', function() {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // New SW installed, tell it to skip waiting
-                                    updateAvailable = true;
-                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                }
-                            });
-                        });
-                    }).catch(function(err) {
-                        console.error('[SW] Registration failed:', err);
-                    });
-
-                    // Listen for update ready message from SW
-                    navigator.serviceWorker.addEventListener('message', function(e) {
-                        if (e.data && e.data.type === 'SW_UPDATED') {
-                            console.log('[SW] Update ready, version:', e.data.version);
-                            // Show update modal (implemented in boot.js)
-                            if (typeof showUpdateModal === 'function') {
-                                showUpdateModal();
-                            }
+                reg.addEventListener('updatefound', function() {
+                    var newWorker = reg.installing;
+                    if (!newWorker) return;
+                    newWorker.addEventListener('statechange', function() {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            newWorker.postMessage({ type: 'SKIP_WAITING' });
                         }
                     });
-                } else {
-                    // Immediately unregister SW for free users and clear all caches
-                    navigator.serviceWorker.getRegistration().then(function(reg) {
-                        if (reg) {
-                            reg.unregister().then(function() {
-                                // Clear all caches after unregistering
-                                if ('caches' in window) {
-                                    caches.keys().then(function(names) {
-                                        names.forEach(function(name) {
-                                            console.log('[SW] Clearing cache:', name);
-                                            caches.delete(name);
-                                        });
-                                    });
-                                }
-                            });
-                        }
-                    }).catch(function() {});
-                }
-            }
-
-            // Check immediately on page load
-            checkAndManageServiceWorker();
-
-            // Notify active service worker about plan status
-            if (navigator.serviceWorker.controller) {
-                var sub = null;
-                try {
-                    var stored = localStorage.getItem('pk_subscription');
-                    sub = stored ? JSON.parse(stored) : null;
-                } catch (err) { sub = null; }
-                var plan = (sub && sub.plan && sub.status !== 'cancelled') ? sub.plan : 'free';
-                var hasOffline = plan === 'pro' || plan === 'team';
-
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'CHECK_PLAN',
-                    hasOffline: hasOffline
                 });
-            }
+            }).catch(function(err) {
+                console.error('[SW] Registration failed:', err);
+            });
 
-            // Prevent PWA installation prompt for free users
-            window.addEventListener('beforeinstallprompt', function(e) {
-                var sub = null;
-                try {
-                    var stored = localStorage.getItem('pk_subscription');
-                    sub = stored ? JSON.parse(stored) : null;
-                } catch (err) { sub = null; }
-                var plan = (sub && sub.plan && sub.status !== 'cancelled') ? sub.plan : 'free';
-                var hasOffline = plan === 'pro' || plan === 'team';
-
-                if (!hasOffline) {
-                    e.preventDefault(); // Block install prompt for free users
-                    if (typeof showUpgradeModal === 'function') {
-                        showUpgradeModal('offline', {allowed: false, plan: 'free'});
-                    }
+            navigator.serviceWorker.addEventListener('message', function(e) {
+                if (e.data && e.data.type === 'SW_UPDATED') {
+                    if (typeof showUpdateModal === 'function') showUpdateModal();
                 }
             });
         })();
@@ -502,17 +412,11 @@
         (function() {
             function showOfflineBanner() {
                 if (document.getElementById('offlineBanner')) return;
-                var plan = typeof getCurrentPlan === 'function' ? getCurrentPlan() : 'free';
-                var hasOffline = plan === 'pro' || plan === 'team';
                 var b = document.createElement('div');
                 b.id = 'offlineBanner';
                 b.setAttribute('role', 'alert');
-                b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:' + (hasOffline ? '#18181b' : '#FF3B30') + ';color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px';
-                if (hasOffline) {
-                    b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.17-2.65"/><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><line x1="2" y1="2" x2="22" y2="22"/></svg> You\'re offline — changes are saved locally and will sync when you reconnect';
-                } else {
-                    b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 0v8l4 4"/></svg> You\'re offline — <strong>Offline access is a Pro feature.</strong> <button onclick="if(typeof showUpgradeModal===\'function\')showUpgradeModal(\'offline\',{allowed:false,plan:\'free\'});else window.open(\'https://proposalkit.com/pricing\',\'_blank\')" style="background:none;border:1px solid #fff;color:#fff;padding:4px 12px;border-radius:9999px;margin-left:8px;cursor:pointer;font-size:12px;font-weight:500">Upgrade</button>';
-                }
+                b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#18181b;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px';
+                b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.17-2.65"/><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><line x1="2" y1="2" x2="22" y2="22"/></svg> You\'re offline — changes are saved locally and will sync when you reconnect';
                 document.body.appendChild(b);
             }
             function hideOfflineBanner() {
